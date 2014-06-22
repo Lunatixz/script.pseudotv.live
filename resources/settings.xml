@@ -1,0 +1,195 @@
+<settings>
+<!--General-->
+    <category label="30000">
+        <setting label="300001" type="lsep"/>
+            <setting type="action" label="30002" action="RunScript($CWD/config.py)"/>
+        <setting label="30003" type="lsep"/>
+            <setting id="Auto_Start" type="bool" label="30044" default="false"/>
+            <setting id="notify" type="bool" label="30046" subsetting="true" visible="eq(-1,true)" default="true"/>
+            <setting id="timer_amount" type="enum" values="0|5|10|15|20" label="30045" subsetting="true" visible="eq(-2,true)" default="1"/>
+            <setting id="AutoOff" type="enum" label="30004" values="Disable|30|60|90|120|150|180|210|240" default="0"/>
+            <setting id="ForceChannelReset" type="bool" label="30005" default="false" />
+            <setting id="ChannelResetSetting" type="enum" label="30006" values="Automatic|Daily|Weekly|Monthly|Never|Every Time" default="0"/>
+            <setting id="StartMode" type="enum" label="30007" values="Resume|Real Time|Random" default="1" />
+            <setting id="ThreadMode" type="enum" label="30008" values="On|Minimum Use|Off" default="1" />
+    </category>
+<!--Sharing-->
+    <category label="30100">
+        <setting label="30101" type="lsep"/>
+            <setting id="ChannelSharing" type="bool" label="30009" default="false" />
+            <setting id="HdhomerunMaster" subsetting="true" type="bool" label="30011" default="true" visible="eq(-1,true)" />
+            <setting id="SettingsFolder" subsetting="true" type="folder" source="auto" visible="eq(-2,true)" label="30010" default="" />
+        <setting label="30102" type="lsep"/>
+            <setting id="UPNP1" type="bool" label="30103" default="false" />
+            <setting id="UPNP1_IPP" subsetting="true" type="text"  label="30709" visible="eq(-1,true)" default="IP:9090" />
+            <setting id="UPNP1_UPW" subsetting="true" type="text" label="30902" visible="eq(-2,true)" default="xbmc:xbmc" />
+            <setting id="UPNP2" type="bool" label="30104" default="false" />
+            <setting id="UPNP2_IPP" subsetting="true" type="text"  label="30709" visible="eq(-1,true)" default="IP:9090" />
+            <setting id="UPNP2_UPW" subsetting="true" type="text" label="30902" visible="eq(-2,true)" default="xbmc:xbmc" />
+            <setting id="UPNP3" type="bool" label="30105" default="false" />
+            <setting id="UPNP3_IPP" subsetting="true" type="text"  label="30709" visible="eq(-1,true)" default="IP:9090" />
+            <setting id="UPNP3_UPW" subsetting="true" type="text" label="30902" visible="eq(-2,true)" default="xbmc:xbmc" />
+            <setting id="UPNP_OFFSET" subsetting="true" type="slider" label="30106" visible="eq(-9,true) | eq(-6,true) | eq(-3,true) " default="0" range="0,.10,5" option="float" />
+    </category>
+<!--Visual-->
+    <category label="30200">
+        <setting id="art.enable" label="30201" type="bool" default="true" /> 
+        <setting id="SkinSelector" type="enum"  label="30202" values="Classic PTV|Default|PTVL|NA|Custom" default="2"/>
+        <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>
+        <setting label="30210" type="lsep"/>
+            <setting id="ClockMode" type="enum" label="30211" default="0" values="12 Hour|24 Hour"/>
+            <setting id="EPGcolor_enabled" label="30212" type="enum" values="Disabled|Genre Type|Channel Type|Rating" default="0" />
+            <setting id="EPGcolor_MovieGenre" subsetting="true" type="bool" label="30213" default="false" visible="eq(-1,1)" />
+            <setting id="EPGTextEnable" type="enum" label="30214" values="Logo|Text" default="0"/>
+            <setting id="EPG.xInfo" type="bool" label="30229" default="true" />
+            <setting id="HideClips" type="bool" label="30215" default="true"/>
+            <setting id="ClipLength" type="enum" subsetting="true" label="30216" visible="eq(-1,true)" values="15|30|60|90|120|180|240|300|360|420|460" default="5"/>
+            <setting type="action" label="30217" option="close" action="RunScript($CWD/videowindow.py, -videowindow)"/>
+        <setting label="30220" type="lsep"/>
+            <setting id="COLOR_CHANNUM" type="enum" label="30203" values="Holo|Cyan|Green|Gray|Light Gray|White" default="0"/>
+            <setting id="InfoOnChange" type="bool" label="30221" default="true"/>
+            <setting id="InfoTimer" subsetting="true" visible="eq(-1,true)" type="enum" label="30222" values="3|5|10|15|20|25" default="1"/>
+            <setting id="ShowChannelBug" type="bool" label="30224" default="true"/>
+            <setting id="COLOR_CHANBUG" subsetting="true" visible="eq(-1,true)" type="bool" label="30228" default="false"/>
+            <setting id="EnableComingUp" type="enum" label="30226" values="Disabled|Overlay|Classic" default="1"/>
+            <setting id="ComingUpArtwork" subsetting="true" visible="eq(-1,2)" type="enum" label="30227" values="Poster|Fanart|Landscape|Logo|Clearart" default="1" />
+   </category>
+<!--Tweaks-->
+    <category label="30300">
+    	<setting id="ShowSeEp" type="bool" label="30301" default="false"/>
+        <setting id="EnhancedGuideData" type="bool" label="30405" default="false" />
+        <setting id="ChannelDelay" type="enum" label="30302" default="0" values="None|0.25|0.5|0.75|1.0|1.25|1.5|1.75|2.0"/>
+        <setting id="SUPchannel" type="enum"  label="30303" values="Last Channel|Preferred Channel" default="0"/>
+        <setting id="CurrentChannel" type="text" label="30304" subsetting="true" visible="eq(-1,1)" default="1"/>
+        <setting id="Disable_Watched" type="bool" label="30311" default="false"/>
+    	<setting id="MEDIA_LIMIT" label="30310" type="enum" values="10|25|50|100|250|500|1000|Unlimited" default="0"/>
+        <setting id="reserveChannels" type="bool" label="30372" default="false"/>
+    </category>
+<!--PVR-->
+   <category label="30400">
+        <setting id="os" type="enum" values="Android Arm|Android x86|ATV1 Linux|ATV1 Stock|ATV2|IOS|Linux 32bit|Linux 64bit|Mac 32bit|Mac 64bit|Rasberry Pi|Windows|TLBB" label="30401" default="11" />
+        <setting id="xmltvLOC" type="folder" source="auto" label="30404" default="" />
+        <setting id="PVR_Enabled" label="30801" type="bool" default="false"/>
+        <setting id="PVR_Folder" subsetting="true" label="30802" visible="eq(-1,true)" type="folder" source="auto" default="" />        
+        <setting id="sickbeard.enabled" label="30708" type="bool" default="false" />
+        <setting id="sickbeard.baseurl" subsetting="true" label="30709" visible="eq(-1,true)" type="text" default="http://localhost:8081"/>
+        <setting id="sickbeard.apikey" subsetting="true" label="30710" visible="eq(-2,true)" type="text" default="Enter API KEY"/>
+        <setting id="couchpotato.enabled" label="30711" type="bool" default="false" />
+        <setting id="couchpotato.baseurl" subsetting="true" label="30709" visible="eq(-1,true)" type="text" default="http://localhost:5050"/>
+        <setting id="couchpotato.apikey" subsetting="true" label="30710" visible="eq(-2,true)" type="text" default="Enter API KEY"/>
+        <setting type="action" label="30719" option="close"  visible="System.HasAddon(script.module.simple.downloader)" action="RunScript($CWD/donordownload.py, -SimpleDownloader)"/>
+        </category>
+<!--Autotune-->
+    <category label="30070">
+      	<setting id="Autotune" type="bool" label="30071" default="false"/>
+      	<setting id="Warning1" type="bool" label="30072" subsetting="true" visible="eq(-1,true)" default="false"/>
+        <setting type="lsep" label="30099" visible="eq(-1,true)"/>
+            <setting id="autoFindCustom" type="bool" label="30077" subsetting="true" visible="eq(-2,true)" default="false"/>
+            <setting id="autoFindSuperFav" type="bool" label="30093" subsetting="true" visible="eq(-3,true)" default="false"/>
+        <setting type="lsep" label="30073" visible="eq(-4,true)"/>
+            <setting id="autoFindLivePVR" type="bool" label="30075" subsetting="true" visible="eq(-5,true)" default="false"/>
+            <setting id="autoFindLiveHD" type="bool" label="30097" subsetting="true" visible="eq(-6,true)" default="false"/>
+            <setting id="autoFindLiveHDPath" type="folder" source="auto" label="30098" subsetting="true" visible="eq(-1,true) + eq(-7,true)"default="C:\Users\%username%\HDHomeRun XBMC TV\"/>
+            <setting id="autoFindUSTVNOW" type="bool" label="30074" subsetting="true" visible="eq(-8,true)" default="false"/>
+        <setting type="lsep" label="30076" visible="eq(-9,true)"/>
+            <setting id="autoFindNetworks" type="bool" label="30078" subsetting="true" visible="eq(-10,true)" default="false"/>
+            <setting id="autoFindStudios" type="bool" label="30079" subsetting="true" visible="eq(-11,true)" default="false"/>
+            <setting id="autoFindTVGenres" type="bool" label="30080" subsetting="true" visible="eq(-12,true)" default="false"/>
+            <setting id="autoFindMovieGenres" type="bool" label="30081" subsetting="true" visible="eq(-13,true)" default="false"/>
+            <setting id="autoFindMixGenres" type="bool" label="30082" subsetting="true" visible="eq(-14,true)" default="false"/>
+        <setting type="lsep" label="30083" visible="eq(-15,true)"/>
+            <setting id="autoFindMusicGenres" type="bool" label="30084" subsetting="true" visible="eq(-16,true)" default="false"/>
+            <setting id="autoFindMusicVideosYoutube" type="bool" label="30085" subsetting="true" visible="eq(-17,true)" default="false"/>
+            <setting id="autoFindMusicVideosVevoTV" type="bool" label="30086" subsetting="true" visible="eq(-18,true)" default="false"/>
+            <setting id="autoFindMusicVideosLastFM" type="bool" label="30087" subsetting="true" visible="eq(-19,true)" default="false"/>
+            <setting id="autoFindMusicVideosLastFMuser" subsetting="true" label="30088" visible="eq(-1,true) + eq(-20,true)" type="text" default="Enter Username"/>
+            <setting id="autoFindMusicVideosLocal" type="folder" source="auto" label="30089" subsetting="true" visible="eq(-21,true)" default=""/>  
+        <setting type="lsep" label="30094" visible="eq(-22,true)"/>  
+            <setting id="autoFindYoutube" type="bool" label="30095" subsetting="true" visible="eq(-23,true)" default="false"/>
+            <setting id="autoFindYoutubeUser" type="text" label="30096" visible="eq(-24,true) + eq(-1,true)" default="Enter Username"/>
+        <setting type="lsep" label="30110" visible="eq(-25,true)"/>
+            <setting id="autoFindCommunity_Plugins" type="bool" label="30111" subsetting="true" visible="eq(-26,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-27,true)" default="false"/>
+            <setting id="autoFindCommunity_RSS" type="bool" label="30112" subsetting="true" visible="eq(-28,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-29,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-30,true)" default="false"/>
+        <setting id="AT_Donor" label="39001" type="bool" visible="false" default="false" />    
+        <setting type="lsep" label="30090" visible="eq(-32,true), eq(-1,true)"/>  
+            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-2,true)" visible="eq(-33,true)" default="false"/>
+            <setting id="CinemaPack" label="30959" type="bool" visible="false" default="false"/>
+            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-4,true) + eq(-1,true)" visible="eq(-35,true)" default="false"/>
+        <setting id="Hub" label="30951" type="bool" visible="false" default="false" /> 
+        <setting label="30952" type="lsep" visible="eq(-37,true) + eq(-1,true)"/>  
+            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-38  ,true) + eq(-2,true)" default="false"/>
+      </category>
+<!--Community Network-->
+    <category label="30700"> 
+        <setting label="30701" type="lsep" default="" /> 
+        <setting id="CN_TV" label="30702" type="bool" default="false" />
+        <setting id="CN_Movies" label="30703" type="bool" default="false" />
+        <setting id="CN_Episodes" label="30704" type="bool" default="false" />
+        <setting id="CN_Sports" label="30705" type="bool" default="false" />
+        <setting id="CN_News" label="30707" type="bool" default="false" />
+        <setting id="CN_Kids" label="30706" type="bool" default="false" />
+        <setting id="CN_Other" label="30718" type="bool" default="false" />
+    </category> 
+<!--BCTs-->   
+    <category label="30499">
+    <setting label="30500" type="lsep"/>
+        <setting label="30501" id="bumpers" type="bool" default="false" />
+        <setting label="30502" id="bumpersfolder" type="folder" source="auto" visible="eq(-1,true)" default="" />
+        <setting label="30503" id="numbumpers" type="enum" visible="eq(-2,true)" values="1|2|3|4|5" default="0"/>
+    <setting label="30510" type="lsep"/>
+        <setting label="39002" id="COM_Donor" type="bool" visible="false" default="false" />
+        <setting label="30511" id="commercials" type="enum" values="Disabled|Local|Youtube|Internet" default="0"/>
+        <setting label="30512" id="commercialsfolder" type="folder" source="auto" visible="eq(-1,1)" default=""/>
+        <setting label="30513" id="Advertolog" enable="eq(-3,true)" visible="eq(-2,3)" type="bool" default="false"/>
+        <setting label="30514" id="Advertolog_Region" subsetting="true" type="enum" enable="eq(-4,true)" visible="eq(-1,true) + eq(-3,3)" values="North America|Latin & South America|Western Asia & Northern Africa|Europe, Western Asia & Africa|Europe|Balkans|Asia Pacific|Africa" default="0"/>
+        <setting label="30515" id="Advertolog_Resolution" subsetting="true" type="enum" enable="eq(-5,true)" visible="eq(-2,true) + eq(-4,3)" values="360p|480p|720p" default="0"/>
+        <setting label="30516" id="iSpot" enable="eq(-6,true)" visible="eq(-5,3)" type="enum" values="Disabled|Recent Ads|Superbowl '13 Ads|Superbowl '14 Ads" default="0"/>
+        <setting label="30517" id="commercialschannel" type="text" visible="eq(-6,2)" default="PLlwhS0wsCzbRNwJ4Epac4rHJJ_6m1JaBm,2,50,1"/>
+        <setting label="30519" id="AsSeenOn" visible="!eq(-7,0)" type="bool" default="false" />
+        <setting label="30518" id="numcommercials" type="enum" visible="!eq(-8,0)" values="1|2|3|4|5" default="0"/>
+    <setting label="30520" type="lsep"/>
+        <setting id="TRL_Donor" label="39003" type="bool" visible="false" default="false" />
+        <setting label="30521" id="trailers" type="enum" values="Disabled|Local|XBMC Library|Youtube|Internet" default="0"/>
+        <setting label="30522" id="trailersfolder" type="folder" source="auto" visible="eq(-1,1), eq(-1,1)" default="" />
+        <setting label="30523" id="trailersgenre" type="bool" visible="eq(-2,2)" default="false" />
+        <setting label="30524" id="Movietrailers" type="bool" visible="!eq(-3,0)" default="false" />
+        <setting label="30527" id="trailersHDnetType" type="enum" enable="eq(-5,true)" visible="eq(-4,4)" values="Latest|Most Watched|Coming Soon" default="2"/>
+        <setting label="30525" id="trailersResolution" subsetting="true" type="enum" enable="eq(-6,true)" visible="eq(-5,4)" values="480p|720p|1080p" default="1"/>
+        <setting label="30528" id="trailersTitleLimit" subsetting="true" type="enum" enable="eq(-7,true)" visible="eq(-6,4)" values="15|30|90|180|270|360" default="1"/>
+        <setting label="30517" id="trailerschannel" type="text" visible="eq(-7,3)" default="MovieclipsCOMINGSOON,1,50,1" /> 
+        <setting label="30530" id="numtrailers" type="enum" visible="!eq(-8,0)" values="1|2|3|4|5" default="0"/>
+    </category>
+    <category label="39000">
+        <setting id="Donor_Enabled" label="30901" type="bool" default="false"/>
+        <setting id="Donor_UP" subsetting="true" label="30902" visible="eq(-1,true)" type="text" default="Username:Password" />    
+        <setting type="action" subsetting="true" label="30904" visible="eq(-2,true)" option="close" action="RunScript($CWD/donordownload.py, -DonorDownloader)"/>
+        <setting id="CAT_Donor" type="bool" label="39004"  visible="false" default="false" />
+        <setting type="action" subsetting="true" label="30905" visible="eq(-1,true)" option="close" action="RunScript($CWD/donordownload.py, -LogoDownloader)"/>
+        <setting type="action" subsetting="true" label="30906" visible="eq(-2,true)" option="close" action="RunScript($CWD/donordownload.py, -BumperDownloader)"/>
+        <setting type="action" subsetting="true" label="30907" visible="eq(-3,true)" option="close" action="RunScript($CWD/donordownload.py, -CEDownloader)"/>
+        <setting label="30903" visible="eq(-6,true)" type="lsep" /> 
+    </category>
+    <!--MISC-->
+    <category label="30900">  
+        <setting id="ATRestore" type="bool" label="30909" default="false"/>
+      	<setting id="Warning2" type="action" subsetting="true" label="30069" visible="eq(-1,true)" action="RunScript($CWD/restore.py)"/>
+        <setting label="30990" type="lsep"/>
+        <setting id="enable_Debug" type="bool" label="30993" default="false"/>
+        <setting id="Override_ok" type="bool" label="30991" default="false"/>
+        <setting id="ClearBCT" type="bool" label="30995" default="false"/>
+        <setting id="ClearLiveArt" type="bool" label="30996" default="false"/>
+        <setting id="ClearCache" type="bool" label="30988" default="false"/>
+        <setting id="Cache_Enabled" label="39999" type="bool" default="true" />
+        <setting id="IncludeIceLib" type="bool" label="30997" default="true"/>
+        <setting id="IncludeBCTs" type="bool" label="39997" default="true"/>
+        <setting id="showNextItem" type="bool" label="39994" visible="false" default="true"/>
+        <setting id="plugin_ok_level" type="enum" label="30994" values="Low|High" default="0"/>
+        <setting id="ga_disable" type="bool" label="30992" default="false"/>
+        <setting id="EnableSettop" type="bool" label="30998" default="false"/>
+        <setting id="REFRESH_INT" subsetting="true"  visible="eq(-1,true)" type="enum" label="31000" values="6|12|24" default="0"/>
+        <setting type="action" label="30999" action="RunScript($CWD/defrag.py)"/>
+    </category>
+</settings>
