@@ -1,0 +1,283 @@
+***CHTYPES***
+0,7 = Playlists/Directory Color: Light Gray
+1,3,6 = TV                Color: Yellow
+2,4 = Movie               Color: Light Blue
+5 = Mixed                 Color: GREEN
+9 = InternetTV            Color: Off Green
+10 = Youtube              Color: RED
+11 = RSS                  Color: Orange
+12 = Music                Color:Light Purple
+
+
+***SPORTS***  Color: RED
+Sport
+Sports Event
+Sports Talk
+Archery
+Rodeo
+Card Games
+Martial Arts
+Basketball
+Baseball
+Hockey
+Football
+Boxing
+Golf
+Auto Racing
+Playoff Sports
+Hunting
+Gymnastics
+Shooting
+Sports non-event
+
+**News/Current Affairs** Color: GREEN
+News
+Public Affairs
+Newsmagazine
+Politics
+Entertainment
+Community
+Talk
+Interview
+Weather
+
+**Comedy**  Color: BLUE
+Comedy
+Comedy-Drama
+Romance-Comedy
+Sitcom
+Comedy-Romance
+
+**Music** COLOR: Light Purple
+Musical
+Music
+Musical Comedy
+
+**Documentary/Educational**  COLOR: Cyan
+Documentary
+History
+Biography
+Educational
+Animals
+Nature
+Health
+
+**Kids** COLOR: Orange
+Animation
+Animated
+Anime
+Children
+Cartoon
+Family
+
+**Movie** COLOR: Light Blue
+Movie
+
+**Movie/Drama** Color: Purple
+Drama
+Romance
+Historical Drama
+
+**Special** Color: Light Light Blue
+Outdoors
+Special
+Reality
+
+**SyFY/Fantasy/Horror** Color: Off Green
+Suspense
+Horror
+Horror Suspense
+Paranormal
+Thriller
+Fantasy
+
+**Adult Movie/Drama** Color: Yellow
+Action 	
+Adventure
+Action and Adventure
+Action Adventure
+Crime
+Crime Drama
+Mystery
+Science Fiction
+Series
+Western
+Soap
+Variety
+War
+Law
+Adults Only
+
+
+**leisure/hobbies** Color: Gray
+Auto
+Collectibles
+Travel
+Shopping
+House Garden
+Home and Garden
+Gardening
+Fitness Health
+Fitness
+Home Improvement
+How-To
+Cooking
+Fashion
+Aviation
+Dance
+Auction
+Art
+Exercise
+Parenting
+
+**others\Unknown** Color: Light Gray
+Consumer
+Game Show
+Other
+Unknown
+Religious
+Anthology
+
+
+
+
+
+
+
+
+
+
+0
+1
+10
+11
+12
+13
+14
+15
+2
+3
+4
+5
+6
+7
+8
+9
+Action Adventure
+Action and Adventure
+Action Sports
+Action
+Adults Only
+Adventure
+Animals
+Animated
+Animation
+Anime
+Anthology
+Archery
+Art
+Auction
+Auto Racing
+Auto
+Aviation
+Baseball
+Basketball
+Biography
+Boxing
+Card Games
+Cartoon
+Children
+Collectibles
+Comedy-Drama
+Comedy-Romance
+Comedy
+Community
+Consumer
+Cooking
+Crime Drama
+Crime
+Dance
+Directory
+Documentary
+Drama
+Educational
+Entertainment
+Exercise
+Family
+Fantasy
+Fashion
+Fitness Health
+Fitness
+Football
+Game Show
+Gardening
+Golf
+Gymnastics
+HD
+Health
+Historical Drama
+History
+Hockey
+Home and Garden
+Home Improvement
+Horror Suspense
+Horror
+House Garden
+How-To
+Hunting
+InternetTV
+Interview
+Kids
+LastFM
+Law
+Martial Arts
+Medical
+Mixed
+Movie
+Music
+Musical Comedy
+Musical
+Mystery
+Nature
+News Magazine
+News
+Newsmagazine
+Normal
+Other
+Outdoor
+Outdoors
+Paranormal
+Parenting
+Playoff Sports
+PluginTV
+Politics
+Public Affairs
+Reality
+Religious
+Rodeo
+Romance-Comedy
+Romance
+RSS
+Science Fiction
+Series
+Shooting
+Shopping
+Sitcom
+Soap
+Special
+Sports Event
+Sports non-event
+Sports Talk
+Sports
+Suspense
+Talk
+Technology
+Thriller
+Travel
+TV
+Unknown
+Variety
+War
+Weather
+Western
+Youtube
