@@ -1,0 +1,172 @@
+[*] Super favourites broken, and will be fixed soon...
+[*] Improved GoTV, GoMovie direct plugin population and enhanced guide data. HUB Only!!
+    Direct Plugin requires "Auto-play" to be enabled in GoTV, GoMovies settings.
+[*] Youtube seek fix, Chtype 15 rewrites (parsing improvments, check op for config examples).
+[*] [COLOR=blue]^ v.0.4.4a ^[/COLOR] 
+[*] Reserve channels 501-999 for Autotune option under "Tweaks" Keeps user channels 1-500, while allowing autotuning.
+    Option needs to be enabled and saved before autotuning!
+[*] New Overlay Keymaps - Showsubtitles, NextSubtitle, CodecInfo and aspectratio.
+[*] Cache purge, force channel reset, videowindow patch, donor update after autoupdate.
+[*] Media Limits extend globaly through all chtypes, Some chtype limits can be overridden manually in setting3,
+    others are limited to 50-250 for performance reasons.
+[*] EPG Extra text info (Unwatched/Rating), option under "Visuals".
+[*] Season/Episode format change w/o needing channel reset.
+[*] New Dynamic feedback labels ie. Loading, Exiting, etc...
+[*] EPG Color by TV|Movie rating, option under "Visuals".
+    [[COLOR=yellow]TV-Y, TV-Y7, TV-G | G,[/COLOR][COLOR=orange] TV-PG, TV-14 | PG, PG-13,[/COLOR][COLOR=red] TV-MA | R, NC-17[/COLOR]]
+[*] Misc. code rewrites, GenreLiveID overhauled for plugin parsing.
+[*] Fixed random directory, Trailers in movie channels, Youtube playlist postion.
+[*] [COLOR=green]** Donor update required **[/COLOR]
+[*] [COLOR=red]** Force Channel Reset Required!! **[/COLOR]
+[*] [COLOR=blue]^ v.0.4.4 ^[/COLOR] 
+[*] [COLOR=green]** Donor update required **[/COLOR]
+[*] Channel Change background, Improved dead channel handling (crash proof?)
+[*] XMLTV over network fix?
+[*] Cinema Experience EPG and Overlay tweaks
+[*] [COLOR=green]** Donor update required **[/COLOR]
+[*] [COLOR=blue]^ v.0.4.3a ^[/COLOR] 
+[*] [COLOR=green]** Donor update required **[/COLOR]
+[*] Autostart fix, videowindow fix, misc tweaks and fixes.
+[*] "Force Channel Reset" purges daily, weekly and monthly cache.
+[*] Independent Artwork and Parser cache, artwork and parser cache can be purged when you clear artwork (misc settings).
+[*] New Hideshort Youtube/Plugin code aka "Stacked", EPG Speed tweaks when handling large collections.
+[*] Initial Cinema Experience Code *Thanks Giftie & RagnaroktA, requires CEPack (donor settings). [COLOR=red]Donor Exclusive!![/COLOR]
+[*] Last.FM tweaking [COLOR=red]Setting2 format change[/COLOR]
+[*] [COLOR=green]** Donor update required **[/COLOR]
+[*] [COLOR=blue]^ v.0.4.3 ^[/COLOR] 
+[*] Dynamic Artwork added to yifymovies, muchmovies.
+[*] EPG/Overlay Tweaks, Cache Tweaks, Seek fix?
+[*] [COLOR=blue]^ v.0.4.2a ^[/COLOR] 
+[*] VideoWindow Patch after autoupdate (if applicable).
+[*] Bumper/Icon Donor Download fix
+[*] Restore previous playcount if "Disable watch flagging" is enabled.
+[*] System Cache and Unicode error handling.
+[*] Dynamic Artwork added to USTVnow, F.T.V, GoMovies and Donor Extras
+[*] Improved TVDB/IMDB Lookup, Overhauled artwork downloader; Landscape art fallback to fanart.
+[*] LiveID update, now includes (playcount, ratings). 
+[*] [COLOR=red]** Force Channel Reset Required!! **[/COLOR]
+[*] [COLOR=blue]^ v.0.4.2 ^[/COLOR] 
+[*] EPG UTC Syncing = F.T.V/USTVnow Sync fix?, Hideshort Overlay fix.
+[*] Missing settings fix, Misc Tweaks, Videowindow patch after autoupdate.
+[*] Community Network Autotune (Beta code).
+[*] Donor Activation/Update fix
+[*] Youtube User Favourites and Subscription Autotune.
+[*] Plugin Community list format change, Youtube Hide Short Video Tweaks, Improved Direct Plugin Parsing.
+[*] FTV Favourite Autotuning (Initial Code) [COLOR=red]Gotham & HUB Only!![/COLOR]
+[*] [COLOR=red]** Force Channel Reset Required!! **[/COLOR]
+[*] [COLOR=blue]^ v.0.4.1 ^[/COLOR] 
+[*] EPG speed tweaks.
+[*] Self updating script *Thanks Blazetamer
+[*] [COLOR=blue]^ v.0.4.0 ^[/COLOR] 
+[*] Community List Auto tuning.
+[*] "As Seen On TV" BCT Commercial option, UPNP Video Mirroring, STRM Duration tweaks.
+[*] USTVnow Fix, Donor Commercial and Trailers Fixed. BCT Auto option temporarily removed .
+[*] Super Favorites Auto tuning. [COLOR=red]Gotham Only!![/COLOR] 
+[*] Aurora and Concast removed, New "Custom" folder added under settings and in skin folder. Place one custom skin there.
+[*] New "Coming Up Next" Overlay
+[*] Noob friendly first time setup. It's recommend you enter settings first, configure then launch PseudoTV Live.
+[*] New Donor tab in settings, Also Donor options throughout settings are disabled until activation.
+[*] Donor Download now includes optional Channel logo and Channel bumper downloading and automatic configuration.
+[*] Channel number color selection.
+[*] Channel logo bug automatic watermark.
+[*] EPG Genre/Chtype color code rewrite. (Performance boost).
+[*] Added support for old Pseudotv skins.
+[*] Direct Plugin improvements...
+[*] BCT Exclusion rule in advanced channel rules.
+[*] New Directory Channel building, includes recursive sub-folder searching.
+[*] Initial Direct Plugin Chtype. [COLOR=red]Gotham Only!![/COLOR] 
+[*] USTVnow Autotuning. [COLOR=red]Gotham Only!![/COLOR] 
+[*] PTVL Skin updates, Donor import fix and Directory Channel fix.
+[*] PTVL Skin updates, A lot of bug fixes and tweaks.
+[*] System Caching.
+[*] Initial UPNP code (experimental, not fully working).
+[*] Skins not displaying Fix, EPG Crash while content change Fix!
+[*] Direct Artwork download for local media, includes art caching. Removed API's from settings.
+[*] LiveTV Artwork reworked to include TVDB/TMDB in addition to Fanart.tv
+[*] HDHomerun Autotune tweaks including network share support.
+[*] Updated Gotham Support.
+[*] Advertolog Commercial update.
+[*] Youtube "Raw gdata" switch, BringthePopcorn Autotune changes, EPG speed tweaks and various bug corrections.
+[*] Hdhomerun Strm Autotune w/EPG Info.
+[*] New Youtube types (User Favorites, Search Query w/SafeSearch).
+[*] BringthePopcorn Autotune and Chtype.  All skins include VideoWindow and "ConCast" skin added [size=x-small]*Thanks Redkiller223[/size].
+[*] Autotune Backup/Restore Channel Configuration tweaks.
+[*] New Donor Activation/Update code, VideoWindow Patcher.
+[*] Non-English Characters and Directory Channel fix.
+[*] Updated HD-Trailer code *Thanks sphere, Added 1080p Resolution, Parsing limits and New Parsing types along with new sources 
+    (apple trailers, yahoo trailers).
+[*] HDD Wake, Spin-up sleeping drive b4 video play.
+[*] Superbowl 2014 Commercials (Donor Exclusive)
+[*] Replaced VevoTV Autotune with Plugin links
+[*] Improved LiveTV Dynamic Art
+[*] Improved "Enhanced" LiveTV Parsing.
+[*] Couchpotato Movie indicator.
+[*] 'Failed Playback' Error handling...
+[*] Gotham Support (no need to add root drive).
+[*] Offair Video Selector (Local/Plugin Strm fallback video).
+[*] Option to ignore strm files (Globally across all channels).
+[*] Youtube Sort Options, tweaks and bug fixes...
+[*] Media Limit fix, fixes for encoding problem and Clear LiveTV Art cache switch.
+[*] More robust error handling (should fix premature exiting from PTVL).
+[*] New Info window time "3", Artwork.Downloader Script support (download missing artwork).
+[*] Tweaks, updates, fixes and Startup Channel Option.
+[*] Page Up/Dn EPG Support, RR/FF disabled for chtypes 8,9.
+[*] HD-trailers.net Trailer source (Donor Exclusive).
+[*]  Updated "Aurora" skin, strm "NFO" parser (matching nfo to strm parsed for <runtime> info).
+[*]  Superbowl commercials (Donor Exclusive).
+[*]  Various tweaks, and fixes, WIP Skin was improved and ARYEZ's Aurora skin was added.
+[*]  Donor Activation/Update Features setting switch
+[*]  Donor Exclusive "Internet" Autotune Channels
+[*]  Donor Exclusive "Internet" Commercial parsing 4 BCT's
+[*]  Coming Up Artwork tweaks
+[*]  LiveTV (Chtype 8) Channel bug disabled.
+[*]  Coming Up next artwork w/ type selector
+[*]  Plugin high level link validation (beta)
+[*]  VevoTV Fixed, added new channels.
+[*]  BCT file caching.
+[*]  BCT beta testing.
+[*]  USTVnow support removed
+[*]  Last.fm music video autotune, Smart description truncation.
+[*]  PVR Backend autotuning.
+[*]  WIP Skin enhancements (NextAired, Trakt.tv Trending)
+[*]  Strm file validation; if 1 links fails, a fallback link is written to keep channel from crashing.
+[*]  Youtube/RSS Code rewrite (optimized channel build, removed strm/nfo and increased limit to 1000).
+[*]  New WIP Skin, Autotune limit tweaks; possible fix for out of order episodes.
+[*]  Default skin updates, new skinning labels
+[*]  Genre parsing for Youtube/RSS & Local Media
+[*]  Dynamic artwork for Overlay/EPG
+[*]  Removed old skins until they are updated.
+[*]  EPG Color (Genre/Chtype)
+[*]  TVDB/TV-IMDB w/Sickbeard
+[*]  Error handling (rtmp,http,plugin).
+[*]  New Skin options, and selector.
+[*]  Autotune tweaks.
+[*]  Tweaks to channel rebuilding rules.
+[*]  NFS file sharing fix?
+[*]  Added Donor autotune enhancements; * indicates extra channels. 
+[*]  Show info timer (5|10|15|20|25) seconds.
+[*]  Autotuning InternetTV Strms (Collection of strm sources, including channels based on your xbmc addons installed)
+[*]  USTVnow Autotuning EPG information w/o the need to configure XMLTV file...
+[*]  Corrected Chtype 8 _3 blank = xmltv (default)
+[*]  Autotuning added
+[*]  LiveTV EPG sync fix.
+[*]  Youtube limit reflects actual page limit. Limits changed to (100|150|200|250).
+[*]  Fixed Custom playlist in channel manager, fixed season naming for youtube channels...
+[*]  Youtube error handling, should fix blank screen on parse of bad youtube channels...
+[*]  Youtube/RSS parsing limit option (100|250|500|1000). less media parsing = faster load time.  
+[*]  Force reset rules changed
+[*]  Added initial code for TVDB/TMDB integration to LiveTV
+[*]  Fixed Youtube playlists and improved parsing.
+[*]  Added url encoding removal from LiveTV, InternetTV Type (adds compatibility to encoded plugin:// links taken from XBMC favorites.xml).
+[*]  Added RSS channel type w/ optional strm/NFO file generation .
+[*]  Added Option to generate youtube strms and nfos along with each channel created. This adds optional xbmc library scraping for better content
+     handling within PseudoTV Live (ie, Youtube Channel interleaving, etc). 
+[*]  Enable option in settings, strm folder is located in userdata/addon_data/script.pseudotv.live/cache/generated/youtube 
+     ("OPTIONAL" scrape this folder to add content to xbmc's library, this isn't needed for regular channel use ).
+[*]  Youtube Channels (manual configuration only , until testing is complete).
+[*]  XMLTV over SMB fixed, Small EPG Sync Tweaks
+[*]  Rules Visibility fixed
+[*]  Added Strm directory building (Choose "Directory" channel type from within PTVL's channel manager. Point to a directory filled with strms
+     (no nfos or xbmc library scraping is necessary). Each individual strm will build with a default runtime of 90mins. Not recommended for 24/7
+     Type streams, but more for multiple "Generic" strms without a media type (ie not Movies or TV Shows).
+[*]  Small skin corrections and improvements.
