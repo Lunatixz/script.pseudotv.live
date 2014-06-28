@@ -35,6 +35,7 @@ else:
 
 # import libraries
 from urllib2 import HTTPError, URLError
+from language import *
 
 # import libraries
 from operator import itemgetter
@@ -166,7 +167,9 @@ class TMDB(object):
                                        'width': item.get('width'),
                                        'language': item.get('iso_639_1','n/a'),
                                        'rating': rating,
-                                       'votes': votes})
+                                       'votes': votes,
+                                       'generalinfo': ('%s: %s' 
+                                                       %( 'Language', get_language(item.get('iso_639_1','n/a')).capitalize()))})
             except Exception, e:
                 xbmc.log( 'Problem report: %s' %str( e ), xbmc.LOGNOTICE )
             # Get thumbs
@@ -187,7 +190,9 @@ class TMDB(object):
                                        'width': item.get('width'),
                                        'language': item.get('iso_639_1','n/a'),
                                        'rating': rating,
-                                       'votes': votes})
+                                       'votes': votes,
+                                       'generalinfo': ('%s: %s' 
+                                                       %( 'Language', get_language(item.get('iso_639_1','n/a')).capitalize()))})
             except Exception, e:
                 xbmc.log( 'Problem report: %s' %str( e ), xbmc.LOGNOTICE )
             # Get posters
@@ -208,7 +213,9 @@ class TMDB(object):
                                        'width': item.get('width'),
                                        'language': item.get('iso_639_1','n/a'),
                                        'rating': rating,
-                                       'votes': votes})
+                                       'votes': votes,
+                                       'generalinfo': ('%s: %s' 
+                                                       %( 'Language', get_language(item.get('iso_639_1','n/a')).capitalize().capitalize()))})
             except Exception, e:
                 xbmc.log( 'Problem report: %s' %str( e ), xbmc.LOGNOTICE )
             if image_list == []:

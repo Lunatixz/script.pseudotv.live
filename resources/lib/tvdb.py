@@ -37,6 +37,7 @@ else:
     
 from Globals import *
 from xml.etree import ElementTree as ET
+from language import *
 
 # Commoncache plugin import
 try:
@@ -299,7 +300,12 @@ class TVDB(object):
                         info['season'] = image.findtext('Season')
                     else:
                         info['season'] = 'n/a'
-
+                    
+                    info['generalinfo'] = '%s: %s  |  ' %( 'Language', get_language(info['language']).capitalize())
+                        
+                    if info:
+                        image_list.append(info)
+                        
         except Exception,e:
             pass
         if image_list == []:

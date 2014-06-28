@@ -19,6 +19,7 @@
     
 import os, sys, re, fileinput
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
+
 from resources.lib.Globals import *
 from resources.lib.FileAccess import *
 
@@ -175,6 +176,7 @@ def videowindow():
         MSG = "VideoWindow Patch Error!"
         
     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 1000, THUMB) )
+    __settings__.openSettings()
     
     
 def autopatch():

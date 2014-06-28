@@ -4,8 +4,12 @@
     <string id="30002">Open Channel Configuration</string>    
     <string id="30003">General Options:</string>
         <string id="30044">Enable Autostart</string>
-        <string id="30045">Delay Service (seconds)</string>
         <string id="30046">Show Notification</string>
+        <string id="30045">Delay Service (seconds)</string>
+        <string id="34041">Enable Artwork Spooler</string>
+        <string id="34047">Run During Playback?</string>
+        <string id="34046">Show Notification</string>
+        <string id="34045">Run Service Every (hours)</string>
         <string id="30004">Auto-off Timer (minutes)</string>
         <string id="30005">Force channel reset on next start</string>
         <string id="30006">Time between channel resets</string>
@@ -30,7 +34,7 @@
         <string id="30212">EPG Color by</string>
         <string id="30213">Include Movie Genres</string>
         <string id="30214">EPG Menu uses Channel</string>
-        <string id="30229">EPG Extra Info</string>
+        <string id="30229">EPG Displays Extra Info "(Watched)(Rating)"</string>
         <string id="30215">Hide very short videos</string>
         <string id="30216">Duration of "short" videos</string>  
         <string id="30217">EPG VideoWindow Patcher</string>  
@@ -45,7 +49,7 @@
         <string id="30227">Coming Up Artwork Type</string>
 <string id="30300">Tweaks</string>
     <string id="30301">Use (S01E01), Instead of (01x01)</string>
-	<string id="30405">Enable Enhanced Guide Data (Slower Channel Building)</string>
+	<string id="30405">Find Missing Guide Data (Slower Channel Building)</string>
     <string id="30302">Channel Change Delay (seconds)</string>
     <string id="30303">Choose Startup Channel</string> 
     <string id="30304">Enter Preferred Channel</string>
@@ -58,6 +62,7 @@
     <string id="30372">Reserve Channels 501-999 for Autotune</string>
 <string id="30400">PVR</string>  
     <string id="30401">Choose Your Operating System</string>  
+    <string id="32055">Preferred Language</string>  
 	<string id="30404">XMLTV file location</string>
     <string id="30219">Enable Dynamic Artwork For LiveTV</string>
     <string id="30801">Enable PVR (Coming Soon)</string>

@@ -257,7 +257,7 @@
                 <description>Show Title Label</description>
                 <width>740</width>
                 <height>40</height>
-                <label>Show Title</label>
+                <label></label>
                 <font>font12</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -278,7 +278,7 @@
             <posy>567</posy>
             <width>835</width>
             <height>100</height>
-            <label>Show Description</label>
+            <label></label>
             <font>font12</font>
             <align>left</align>
             <aligny>top</aligny>

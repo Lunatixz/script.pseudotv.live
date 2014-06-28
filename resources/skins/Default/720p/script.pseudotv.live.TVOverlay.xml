@@ -72,7 +72,7 @@
                     <description>Showtitle Label</description>
                     <width min="5" max="650">auto</width>
                     <height>30</height>
-                    <label>Show title</label>
+                    <label></label>
                     <font>Font_Bold34</font>
                     <align>left</align>
                     <textcolor>FF00b4db</textcolor>
@@ -92,7 +92,7 @@
                     <description>ShowTitle Description</description>
                     <width min="15" max="800">auto</width>
                     <height>30</height>
-                    <label>Show Title detail</label>
+                    <label></label>
                     <font>Font_Reg28</font>
                     <align>left</align>
                     <textcolor>FFFFFFFF</textcolor>
@@ -119,7 +119,7 @@
                 <description>Channel Name</description>
                 <width min="5" max="600">auto</width>
                 <height>30</height>
-                <label>Channel Name</label>
+                <label></label>
                 <font>font13</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -127,12 +127,12 @@
                 <visible>false</visible>
             </control>
 <!--line 2 logos-->      
-        <!--NowPlaying.Window-->   
         <control type="group" id="513">  
+            <!--NowPlaying.Window-->   
             <posx>155</posx>
             <posy>540</posy>        
             <control type="image" >
-                <texture fallback="clearlogo.png">$INFO[Player.Art(clearlogo)]</texture>
+                <texture fallback="logo.png">$INFO[Player.Art(clearlogo)]</texture>
                 <width>170</width>
                 <height>75</height>
                 <align>center</align>
@@ -140,12 +140,29 @@
                 <visible>[VideoPlayer.Content(movies) + IsEmpty(Control.GetImage(516))]</visible>
             </control>
             <control type="image" >
-                <texture fallback="clearlogo.png">$INFO[Player.Art(tvshow.clearlogo)]</texture>
+                <texture fallback="logo.png">$INFO[Player.Art(tvshow.clearlogo)]</texture>
                 <width>170</width>
                 <height>75</height>
                 <align>center</align>
                 <aspectratio>keep</aspectratio>
                 <visible>[VideoPlayer.Content(episodes) + IsEmpty(Control.GetImage(516))]</visible>
+            </control>
+            <!-- Poster Window --> 
+            <posx>1040</posx>
+            <posy>420</posy>    
+            <control type="image">
+                <texture fallback="poster.png">$INFO[Player.Art(poster)]</texture>
+                <width max="200">auto</width>
+                <height max="300">auto</height>
+                <align>center</align>
+                <aspectratio>keep</aspectratio>
+            </control>
+            <control type="image">
+                <texture>$INFO[Player.Art(tvshow.poster)]</texture>
+                <width  max="200">auto</width>
+                <height  max="300">auto</height>
+                <align>center</align>
+                <aspectratio>keep</aspectratio>
             </control>
         </control>
         <control type="group">  
@@ -160,25 +177,6 @@
                 <description>Dynamic art</description>
                 <width>170</width>
                 <height>75</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-            </control>
-        </control>
-        <!-- Poster Window --> 
-        <control type="group" id="513">  
-            <posx>1040</posx>
-            <posy>420</posy>    
-            <control type="image">
-                <texture fallback="poster.png">$INFO[Player.Art(poster)]</texture>
-                <width max="200">auto</width>
-                <height max="300">auto</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-            </control>
-            <control type="image">
-                <texture>$INFO[Player.Art(tvshow.poster)]</texture>
-                <width  max="200">auto</width>
-                <height  max="300">auto</height>
                 <align>center</align>
                 <aspectratio>keep</aspectratio>
             </control>
@@ -214,7 +212,7 @@
             <height>50</height>
             <align>left</align>
             <aligny>top</aligny>
-            <label>Show Description</label>
+            <label></label>
             <textcolor>FFFFFFFF</textcolor>
             <font>font12</font>
             <wrapmultiline>true</wrapmultiline>
@@ -335,7 +333,7 @@
             <align>right</align>
             <textcolor>FFFFFFFF</textcolor>
         </control>
-        <control type="label" id="513">
+        <control type="label" id="551">
             <description>Weather</description>
             <posx>17r</posx>
             <posy>30</posy>

@@ -2,9 +2,11 @@
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import os, sys, time, fileinput, re
-import downloader, extract, urllib, urllib2
+import urllib, urllib2
+
 from resources.lib.Globals import *
 from resources.lib.FileAccess import FileLock, FileAccess
+from resources.lib.utils import *
 
 try:
     import Donor
@@ -124,8 +126,8 @@ def BumperDownloader():
         linesLST = f.readlines()
         BumperURLPath = linesLST[0]
         
-        downloader.download(BumperURLPath, BUMPERDEST)
-        extract.all(BUMPERDEST, BumperPath)
+        download(BumperURLPath, BUMPERDEST)
+        all(BUMPERDEST, BumperPath)
             
         REAL_SETTINGS.setSetting("bumpers", "true")
         REAL_SETTINGS.setSetting("bumpersfolder", BUMPER_LOC)
@@ -167,8 +169,8 @@ def LogoDownloader():
     linesLST = f.readlines()
     LogoURLPath = linesLST[i]
         
-    downloader.download(LogoURLPath, LogoDEST)
-    extract.all(LogoDEST, LogoPath)
+    download(LogoURLPath, LogoDEST)
+    all(LogoDEST, LogoPath)
     
     REAL_SETTINGS.setSetting("ChannelLogoFolder", DEFAULT_LOGO_LOC)
     
@@ -199,8 +201,8 @@ def CEDownloader():
         linesLST = f.readlines()
         CEURLPath = linesLST[3]
         
-        downloader.download(CEURLPath, CEDEST)
-        extract.all(CEDEST, CEPath)
+        download(CEURLPath, CEDEST)
+        all(CEDEST, CEPath)
         
         try:
             os.remove(CEDEST)

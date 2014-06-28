@@ -18,18 +18,23 @@
 
 import xbmc, xbmcgui, xbmcaddon
 import subprocess, os
-import time, threading
+import time
 import datetime
 import sys, re
 import random, traceback
 import urllib, urllib2
 import fanarttv
+import socket
+socket.setdefaulttimeout(5)
 
+from ChannelList import ChannelList
 from Globals import *
 from FileAccess import FileLock, FileAccess
 from xml.etree import ElementTree as ET
 from tvdb import *
 from tmdb import *
+from urllib import unquote
+from metahandler import metahandlers
 
 # Commoncache plugin import
 try:
@@ -46,289 +51,231 @@ class Artdownloader:
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
         if REAL_SETTINGS.getSetting('enable_Debug') == "true":
             log('Artdownloader: ' + msg, level)
+    
+    
+    def JsonArtwork(self, path, media='video'):
+        self.log('JsonArtwork')
+        chanlist = ChannelList()
+        json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["art"]}, "id": 1}' % ((path), media))
+        json_folder_detail = chanlist.sendJSON(json_query)
+        file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+        self.log('JsonArtwork - return')
+        return file_detail
+
+    
+    def LocalArtwork(self, path, type, arttype):
+        if Cache_Enabled:
+            self.log("LocalArtwork Cache")
+            try:
+                result = artwork.cacheFunction(self.LocalArtwork_NEW, path, type, arttype)
+            except:
+                self.log("LocalArtwork Cache Failed Forwarding to LocalArtwork_NEW")
+                result = self.LocalArtwork_NEW(path, type, arttype)
+                pass
+        else:
+            self.log("LocalArtwork Cache Disabled")
+            result = self.LocalArtwork_NEW(path, type, arttype)
+        if not result:
+            result = 0
+        return result
+        
+        
+    def LocalArtwork_NEW(self, path, type, arttype):
+        self.log('LocalArtwork_NEW')
+        arttype = arttype.replace('folder','poster').replace('character','characterart').replace('logo','clearlogo').replace('disc','discart')#correct search names
+        results = self.JsonArtwork(path)
+        arttype = ((type + '.' + arttype if type == 'tvshow' else arttype))
+        fletype = ''
+
+        for f in results:
+            arttypes = re.search(('"%s" *: *"(.*?)"' % arttype), f)
+
+            if arttypes:
+                fletype = unquote((arttypes.group(1).split(','))[0]).replace('image://','').replace('.jpg/','.jpg').replace('.png/','.png')
+
+            if fletype:
+                break
+        self.log('LocalArtwork_NEW - return')  
+        return fletype
+  
      
-     
-    def FindArtwork(self, type, chtype, id, title, mediapath, type1EXT, type2EXT):
+    def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
         if Cache_Enabled:
             self.log("FindArtwork Cache")
-            try:
-                result = artwork.cacheFunction(self.FindArtwork_NEW, type, chtype, id, title, mediapath, type1EXT, type2EXT)
+            chtype = int(chtype)
+            try: #stagger artwork cache by chtype
+                if chtype <= 3:
+                    result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 3 and chtype <= 6:
+                    result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 6 and chtype <= 9:
+                    result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 9 and chtype <= 12:
+                    result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 9 and chtype <= 15:
+                    result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                else:
+                    result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
             except:
-                self.log("FindArtwork Cache Failed Fowarding to FindArtwork_NEW")
-                result = self.FindArtwork_NEW(type, chtype, id, title, mediapath, type1EXT, type2EXT)
+                self.log("FindArtwork Cache Failed Forwarding to FindArtwork_NEW")
+                result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
                 pass
         else:
             self.log("FindArtwork Cache Disabled")
-            result = self.FindArtwork_NEW(type, chtype, id, title, mediapath, type1EXT, type2EXT)    
+            result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
         if not result:
             result = 0
         return result
          
-     
-    def FindArtwork_NEW(self, type, chtype, id, title, mediapath, type1EXT, type2EXT):
-        self.log('FindArtwork')
-        print type, chtype, id, title, mediapath, type1EXT, type2EXT
-        
-        ArtDownload = ''            
-        mediapathSeason, filename = os.path.split(mediapath)
-        mediapathSeries = os.path.dirname(mediapathSeason)
-        
-        fle1 = str(id) + '-' + type1EXT
-        type1 = type1EXT.split(".")[0]
-        MediaImage1 = os.path.join(MEDIA_LOC, (type1 + '.png'))
-        DefaultImage1 = os.path.join(DEFAULT_MEDIA_LOC, (type1 + '.png'))
-        
-        fle2 = str(id) + '-' + type2EXT
-        type2 = type2EXT.split(".")[0]
-        MediaImage2 = os.path.join(MEDIA_LOC, (type2 + '.png'))
-        DefaultImage2 = os.path.join(DEFAULT_MEDIA_LOC, (type2 + '.png'))
-              
-        if FileAccess.exists(MediaImage1):
-            setImage1 = MediaImage1
-        elif FileAccess.exists(DefaultImage1):
-            setImage1 = DefaultImage1
-        else:
-            setImage1 = 'NA.png'
-            
-        bakImage1 = setImage1
-        
-        if FileAccess.exists(MediaImage2):
-            setImage2 = MediaImage2
-        elif FileAccess.exists(DefaultImage2):
-            setImage2 = DefaultImage2
-        else:
-            setImage2 = 'NA.png'
-            
-        bakImage2 = setImage2
 
-        ArtLocal_Series1 = ascii(os.path.join(mediapathSeries, type1EXT))
-        ArtLocal_Season1 = ascii(os.path.join(mediapathSeason, type1EXT))
-        ArtCache1 = os.path.join(ART_LOC, fle1)
-        
-        ArtLocal_Season2 = ascii(os.path.join(mediapathSeason, type2EXT))
-        ArtLocal_Series2 = ascii(os.path.join(mediapathSeries, type2EXT))
-        ArtCache2 = os.path.join(ART_LOC, fle2)
-        
-        ###############
+    def FindArtwork_NEW(self, type, chtype, id, mediapath, arttypeEXT):
+        self.log('FindArtwork_NEW')
+        chtype = int(chtype)
+        setImage = ''
+        arttype = arttypeEXT.split(".")[0]
+        fle = str(id) + '-' + arttypeEXT
+        ArtCache = os.path.join(ART_LOC, fle)
+        MediaImage = os.path.join(MEDIA_LOC, (arttype + '.png'))
+        DefaultImage = os.path.join(DEFAULT_MEDIA_LOC, (arttype + '.png'))
+
         if chtype <= 6:
             self.log('FindArtwork, Local')
-            #508
-            try:
-                if FileAccess.exists(ArtLocal_Series1):
-                    setImage1 = ArtLocal_Series1
-                elif FileAccess.exists(ArtLocal_Season1):
-                    setImage1 = ArtLocal_Season1
-                elif FileAccess.exists(ArtCache1):
-                    setImage1 = ArtCache1
-                else:
-                    setImage1 = self.DownloadArt(type, id, fle1, type1EXT, ART_LOC)
-            except:
-                pass
+            #XBMC Artwork
+            setImage = self.LocalArtwork(mediapath, type, arttype)
             
-            #510   
-            try:
-                if FileAccess.exists(ArtLocal_Series2):
-                    setImage2 = ArtLocal_Series2
-                elif FileAccess.exists(ArtLocal_Season2):
-                    setImage2 = ArtLocal_Season2
-                elif FileAccess.exists(ArtCache2):
-                    setImage2 = ArtCache2
-                else:
-                    setImage2 = self.DownloadArt(type, id, fle2, type2EXT, ART_LOC)
-            except:
-                pass
+            if not setImage:
+                #XBMC Artwork - Fallback
+                self.log('FindArtwork, Local - Local - Fallback')
+                arttype_fallback = arttype.replace('landscape','fanart')
+                setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
                 
-        ###############
+            if not setImage:
+                if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                    #PseudoTV Artwork Cache
+                    if FileAccess.exists(ArtCache):
+                        setImage = ArtCache
+                    else:
+                        #Download Artwork
+                        self.log('FindArtwork, Local - Download')
+                        setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
+
+                    if not setImage:
+                        #Download Artwork - Fallback
+                        self.log('FindArtwork, Local - Download - Fallback')
+                        arttype_fallback = arttypeEXT.replace('landscape','fanart')
+                        setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
+       
+            if not setImage:    
+                self.log('FindArtwork, Local - Default')
+                #Default fallbacks
+                if FileAccess.exists(MediaImage):
+                    #Skin media
+                    setImage = MediaImage
+                elif FileAccess.exists(DefaultImage):
+                    #Default Skin media
+                    setImage = DefaultImage
+        
         elif chtype == 7:
-            self.log('FindArtwork, Directory')
-            #508
-            if FileAccess.exists(ArtLocal_Season1):
-                setImage1 = ArtLocal_Season1
-            elif FileAccess.exists(MediaImage1):
-                setImage1 = MediaImage1
-            elif FileAccess.exists(DefaultImage1):
-                setImage1 = DefaultImage1
+            self.log('FindArtwork, Local - Directory')
+            folderArt = os.path.join(path, 'folder.jpg')
             
-            #510
-            if FileAccess.exists(ArtLocal_Season2):
-                setImage2 = ArtLocal_Season2
-            elif FileAccess.exists(MediaImage2):
-                setImage2 = MediaImage2
-            elif FileAccess.exists(DefaultImage2):
-                setImage2 = DefaultImage2
-            
-        #################
-        elif chtype == 8:
-            self.log('FindArtwork, LiveTV')
-            
-            if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
-                self.log('LiveTV Art Enabled')
-                
-                #508
-                try:
-                    if FileAccess.exists(ArtCache1):
-                        setImage1 = ArtCache1
-                    else:
-                        setImage1 = self.DownloadArt(type, id, fle1, type1EXT, ART_LOC)
-                except:
-                    pass
-                    
-                #510
-                try:
-                    if FileAccess.exists(ArtCache2):
-                        setImage2 = ArtCache2
-                    else:
-                        setImage2 = self.DownloadArt(type, id, fle2, type2EXT, ART_LOC)
-                except:
-                    pass
-                    
-            else:
-            
-                if FileAccess.exists(MediaImage1):
-                    setImage1 = MediaImage1
-                elif FileAccess.exists(DefaultImage1):
-                    setImage1 = DefaultImage1
-                      
-                if FileAccess.exists(MediaImage2):
-                    setImage2 = MediaImage2
-                elif FileAccess.exists(DefaultImage2):
-                    setImage2 = DefaultImage2
-                    
-        #################
-        elif chtype == 9:  
-            self.log('FindArtwork, InternetTV')        
-                    
-            if FileAccess.exists((MEDIA_LOC + 'InternetTV.'+ type1 + '.png')):
-                setImage1 = (MEDIA_LOC + 'InternetTV.'+ type1 + '.png')
-            elif FileAccess.exists((DEFAULT_MEDIA_LOC + 'InternetTV.'+ type1 + '.png')):
-                setImage1 = (DEFAULT_MEDIA_LOC + 'InternetTV.'+ type1 + '.png')
-                  
-            if FileAccess.exists((MEDIA_LOC + 'InternetTV.'+ type2 + '.png')):
-                setImage2 = (MEDIA_LOC + 'InternetTV.'+ type2 + '.png')
-            elif FileAccess.exists(DEFAULT_MEDIA_LOC + 'InternetTV.'+ type2 + '.png'):
-                setImage2 = (DEFAULT_MEDIA_LOC + 'InternetTV.'+ type2 + '.png')
-                    
-        #################
-        elif chtype == 10 or chtype == 17:   
-            self.log('FindArtwork, Youtube')        
-                    
-            if FileAccess.exists((MEDIA_LOC + 'Youtube.'+ type1 + '.png')):
-                setImage1 = (MEDIA_LOC + 'Youtube.'+ type1 + '.png')
-            elif FileAccess.exists((DEFAULT_MEDIA_LOC + 'Youtube.'+ type1 + '.png')):
-                setImage1 = (DEFAULT_MEDIA_LOC + 'Youtube.'+ type1 + '.png')
-                  
-            if FileAccess.exists((MEDIA_LOC + 'Youtube.'+ type2 + '.png')):
-                setImage2 = (MEDIA_LOC + 'Youtube.'+ type2 + '.png')
-            elif FileAccess.exists(DEFAULT_MEDIA_LOC + 'Youtube.'+ type2 + '.png'):
-                setImage2 = (DEFAULT_MEDIA_LOC + 'Youtube.'+ type2 + '.png')
-                    
-        #################
-        elif chtype == 11: 
-            self.log('FindArtwork, RSS')          
-                    
-            if FileAccess.exists((MEDIA_LOC + 'RSS.'+ type1 + '.png')):
-                setImage1 = (MEDIA_LOC + 'RSS.'+ type1 + '.png')
-            elif FileAccess.exists((DEFAULT_MEDIA_LOC + 'RSS.'+ type1 + '.png')):
-                setImage1 = (DEFAULT_MEDIA_LOC + 'RSS.'+ type1 + '.png')
-                  
-            if FileAccess.exists((MEDIA_LOC + 'RSS.'+ type2 + '.png')):
-                setImage2 = (MEDIA_LOC + 'RSS.'+ type2 + '.png')
-            elif FileAccess.exists(DEFAULT_MEDIA_LOC + 'RSS.'+ type2 + '.png'):
-                setImage2 = (DEFAULT_MEDIA_LOC + 'RSS.'+ type2 + '.png')
-                
-        #################
-        # elif chtype == 12:           
-                    
-                    
-        #################
-        elif chtype == 13:  
-            self.log('FindArtwork, LastFM')         
-                    
-            if FileAccess.exists((MEDIA_LOC + 'LastFM.'+ type1 + '.png')):
-                setImage1 = (MEDIA_LOC + 'LastFM.'+ type1 + '.png')
-            elif FileAccess.exists((DEFAULT_MEDIA_LOC + 'LastFM.'+ type1 + '.png')):
-                setImage1 = (DEFAULT_MEDIA_LOC + 'LastFM.'+ type1 + '.png')
-                
-            if FileAccess.exists((MEDIA_LOC + 'LastFM.'+ type2 + '.png')):
-                setImage2 = (MEDIA_LOC + 'LastFM.'+ type2 + '.png')
-            elif FileAccess.exists(DEFAULT_MEDIA_LOC + 'LastFM.'+ type2 + '.png'):
-                setImage2 = (DEFAULT_MEDIA_LOC + 'LastFM.'+ type2 + '.png')
-                    
-        #################
-        elif chtype == 14:    
-            self.log('FindArtwork, Extras')       
-                    
-            #508
-            try:
-                if FileAccess.exists(ArtCache1):
-                    setImage1 = ArtCache1
-                else:
-                    setImage1 = self.DownloadArt(type, id, fle1, type1EXT, ART_LOC)
-            except:
-                pass
-                
-            #510
-            try:
-                if FileAccess.exists(ArtCache2):
-                    setImage2 = ArtCache2
-                else:
-                    setImage2 = self.DownloadArt(type, id, fle2, type2EXT, ART_LOC)
-            except:
-                pass
+            if FileAccess.exists(folderArt):
+                setImage = folderArt
+            else:      
+                self.log('FindArtwork, Local - Directory - Default')
+                #Default fallbacks
+                if FileAccess.exists(MediaImage):
+                    #Skin media
+                    setImage = MediaImage
+                elif FileAccess.exists(DefaultImage):
+                    #Default Skin media
+                    setImage = DefaultImage
         
-        #################           
-        elif chtype == 15 or chtype == 16:
-            self.log('FindArtwork, PluginTV')
+        else:
+            self.log('FindArtwork, NonLocal')
+            addon = ''
             
-            if id != '0':
-                #508
+            try:
+                addon = mediapath.split('/')[2]
+            except Exception,e:
                 try:
-                    if FileAccess.exists(ArtCache1):
-                        setImage1 = ArtCache1
-                    else:
-                        setImage1 = self.DownloadArt(type, id, fle1, type1EXT, ART_LOC)
+                    addon = (mediapath.split('/'))
+                    addon = ([x for x in addon if x != ''])
+                    addon = str(addon[1])
                 except:
                     pass
-                    
-                #510
-                try:
-                    if FileAccess.exists(ArtCache2):
-                        setImage2 = ArtCache2
-                    else:
-                        setImage2 = self.DownloadArt(type, id, fle2, type2EXT, ART_LOC)
-                except:
-                    pass
-            else:
-                id = mediapathSeason.replace("/?path=/root", "")
-                id = id.split('plugin://', 1)[-1]
-                
-                icon = 'special://home/addons/'+ id + '/icon.png'
-                fanart = 'special://home/addons/'+ id + '/fanart.jpg'
-                
+            
+            icon = 'special://home/addons/'+ str(addon) + '/icon.png'
+            fanart = 'special://home/addons/'+ str(addon) + '/fanart.jpg'
+            
+            if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                #PseudoTV Artwork Cache
+                if FileAccess.exists(ArtCache):
+                    setImage = ArtCache
+                else:
+                    #Download Artwork
+                    self.log('FindArtwork, NonLocal - Download')
+                    setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
+
+                if not setImage:
+                    self.log('FindArtwork, NonLocal - Download - Fallback')
+                    #Download Artwork - Fallback
+                    arttype_fallback = arttypeEXT.replace('landscape','fanart')
+                    setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
+
+            if not setImage:
                 if FileAccess.exists(icon):
-                    setImage1 = icon
-                elif FileAccess.exists(MediaImage1):
-                    setImage1 = MediaImage1
-                elif FileAccess.exists(DefaultImage1):
-                    setImage1 = DefaultImage1
-                    
-                if FileAccess.exists(fanart):
-                    setImage2 = fanart
-                else:
-                    setImage2 = setImage1
-                          
-        if type1EXT == 'NA.png' or type1EXT == '.png':
-            setImage1 = bakImage1
-        elif type2EXT == 'NA.png' or type2EXT == '.png':
-            setImage2 = bakImage2
+                    setImage = icon
+                
+                    # if arttype == 'landscape' or arttype == 'fanart':
+                        # if FileAccess.exists(fanart):
+                            # setImage = fanart
+                else:      
+                    #if chtype watermark setimage
+                    self.log('FindArtwork, NonLocal - Default')
+                    #Default fallbacks
+                    if FileAccess.exists(MediaImage):
+                        #Skin media
+                        setImage = MediaImage
+                    elif FileAccess.exists(DefaultImage):
+                        #Default Skin media
+                        setImage = DefaultImage            
+                        
+        self.log('FindArtwork - return')  
+        return setImage
         
-        print setImage1, setImage2
-        return setImage1, setImage2
+                
+    def DownloadMetaArt(self, type, fle, id, typeEXT, ART_LOC):
+        self.log('DownloadMetaArt')
+        ArtPath = os.path.join(ART_LOC, fle)
         
-  
+        if type == 'tvshow':
+            Tid = id
+            Mid = ''
+        else:
+            Mid = id
+            Tid = ''
+            
+        typeEXT = typeEXT.split('.')[0]
+        typeEXT = typeEXT.replace('landscape','backdrop_url').replace('fanart','backdrop_url').replace('logo','backdrop_url').replace('clearart','backdrop_url').replace('poster','cover_url').replace('banner','banner_url')
+        
+        # try:
+        print 'metahander'
+        self.metaget = metahandlers.MetaData(preparezip=False)
+        ImageURL = str(self.metaget.get_meta(type, '', imdb_id=str(Mid), tmdb_id=str(Tid)))[typeEXT]
+        resource = urllib.urlopen(ImageURL)
+        output = FileAccess.open(ArtPath, 'w')
+        output.write(resource.read())
+        output.close()
+        setImage = ArtPath
+        # except:
+            # pass
+            
+        return setImage
+        
+            
     def DownloadArt(self, type, id, fle, typeEXT, ART_LOC):
         self.log('DownloadArt')
-        print type, id, fle, typeEXT, ART_LOC
         tvdbAPI = TVDB(TVDB_API_KEY)
         tmdbAPI = TMDB(TMDB_API_KEY)     
 
@@ -375,7 +322,6 @@ class Artdownloader:
                 ArtType = ArtType.replace('graphical', 'banner').replace('folder', 'poster').replace('fanart', 'tvfanart')
                 fan = fanarttv.get_image_list_TV(id)
                 try:
-                    FallbackFailed = True
                     data = str(fan).replace("[", "").replace("]", "").replace("'", "")
                     data = data.split('}, {')
                     fanPath = str([s for s in data if ArtType in s]).split("', 'art_type: ")[0]
@@ -386,16 +332,9 @@ class Artdownloader:
                     output = FileAccess.open(TVFilePath, 'w')
                     output.write(resource.read())
                     output.close()
-                    FallbackFailed = False
                     return TVFilePath
                 except Exception,e:
                     self.log('FanTVDownload Failed!')    
-                    TVFilePath = setImage
-                    if ArtType == 'landscape' and FallbackFailed == True:
-                        TVFilePath = self.DownloadArt(type, id, fle, 'fanart.jpg', ART_LOC)
-                        return TVFilePath
-
-                    return setImage
                     pass
 
         elif type == 'movie':
@@ -433,7 +372,6 @@ class Artdownloader:
                 fan = fanarttv.get_image_list_Movie(id)
                 self.log('fan = ' + str(fan))
                 try:
-                    FallbackFailed = True
                     data = str(fan).replace("[", "").replace("]", "").replace("'", "")
                     data = data.split('}, {')
                     fanPath = str([s for s in data if ArtType in s]).split("', 'art_type: ")[0]
@@ -445,13 +383,7 @@ class Artdownloader:
                     output = FileAccess.open(MovieFilePath, 'w')
                     output.write(resource.read())
                     output.close()
-                    FallbackFailed = False
                     return MovieFilePath
                 except Exception,e:
                     self.log('FanMovieDownload Failed!')
-                    if ArtType == 'landscape' and FallbackFailed == True:
-                        MovieFilePath = self.DownloadArt(type, id, fle, 'fanart.jpg', ART_LOC)
-                        return MovieFilePath
-
-                    return setImage
                     pass                

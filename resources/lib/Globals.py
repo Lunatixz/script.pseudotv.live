@@ -135,10 +135,8 @@ if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
 if int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
     Skin_Select = 'Default'
 elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
-    Skin_Select = 'PTVL' 
+    Skin_Select = 'PTVL'   
 elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
-    Skin_Select = 'TWCC'  
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
     Skin_Select = 'Custom' 
     
 # Original Skin Location changes    
@@ -181,11 +179,18 @@ else:
     xbmc.log("script.pseudotv.live-Globals: System Caching Disabled")
 
 # Common Cache types, 22hr clock.  
-daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22)
-weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",22 * 7)
-monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((22 * 7) * 4))
-artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((22 * 7) * 4))
-parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((22 * 7) * 4))
+daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22) #System Purge, Force Reset
+weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",22 * 7) #System Purge, Force Reset
+monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((22 * 7) * 4)) #System Purge
+xmltv = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "xmltv",22) #System Purge
+parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((22 * 7) * 4)) #No Purge
+artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((22 * 7) * 4)) #Artwork Purge
+artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((22 * 7) * 4)) #Artwork Purge
+artwork2 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork2",((22 * 7) * 4)) #Artwork Purge
+artwork3 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork3",((22 * 7) * 4)) #Artwork Purge
+artwork4 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork4",((22 * 7) * 4)) #Artwork Purge
+artwork5 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork5",((22 * 7) * 4)) #Artwork Purge
+artwork6 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork6",((22 * 7) * 4)) #Artwork Purge
 
 # HEX COLOR OPTIONS 4 (Overlay CHANBUG, EPG Genre & CHtype) 
 # http://www.w3schools.com/html/html_colornames.asp
@@ -232,7 +237,7 @@ CHANBUG_COLOR = COLOR_CHANNUM[int(REAL_SETTINGS.getSetting('COLOR_CHANNUM'))]
 SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
 MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]
-REFRESH_INT = [21600,43200,86400]#6,12,24hrs
+REFRESH_INT = [21600,43200,86400,172800,216000]#6,12,24,48,72hrs
 
 GlobalFileLock = FileLock()
 dlg = xbmcgui.Dialog()
@@ -259,7 +264,7 @@ ACTION_MOVE_DOWN = 4
 ACTION_PAGEUP = 5
 ACTION_PAGEDOWN = 6
 ACTION_SELECT_ITEM = 7
-ACTION_PREVIOUS_MENU = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
+ACTION_PREVIOUS_MENU = (9, 10, 92, 216, 247, 257, 350, 61467, 61448,)
 ACTION_SHOW_INFO = 11
 ACTION_PAUSE = 12
 ACTION_STOP = 13
@@ -311,11 +316,11 @@ CE_RATINGS_LOC = xbmc.translatePath(os.path.join(CE_LOC, 'ratings')) + '/'
 UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V']
 
 #Dynamic Artwork plugin
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd'] #Title format must be "Movie (Year)"
 DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd'] #Title format must be "Movie (Year)"
 
-# Plugin seek whitelist
-BYPASS_SEEK_BLOCK = ['plugin.video.youtube']
+# Plugin seek blacklist
+BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow']
 
 # Bypass EPG (paused/stacked) by channel name
 BYPASS_EPG = ['PseudoCinema']

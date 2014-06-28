@@ -136,7 +136,7 @@
                     <description>Show Name Label</description>
                     <width min="55" max="600">auto</width>
                     <height>30</height>
-                    <label>Show Name</label>
+                    <label></label>
                     <font>font14</font>
                     <textcolor>FF0297eb</textcolor>
                     <scroll>true</scroll>
@@ -157,7 +157,7 @@
                     <description>Show Title Label</description>
                     <width min="55" max="600">auto</width>
                     <height>30</height>
-                    <label>Show Title</label>
+                    <label></label>
                     <font>font14</font>
                     <textcolor>FFFFFFFF</textcolor>
                     <scroll>true</scroll>
@@ -170,7 +170,7 @@
                 <description>Channel Name</description>
                 <width min="5" max="600">auto</width>
                 <height>30</height>
-                <label>Channel Name</label>
+                <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -185,7 +185,7 @@
             <height>100</height>
             <align>left</align>
             <aligny>top</aligny>
-            <label>Show Description</label>
+            <label></label>
             <textcolor>FFFFFFFF</textcolor>
             <font>font12</font>
             <wrapmultiline>true</wrapmultiline>
