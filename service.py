@@ -51,6 +51,7 @@ def MonitorChange():
          
         if PseudoTVSkin_Num != PseudoTVSkin_LastNum: # Force Art service after skin change.
             REAL_SETTINGS.setSetting("ArtService_LastRun",'')#clear Artservice Lastrun
+            REAL_SETTINGS.setSetting("PseudoTVSkin_LastNum",str(PseudoTVSkin_Num))
             #Run artservice, if not running.
             if not ArtService_Running:
                 ArtService()
@@ -59,7 +60,6 @@ def MonitorChange():
             ArtService_Enabled = False
     except:
         pass
-    REAL_SETTINGS.setSetting("PseudoTVSkin_LastNum",str(PseudoTVSkin_Num))
          
         
 def uniq(lst):
