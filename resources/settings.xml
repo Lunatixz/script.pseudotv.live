@@ -7,10 +7,6 @@
             <setting id="Auto_Start" type="bool" label="30044" default="false"/>
             <setting id="notify" type="bool" label="30046" subsetting="true" visible="eq(-1,true)" default="true"/>
             <setting id="timer_amount" type="enum" values="0|5|10|15|20" label="30045" subsetting="true" visible="eq(-2,true)" default="1"/>
-            <setting id="ArtService_Enabled" type="bool" label="34041" default="false"/>
-            <setting id="ArtService_Background" type="bool" label="34047" subsetting="true" visible="eq(-1,true)" default="true"/>
-            <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-2,true)" default="true"/>
-            <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-3,true)" default="2"/>
             <setting id="AutoOff" type="enum" label="30004" values="Disable|30|60|90|120|150|180|210|240" default="0"/>
             <setting id="ForceChannelReset" type="bool" label="30005" default="false" />
             <setting id="ChannelResetSetting" type="enum" label="30006" values="Automatic|Daily|Weekly|Monthly|Never|Every Time" default="0"/>
@@ -23,7 +19,7 @@
         <setting id="SUPchannel" type="enum"  label="30303" values="Last Channel|Preferred Channel" default="0"/>
         <setting id="CurrentChannel" type="text" label="30304" subsetting="true" visible="eq(-1,1)" default="1"/>
         <setting id="Disable_Watched" type="bool" label="30311" default="false"/>
-        <setting id="EnhancedGuideData" type="bool" label="30405" default="true" />
+        <setting id="EnhancedGuideData" type="bool" label="30405" default="false" />
         <setting id="HideClips" type="bool" label="30215" default="true"/>
         <setting id="ClipLength" type="enum" subsetting="true" label="30216" visible="eq(-1,true)" values="15|30|60|90|120|180|240|300|360|420|460" default="5"/>
     	<setting id="MEDIA_LIMIT" label="30310" type="enum" values="10|25|50|100|250|500|1000|Unlimited" default="0"/>
@@ -32,15 +28,18 @@
 <!--Visual-->
     <category label="30200">
         <setting id="SkinSelector" type="enum"  label="30202" values="Classic PTV|Default|PTVL|Custom" default="2"/>
-        <setting id="art.enable" label="30201" type="bool" default="true" /> 
-    	<setting id="ShowSeEp" type="bool" label="30301" default="false"/>
+        <setting id="art.enable" label="30201" type="bool" default="false" /> 
+        <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
+        <setting id="ArtService_Background" type="bool" label="34047" subsetting="true" visible="eq(-2,true)" default="true"/>
+        <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-3,true)" default="2"/>
+        <setting id="ShowSeEp" type="bool" label="30301" default="false"/>
         <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>
         <setting label="30210" type="lsep"/>
             <setting id="ClockMode" type="enum" label="30211" default="0" values="12 Hour|24 Hour"/>
-            <setting id="EPGcolor_enabled" label="30212" type="enum" values="Disabled|Genre Type|Channel Type|Rating" default="0" />
+            <setting id="EPGcolor_enabled" label="30212" type="enum" values="Disabled|Genre Type|Channel Type|Rating Type" default="0" />
             <setting id="EPGcolor_MovieGenre" subsetting="true" type="bool" label="30213" default="false" visible="eq(-1,1)" />
             <setting id="EPGTextEnable" type="enum" label="30214" values="Logo|Text" default="0"/>
-            <setting id="EPG.xInfo" type="bool" label="30229" default="true" />
+            <setting id="EPG.xInfo" type="bool" label="30229" default="false" />
             <setting type="action" label="30217" option="close" action="RunScript($CWD/videowindow.py, -videowindow)"/>
         <setting label="30220" type="lsep"/>
             <setting id="COLOR_CHANNUM" type="enum" label="30203" values="Holo|Cyan|Green|Gray|Light Gray|White" default="0"/>
@@ -194,7 +193,7 @@
         <setting id="plugin_ok_level" type="enum" label="30994" values="Low|High" default="0"/>
         <setting id="ga_disable" type="bool" label="30992" default="false"/>
         <setting id="EnableSettop" type="bool" label="30998" default="false"/>
-        <setting id="REFRESH_INT" subsetting="true"  visible="eq(-1,true)" type="enum" label="31000" values="6|12|24" default="0"/>
+        <setting id="REFRESH_INT" subsetting="true"  visible="eq(-1,true)" type="enum" label="31000" values="6|12|24|48|72" default="2"/>
         <setting type="action" label="30999" action="RunScript($CWD/defrag.py)"/>
     </category>
 </settings>

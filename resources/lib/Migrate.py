@@ -24,7 +24,8 @@ import urllib, urllib2, httplib, random
 from Globals import *
 from xml.etree import ElementTree as ET
 from FileAccess import FileLock, FileAccess
-   
+from urllib import unquote
+
 try:
     from Donor import *
     Donor_Downloaded = True

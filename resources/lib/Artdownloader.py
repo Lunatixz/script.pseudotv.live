@@ -18,7 +18,7 @@
 
 import xbmc, xbmcgui, xbmcaddon
 import subprocess, os
-import time
+import time, datetime, random
 import datetime
 import sys, re
 import random, traceback
@@ -27,13 +27,13 @@ import fanarttv
 import socket
 socket.setdefaulttimeout(5)
 
-from ChannelList import ChannelList
+from ChannelList import *
 from Globals import *
 from FileAccess import FileLock, FileAccess
 from xml.etree import ElementTree as ET
 from tvdb import *
 from tmdb import *
-from urllib import unquote
+from urllib import unquote, quote
 from metahandler import metahandlers
 
 # Commoncache plugin import
@@ -44,6 +44,9 @@ except Exception,e:
 
 class Artdownloader:
 
+    global ArtService_Running
+    ArtService_Running = False
+
     def log(self, msg, level = xbmc.LOGDEBUG):
         log('Artdownloader: ' + msg, level)
 
@@ -53,35 +56,22 @@ class Artdownloader:
             log('Artdownloader: ' + msg, level)
     
     
-    def JsonArtwork(self, path, media='video'):
-        self.log('JsonArtwork')
-        chanlist = ChannelList()
-        json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["art"]}, "id": 1}' % ((path), media))
-        json_folder_detail = chanlist.sendJSON(json_query)
-        file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
-        self.log('JsonArtwork - return')
+    def JsonArtwork(self, mpath, media='video'):
+        print ('JsonArtwork')
+        file_detail = []
+        try:
+            chanlist = ChannelList()
+            json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","media":"%s","properties":["art"]},"id":1}' % (chanlist.escapeDirJSON(mpath), media))
+            json_folder_detail = chanlist.sendJSON(json_query)
+            file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+            print ('JsonArtwork - return')
+        except:
+            pass
         return file_detail
 
-    
+        
     def LocalArtwork(self, path, type, arttype):
-        if Cache_Enabled:
-            self.log("LocalArtwork Cache")
-            try:
-                result = artwork.cacheFunction(self.LocalArtwork_NEW, path, type, arttype)
-            except:
-                self.log("LocalArtwork Cache Failed Forwarding to LocalArtwork_NEW")
-                result = self.LocalArtwork_NEW(path, type, arttype)
-                pass
-        else:
-            self.log("LocalArtwork Cache Disabled")
-            result = self.LocalArtwork_NEW(path, type, arttype)
-        if not result:
-            result = 0
-        return result
-        
-        
-    def LocalArtwork_NEW(self, path, type, arttype):
-        self.log('LocalArtwork_NEW')
+        print ('LocalArtwork')
         arttype = arttype.replace('folder','poster').replace('character','characterart').replace('logo','clearlogo').replace('disc','discart')#correct search names
         results = self.JsonArtwork(path)
         arttype = ((type + '.' + arttype if type == 'tvshow' else arttype))
@@ -91,162 +81,170 @@ class Artdownloader:
             arttypes = re.search(('"%s" *: *"(.*?)"' % arttype), f)
 
             if arttypes:
-                fletype = unquote((arttypes.group(1).split(','))[0]).replace('image://','').replace('.jpg/','.jpg').replace('.png/','.png')
+                fletype = (unquote((arttypes.group(1).split(','))[0])).replace('image://','').replace('.jpg/','.jpg').replace('.png/','.png')
 
             if fletype:
-                break
-        self.log('LocalArtwork_NEW - return')  
+                break 
+                
         return fletype
   
      
-    def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
-        if Cache_Enabled:
-            self.log("FindArtwork Cache")
-            chtype = int(chtype)
-            try: #stagger artwork cache by chtype
-                if chtype <= 3:
-                    result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                elif chtype > 3 and chtype <= 6:
-                    result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                elif chtype > 6 and chtype <= 9:
-                    result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                elif chtype > 9 and chtype <= 12:
-                    result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                elif chtype > 9 and chtype <= 15:
-                    result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                else:
-                    result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-            except:
-                self.log("FindArtwork Cache Failed Forwarding to FindArtwork_NEW")
-                result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
-                pass
-        else:
-            self.log("FindArtwork Cache Disabled")
-            result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
-        if not result:
-            result = 0
-        return result
+    # def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
+        # if Cache_Enabled:
+            # print ("FindArtwork Cache")
+            # chtype = int(chtype)
+            # try: #stagger artwork cache by chtype
+                # if chtype <= 3:
+                    # result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                # elif chtype > 3 and chtype <= 6:
+                    # result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                # elif chtype > 6 and chtype <= 9:
+                    # result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                # elif chtype > 9 and chtype <= 12:
+                    # result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                # elif chtype > 9 and chtype <= 15:
+                    # result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                # else:
+                    # result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+            # except:
+                # print ("FindArtwork Cache Failed Forwarding to FindArtwork_NEW")
+                # result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
+                # pass
+        # else:
+            # print ("FindArtwork Cache Disabled")
+            # result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
+        # if not result:
+            # result = 0
+        # return result
          
 
-    def FindArtwork_NEW(self, type, chtype, id, mediapath, arttypeEXT):
-        self.log('FindArtwork_NEW')
+    def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
+        print ('FindArtwork_NEW')
+        print type, chtype, id, mediapath, arttypeEXT
+        
         chtype = int(chtype)
         setImage = ''
         arttype = arttypeEXT.split(".")[0]
         fle = str(id) + '-' + arttypeEXT
+        smpath = os.path.dirname(mediapath)
         ArtCache = os.path.join(ART_LOC, fle)
         MediaImage = os.path.join(MEDIA_LOC, (arttype + '.png'))
         DefaultImage = os.path.join(DEFAULT_MEDIA_LOC, (arttype + '.png'))
-
-        if chtype <= 6:
-            self.log('FindArtwork, Local')
-            #XBMC Artwork
+        mediapathSeason, filename = os.path.split(mediapath)
+        mediapathSeries = os.path.dirname(mediapathSeason)
+        
+        if chtype <= 7:
+            print ('FindArtwork, Chtype <= 7')
+            print ('Find Json Artwork')
             setImage = self.LocalArtwork(mediapath, type, arttype)
             
             if not setImage:
-                #XBMC Artwork - Fallback
-                self.log('FindArtwork, Local - Local - Fallback')
+                print ('Find Json Artwork - Fallback')
                 arttype_fallback = arttype.replace('landscape','fanart')
                 setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
-                
-            if not setImage:
-                if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
-                    #PseudoTV Artwork Cache
-                    if FileAccess.exists(ArtCache):
-                        setImage = ArtCache
-                    else:
-                        #Download Artwork
-                        self.log('FindArtwork, Local - Download')
-                        setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
+                    
+                if not setImage:
+                    print ('Find Infolder Artwork')                        
+                    artSeries = xbmc.translatePath(os.path.join(smpath, arttypeEXT))
+                    artSeason = xbmc.translatePath(os.path.join(mediapath, arttypeEXT))
+                    print arttypeEXT, artSeries, artSeason
 
-                    if not setImage:
-                        #Download Artwork - Fallback
-                        self.log('FindArtwork, Local - Download - Fallback')
-                        arttype_fallback = arttypeEXT.replace('landscape','fanart')
-                        setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
+                    if FileAccess.exists(artSeries): 
+                        setImage = artSeries
+                    elif FileAccess.exists(artSeason):
+                        setImage = artSeason
+                    else:
+                        print ('Find Infolder Artwork - Fallback')
+                        arttypeEXT_fallback = arttypeEXT.replace('landscape','fanart')
+                        artSeries_fallback = xbmc.translatePath(os.path.join(smpath, arttypeEXT_fallback))
+                        artSeason_fallback = xbmc.translatePath(os.path.join(mediapath, arttypeEXT_fallback))
+                        print arttypeEXT_fallback, artSeries_fallback, artSeason_fallback
+
+                        if FileAccess.exists(artSeries_fallback): 
+                            setImage = artSeries_fallback
+                        elif FileAccess.exists(artSeason_fallback):
+                            setImage = artSeason_fallback
+                        else:
+                            if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                                print ('Find Artwork Cache')
+                                if FileAccess.exists(ArtCache):
+                                    setImage = ArtCache
+                                else:
+                                    print ('Find Download Artwork')
+                                    setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
+
+                                    if not setImage:
+                                        print ('Find Download Artwork - Fallback')
+                                        setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
        
-            if not setImage:    
-                self.log('FindArtwork, Local - Default')
-                #Default fallbacks
-                if FileAccess.exists(MediaImage):
-                    #Skin media
-                    setImage = MediaImage
-                elif FileAccess.exists(DefaultImage):
-                    #Default Skin media
-                    setImage = DefaultImage
-        
-        elif chtype == 7:
-            self.log('FindArtwork, Local - Directory')
-            folderArt = os.path.join(path, 'folder.jpg')
-            
-            if FileAccess.exists(folderArt):
-                setImage = folderArt
-            else:      
-                self.log('FindArtwork, Local - Directory - Default')
-                #Default fallbacks
-                if FileAccess.exists(MediaImage):
-                    #Skin media
-                    setImage = MediaImage
-                elif FileAccess.exists(DefaultImage):
-                    #Default Skin media
-                    setImage = DefaultImage
-        
+                            if not setImage:    
+                                print ('Find Default Artwork')
+                                #Default fallbacks
+                                if FileAccess.exists(MediaImage):
+                                    #Skin media
+                                    setImage = MediaImage
+                                elif FileAccess.exists(DefaultImage):
+                                    #Default Skin media
+                                    setImage = DefaultImage
+                
         else:
-            self.log('FindArtwork, NonLocal')
-            addon = ''
-            
-            try:
-                addon = mediapath.split('/')[2]
-            except Exception,e:
-                try:
-                    addon = (mediapath.split('/'))
-                    addon = ([x for x in addon if x != ''])
-                    addon = str(addon[1])
-                except:
-                    pass
-            
-            icon = 'special://home/addons/'+ str(addon) + '/icon.png'
-            fanart = 'special://home/addons/'+ str(addon) + '/fanart.jpg'
-            
+            print ('FindArtwork, Chtype > 7')
             if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
                 #PseudoTV Artwork Cache
+                print ('Find Artwork Cache')
                 if FileAccess.exists(ArtCache):
                     setImage = ArtCache
                 else:
                     #Download Artwork
-                    self.log('FindArtwork, NonLocal - Download')
+                    print ('Find Artwork Download')
                     setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
 
-                if not setImage:
-                    self.log('FindArtwork, NonLocal - Download - Fallback')
-                    #Download Artwork - Fallback
-                    arttype_fallback = arttypeEXT.replace('landscape','fanart')
-                    setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
+                    if not setImage:
+                        print ('Find Artwork Download - Fallback')
+                        #Download Artwork - Fallback
+                        arttype_fallback = arttypeEXT.replace('landscape','fanart')
+                        setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
 
-            if not setImage:
-                if FileAccess.exists(icon):
-                    setImage = icon
+                        if not setImage:
+                            addon = ''
+                            
+                            try:
+                                addon = mediapath.split('/')[2]
+                            except Exception,e:
+                                try:
+                                    addon = (mediapath.split('/'))
+                                    addon = ([x for x in addon if x != ''])
+                                    addon = str(addon[1])
+                                except:
+                                    pass
+                            
+                            icon = 'special://home/addons/'+ str(addon) + '/icon.png'
+                            fanart = 'special://home/addons/'+ str(addon) + '/fanart.jpg'
+            
+                            if FileAccess.exists(icon):
+                                print ('Find Icon Artwork')
+                                setImage = icon
                 
-                    # if arttype == 'landscape' or arttype == 'fanart':
-                        # if FileAccess.exists(fanart):
-                            # setImage = fanart
-                else:      
-                    #if chtype watermark setimage
-                    self.log('FindArtwork, NonLocal - Default')
-                    #Default fallbacks
-                    if FileAccess.exists(MediaImage):
-                        #Skin media
-                        setImage = MediaImage
-                    elif FileAccess.exists(DefaultImage):
-                        #Default Skin media
-                        setImage = DefaultImage            
+                            # if arttype == 'landscape' or arttype == 'fanart':
+                                # if FileAccess.exists(fanart):
+                                    # setImage = fanart
+                                    
+            if not setImage:     
+                #if chtype watermark setimage
+                print ('Find Default Artwork')
+                #Default fallbacks
+                if FileAccess.exists(MediaImage):
+                    #Skin media
+                    setImage = MediaImage
+                elif FileAccess.exists(DefaultImage):
+                    #Default Skin media
+                    setImage = DefaultImage            
                         
-        self.log('FindArtwork - return')  
         return setImage
         
                 
     def DownloadMetaArt(self, type, fle, id, typeEXT, ART_LOC):
-        self.log('DownloadMetaArt')
+        print ('DownloadMetaArt')
         ArtPath = os.path.join(ART_LOC, fle)
         
         if type == 'tvshow':
@@ -275,7 +273,7 @@ class Artdownloader:
         
             
     def DownloadArt(self, type, id, fle, typeEXT, ART_LOC):
-        self.log('DownloadArt')
+        print ('DownloadArt')
         tvdbAPI = TVDB(TVDB_API_KEY)
         tmdbAPI = TMDB(TMDB_API_KEY)     
 
@@ -296,7 +294,7 @@ class Artdownloader:
         if type == 'tvshow':
             FanTVDownload = False
             TVFilePath = os.path.join(ART_LOC, fle)
-            self.log('TVFilePath = ' + TVFilePath) 
+            print ('TVFilePath = ' + TVFilePath) 
             
             tvdb_Types = ['banner', 'fanart', 'folder', 'poster']
             
@@ -305,7 +303,7 @@ class Artdownloader:
                 tvdb = str(tvdbAPI.getBannerByID(id, ArtType))
                 try:
                     tvdbPath = tvdb.split(', ')[0].replace("[('", "").replace("'", "")
-                    self.log('tvdbPath = ' + tvdbPath)  
+                    print ('tvdbPath = ' + tvdbPath)  
                     resource = urllib.urlopen(tvdbPath)
                     output = FileAccess.open(TVFilePath, 'w')
                     output.write(resource.read())
@@ -313,7 +311,7 @@ class Artdownloader:
                     return TVFilePath
                 except Exception,e:
                     FanTVDownload = True
-                    self.log('tvdbAPI Failed!') 
+                    print ('tvdbAPI Failed!') 
                     pass
             else:
                 FanTVDownload = True
@@ -327,34 +325,34 @@ class Artdownloader:
                     fanPath = str([s for s in data if ArtType in s]).split("', 'art_type: ")[0]
                     match = re.search("url *: *(.*?),", fanPath)
                     fanPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
-                    self.log('fanPath = ' + fanPath)
+                    print ('fanPath = ' + fanPath)
                     resource = urllib.urlopen(fanPath)
                     output = FileAccess.open(TVFilePath, 'w')
                     output.write(resource.read())
                     output.close()
                     return TVFilePath
                 except Exception,e:
-                    self.log('FanTVDownload Failed!')    
+                    print ('FanTVDownload Failed!')    
                     pass
 
         elif type == 'movie':
             FanMovieDownload = False
             MovieFilePath = os.path.join(ART_LOC, fle)
-            self.log('MovieFilePath = ' + MovieFilePath) 
+            print ('MovieFilePath = ' + MovieFilePath) 
 
             tmdb = ['fanart', 'folder', 'poster']
             
             if ArtType in tmdb:
                 ArtType = ArtType.replace('folder', 'poster')
                 tmdb = tmdbAPI.get_image_list(id)
-                self.log('tmdb = ' + str(tmdb))
+                print ('tmdb = ' + str(tmdb))
                 try:
                     data = str(tmdb).replace("[", "").replace("]", "").replace("'", "")
                     data = data.split('}, {')
                     tmdbPath = str([s for s in data if ArtType in s]).split("', 'width: ")[0]
                     match = re.search('url *: *(.*?),', tmdbPath)
                     tmdbPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
-                    self.log('tmdbPath = ' + tmdbPath) 
+                    print ('tmdbPath = ' + tmdbPath) 
                     resource = urllib.urlopen(tmdbPath)
                     output = FileAccess.open(MovieFilePath, 'w')
                     output.write(resource.read())
@@ -362,7 +360,7 @@ class Artdownloader:
                     return MovieFilePath
                 except Exception,e:
                     FanMovieDownload = True
-                    self.log('tmdbAPI Failed!') 
+                    print ('tmdbAPI Failed!') 
                     pass
             else:
                 FanMovieDownload = True
@@ -370,20 +368,256 @@ class Artdownloader:
             if FanMovieDownload == True:
                 ArtType = ArtType.replace('folder', 'poster').replace('fanart', 'moviefanart')
                 fan = fanarttv.get_image_list_Movie(id)
-                self.log('fan = ' + str(fan))
+                print ('fan = ' + str(fan))
                 try:
                     data = str(fan).replace("[", "").replace("]", "").replace("'", "")
                     data = data.split('}, {')
                     fanPath = str([s for s in data if ArtType in s]).split("', 'art_type: ")[0]
-                    self.log('fanPath = ' + fanPath) 
+                    print ('fanPath = ' + fanPath) 
                     match = re.search("url *: *(.*?),", fanPath)
                     fanPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
-                    self.log('fanPath = ' + fanPath)
+                    print ('fanPath = ' + fanPath)
                     resource = urllib.urlopen(fanPath)
                     output = FileAccess.open(MovieFilePath, 'w')
                     output.write(resource.read())
                     output.close()
                     return MovieFilePath
                 except Exception,e:
-                    self.log('FanMovieDownload Failed!')
+                    print ('FanMovieDownload Failed!')
                     pass                
+
+                    
+    def EXTtype(self, arttype): 
+        print ('EXTtype')               
+        JPG = ['banner', 'fanart', 'folder', 'landscape', 'poster']
+        PNG = ['character', 'clearart', 'logo', 'disc']
+        
+        if arttype in JPG:
+            arttypeEXT = (arttype + '.jpg')
+        else:
+            arttypeEXT = (arttype + '.png')
+        print ('EXTtype = ' + str(arttypeEXT))
+        return arttypeEXT
+        
+        
+    def ArtSpool(self, chtype, channel):
+        print 'ArtSpool'
+        print str(chtype), ' ', str(channel)
+        exclude = ['#EXTM3U', '#EXTINF']
+        lineLST = []
+        newLST = []
+        ArtLST = []
+        id = -1
+        type = ''
+        mpath = ''
+        fle = xbmc.translatePath(os.path.join(LOCK_LOC, ("channel_" + str(channel) + '.m3u')))
+        
+        global ArtService_Running
+        if not ArtService_Running:
+            ArtService_Running = True
+            
+            if chtype >= 0:
+                try:
+                    if FileAccess.exists(fle):
+                        f = FileAccess.open(fle, 'r')
+                        lineLST = f.readlines()
+                        lineLST.pop(0) #Remove unwanted first line '#EXTM3U'
+                        for n in range(len(lineLST)):
+                            line = lineLST[n]
+                            
+                            if line[0:7] == '#EXTINF':
+                            
+                                try:
+                                    TV_liveid = (line.split('tvshow|')[1])
+                                    TV_liveid =  'tvshow|' + TV_liveid
+                                    type = (TV_liveid.split('|'))[0]
+                                    id = (TV_liveid.split('|'))[1]
+                                except Exception,e:
+                                    MO_liveid = line.split('movie|')[1]
+                                    MO_liveid = 'movie|' + MO_liveid
+                                    type = MO_liveid.split('|')[0]
+                                    id = MO_liveid.split('|')[1]
+                                except:
+                                    pass
+                            
+                            elif line[0:7] not in exclude:
+                                if id != -1:
+                                    if line[0:5] == 'stack':
+                                        line = (line.split(' , ')[0]).replace('stack://','').replace('rar://','')
+                                    mpath = (os.path.split(line)[0])
+
+                                    if type and mpath:
+                                        newLST = [type, chtype, id, mpath]
+                                        print newLST
+                                        ArtLST.append(newLST)
+                except:
+                    pass
+                            
+            random.shuffle(ArtLST)
+            print ArtLST
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Spooling Channel " +  str(channel), 4000, THUMB) )
+            
+            if len(ArtLST) > 0:
+                try:
+                    type1EXT = REAL_SETTINGS.getSetting('type1EXT')
+                except:
+                    type1EXT = 'landscape.jpg'
+                    pass
+                
+                try:
+                    type2EXT = REAL_SETTINGS.getSetting('type2EXT')
+                except:
+                    type2EXT = 'logo.png'
+                    pass
+
+                for i in range(len(ArtLST)):
+                    setImage1 = ''
+                    setImage2 = ''
+                    lineLST = ArtLST[i]
+                    type = lineLST[0]
+                    chtype = lineLST[1]
+                    id = lineLST[2]
+                    mpath = lineLST[3]
+                    
+                    setImage1 = self.FindArtwork(type, chtype, id, mpath, type1EXT)
+                    setImage2 = self.FindArtwork(type, chtype, id, mpath, type2EXT)
+                    print "ArtSpool Finished Channel " + str(channel)   
+                    ArtService_Running = False             
+                
+ 
+    def PreArtService(self):
+        print 'PreArtService'
+        ADDON_SETTINGS.loadSettings()
+        exclude = ['#EXTM3U', '#EXTINF']
+        i = 0
+        lineLST = []
+        newLST = []
+        ArtLST = []
+        
+        for i in range(999):
+            chtype = -1
+            id = -1
+            type = ''
+            mpath = ''
+            
+            try:
+                chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(i + 1) + '_type'))
+                fle = xbmc.translatePath(os.path.join(LOCK_LOC, ("channel_" + str(i + 1) + '.m3u')))
+            except:
+                pass
+            
+            if chtype >= 0:
+                try:
+                    if FileAccess.exists(fle):
+                        f = FileAccess.open(fle, 'r')
+                        lineLST = f.readlines()
+                        lineLST.pop(0) #Remove unwanted first line '#EXTM3U'
+                        for n in range(len(lineLST)):
+                            line = lineLST[n]
+                            
+                            if line[0:7] == '#EXTINF':
+                            
+                                try:
+                                    TV_liveid = (line.split('tvshow|')[1])
+                                    TV_liveid =  'tvshow|' + TV_liveid
+                                    type = (TV_liveid.split('|'))[0]
+                                    id = (TV_liveid.split('|'))[1]
+                                except Exception,e:
+                                    MO_liveid = line.split('movie|')[1]
+                                    MO_liveid = 'movie|' + MO_liveid
+                                    type = MO_liveid.split('|')[0]
+                                    id = MO_liveid.split('|')[1]
+                                except:
+                                    pass
+                            
+                            elif line[0:7] not in exclude:
+                                if id != -1:
+                                    if line[0:5] == 'stack':
+                                        line = (line.split(' , ')[0]).replace('stack://','').replace('rar://','')
+                                    mpath = (os.path.split(line)[0])
+
+                                    if type and mpath:
+                                        newLST = [type, chtype, id, mpath]
+                                        print newLST
+                                        ArtLST.append(newLST)
+                except:
+                    pass
+                        
+        random.shuffle(ArtLST)
+        print 'PreArtService - Total Count - ' + str(len(ArtLST))
+        return ArtLST
+
+    
+    def ArtService(self, Art_Msg=ArtService_Msg):
+        print 'ArtService'
+        
+        global ArtService_Running
+        if not ArtService_Running:
+            start = datetime.datetime.today()
+            print 'ArtService_Start = ' + str(start)
+            
+            ArtService_Running = True
+            ArtLst = self.PreArtService()
+            
+            if (Art_Msg == 'true'):
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Spooling Started", 4000, THUMB) )
+            
+            # Clear Artwork Cache Folders
+            if REAL_SETTINGS.getSetting("ClearLiveArt") == "true":
+
+                try: # Dynamic Artwork Cache
+                    shutil.rmtree(ART_LOC)
+                except:
+                    pass
+                    
+                artwork.delete("%") 
+                artwork1.delete("%")
+                artwork2.delete("%")
+                artwork3.delete("%")
+                artwork4.delete("%")
+                artwork5.delete("%")
+                artwork6.delete("%")
+                time.sleep(5)
+                xbmc.log('script.pseudotv.live-service: ArtCache Purged!')
+                REAL_SETTINGS.setSetting('ClearLiveArt', "false")
+                REAL_SETTINGS.setSetting('ArtService_LastRun', "")
+     
+                if (Art_Msg == 'true'):
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Cache Cleared", 4000, THUMB) )
+                
+            try:
+                type1EXT = REAL_SETTINGS.getSetting('type1EXT')
+            except:
+                type1EXT = 'landscape.jpg'
+                pass
+            
+            try:
+                type2EXT = REAL_SETTINGS.getSetting('type2EXT')
+            except:
+                type2EXT = 'logo.png'
+                pass
+    
+            for i in range(len(ArtLst)):
+                setImage1 = ''
+                setImage2 = ''
+                lineLST = ArtLst[i]
+                type = lineLST[0]
+                chtype = lineLST[1]
+                id = lineLST[2]
+                mpath = lineLST[3]
+                
+                setImage1 = self.FindArtwork(type, chtype, id, mpath, type1EXT)
+                setImage2 = self.FindArtwork(type, chtype, id, mpath, type2EXT)
+                print setImage1, setImage2
+            
+            stop = datetime.datetime.today()
+            finished = stop - start
+            MSSG = ("Artwork Spooling Finished in %d seconds" %finished.seconds)
+            print str(MSSG)
+            
+            REAL_SETTINGS.setSetting("ArtService_LastRun",str(stop))
+            ArtService_Running = False
+            
+            if (Art_Msg == 'true'):
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSSG, 2000, THUMB) )
+        

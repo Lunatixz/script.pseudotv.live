@@ -40,19 +40,19 @@ try:#If found, Load PTVL Skin
 except:#Else, Load PTV Skin
     MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.TVOverlay.xml", __cwd__, Skin_Select)
     
-for curthread in threading.enumerate():
-    try:
-        log("Active Thread: " + str(curthread.name), xbmc.LOGERROR)
+# for curthread in threading.enumerate():
+    # try:
+        # log("Active Thread: " + str(curthread.name), xbmc.LOGERROR)
 
-        if curthread.name != "MainThread":
-            try:
-                curthread.join()
-            except:
-                pass
+        # if curthread.name != "MainThread":
+            # try:
+                # curthread.join()
+            # except:
+                # pass
 
-            log("Joined " + curthread.name)
-    except:
-        pass
+            # log("Joined " + curthread.name)
+    # except:
+        # pass
           
 del MyOverlayWindow
   

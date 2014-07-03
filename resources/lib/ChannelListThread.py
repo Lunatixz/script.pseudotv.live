@@ -28,7 +28,6 @@ from Channel import Channel
 from Globals import *
 
 
-
 class ChannelListThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)

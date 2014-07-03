@@ -81,7 +81,7 @@ TOTAL_FILL_CHANNELS = 20
 PREP_CHANNEL_TIME = 60 * 60 * 24 * 5
 ALLOW_CHANNEL_HISTORY_TIME = 60 * 60 * 24 * 1
 NOTIFICATION_CHECK_TIME = 5
-NOTIFICATION_TIME_BEFORE_END = 90
+NOTIFICATION_TIME_BEFORE_END = 480
 NOTIFICATION_DISPLAY_TIME = 8
 
 MODE_RESUME = 1
@@ -234,9 +234,10 @@ COLOR_ltGRAY_TYPE = ['0', '7', 'NR', 'Consumer', 'Game Show', 'Other', 'Unknown'
 COLOR_CHANNUM = ['0xFF0297eb', '0xC0C0C0C0', '0xff00ff00', '0xff888888', '0xffcccccc', '0xffffffff']
 CHANBUG_COLOR = COLOR_CHANNUM[int(REAL_SETTINGS.getSetting('COLOR_CHANNUM'))]
 
+AUTOSTART_TIMER = [0,5,10,15,20]#in seconds
 SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
-MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]
+MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]#Media Per/Channel
 REFRESH_INT = [21600,43200,86400,172800,216000]#6,12,24,48,72hrs
 
 GlobalFileLock = FileLock()
@@ -264,7 +265,7 @@ ACTION_MOVE_DOWN = 4
 ACTION_PAGEUP = 5
 ACTION_PAGEDOWN = 6
 ACTION_SELECT_ITEM = 7
-ACTION_PREVIOUS_MENU = (9, 10, 92, 216, 247, 257, 350, 61467, 61448,)
+ACTION_PREVIOUS_MENU = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
 ACTION_SHOW_INFO = 11
 ACTION_PAUSE = 12
 ACTION_STOP = 13
@@ -327,3 +328,9 @@ BYPASS_EPG = ['PseudoCinema']
 
 # Bypass Overlay Coming up next by channel name
 BYPASS_OVERLAY = ['PseudoCinema']
+
+# Dynamic Artwork Service
+ArtService_Enabled = REAL_SETTINGS.getSetting("art.enable")
+ArtService_Msg = REAL_SETTINGS.getSetting('ArtService_notify')
+ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]  
+ArtService_Background = REAL_SETTINGS.getSetting('ArtService_Background') 

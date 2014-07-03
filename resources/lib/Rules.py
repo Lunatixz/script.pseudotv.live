@@ -1364,11 +1364,15 @@ class SetResetTime(BaseRule):
             rightnow = int(time.time())
             nextreset = rightnow
 
+            try:
+                nextreset = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchan) + '_SetResetTime'))
+            except:
+                pass
+                
             if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
                 try:
                     Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))] #refresh time in seconds
-                    Refresh = Refresh / 60 #convert to minutes
-                    
+
                     if rightnow >= nextreset:
                         channeldata.isValid = False
                         ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
@@ -1378,11 +1382,7 @@ class SetResetTime(BaseRule):
                     pass
 
             else:
-                try:
-                    nextreset = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchan) + '_SetResetTime'))
-                except:
-                    pass
-
+            
                 if rightnow >= nextreset:
                     channeldata.isValid = False
                     ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
