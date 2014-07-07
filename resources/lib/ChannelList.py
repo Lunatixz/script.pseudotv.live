@@ -119,6 +119,7 @@ class ChannelList:
         if self.forceReset:
             daily.delete("%") 
             weekly.delete("%")
+            REAL_SETTINGS.setSetting("INTRO_PLAYED","false")
             REAL_SETTINGS.setSetting("ArtService_LastRun",'')
             REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
             self.forceReset = False
@@ -135,6 +136,7 @@ class ChannelList:
             
             
     def setupList(self):
+        print 'setupList'
         self.readConfig()
         self.updateDialog.create("PseudoTV Live", "Updating channel list")
         self.updateDialog.update(0, "Updating channel list")
@@ -182,7 +184,6 @@ class ChannelList:
         self.updateDialog.update(100, "Update complete")
         self.updateDialog.close()
         return self.channels
-
 
 
     def log(self, msg, level = xbmc.LOGDEBUG):
@@ -466,6 +467,8 @@ class ChannelList:
                             ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'False')
                             self.channels[channel - 1].isSetup = True
                     
+                
+                
                 # self.Artdownloader = Artdownloader()
                 # ArtSpoolThreadTimer = threading.Timer(1, self.Artdownloader.ArtSpool, args=[chtype, channel])
                 # ArtSpoolThreadTimer.start()
@@ -725,7 +728,6 @@ class ChannelList:
                 self.log("makeChannelList Unable to open the smart playlist " + fle, xbmc.LOGERROR)
                 return False
 
-
             try:
                 dom = parse(xml)
             except Exception,e:
@@ -784,6 +786,9 @@ class ChannelList:
 
         if append == False:
             channelplaylist.write(uni("#EXTM3U\n"))
+
+            # if channel == 1:
+                # channelplaylist.write(uni("#EXTINF:17,PseudoTV Live//Welcome to PseudoTV Live////Unknown////tvshow|0|0|False|1|NR|") + uni("\n") + uni("plugin://plugin.video.youtube/?action=play_video&videoid=Y8WlAhpHzkM\n"))
         
         if fileList != None:  
             if len(fileList) == 0:
@@ -813,7 +818,7 @@ class ChannelList:
         # Write each entry into the new playlist
         for string in fileList:
             channelplaylist.write(uni("#EXTINF:") + uni(string) + uni("\n"))
-
+            
         channelplaylist.close()
         self.log('makeChannelList return')
         return True
@@ -1937,7 +1942,7 @@ class ChannelList:
         
         if setting3 == 'ustvnow' or setting3 == 'ftvguide':
             GMToffset = True
-            f = OPEN_URL_CACHE(self.xmlTvFile)
+            f = Open_URL(self.xmlTvFile)
             
         elif setting3 != '':
             f = FileAccess.open(self.xmlTvFile, "rb")
@@ -2942,7 +2947,7 @@ class ChannelList:
         urlOK = True
         pluginOK = True
         lines = ''
-        fallback = 'plugin://plugin.video.youtube/?path=/root/video&amp;action=play_video&amp;videoid=Y8WlAhpHzkM'
+        fallback = INTRO
 
         try:
             f = FileAccess.open(setting2, "rb")
@@ -4758,7 +4763,7 @@ class ChannelList:
         elif setting1 == 'Playlist':
             url = Playlist_List
 
-        f = OPEN_URL_CACHE(url)
+        f = Open_URL(url)
         linesLST = f.readlines()
         linesLST = linesLST[2:]
         f.close

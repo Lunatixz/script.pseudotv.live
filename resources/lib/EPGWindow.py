@@ -1139,7 +1139,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.log('setArtwork1')
         try:
             self.getControl(508).setImage('NA.png')
-            setImage1 = self.Artdownloader.FindArtwork(type, chtype, id, mpath, type1EXT)
+            setImage1 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type1EXT)
             self.getControl(508).setImage(setImage1)
         except:
             pass  
@@ -1149,7 +1149,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.log('setArtwork2')
         try: 
             self.getControl(510).setImage('NA.png')
-            setImage2 = self.Artdownloader.FindArtwork(type, chtype, id, mpath, type2EXT)
+            setImage2 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type2EXT)
             self.getControl(510).setImage(setImage2)
         except:
             pass
@@ -1157,7 +1157,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         
     # using the currently selected button, play the proper shows
     def selectShow(self):
-        self.log('selectShow')
+        self.log('selectShow')    
+        CurChannel = self.MyOverlayWindow.currentChannel
+        REAL_SETTINGS.setSetting('LastChannel', str(CurChannel))
+        
         try:
             basex, basey = self.getControl(111 + self.focusRow).getPosition()
             baseh = self.getControl(111 + self.focusRow).getHeight()

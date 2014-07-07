@@ -1316,9 +1316,15 @@ class PlayShowInOrder(BaseRule):
 
 class SetResetTime(BaseRule):
     def __init__(self):
-        self.name = "Reset Every x Days"
-        self.optionLabels = ['Number of Days']
-        self.optionValues = ['5']
+        if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+            self.name = "Reset Every x Hours"
+            self.optionLabels = ['Number of Hours']
+            self.optionValues = ['6']
+
+        else:
+            self.name = "Reset Every x Days"
+            self.optionLabels = ['Number of Days']
+            self.optionValues = ['5']
         self.myId = 13
         self.actions = RULES_ACTION_START
 
@@ -1329,10 +1335,16 @@ class SetResetTime(BaseRule):
 
     def getTitle(self):
         if len(self.optionValues[0]) > 0:
-            if self.optionValues[0] == '1':
-                return "Reset Every Day"
+            if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+                if self.optionValues[0] == '1':
+                    return "Reset Every Hour"
+                else:
+                    return "Reset Every " + self.optionValues[0] + " Hours"
             else:
-                return "Reset Every " + self.optionValues[0] + " Days"
+                if self.optionValues[0] == '1':
+                    return "Reset Every Day"
+                else:
+                    return "Reset Every " + self.optionValues[0] + " Days"
 
         return self.name
 
@@ -1370,16 +1382,12 @@ class SetResetTime(BaseRule):
                 pass
                 
             if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
-                try:
-                    Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))] #refresh time in seconds
-
-                    if rightnow >= nextreset:
-                        channeldata.isValid = False
-                        ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
-                        nextreset = int(time.time()+Refresh)
-                        ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_SetResetTime', str(nextreset))
-                except:
-                    pass
+                
+                if rightnow >= nextreset:
+                    channeldata.isValid = False
+                    ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
+                    nextreset = rightnow + ((60 * numdays) * 60)
+                    ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_SetResetTime', str(nextreset))
 
             else:
             

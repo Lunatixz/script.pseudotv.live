@@ -1,3 +1,5 @@
+[*] Last Channel recall, requires Virtual Keyboard "ACTION_SHIFT" to be key-mapped.
+[*] Intro video, improved error handling.
 [*] EPG Speed tweaks, XBMC Library Artwork semi-working...
 [*] Art Service linked with Dynamic Artwork, Enabling Dynamic Artwork forces service.
 [*] Skin Change & Force Channel Reset triggers Art Service (if applicable).

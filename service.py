@@ -48,7 +48,7 @@ def ArtServiceTimer(time=1800):
     print 'ArtServiceTimer'
     global PseudoTVRunning 
     if not PseudoTVRunning:
-        now = datetime.datetime.today()
+        now  = datetime.datetime.today()
         Artdown = Artdownloader()
         ArtServiceTimerThread = threading.Timer(float(time), ArtServiceTimer)
         ArtServiceTimerThread.name = 'script.pseudotv.live-service: ArtServiceTimer_Thread'
@@ -60,6 +60,7 @@ def ArtServiceTimer(time=1800):
             ArtService_NextRun = (ArtService_LastRun + datetime.timedelta(seconds=ArtService_Timer))
         except:
             ArtService_NextRun = now
+            REAL_SETTINGS.setSetting("ArtService_LastRun",str(now))
             pass
             
         if now >= ArtService_NextRun:  
@@ -122,7 +123,7 @@ def HubSwap():
         except:
             pass    
           
-          
+ 
 def CEpack():
     xbmc.log('script.pseudotv.live-service: CEpack')
 
@@ -141,19 +142,14 @@ def autostart():
     sleep(IDLE_TIME)
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
 
-    
-if sys.argv[0] == '-AutoRestart':
-    xbmc.log('script.pseudotv.live-service: Auto_RESTART')
-    sleep(2)
-    xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
-else:
-    CEpack()
-    HubSwap()
 
-    if (Enabled == 'true'):
-        autostart()
-     
-    if (ArtService_Enabled == 'true'): 
-        sleep(IDLE_TIME + 900)
-        ArtServiceTimer() 
-        ChangeMonitor()
+CEpack()
+HubSwap()
+
+if (Enabled == 'true'):
+    autostart()
+ 
+if (ArtService_Enabled == 'true'): 
+    # sleep(IDLE_TIME + 900)
+    ArtServiceTimer() 
+    ChangeMonitor()

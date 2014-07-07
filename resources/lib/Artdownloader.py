@@ -61,7 +61,7 @@ class Artdownloader:
         file_detail = []
         try:
             chanlist = ChannelList()
-            json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","media":"%s","properties":["art"]},"id":1}' % (chanlist.escapeDirJSON(mpath), media))
+            json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","media":"%s","properties":["art"]},"id":10}' % (chanlist.escapeDirJSON(mpath), media))
             json_folder_detail = chanlist.sendJSON(json_query)
             file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
             print ('JsonArtwork - return')
@@ -89,36 +89,36 @@ class Artdownloader:
         return fletype
   
      
-    # def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
-        # if Cache_Enabled:
-            # print ("FindArtwork Cache")
-            # chtype = int(chtype)
-            # try: #stagger artwork cache by chtype
-                # if chtype <= 3:
-                    # result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                # elif chtype > 3 and chtype <= 6:
-                    # result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                # elif chtype > 6 and chtype <= 9:
-                    # result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                # elif chtype > 9 and chtype <= 12:
-                    # result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                # elif chtype > 9 and chtype <= 15:
-                    # result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-                # else:
-                    # result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
-            # except:
-                # print ("FindArtwork Cache Failed Forwarding to FindArtwork_NEW")
-                # result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
-                # pass
-        # else:
-            # print ("FindArtwork Cache Disabled")
-            # result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
-        # if not result:
-            # result = 0
-        # return result
+    def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
+        if Cache_Enabled:
+            print ("FindArtwork Cache")
+            chtype = int(chtype)
+            try: #stagger artwork cache by chtype
+                if chtype <= 3:
+                    result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 3 and chtype <= 6:
+                    result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 6 and chtype <= 9:
+                    result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 9 and chtype <= 12:
+                    result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                elif chtype > 9 and chtype <= 15:
+                    result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                else:
+                    result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+            except:
+                print ("FindArtwork Cache Failed Forwarding to FindArtwork_NEW")
+                result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
+                pass
+        else:
+            print ("FindArtwork Cache Disabled")
+            result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
+        if not result:
+            result = 0
+        return result
          
 
-    def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
+    def FindArtwork_NEW(self, type, chtype, id, mediapath, arttypeEXT):
         print ('FindArtwork_NEW')
         print type, chtype, id, mediapath, arttypeEXT
         
@@ -580,7 +580,6 @@ class Artdownloader:
                 time.sleep(5)
                 xbmc.log('script.pseudotv.live-service: ArtCache Purged!')
                 REAL_SETTINGS.setSetting('ClearLiveArt', "false")
-                REAL_SETTINGS.setSetting('ArtService_LastRun', "")
      
                 if (Art_Msg == 'true'):
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Cache Cleared", 4000, THUMB) )
@@ -608,7 +607,6 @@ class Artdownloader:
                 
                 setImage1 = self.FindArtwork(type, chtype, id, mpath, type1EXT)
                 setImage2 = self.FindArtwork(type, chtype, id, mpath, type2EXT)
-                print setImage1, setImage2
             
             stop = datetime.datetime.today()
             finished = stop - start
