@@ -81,7 +81,7 @@ TOTAL_FILL_CHANNELS = 20
 PREP_CHANNEL_TIME = 60 * 60 * 24 * 5
 ALLOW_CHANNEL_HISTORY_TIME = 60 * 60 * 24 * 1
 NOTIFICATION_CHECK_TIME = 5
-NOTIFICATION_TIME_BEFORE_END = 90
+NOTIFICATION_TIME_BEFORE_END = 240
 NOTIFICATION_DISPLAY_TIME = 8
 
 MODE_RESUME = 1
@@ -124,6 +124,7 @@ TIME_BAR = 'pstvTimeBar.png'
 BUTTON_FOCUS = 'pstvButtonFocus.png'
 BUTTON_NO_FOCUS = 'pstvButtonNoFocus.png'
 THUMB = (DEFAULT_IMAGES_LOC + 'icon.png')
+INTRO = (DEFAULT_IMAGES_LOC + 'PTVL_INTRO.mp4')
 
 #Channel Sharing location changes
 if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
@@ -234,9 +235,10 @@ COLOR_ltGRAY_TYPE = ['0', '7', 'NR', 'Consumer', 'Game Show', 'Other', 'Unknown'
 COLOR_CHANNUM = ['0xFF0297eb', '0xC0C0C0C0', '0xff00ff00', '0xff888888', '0xffcccccc', '0xffffffff']
 CHANBUG_COLOR = COLOR_CHANNUM[int(REAL_SETTINGS.getSetting('COLOR_CHANNUM'))]
 
+AUTOSTART_TIMER = [0,5,10,15,20]#in seconds
 SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
-MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]
+MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]#Media Per/Channel
 REFRESH_INT = [21600,43200,86400,172800,216000]#6,12,24,48,72hrs
 
 GlobalFileLock = FileLock()
@@ -264,16 +266,12 @@ ACTION_MOVE_DOWN = 4
 ACTION_PAGEUP = 5
 ACTION_PAGEDOWN = 6
 ACTION_SELECT_ITEM = 7
-ACTION_PREVIOUS_MENU = (9, 10, 92, 216, 247, 257, 350, 61467, 61448,)
+ACTION_PREVIOUS_MENU = (9, 10, 92, 247, 257, 275, 61467, 61448)
+##KEY_BUTTON_BACK = 275   
+##ACTION_NAV_BACK = 92
 ACTION_SHOW_INFO = 11
 ACTION_PAUSE = 12
 ACTION_STOP = 13
-ACTION_NEXT_ITEM = 14
-ACTION_PREV_ITEM = 15
-ACTION_STEP_FOWARD = 17
-ACTION_STEP_BACK = 18
-ACTION_BIG_STEP_FORWARD = 19
-ACTION_BIG_STEP_BACK = 20
 ACTION_OSD = 122
 ACTION_NUMBER_0 = 58
 ACTION_NUMBER_1 = 59
@@ -285,22 +283,64 @@ ACTION_NUMBER_6 = 64
 ACTION_NUMBER_7 = 65
 ACTION_NUMBER_8 = 66
 ACTION_NUMBER_9 = 67
-ACTION_PLAYER_FORWARD = 73
-ACTION_PLAYER_REWIND = 74
-ACTION_PLAYER_PLAY = 75
-ACTION_PLAYER_PLAYPAUSE = 76
-#ACTION_MENU = 117
-ACTION_MENU = 7
 ACTION_INVALID = 999
 ACTION_SHOW_SUBTITLES = 25 #turn subtitles on/off. 
 ACTION_AUDIO_NEXT_LANGUAGE = 56 #Select next language in movie
 ACTION_RECORD = 170 #PVR Backend Record
+ACTION_SHOW_CODEC = 27
+ACTION_ASPECT_RATIO = 19 
+ACTION_SHIFT = 118
+#unused
+ACTION_NEXT_ITEM = 14
+ACTION_PREV_ITEM = 15
+ACTION_STEP_FOWARD = 17
+ACTION_STEP_BACK = 18
+ACTION_BIG_STEP_FORWARD = 19
+ACTION_BIG_STEP_BACK = 20
+ACTION_PLAYER_FORWARD = 73
+ACTION_PLAYER_REWIND = 74
+ACTION_PLAYER_PLAY = 75
+ACTION_PLAYER_PLAYPAUSE = 76
+ACTION_TRIGGER_OSD = 243 #show autoclosing OSD. Can b used in videoFullScreen.xml window id=2005
+ACTION_SHOW_MPLAYER_OSD = 83 #toggles mplayers OSD. Can be used in videofullscreen.xml window id=2005
+ACTION_SHOW_OSD_TIME = 123 #displays current time, can be used in videoFullScreen.xml window id=2005
+#ACTION_MENU = 117
+ACTION_MENU = 7
 ACTION_TELETEXT_RED = 215
 ACTION_TELETEXT_GREEN = 216
 ACTION_TELETEXT_YELLOW = 217
 ACTION_TELETEXT_BLUE = 218
-ACTION_SHOW_CODEC = 27
-ACTION_ASPECT_RATIO = 19 
+
+#define ACTION_VOLUME_UP            88
+#define ACTION_VOLUME_DOWN          89
+#define ACTION_MUTE                 91
+#define ACTION_VOLAMP_UP            93
+#define ACTION_VOLAMP_DOWN          94
+#define ACTION_CHANNEL_SWITCH         183 #last channel?
+#define ACTION_TOGGLE_WATCHED         200 // Toggle watched status (videos)
+#define ACTION_TOGGLE_DIGITAL_ANALOG  202 // switch digital <-> analog
+#Touch Support todo
+#// touch actions
+#define ACTION_TOUCH_TAP              401
+#define ACTION_TOUCH_TAP_TEN          410
+#define ACTION_TOUCH_LONGPRESS        411
+#define ACTION_TOUCH_LONGPRESS_TEN    420
+#define ACTION_GESTURE_NOTIFY         500
+#define ACTION_GESTURE_BEGIN          501
+#define ACTION_GESTURE_ZOOM           502 //sendaction with point and currentPinchScale (fingers together < 1.0 -> fingers apart > 1.0)
+#define ACTION_GESTURE_ROTATE         503
+#define ACTION_GESTURE_PAN            504
+#define ACTION_GESTURE_SWIPE_LEFT       511
+#define ACTION_GESTURE_SWIPE_LEFT_TEN   520
+#define ACTION_GESTURE_SWIPE_RIGHT      521
+#define ACTION_GESTURE_SWIPE_RIGHT_TEN  530
+#define ACTION_GESTURE_SWIPE_UP         531
+#define ACTION_GESTURE_SWIPE_UP_TEN     540
+#define ACTION_GESTURE_SWIPE_DOWN       541
+#define ACTION_GESTURE_SWIPE_DOWN_TEN   550
+#// 5xx is reserved for additional gesture actions
+#define ACTION_GESTURE_END            599
+
 
 #Cinema Experience
 CE_THEME = ['Default', 'IMAX']
@@ -316,8 +356,8 @@ CE_RATINGS_LOC = xbmc.translatePath(os.path.join(CE_LOC, 'ratings')) + '/'
 UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V']
 
 #Dynamic Artwork plugin
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd'] #Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd'] #Title format must be "Movie (Year)"
 
 # Plugin seek blacklist
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow']
@@ -327,3 +367,9 @@ BYPASS_EPG = ['PseudoCinema']
 
 # Bypass Overlay Coming up next by channel name
 BYPASS_OVERLAY = ['PseudoCinema']
+
+# Dynamic Artwork Service
+ArtService_Enabled = REAL_SETTINGS.getSetting("art.enable")
+ArtService_Msg = REAL_SETTINGS.getSetting('ArtService_notify')
+ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]  
+ArtService_Background = REAL_SETTINGS.getSetting('ArtService_Background') 

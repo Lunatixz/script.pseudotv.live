@@ -102,6 +102,7 @@
                 <width>20</width>
                 <height>20</height>
                 <aspectratio>scale</aspectratio>
+                <visible></visible>
             </control> 
             <control type="image" id="512">
                 <description>Unaired NEW Icon</description>         
@@ -110,6 +111,7 @@
                 <width>100</width>
                 <height>100</height>
                 <aspectratio>keep</aspectratio>
+                <visible></visible>
             </control>
             <control type="label" id="502">
                 <posx>-15</posx>

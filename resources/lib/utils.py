@@ -45,7 +45,7 @@ def _pbhook(numblocks, blocksize, filesize, dp, start_time):
         dp.close() 
        
        
-def OPEN_URL(url):
+def Request_URL(url):
     try:
         req=urllib2.Request(url)
         req.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
@@ -55,26 +55,9 @@ def OPEN_URL(url):
         return link
     except:
         pass
-        
-        
-def OPEN_URL_CACHE(url):
-    if Cache_Enabled:
-        xbmc.log("OPEN_URL_CACHE Cache")
-        try:
-            result = xmltv.cacheFunction(OPEN_URL_CACHE_NEW, url)
-        except:
-            xbmc.log("OPEN_URL_CACHE Cache Failed Forwarding to OPEN_URL_CACHE_NEW")
-            result = OPEN_URL_CACHE_NEW(url)
-            pass
-    else:
-        xbmc.log("OPEN_URL_CACHE Cache Disabled")
-        result = OPEN_URL_CACHE_NEW(url)
-    if not result:
-        result = 0
-    return result
+           
     
-    
-def OPEN_URL_CACHE_NEW(url):        
+def Open_URL(url):        
     try:
         f = urllib2.urlopen(url)
         return f
@@ -138,7 +121,7 @@ class TextBox:
 
     def setControls(self):
         # set heading
-        heading = "PseudoTV Live Changelog v%s" % (ADDON_VERSION)
+        heading = "Changelog - PseudoTV Live v%s" % (ADDON_VERSION)
         self.win.getControl(self.CONTROL_LABEL).setLabel(heading)
         # set text
         faq_path =(os.path.join(ADDON_PATH, 'changelog.txt'))

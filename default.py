@@ -36,12 +36,12 @@ __author__     = "Lunatixz, Jason102 & Angrycamel"
 __url__        = "https://github.com/Lunatixz/script.pseudotv.live"
 __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
 __cwd__        = __settings__.getAddonInfo('path')
-UPDATED = False
    
 # Adapting a solution from ronie (http://forum.xbmc.org/showthread.php?t=97353)
 if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
     xbmcgui.Window(10000).setProperty("PseudoTVRunning", "True")
     shouldrestart = False
+    UPDATED = False
 
     if shouldrestart == False:
     
@@ -76,6 +76,10 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
         
         #If Updated, Textbox, Videowindow and DonorDownload...
         if UPDATED:
+            REAL_SETTINGS.setSetting("AT_Donor", "false")
+            REAL_SETTINGS.setSetting("COM_Donor", "false")
+            REAL_SETTINGS.setSetting("TRL_Donor", "false")
+            REAL_SETTINGS.setSetting("CAT_Donor", "false")
             REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
             REAL_SETTINGS.setSetting('ClearCache', 'true')
             xbmc.executebuiltin("RunScript("+__cwd__+"/videowindow.py,-autopatch)")
@@ -91,7 +95,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             
                 try:
                     shutil.rmtree(BCT_LOC)
-                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "BCT Cache Cleared", 2000, THUMB) )
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "BCT Cache Cleared", 4000, THUMB) )
                     REAL_SETTINGS.setSetting('ClearBCT', "false")
                     xbmc.log('script.pseudotv.live-default: BCT Folder Purged!')
                 except Exception,e:
@@ -113,15 +117,15 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                     shutil.rmtree(ART_LOC)
                 except:
                     pass
-                            
-                artwork.delete("%")         
+                                
+                artwork.delete("%") 
                 artwork1.delete("%")
                 artwork2.delete("%")
                 artwork3.delete("%")
                 artwork4.delete("%")
                 artwork5.delete("%")
                 artwork6.delete("%")
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Cache Cleared", 2000, THUMB) )
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Cache Cleared", 4000, THUMB) )
                 REAL_SETTINGS.setSetting('ClearLiveArt', "false")
                 xbmc.log('script.pseudotv.live-default: ArtCache Purged!')
 
@@ -131,7 +135,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                 weekly.delete("%")
                 monthly.delete("%")
                 xmltv.delete("%")
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "System Cache Cleared", 2000, THUMB) )
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "System Cache Cleared", 4000, THUMB) )
                 REAL_SETTINGS.setSetting('ClearCache', "false")
 
             xbmc.executebuiltin('RunScript("' + __cwd__ + '/pseudotv.py' + '")')

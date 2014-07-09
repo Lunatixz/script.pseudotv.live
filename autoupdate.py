@@ -1,5 +1,21 @@
-# Autoupdate Module By: Blazetamer 2013#
-########################################
+#   Copyright (C) 2013 Blazetamer 2013, Lunatixz
+#
+#
+# This file is part of PseudoTV Live.
+#
+# PseudoTV is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# PseudoTV is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
+
 
 import urllib,urllib2
 import xbmcplugin,xbmcgui,xbmc,xbmcaddon,xbmcvfs
@@ -7,12 +23,10 @@ import re,os,sys,time,shutil
 import resources.lib.utils
 
 from addon.common.addon import Addon
-from addon.common.net import Net
 from resources.lib.Globals import *
 from resources.lib.FileAccess import *
 from resources.lib.utils import *
 
-net = Net()
 __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
 __cwd__        = __settings__.getAddonInfo('path')
 
@@ -28,13 +42,11 @@ def UPDATEFILES():
     addonpath = xbmc.translatePath(os.path.join('special://','home/addons'))
     lib = os.path.join(path,name)
     
-    if ADDON == 'script.pseudotv.live-Hub-Edition':
-        url='https://github.com/Lunatixz/script.pseudotv.live/archive/Hub-Edition.zip'
-        name = 'script.pseudotv.live-Hub-Edition.zip' 
-    else:
+    try:
         url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
         name = 'script.pseudotv.live-master.zip'    
-    
+    except:
+        pass
     xbmc.log('script.pseudotv.live-autoupdate: URL = ' + url)
     
     try: 
@@ -49,8 +61,10 @@ def UPDATEFILES():
         all(lib,addonpath,'')
         xbmc.log('script.pseudotv.live-autoupdate: extracted new package')
         MSG = 'Update Complete'
-        xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 2000, THUMB) )
-        xbmc.executebuiltin("UpdateLocalAddons")
         return
     except: 
+        MSG = 'Update Failed, Try Again Later'
         pass
+        
+    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) )
+    xbmc.executebuiltin("UpdateLocalAddons")

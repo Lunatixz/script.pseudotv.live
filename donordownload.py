@@ -35,11 +35,13 @@ def autopatch():
     MSG = 'Donor Autoupdate Complete'
     
     try:
-        if xbmcvfs.exists(DonorPath):
-            os.remove(xbmc.translatePath(DonorPath))
-            xbmc.log('script.pseudotv.live-donordownload: autopatch, Removed DonorPath')   
-    except Exception,e:
-        xbmc.log('script.pseudotv.live-donordownload: Removed DonorPath Failed! ' + str(e)) 
+        os.remove(xbmc.translatePath(DL_DonorPath))
+    except:
+        pass
+        
+    try:
+        os.remove(xbmc.translatePath(DonorPath))  
+    except:
         pass
         
     try:
@@ -107,38 +109,37 @@ def BumperDownloader():
     
     BUMPERDEST = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'Bumpers.zip'))
     BumperPath = xbmc.translatePath(os.path.join(SETTINGS_LOC))
-
-    if xbmcvfs.exists(BUMPERDEST):        
-        try:
-            os.remove(BUMPERDEST)
-        except:
-            pass
+     
+    try:
+        os.remove(BUMPERDEST)
+    except:
+        pass
     
     if dlg.yesno("PseudoTV Live", "Download Bumpers?", "700Mb File"):
-        if xbmcvfs.exists(LinkPath):
-            try:
-                os.remove(xbmc.translatePath(LinkPath))
-            except:
-                pass
-                
-        urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
-        f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
-        linesLST = f.readlines()
-        BumperURLPath = linesLST[0]
-        
-        download(BumperURLPath, BUMPERDEST)
-        all(BUMPERDEST, BumperPath)
-            
-        REAL_SETTINGS.setSetting("bumpers", "true")
-        REAL_SETTINGS.setSetting("bumpersfolder", BUMPER_LOC)
-        REAL_SETTINGS.setSetting("numbumpers", "1")
-        
         try:
+            os.remove(xbmc.translatePath(LinkPath))
+        except:
+            pass
+         
+        try:       
+            urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
+            f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
+            linesLST = f.readlines()
+            BumperURLPath = linesLST[0]
+            
+            download(BumperURLPath, BUMPERDEST)
+            all(BUMPERDEST, BumperPath)
+                
+            REAL_SETTINGS.setSetting("bumpers", "true")
+            REAL_SETTINGS.setSetting("bumpersfolder", BUMPER_LOC)
+            REAL_SETTINGS.setSetting("numbumpers", "1")
+            
             os.remove(BUMPERDEST)
         except:
             pass
     
         REAL_SETTINGS.openSettings()
+        
     else:
         REAL_SETTINGS.openSettings()
             
@@ -158,23 +159,19 @@ def LogoDownloader():
     if not DEFAULT_LOGO_LOC:
         os.makedirs(DEFAULT_LOGO_LOC)
         
-    if xbmcvfs.exists(LinkPath):
-        try:
-            os.remove(xbmc.translatePath(LinkPath))
-        except:
-            pass
-            
-    urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
-    f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
-    linesLST = f.readlines()
-    LogoURLPath = linesLST[i]
-        
-    download(LogoURLPath, LogoDEST)
-    all(LogoDEST, LogoPath)
-    
-    REAL_SETTINGS.setSetting("ChannelLogoFolder", DEFAULT_LOGO_LOC)
-    
     try:
+        os.remove(xbmc.translatePath(LinkPath))
+    except:
+        pass
+         
+    try:
+        urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
+        f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
+        linesLST = f.readlines()
+        LogoURLPath = linesLST[i] 
+        download(LogoURLPath, LogoDEST)
+        all(LogoDEST, LogoPath)
+        REAL_SETTINGS.setSetting("ChannelLogoFolder", DEFAULT_LOGO_LOC)
         os.remove(LogoDEST)
     except:
         pass
@@ -190,31 +187,30 @@ def CEDownloader():
 
     if dlg.yesno("PseudoTV Live", "Download Cinema Experience Pack", ""):
         
-        if xbmcvfs.exists(LinkPath):
-            try:
-                os.remove(xbmc.translatePath(LinkPath))
-            except:
-                pass
-                
-        urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
-        f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
-        linesLST = f.readlines()
-        CEURLPath = linesLST[3]
-        
-        download(CEURLPath, CEDEST)
-        all(CEDEST, CEPath)
-        
         try:
-            os.remove(CEDEST)
+            os.remove(xbmc.translatePath(LinkPath))
         except:
             pass
             
-        if xbmcvfs.exists(CE_LOC):
-            REAL_SETTINGS.setSetting("CinemaPack", "true")
-        else:
-            REAL_SETTINGS.setSetting("CinemaPack", "false")
+        try:
+            urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
+            f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
+            linesLST = f.readlines()
+            CEURLPath = linesLST[3]
             
-        REAL_SETTINGS.openSettings()
+            download(CEURLPath, CEDEST)
+            all(CEDEST, CEPath)
+            
+            if xbmcvfs.exists(CE_LOC):
+                REAL_SETTINGS.setSetting("CinemaPack", "true")
+            else:
+                REAL_SETTINGS.setSetting("CinemaPack", "false")
+
+            os.remove(CEDEST)
+        except:
+            pass  
+            
+            REAL_SETTINGS.openSettings()
     else:
         REAL_SETTINGS.openSettings()
        

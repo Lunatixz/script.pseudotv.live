@@ -24,7 +24,8 @@ import urllib, urllib2, httplib, random
 from Globals import *
 from xml.etree import ElementTree as ET
 from FileAccess import FileLock, FileAccess
-   
+from urllib import unquote
+
 try:
     from Donor import *
     Donor_Downloaded = True
@@ -171,7 +172,7 @@ class Migrate:
                                         if SFmatch[0:9] != '/Channel_':
                                             Match = False
                                 
-                                SFname = SFmatch.replace('/PseudoTV_Live/','')
+                                SFname = SFmatch.replace('/PseudoTV_Live/','').replace('/','')
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'plugin://plugin.program.super.favourites' + SFmatch)

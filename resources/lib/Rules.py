@@ -1316,9 +1316,20 @@ class PlayShowInOrder(BaseRule):
 
 class SetResetTime(BaseRule):
     def __init__(self):
-        self.name = "Reset Every x Days"
-        self.optionLabels = ['Number of Days']
-        self.optionValues = ['5']
+        SETTOP = False
+        Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]     
+        if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+            SETTOP = True
+        
+        if SETTOP == True:
+            self.name = "Reset Every x Hours"
+            self.optionLabels = ['Number of Hours']
+            Hour = str((Refresh / 60) / 60)
+            self.optionValues = [Hour]
+        else:
+            self.name = "Reset Every x Days"
+            self.optionLabels = ['Number of Days']
+            self.optionValues = ['5']
         self.myId = 13
         self.actions = RULES_ACTION_START
 
@@ -1329,10 +1340,16 @@ class SetResetTime(BaseRule):
 
     def getTitle(self):
         if len(self.optionValues[0]) > 0:
-            if self.optionValues[0] == '1':
-                return "Reset Every Day"
+            if SETTOP == True:
+                if self.optionValues[0] == '1':
+                    return "Reset Every Hour"
+                else:
+                    return "Reset Every " + self.optionValues[0] + " Hours"
             else:
-                return "Reset Every " + self.optionValues[0] + " Days"
+                if self.optionValues[0] == '1':
+                    return "Reset Every Day"
+                else:
+                    return "Reset Every " + self.optionValues[0] + " Days"
 
         return self.name
 
@@ -1352,10 +1369,17 @@ class SetResetTime(BaseRule):
             curchan = channeldata.channelNumber
             numdays = 0
 
-            try:
-                numdays = int(self.optionValues[0])
-            except:
-                pass
+            if SETTOP == True:
+                try:
+                    numdays = int(Refresh)
+                except:
+                    pass
+            
+            else:
+                try:
+                    numdays = int(self.optionValues[0])
+                except:
+                    pass
 
             if numdays <= 0:
                 self.log("Invalid day count: " + str(numdays))
@@ -1364,25 +1388,21 @@ class SetResetTime(BaseRule):
             rightnow = int(time.time())
             nextreset = rightnow
 
-            if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
-                try:
-                    Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))] #refresh time in seconds
-                    Refresh = Refresh / 60 #convert to minutes
-                    
-                    if rightnow >= nextreset:
-                        channeldata.isValid = False
-                        ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
-                        nextreset = int(time.time()+Refresh)
-                        ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_SetResetTime', str(nextreset))
-                except:
-                    pass
+            try:
+                nextreset = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchan) + '_SetResetTime'))
+            except:
+                pass
+                
+            if SETTOP == True:
+                
+                if rightnow >= nextreset:
+                    channeldata.isValid = False
+                    ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
+                    nextreset = (rightnow + numdays)
+                    ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_SetResetTime', str(nextreset))
 
             else:
-                try:
-                    nextreset = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchan) + '_SetResetTime'))
-                except:
-                    pass
-
+            
                 if rightnow >= nextreset:
                     channeldata.isValid = False
                     ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')

@@ -569,7 +569,7 @@
                 <description>Channel 1 Number</description>
                 <width>40</width>
                 <height>42</height>
-                <label>1</label>
+                <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
@@ -579,7 +579,7 @@
                 <description>Channel 2 Number</description>
                 <width>40</width>
                 <height>42</height>
-                <label>2</label>
+                <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
@@ -589,7 +589,7 @@
                 <description>Channel 3 Number</description>
                 <width>40</width>
                 <height>42</height>
-                <label>3</label>
+                <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
@@ -599,7 +599,7 @@
                 <description>Channel 4 Number</description>
                 <width>40</width>
                 <height>42</height>
-                <label>4</label>
+                <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
@@ -609,7 +609,7 @@
                 <description>Channel 5 Number</description>
                 <width>40</width>
                 <height>42</height>
-                <label>5</label>
+                <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
@@ -619,7 +619,7 @@
                 <description>Channel 6 Number</description>
                 <width>40</width>
                 <height>42</height>
-                <label>6</label>
+                <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
@@ -636,7 +636,7 @@
                 <description>Channel 1 Name</description>
                 <width>200</width>
                 <height>42</height>
-                <label>Channel</label>
+                <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -657,7 +657,7 @@
                 <width>200</width>
                 <height>42</height>
                 <posy>2</posy>
-                <label>Channel</label>
+                <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -678,7 +678,7 @@
                 <width>200</width>
                 <height>42</height>
                 <posy>4</posy>
-                <label>Channel</label>
+                <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -699,7 +699,7 @@
                 <width>200</width>
                 <height>42</height>
                 <posy>6</posy>
-                <label>Channel</label>
+                <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -720,7 +720,7 @@
                 <width>200</width>
                 <height>42</height>
                 <posy>8</posy>
-                <label>Channel</label>
+                <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -741,7 +741,7 @@
                 <width>200</width>
                 <height>42</height>
                 <posy>10</posy>
-                <label>Channel</label>
+                <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
@@ -763,78 +763,78 @@
             <description>Channel Background</description>
             <posx>274</posx>
             <posy>225</posy>
-            <width>1280</width>
+            <width>1080</width>
             <height>50</height>
         </control>
 		<control type="group" id="111">
             <posx>274</posx>
             <posy>225</posy>
-            <width>1005</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="image">
             <description>Channel Background</description>
             <posx>274</posx>
             <posy>275</posy>
-            <width>1280</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="group" id="112">
             <posx>274</posx>
             <posy>275</posy>
-            <width>1005</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="image">
             <description>Channel Background</description>
             <posx>274</posx>
             <posy>325</posy>
-            <width>1280</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="group" id="113">
             <posx>274</posx>
             <posy>325</posy>
-            <width>1005</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="image">
             <description>Channel Background</description>
             <posx>274</posx>
             <posy>375</posy>
-            <width>1280</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="group" id="114">
             <posx>274</posx>
             <posy>375</posy>
-            <width>1005</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="image">
             <description>Channel Background</description>
             <posx>274</posx>
             <posy>425</posy>
-            <width>1280</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="group" id="115">
             <posx>274</posx>
             <posy>425</posy>
-            <width>1005</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="image">
             <description>Channel Background</description>
             <posx>274</posx>
             <posy>475</posy>
-            <width>1280</width>
+            <width>1080</width>
             <height>50</height>
         </control>
         <control type="group" id="116">
             <posx>274</posx>
             <posy>475</posy>
-            <width>1005</width>
+            <width>1080</width>
             <height>50</height>
         </control>
 <!--         <control type="group" id="120">
@@ -883,6 +883,16 @@
                 <label>landscape</label>
                 <visible>false</visible>
             </control>
+<!--             <control type="image">
+                <description>Logo</description>
+                <colordiffuse>FFFFFFFF</colordiffuse>
+                <width>300</width>
+                <height>125</height>
+                <align>center</align>
+                <aspectratio>keep</aspectratio>
+                <texture>logo.png</texture>
+                <visible>!Control.IsVisible(508)|!Control.IsVisible(510)</visible>
+            </control> -->
             <control type="image" id="508">
                 <description>Dynamic art</description>
                 <colordiffuse>FFFFFFFF</colordiffuse>
@@ -890,23 +900,25 @@
                 <height>125</height>
                 <align>center</align>
                 <aspectratio>keep</aspectratio>
-            </control>   
-            <control type="image" id="511">
-                <description>Sickbeard/Couchpotato Icon</description>   
-                <posx>221</posx>
-                <posy>630</posy>         
-                <width>20</width>
-                <height>20</height>
-                <aspectratio>scale</aspectratio>
             </control> 
-            <control type="image" id="512">
-                <description>Unaired NEW Icon</description>         
-                <posx>20</posx>
-                <posy>528</posy>  
-                <width>100</width>
-                <height>100</height>
-                <aspectratio>keep</aspectratio>
-            </control>
+        </control>  
+        <control type="image" id="511">
+            <description>Sickbeard/Couchpotato Icon</description>   
+            <posx>221</posx>
+            <posy>630</posy>         
+            <width>20</width>
+            <height>20</height>
+            <aspectratio>scale</aspectratio>
+            <visible></visible>
+        </control> 
+        <control type="image" id="512">
+            <description>Unaired NEW Icon</description>         
+            <posx>20</posx>
+            <posy>528</posy>  
+            <width>100</width>
+            <height>100</height>
+            <aspectratio>keep</aspectratio>
+            <visible></visible>
         </control>
         <!--TEXT Now Playing-->
         <control type="label" id="522">
