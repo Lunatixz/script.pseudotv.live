@@ -172,7 +172,7 @@ class Migrate:
                                         if SFmatch[0:9] != '/Channel_':
                                             Match = False
                                 
-                                SFname = SFmatch.replace('/PseudoTV_Live/','')
+                                SFname = SFmatch.replace('/PseudoTV_Live/','').replace('/','')
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'plugin://plugin.program.super.favourites' + SFmatch)

@@ -266,7 +266,7 @@ ACTION_MOVE_DOWN = 4
 ACTION_PAGEUP = 5
 ACTION_PAGEDOWN = 6
 ACTION_SELECT_ITEM = 7
-ACTION_PREVIOUS_MENU = (9, 10, 92, 247, 257, 275, 61467, 61448,)
+ACTION_PREVIOUS_MENU = (9, 10, 92, 247, 257, 275, 61467, 61448)
 ##KEY_BUTTON_BACK = 275   
 ##ACTION_NAV_BACK = 92
 ACTION_SHOW_INFO = 11
@@ -356,8 +356,8 @@ CE_RATINGS_LOC = xbmc.translatePath(os.path.join(CE_LOC, 'ratings')) + '/'
 UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V']
 
 #Dynamic Artwork plugin
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd'] #Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd'] #Title format must be "Movie (Year)"
 
 # Plugin seek blacklist
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow']

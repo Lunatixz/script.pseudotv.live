@@ -3,6 +3,7 @@ import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
 from resources.lib.Globals import *
+from resources.lib.ChannelList import *
 from resources.lib.Artdownloader import *
 from resources.lib.FileAccess import FileLock, FileAccess
 
@@ -96,9 +97,11 @@ def SkinChange():
            
 def HubSwap():
     xbmc.log('script.pseudotv.live-service: HubSwap')
-    ADDON = os.path.split(ADDON_PATH)[1]
     icon = ADDON_PATH + '/icon'
-    if ADDON == 'script.pseudotv.live-Hub-Edition':
+    chanlist = ChannelList()
+    HUB = chanlist.plugin_ok('plugin.program.addoninstaller')
+    
+    if HUB == True:
         xbmc.log('script.pseudotv.live-service: HubSwap - Hub Edition')
         REAL_SETTINGS.setSetting("Hub","true")
         try:
@@ -150,6 +153,6 @@ if (Enabled == 'true'):
     autostart()
  
 if (ArtService_Enabled == 'true'): 
-    # sleep(IDLE_TIME + 900)
+    sleep(IDLE_TIME + 900)
     ArtServiceTimer() 
     ChangeMonitor()

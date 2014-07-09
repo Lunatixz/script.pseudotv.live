@@ -122,9 +122,9 @@
 <!--BCTs-->   
     <category label="30499">
     <setting label="30500" type="lsep"/>
-        <setting label="30501" id="bumpers" type="bool" default="false" />
-        <setting label="30502" id="bumpersfolder" type="folder" source="auto" visible="eq(-1,true)" default="" />
-        <setting label="30503" id="numbumpers" type="enum" visible="eq(-2,true)" values="1|2|3|4|5" default="0"/>
+        <setting label="30501" id="bumpers" type="enum" values="Disabled|Local|Internet" default="0" />
+        <setting label="30502" id="bumpersfolder" type="folder" source="auto" visible="eq(-1,1)" default="" />
+        <setting label="30503" id="numbumpers" type="enum" visible="!eq(-2,0)" values="1|2|3|4|5" default="0"/>
     <setting label="30510" type="lsep"/>
         <setting label="39002" id="COM_Donor" type="bool" visible="false" default="false" />
         <setting label="30511" id="commercials" type="enum" values="Disabled|Local|Youtube|Internet" default="0"/>

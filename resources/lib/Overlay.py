@@ -60,27 +60,29 @@ class MyPlayer(xbmc.Player):
     def onPlayBackPaused(self):
         self.log('onPlayBackPaused')
         
-        if REAL_SETTINGS.getSetting("UPNP1") == "true":
-            UPNP1 = PauseUPNP(IPP1)
-        
-        if REAL_SETTINGS.getSetting("UPNP2") == "true":
-            UPNP2 = PauseUPNP(IPP2)
-        
-        if REAL_SETTINGS.getSetting("UPNP3") == "true":
-            UPNP3 = PauseUPNP(IPP3)
+        try:
+            if REAL_SETTINGS.getSetting("UPNP1") == "true":
+                UPNP1 = PauseUPNP(IPP1)
+            if REAL_SETTINGS.getSetting("UPNP2") == "true":
+                UPNP2 = PauseUPNP(IPP2)
+            if REAL_SETTINGS.getSetting("UPNP3") == "true":
+                UPNP3 = PauseUPNP(IPP3)
+        except:
+            pass
         
         
     def onPlayBackResumed(self):
         self.log('onPlayBackResumed')
         
-        if REAL_SETTINGS.getSetting("UPNP1") == "true":
-            UPNP1 = ResumeUPNP(IPP1)
-        
-        if REAL_SETTINGS.getSetting("UPNP2") == "true":
-            UPNP2 = ResumeUPNP(IPP2)
-        
-        if REAL_SETTINGS.getSetting("UPNP3") == "true":
-            UPNP3 = ResumeUPNP(IPP3)
+        try:
+            if REAL_SETTINGS.getSetting("UPNP1") == "true":
+                UPNP1 = ResumeUPNP(IPP1)
+            if REAL_SETTINGS.getSetting("UPNP2") == "true":
+                UPNP2 = ResumeUPNP(IPP2)
+            if REAL_SETTINGS.getSetting("UPNP3") == "true":
+                UPNP3 = ResumeUPNP(IPP3)
+        except:
+            pass
     
     
     def onQueueNextItem(self):
@@ -95,35 +97,24 @@ class MyPlayer(xbmc.Player):
         self.log('onPlayBackStarted')
         
         #UPNP Forwarding
-        file = xbmc.Player().getPlayingFile()
-        file = file.replace("\\\\","\\")
-        seektime = xbmc.Player().getTime()
-       
-        if REAL_SETTINGS.getSetting("UPNP1") == "true":
-            self.log('UPNP1 Sharing')
-            UPNP1 = SendUPNP(IPP1, file, seektime)
-        if REAL_SETTINGS.getSetting("UPNP2") == "true":
-            self.log('UPNP2 Sharing')
-            UPNP2 = SendUPNP(IPP2, file, seektime)
-        if REAL_SETTINGS.getSetting("UPNP3") == "true":
-            self.log('UPNP3 Sharing')
-            UPNP3 = SendUPNP(IPP3, file, seektime)
+        try:
+            file = xbmc.Player().getPlayingFile()
+            file = file.replace("\\\\","\\")
+            seektime = xbmc.Player().getTime()
+           
+            if REAL_SETTINGS.getSetting("UPNP1") == "true":
+                self.log('UPNP1 Sharing')
+                UPNP1 = SendUPNP(IPP1, file, seektime)
+            if REAL_SETTINGS.getSetting("UPNP2") == "true":
+                self.log('UPNP2 Sharing')
+                UPNP2 = SendUPNP(IPP2, file, seektime)
+            if REAL_SETTINGS.getSetting("UPNP3") == "true":
+                self.log('UPNP3 Sharing')
+                UPNP3 = SendUPNP(IPP3, file, seektime)
+        except:
+            pass
     
-        ###########################################################################################################
-        # Video Failed Detection?
-        # if self.Player.isPlaying():
-            # VideoFailed == False
-        # VideoFailed = True
-        # if self.stopped == False:
-            # self.log('Playback stopped')
-            # xbmc.sleep(1)
-            # self.ignoreInfoAction = True
-            # json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"select"},"id":1}'
-            # self.channelList.sendJSON(json_query);
-            # self.ignoreInfoAction = False
-        #############################################################################################################
-
-        
+    
     def onPlayBackStopped(self):
         if self.stopped == False:
             self.log('Playback stopped')
@@ -196,7 +187,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.getControl(101).setLabel('Loading...')
         except:
             pass
-            
+     
+     
     def resetChannelTimes(self):
         for i in range(self.maxChannels):
             self.channels[i].setAccessTime(self.timeStarted - self.channels[i].totalTimePlayed)
@@ -214,7 +206,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         settingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml'))
         nsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.bak.xml'))
         dlg = xbmcgui.Dialog()
-        THUMB = (DEFAULT_IMAGES_LOC + 'icon.png')
         
         # Clear Setting2 for fresh autotune
         if REAL_SETTINGS.getSetting("Autotune") == "true" and REAL_SETTINGS.getSetting("Warning1") == "true":
@@ -391,7 +382,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
             print 'SETTOP BOX Enabled'
             Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]     
-            self.channelThread_Timer = threading.Timer((float(Refresh + 60)), self.channelList.setupList)
+            self.channelThread_Timer = threading.Timer((float(Refresh)), self.channelList.setupList)
             self.channelThread_Timer.name = "ChannelThread_Timer"
             self.channelThread_Timer.start()
               
@@ -415,8 +406,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.showChannelBug = REAL_SETTINGS.getSetting("ShowChannelBug") == "true"
         self.log('Show channel bug - ' + str(self.showChannelBug))
         self.showNextItem = REAL_SETTINGS.getSetting('showNextItem') == "true"
-        if REAL_SETTINGS.getSetting("EnableComingUp") == "0":
-            self.showNextItem = False
         self.log("Show Next Item - " + str(self.showNextItem))
         self.forceReset = REAL_SETTINGS.getSetting('ForceChannelReset') == "true"
         self.channelResetSetting = REAL_SETTINGS.getSetting('ChannelResetSetting')
@@ -430,6 +419,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("Short item length - " + str(self.shortItemLength))
         self.channelDelay = int(REAL_SETTINGS.getSetting("ChannelDelay")) * 250
 
+        if REAL_SETTINGS.getSetting("EnableComingUp") == "0":
+            self.showNextItem = False
+            
         if FileAccess.exists(self.channelLogos) == False:
             self.channelLogos = DEFAULT_LOGO_LOC
 
@@ -609,10 +601,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         xbmc.executebuiltin("PlayerControl(repeatall)")
         curtime = time.time()
         timedif = (curtime - self.channels[self.currentChannel - 1].lastAccessTime)
-        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))  
-        # self.Artdownloader = Artdownloader() 
-        # ArtSpoolTimerThread = threading.Timer(10.0, self.Artdownloader.ArtSpool, args=[chtype,channel])
-        # ArtSpoolTimerThread.start() 
+        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
         
         if self.channels[self.currentChannel - 1].isPaused == False:
             # adjust the show and time offsets to properly position inside the playlist
@@ -702,18 +691,21 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         self.log('Exception during seek', xbmc.LOGERROR)
    
             #UPNP
-            # seektime = xbmc.Player().getTime()
-            file = self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)
-            file = file.replace("\\\\","\\")
-            if REAL_SETTINGS.getSetting("UPNP1") == "true":
-                self.log('UPNP1 Sharing')
-                UPNP1 = SendUPNP(IPP1, file, seektime)
-            if REAL_SETTINGS.getSetting("UPNP2") == "true":
-                self.log('UPNP2 Sharing')
-                UPNP2 = SendUPNP(IPP2, file, seektime)
-            if REAL_SETTINGS.getSetting("UPNP3") == "true":
-                self.log('UPNP3 Sharing')
-                UPNP3 = SendUPNP(IPP3, file, seektime)
+            try:
+                # seektime = xbmc.Player().getTime()
+                file = self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)
+                file = file.replace("\\\\","\\")
+                if REAL_SETTINGS.getSetting("UPNP1") == "true":
+                    self.log('UPNP1 Sharing')
+                    UPNP1 = SendUPNP(IPP1, file, seektime)
+                if REAL_SETTINGS.getSetting("UPNP2") == "true":
+                    self.log('UPNP2 Sharing')
+                    UPNP2 = SendUPNP(IPP2, file, seektime)
+                if REAL_SETTINGS.getSetting("UPNP3") == "true":
+                    self.log('UPNP3 Sharing')
+                    UPNP3 = SendUPNP(IPP3, file, seektime)
+            except:
+                pass
                         
         # Unmute
         self.log("Finished, unmuting");
@@ -1081,7 +1073,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     else:
                         self.getControl(103).setImage(DEFAULT_IMAGES_LOC + 'Default.png')
             else:
-                self.getControl(103).setImage('')
+                self.getControl(103).setImage('NA.png')
         except:
             pass
                 
@@ -1278,15 +1270,18 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 xbmc.executebuiltin("PlayerControl(SmallSkipForward)")
                 self.log("SmallSkipForward")
         
-                if REAL_SETTINGS.getSetting("UPNP1") == "true":
-                    self.log('UPNP1 FF')
-                    UPNP1 = FFUPNP(IPP1)
-                if REAL_SETTINGS.getSetting("UPNP2") == "true":
-                    self.log('UPNP2 FF')
-                    UPNP2 = FFUPNP(IPP2)
-                if REAL_SETTINGS.getSetting("UPNP3") == "true":
-                    self.log('UPNP3 FF')
-                    UPNP3 = FFUPNP(IPP3)
+                try:
+                    if REAL_SETTINGS.getSetting("UPNP1") == "true":
+                        self.log('UPNP1 FF')
+                        UPNP1 = FFUPNP(IPP1)
+                    if REAL_SETTINGS.getSetting("UPNP2") == "true":
+                        self.log('UPNP2 FF')
+                        UPNP2 = FFUPNP(IPP2)
+                    if REAL_SETTINGS.getSetting("UPNP3") == "true":
+                        self.log('UPNP3 FF')
+                        UPNP3 = FFUPNP(IPP3)
+                except:
+                    pass
                     
         elif action in ACTION_PREVIOUS_MENU:
             if self.showingInfo:
@@ -1553,9 +1548,11 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     pass
                     
                 #self.channelUp()
+                json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"Select"},"id":1}'
+                self.channelList.sendJSON(json_query)
                 json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"up"},"id":1}'
                 self.channelList.sendJSON(json_query)
-                self.log("error one peat invalid channel, changing channel")
+                self.log("error three peat invalid channel, changing channel")
                 return
             else:       
             
@@ -1565,9 +1562,11 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     pass
                     
                 #xbmc.executebuiltin("PlayerControl(SmallSkipForward)")
+                json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"Select"},"id":1}'
+                self.channelList.sendJSON(json_query)
                 json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"skipnext"},"id":1}'
                 self.channelList.sendJSON(json_query)
-                self.log("error one peat invalid channel, skipping program")
+                self.log("error three peat invalid channel, skipping program")
                 return  
         
                 
@@ -1609,15 +1608,16 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.isExiting = True
         updateDialog = xbmcgui.DialogProgress()
         updateDialog.create("PseudoTV Live", "Exiting")
-                
-        if REAL_SETTINGS.getSetting("UPNP1") == "true":
-            UPNP1 = StopUPNP(IPP1)
-        
-        if REAL_SETTINGS.getSetting("UPNP2") == "true":
-            UPNP2 = StopUPNP(IPP2)
-        
-        if REAL_SETTINGS.getSetting("UPNP3") == "true":
-            UPNP3 = StopUPNP(IPP3)
+              
+        try:
+            if REAL_SETTINGS.getSetting("UPNP1") == "true":
+                UPNP1 = StopUPNP(IPP1)
+            if REAL_SETTINGS.getSetting("UPNP2") == "true":
+                UPNP2 = StopUPNP(IPP2)
+            if REAL_SETTINGS.getSetting("UPNP3") == "true":
+                UPNP3 = StopUPNP(IPP3)
+        except:
+            pass
         
         if CHANNEL_SHARING and self.isMaster:
             updateDialog.update(0, "Exiting", "Removing File Locks")

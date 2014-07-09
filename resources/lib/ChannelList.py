@@ -700,6 +700,14 @@ class ChannelList:
             else:
                 self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'fileListCHK invalid: ' + str(setting2))
                 return 
+        
+        elif chtype == 16:
+            # Validate Feed #
+            fileListCHK = self.Valid_ok(setting1)
+            if fileListCHK == True:
+                self.log("Building Plugin Channel, " + setting1 + "...")
+                fileList = self.FillPluginFileList(setting1, setting2, setting3, setting4, channel)
+
                 
         # Community Network
         elif chtype == 17:
@@ -3127,7 +3135,7 @@ class ChannelList:
         numTrailers = int(REAL_SETTINGS.getSetting("numtrailers")) + 1#number of trailers between shows
 
         #Bumpers
-        if (REAL_SETTINGS.getSetting('bumpers') == "true" and type != 'movies'): # Bumpers not disabled,and is custom or network playlist.
+        if (REAL_SETTINGS.getSetting('bumpers') != "0" and type != 'movies'): # Bumpers not disabled,and is custom or network playlist.
             BumperLST = self.GetBumperList(channel, fileList)#build full Bumper list
             random.shuffle(BumperLST)
             BumperNum = len(BumperLST)#number of Bumpers items in full list
@@ -3224,48 +3232,99 @@ class ChannelList:
     def GetBumperList (self, channel, fileList):
         self.log("GetBumperList")
         BumperCachePath = xbmc.translatePath(os.path.join(BCT_LOC, 'bumpers')) + '/'  
+        BumperLST = []
         chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
         
         if chtype == '0':
             setting1 = str(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_1'))
             directory, filename = os.path.split(setting1)
-            filename = uni(filename.split('.'))
-            chname = uni(filename[0])
+            filename = ascii(filename.split('.'))
+            chname = ascii(filename[0])
         else:
             chname = ADDON_SETTINGS.getSetting("Channel_" + str(channel) + "_1")  
-            
-        PATH = REAL_SETTINGS.getSetting('bumpersfolder')
-        PATH = uni(PATH + chname)
-        LocalBumperLST = []
-        BumperLST = []
-        duration = 0
-        
-        #Local
-        if FileAccess.exists(PATH) and REAL_SETTINGS.getSetting('bumpers') == "true":            
-            BumperLocalCache = 'Bumper_Local_Cache_' + chname +'.xml'
-            CacheExpired = self.Cache_ok(BumperCachePath, BumperLocalCache) 
-
-            if CacheExpired == False:
-                BumperLST = self.readCache(BumperCachePath, BumperLocalCache)
                 
-            elif CacheExpired == True: 
-                LocalFLE = ''
-                LocalBumper = ''
-                LocalLST = xbmcvfs.listdir(PATH)[1]
-                for i in range(len(LocalLST)):    
-                    if self.background == False:
-                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Bumpers", "parsing Local Bumpers")
-                    LocalFLE = (LocalLST[i])
-                    filename = uni(PATH + '/' + LocalFLE)
-                    duration = self.videoParser.getVideoLength(filename)
-                    if duration == 0:
-                        duration = 3
+        #Local
+        if REAL_SETTINGS.getSetting('bumpers') == "1":  
+            self.log("GetBumperList - Local")
+            PATH = REAL_SETTINGS.getSetting('bumpersfolder')
+            PATH = (PATH + chname)
+            
+            if FileAccess.exists(PATH):
+                try:
+                    LocalBumperLST = []
+                    duration = 0
+                    BumperLocalCache = 'Bumper_Local_Cache_' + chname +'.xml'
+                    CacheExpired = self.Cache_ok(BumperCachePath, BumperLocalCache) 
+
+                    if CacheExpired == False:
+                        BumperLST = self.readCache(BumperCachePath, BumperLocalCache)
+                        
+                    elif CacheExpired == True: 
+                        LocalFLE = ''
+                        LocalBumper = ''
+                        LocalLST = xbmcvfs.listdir(PATH)[1]
+                        for i in range(len(LocalLST)):    
+                            if self.background == False:
+                                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Bumpers", "parsing Local Bumpers")
+                            LocalFLE = (LocalLST[i])
+                            filename = uni(PATH + '/' + LocalFLE)
+                            duration = self.videoParser.getVideoLength(filename)
+                            if duration == 0:
+                                duration = 3
+                            
+                            if duration > 0:
+                                LocalBumper = (str(duration) + ',' + filename)
+                                LocalBumperLST.append(LocalBumper)#Put all bumpers found into one List
+                        BumperLST.extend(LocalBumperLST)#Put local bumper list into master bumper list.                
+                        self.writeCache(BumperLST, BumperCachePath, BumperLocalCache)
+                except:
+                    pass
                     
-                    if duration > 0:
-                        LocalBumper = (str(duration) + ',' + filename)
-                        LocalBumperLST.append(LocalBumper)#Put all bumpers found into one List
-                BumperLST.extend(LocalBumperLST)#Put local bumper list into master bumper list.                
-                self.writeCache(BumperLST, BumperCachePath, BumperLocalCache)
+        #Internet
+        elif REAL_SETTINGS.getSetting('bumpers') == "2":
+            self.log("GetBumperList - Internet")
+            Pluginvalid1 = self.plugin_ok('plugin.video.vimeo')
+            Pluginvalid2 = self.plugin_ok('plugin.video.youtube')
+            
+            if Pluginvalid1 and Pluginvalid2:
+                try:
+                    InternetBumperLST = []
+                    duration = 3
+                    BumperInternetCache = 'Bumper_Internet_Cache_' + chname +'.xml'
+                    CacheExpired = self.Cache_ok(BumperCachePath, BumperInternetCache) 
+                    
+                    if CacheExpired == False:
+                        BumperLST = self.readCache(BumperCachePath, BumperInternetCache)
+                        
+                    elif CacheExpired == True: 
+                        Bumper_List = 'https://pseudotv-live-community.googlecode.com/svn/bumpers.xml'
+
+                        f = urllib2.urlopen(Bumper_List)
+                        linesLST = f.readlines()
+                        linesLST = linesLST[2:]
+                        f.close
+
+                        for i in range(len(Bumper_List)):
+                            lines = str(linesLST[i]).replace('\n','')
+                            lines = lines.split('|')
+                            ChannelName = lines[0]
+                            BumperNumber = lines[1]
+                            BumperSource = lines[2].split('_')[0]
+                            BumperID = lines[2].split('_')[1]
+
+                            if BumperSource == 'vimeo':
+                                url = 'plugin://plugin.video.vimeo/?path=/root/video&action=play_video&videoid=' + BumperID
+                            else:
+                                url = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + BumperID
+                            
+                            if chname.lower() == ChannelName.lower():
+                                InternetBumper = (str(duration) + ',' + url)
+                                InternetBumperLST.append(InternetBumper)
+                        BumperLST.extend(InternetBumperLST)#Put local bumper list into master bumper list.                
+                        self.writeCache(BumperLST, BumperCachePath, BumperInternetCache)
+                except:
+                    pass
+                    
         return (BumperLST)        
         
     
@@ -4154,10 +4213,11 @@ class ChannelList:
                                 epval = -1
 
                                 if self.background == False:
+                                    plugname = plugchk.replace('plugin.video.','').replace('plugin.program.','')
                                     if filecount == 1:
-                                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugchk), "added " + str(filecount) + " entry")
+                                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugname), "added " + str(filecount) + " entry")
                                     else:
-                                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugchk), "added " + str(filecount) + " entries")
+                                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugname), "added " + str(filecount) + " entries")
                         
                                 labels = re.search('"label" *: *"(.*?)"', f)
                                 titles = re.search('"title" *: *"(.*?)"', f)
@@ -4372,6 +4432,18 @@ class ChannelList:
         #fileList = self.remDupes(fileList)
         return fileList
 
+    
+    def FillPluginFileList(self, setting1, setting2, setting3, setting4, channel):
+        self.log("FillPluginFileList")
+        
+        limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
+        if limit == 0 or limit < 50 or limit >= 250:
+            limit = 50
+        self.log("FillPluginFileList, Using Global Parse-limit " + str(limit))
+        
+        fileList = self.PluginWalk(setting1, channel)
+        return fileList
+        
         
     def BuildPluginFileList(self, setting1, setting2, setting3, setting4, channel):
         self.log("BuildPluginFileList")
@@ -4445,7 +4517,8 @@ class ChannelList:
             print plugchk
             
             if self.background == False:
-                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV", 'parsing ' + (plugchk))
+                plugname = plugchk.replace('plugin.video.','').replace('plugin.program.','')
+                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV", 'parsing ' + (plugname))
 
             for f in DetailLST:
                 if self.threadPause() == False:
@@ -4507,10 +4580,11 @@ class ChannelList:
                                     epval = -1
 
                                     if self.background == False:
+                                        plugname = plugchk.replace('plugin.video.','').replace('plugin.program.','')
                                         if filecount == 1:
-                                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugchk), "added " + str(filecount) + " entry")
+                                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugname), "added " + str(filecount) + " entry")
                                         else:
-                                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugchk), "added " + str(filecount) + " entries")
+                                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding PluginTV, parsing " + (plugname), "added " + str(filecount) + " entries")
                             
                                     labels = re.search('"label" *: *"(.*?)"', f)
                                     titles = re.search('"title" *: *"(.*?)"', f)

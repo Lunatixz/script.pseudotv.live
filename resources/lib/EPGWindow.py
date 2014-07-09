@@ -327,15 +327,15 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             nowDate = datetime.datetime.now()
             self.logDebug("setbuttonnowtime " + str(nowDate))
             playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
-            
-            if self.MyOverlayWindow.channels[curchannel - 1].isPaused:
+                        
+            if chname == 'PseudoCinema' and self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <= 1800:
+                self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
+
+            elif self.MyOverlayWindow.channels[curchannel - 1].isPaused:
                 if chname in BYPASS_EPG:
                     self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
                 else:
                     self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].getCurrentTitle() + " (paused)", focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
-            
-            elif chname == 'PseudoCinema'and self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <= 1800:
-                self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
 
             elif chtype >= 10 and self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <= self.MyOverlayWindow.shortItemLength:
                 if chname in BYPASS_EPG:
@@ -1289,7 +1289,11 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     reftime = time.time()
                 else:
                     playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
-                    videotime = xbmc.Player().getTime()
+                    try:
+                        videotime = xbmc.Player().getTime()
+                    except:
+                        videotime = xbmc.Player().getTime()
+                        pass
                     reftime = time.time()
                    
             else:

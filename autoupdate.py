@@ -23,12 +23,10 @@ import re,os,sys,time,shutil
 import resources.lib.utils
 
 from addon.common.addon import Addon
-from addon.common.net import Net
 from resources.lib.Globals import *
 from resources.lib.FileAccess import *
 from resources.lib.utils import *
 
-net = Net()
 __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
 __cwd__        = __settings__.getAddonInfo('path')
 
@@ -45,12 +43,8 @@ def UPDATEFILES():
     lib = os.path.join(path,name)
     
     try:
-        if ADDON == 'script.pseudotv.live-Hub-Edition':
-            url='https://github.com/Lunatixz/script.pseudotv.live/archive/Hub-Edition.zip'
-            name = 'script.pseudotv.live-Hub-Edition.zip' 
-        else:
-            url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
-            name = 'script.pseudotv.live-master.zip'    
+        url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
+        name = 'script.pseudotv.live-master.zip'    
     except:
         pass
     xbmc.log('script.pseudotv.live-autoupdate: URL = ' + url)

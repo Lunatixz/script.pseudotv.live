@@ -1316,11 +1316,16 @@ class PlayShowInOrder(BaseRule):
 
 class SetResetTime(BaseRule):
     def __init__(self):
+        SETTOP = False
+        Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]     
         if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+            SETTOP = True
+        
+        if SETTOP == True:
             self.name = "Reset Every x Hours"
             self.optionLabels = ['Number of Hours']
-            self.optionValues = ['6']
-
+            Hour = str((Refresh / 60) / 60)
+            self.optionValues = [Hour]
         else:
             self.name = "Reset Every x Days"
             self.optionLabels = ['Number of Days']
@@ -1335,7 +1340,7 @@ class SetResetTime(BaseRule):
 
     def getTitle(self):
         if len(self.optionValues[0]) > 0:
-            if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+            if SETTOP == True:
                 if self.optionValues[0] == '1':
                     return "Reset Every Hour"
                 else:
@@ -1364,10 +1369,17 @@ class SetResetTime(BaseRule):
             curchan = channeldata.channelNumber
             numdays = 0
 
-            try:
-                numdays = int(self.optionValues[0])
-            except:
-                pass
+            if SETTOP == True:
+                try:
+                    numdays = int(Refresh)
+                except:
+                    pass
+            
+            else:
+                try:
+                    numdays = int(self.optionValues[0])
+                except:
+                    pass
 
             if numdays <= 0:
                 self.log("Invalid day count: " + str(numdays))
@@ -1381,12 +1393,12 @@ class SetResetTime(BaseRule):
             except:
                 pass
                 
-            if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+            if SETTOP == True:
                 
                 if rightnow >= nextreset:
                     channeldata.isValid = False
                     ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
-                    nextreset = rightnow + ((60 * numdays) * 60)
+                    nextreset = (rightnow + numdays)
                     ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_SetResetTime', str(nextreset))
 
             else:

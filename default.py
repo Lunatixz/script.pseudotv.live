@@ -36,12 +36,12 @@ __author__     = "Lunatixz, Jason102 & Angrycamel"
 __url__        = "https://github.com/Lunatixz/script.pseudotv.live"
 __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
 __cwd__        = __settings__.getAddonInfo('path')
-UPDATED = False
    
 # Adapting a solution from ronie (http://forum.xbmc.org/showthread.php?t=97353)
 if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
     xbmcgui.Window(10000).setProperty("PseudoTVRunning", "True")
     shouldrestart = False
+    UPDATED = False
 
     if shouldrestart == False:
     
