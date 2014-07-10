@@ -20,7 +20,6 @@
 import urllib,urllib2
 import xbmcplugin,xbmcgui,xbmc,xbmcaddon,xbmcvfs
 import re,os,sys,time,shutil
-import resources.lib.utils
 
 from addon.common.addon import Addon
 from resources.lib.Globals import *
@@ -35,18 +34,12 @@ def UPDATEFILES():
     ADDON = os.path.split(__cwd__)[1]
     xbmc.log('script.pseudotv.live-autoupdate: UPDATEFILES')
     xbmc.log('script.pseudotv.live-autoupdate: Version = ' + ADDON)
-    url = ''
-    name = ''
+    url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
+    name = 'script.pseudotv.live-master.zip'  
     changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt'         
     path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
     addonpath = xbmc.translatePath(os.path.join('special://','home/addons'))
     lib = os.path.join(path,name)
-    
-    try:
-        url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
-        name = 'script.pseudotv.live-master.zip'    
-    except:
-        pass
     xbmc.log('script.pseudotv.live-autoupdate: URL = ' + url)
     
     try: 

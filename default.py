@@ -56,7 +56,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             for vernum in match:
                     print 'Original Version is ' + vernum
             try:
-                link=OPEN_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/addon.xml')
+                link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/addon.xml')
             except:
                 link='nill'
 
