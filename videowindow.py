@@ -1,21 +1,20 @@
-#   Copyright (C) 2013 Lunatixz
+# Copyright 2011-2014 Blazetamer, Jason Anderson, Kevin, Lunatixz,
+# Martijn Kaijser, Tommy Winther & Tristan Fischer.
 #
+# This file is part of PseudoTV Live. <https://github.com/Lunatixz/script.pseudotv.live>
 #
-# This file is part of PseudoTV Live.
-#
-# PseudoTV is free software: you can redistribute it and/or modify
+# PseudoTV Live is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# PseudoTV is distributed in the hope that it will be useful,
+# PseudoTV Live is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
-
+# along with PseudoTV Live. If not, see <http://www.gnu.org/licenses/>.
     
 import os, sys, re, fileinput
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
@@ -23,14 +22,12 @@ import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 from resources.lib.Globals import *
 from resources.lib.FileAccess import *
 
-
 def replaceAll(file,searchExp,replaceExp):
     xbmc.log('script.pseudotv.live-videowindow: replaceAll')
     for line in fileinput.input(file, inplace=1):
         if searchExp in line:
             line = line.replace(searchExp,replaceExp)
-        sys.stdout.write(line)
-        
+        sys.stdout.write(line)        
 
 def videowindow():   
     xbmc.log('script.pseudotv.live-videowindow: videowindow')

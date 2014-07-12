@@ -1,4 +1,22 @@
-﻿import os, shutil, datetime, random, threading
+﻿# Copyright 2011-2014 Blazetamer, Jason Anderson, Kevin, Lunatixz,
+# Martijn Kaijser, Tommy Winther & Tristan Fischer.
+#
+# This file is part of PseudoTV Live. <https://github.com/Lunatixz/script.pseudotv.live>
+#
+# PseudoTV Live is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# PseudoTV Live is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PseudoTV Live. If not, see <http://www.gnu.org/licenses/>.
+
+import os, shutil, datetime, random, threading
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
@@ -26,15 +44,13 @@ xbmc.log("script.pseudotv.live-service: Service Started...")
 if xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True":
     if (ArtService_Background == 'false'):
         PseudoTVRunning = True
-
         
 def ThreadTimer(object, seconds, function):
     print 'ThreadTimer'
     objectname = str(object)
     object = threading.Timer(float(seconds), function)
     object.name = objectname
-    object.start()
-    
+    object.start()    
     
 def ChangeMonitor(seconds=900):
     print 'ChangeMonitor' 
@@ -43,7 +59,6 @@ def ChangeMonitor(seconds=900):
         ChangeMonitorThread.name = 'script.pseudotv.live-service: ChangeMonitor_Thread'
         ChangeMonitorThread.start()
         SkinChange()
-
     
 def ArtServiceTimer(time=1800):
     print 'ArtServiceTimer'
@@ -65,8 +80,7 @@ def ArtServiceTimer(time=1800):
             pass
             
         if now >= ArtService_NextRun:  
-            Artdown.ArtService()
-       
+            Artdown.ArtService()       
        
 def ForceArtService():
     print 'ForceArtService'
