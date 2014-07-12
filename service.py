@@ -44,15 +44,13 @@ xbmc.log("script.pseudotv.live-service: Service Started...")
 if xbmcgui.Window(10000).getProperty("PseudoTVRunning") == "True":
     if (ArtService_Background == 'false'):
         PseudoTVRunning = True
-
         
 def ThreadTimer(object, seconds, function):
     print 'ThreadTimer'
     objectname = str(object)
     object = threading.Timer(float(seconds), function)
     object.name = objectname
-    object.start()
-    
+    object.start()    
     
 def ChangeMonitor(seconds=900):
     print 'ChangeMonitor' 
@@ -61,7 +59,6 @@ def ChangeMonitor(seconds=900):
         ChangeMonitorThread.name = 'script.pseudotv.live-service: ChangeMonitor_Thread'
         ChangeMonitorThread.start()
         SkinChange()
-
     
 def ArtServiceTimer(time=1800):
     print 'ArtServiceTimer'
@@ -83,8 +80,7 @@ def ArtServiceTimer(time=1800):
             pass
             
         if now >= ArtService_NextRun:  
-            Artdown.ArtService()
-       
+            Artdown.ArtService()       
        
 def ForceArtService():
     print 'ForceArtService'
