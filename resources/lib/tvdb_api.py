@@ -28,7 +28,7 @@ import warnings
 import logging
 import datetime
 import zipfile
-
+import xbmcaddon, xbmc, xbmcgui, xbmcvfs
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
@@ -495,19 +495,7 @@ class Tvdb:
         self.config['url_artworkPrefix'] = u"%(base_url)s/banners/%%s" % self.config
 
     def _getTempDir(self):
-        """Returns the [system temp dir]/tvdb_api-u501 (or
-        tvdb_api-myuser)
-        """
-        if hasattr(os, 'getuid'):
-            uid = "u%d" % (os.getuid())
-        else:
-            # For Windows
-            try:
-                uid = getpass.getuser()
-            except ImportError:
-                return os.path.join(tempfile.gettempdir(), "tvdb_api")
-
-        return os.path.join(tempfile.gettempdir(), "tvdb_api-%s" % (uid))
+        return xbmc.translatePath(os.path.join('special://temp/',"tvdb_api"))
 
     def _loadUrl(self, url, recache = False, language=None):
         global lastTimeout

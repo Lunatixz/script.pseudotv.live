@@ -23,10 +23,8 @@
     <string id="30106">Playback Offset (milliseconds)</string>  
 <string id="30200">Visuals</string>
     <string id="30201">Enable Dynamic Artwork (Incl. Service)</string>
-    <string id="34041">Enable Artwork Spooling</string>
     <string id="34046">Show Notification</string>
     <string id="34045">Run Service Every (hours)</string>
-    <string id="34047">Run Service During Playback?</string>
     <string id="30202">Select Skin</string> 
     <string id="30225">Channel Logo Folder</string>  
     <string id="30210">EPG Options:</string> 
@@ -119,6 +117,7 @@
         <string id="30501">Enable Bumpers</string>
         <string id="30502">Select Bumpers Folder</string>
         <string id="30503">Number of Bumpers Between Shows</string>
+        <string id="39504">Add Ratings Between Movies</string>
         <string id="30510">(C)ommercials:</string> 
             <string id="30511">Enable Commercials</string>
             <string id="30512">Select Commercials Folder</string>

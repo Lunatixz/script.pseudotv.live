@@ -129,28 +129,30 @@
 <!--line 2 logos-->      
         <control type="group" id="513">  
             <!--NowPlaying.Window-->   
-            <posx>155</posx>
-            <posy>540</posy>        
             <control type="image" >
+                <posx>155</posx>
+                <posy>540</posy>        
                 <texture fallback="logo.png">$INFO[Player.Art(clearlogo)]</texture>
                 <width>170</width>
                 <height>75</height>
                 <align>center</align>
                 <aspectratio>keep</aspectratio>                
-                <visible>[VideoPlayer.Content(movies) + IsEmpty(Control.GetImage(516))]</visible>
+                <!-- <visible>[VideoPlayer.Content(movies) + IsEmpty(Control.GetImage(510))]</visible> -->
             </control>
             <control type="image" >
-                <texture fallback="logo.png">$INFO[Player.Art(tvshow.clearlogo)]</texture>
+                <posx>155</posx>
+                <posy>540</posy>      
+                <texture>$INFO[Player.Art(tvshow.clearlogo)]</texture>
                 <width>170</width>
                 <height>75</height>
                 <align>center</align>
                 <aspectratio>keep</aspectratio>
-                <visible>[VideoPlayer.Content(episodes) + IsEmpty(Control.GetImage(516))]</visible>
+                <!-- <visible>[VideoPlayer.Content(episodes) + IsEmpty(Control.GetImage(510))]</visible> -->
             </control>
             <!-- Poster Window --> 
-            <posx>1040</posx>
-            <posy>420</posy>    
             <control type="image">
+                <posx>1040</posx>
+                <posy>420</posy>    
                 <texture fallback="poster.png">$INFO[Player.Art(poster)]</texture>
                 <width max="200">auto</width>
                 <height max="300">auto</height>
@@ -158,6 +160,8 @@
                 <aspectratio>keep</aspectratio>
             </control>
             <control type="image">
+                <posx>1040</posx>
+                <posy>420</posy>    
                 <texture>$INFO[Player.Art(tvshow.poster)]</texture>
                 <width  max="200">auto</width>
                 <height  max="300">auto</height>

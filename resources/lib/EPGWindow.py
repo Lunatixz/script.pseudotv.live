@@ -328,8 +328,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             self.logDebug("setbuttonnowtime " + str(nowDate))
             playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                         
-            if chname == 'PseudoCinema' and self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <= 1800:
-                self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
+            if chname == 'PseudoCinema':
+                if self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <= 1800:
+                    self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
 
             elif self.MyOverlayWindow.channels[curchannel - 1].isPaused:
                 if chname in BYPASS_EPG:
@@ -693,6 +694,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             elif action == ACTION_RECORD:
                 self.log('ACTION_RECORD')
                 PVRrecord(self.PVRchtype, self.PVRmediapath, self.PVRchname, self.PVRtitle)
+
         except:
             self.log("Unknown EPG Exception", xbmc.LOGERROR)
             self.log(traceback.format_exc(), xbmc.LOGERROR)
@@ -1025,7 +1027,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 
         #Change Label when Dynamic artwork enabled
         try:
-            if REAL_SETTINGS.getSetting("art.enable") == "true":     
+            if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":      
             
                 if self.infoOffset > 0:
                     self.getControl(522).setLabel('COMING UP:')
@@ -1071,7 +1073,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.getControl(502).setLabel(self.MyOverlayWindow.channels[newchan - 1].getItemDescription(plpos))
         self.getControl(503).setImage(self.channelLogos + ascii(self.MyOverlayWindow.channels[newchan - 1].name) + '.png')
         
-        if REAL_SETTINGS.getSetting("art.enable") == "true": 
+        if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":  
             self.log('Dynamic artwork enabled')
             
             #hide xbmc.videoplayer art since using dynamic art
@@ -1109,9 +1111,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 type1 = str(self.getControl(507).getLabel())
                 type1EXT = self.Artdownloader.EXTtype(type1)
                 self.setArtwork1(type, chtype, id, mpath, type1EXT)
-                # self.getControl(508).setImage('NA.png')
-                # setImage1 = self.Artdownloader.FindArtwork(type, chtype, id, mpath, type1EXT)
-                # self.getControl(508).setImage(setImage1)
             except:
                 pass
                
@@ -1119,9 +1118,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 type2 = str(self.getControl(509).getLabel())
                 type2EXT = self.Artdownloader.EXTtype(type2)
                 self.setArtwork2(type, chtype, id, mpath, type2EXT)
-                # self.getControl(510).setImage('NA.png')
-                # setImage2 = self.Artdownloader.FindArtwork(type, chtype, id, mpath, type2EXT)
-                # self.getControl(510).setImage(setImage2)
             except:
                 pass
         

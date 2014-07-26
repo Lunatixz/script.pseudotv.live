@@ -46,7 +46,10 @@ class Artdownloader:
 
     global ArtService_Running
     ArtService_Running = False
-
+    
+    global ArtService_Msg
+    ArtService_Msg = REAL_SETTINGS.getSetting('ArtService_notify')
+    
     def log(self, msg, level = xbmc.LOGDEBUG):
         log('Artdownloader: ' + msg, level)
 
@@ -92,8 +95,8 @@ class Artdownloader:
     def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
         if Cache_Enabled:
             print ("FindArtwork Cache")
-            chtype = int(chtype)
             try: #stagger artwork cache by chtype
+                # chtype = int(chtype)
                 if chtype <= 3:
                     result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
                 elif chtype > 3 and chtype <= 6:
@@ -122,7 +125,7 @@ class Artdownloader:
         print ('FindArtwork_NEW')
         print type, chtype, id, mediapath, arttypeEXT
         
-        chtype = int(chtype)
+        # chtype = int(chtype)
         setImage = ''
         arttype = arttypeEXT.split(".")[0]
         fle = str(id) + '-' + arttypeEXT
@@ -550,6 +553,7 @@ class Artdownloader:
     
     def ArtService(self, Art_Msg=ArtService_Msg):
         print 'ArtService'
+        REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
         
         global ArtService_Running
         if not ArtService_Running:
@@ -613,6 +617,7 @@ class Artdownloader:
             MSSG = ("Artwork Spooling Finished in %d seconds" %finished.seconds)
             print str(MSSG)
             
+            REAL_SETTINGS.setSetting("DynamicArt_Enabled","true")
             REAL_SETTINGS.setSetting("ArtService_LastRun",str(stop))
             ArtService_Running = False
             

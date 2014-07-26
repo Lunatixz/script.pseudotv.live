@@ -367,9 +367,3 @@ BYPASS_EPG = ['PseudoCinema']
 
 # Bypass Overlay Coming up next by channel name
 BYPASS_OVERLAY = ['PseudoCinema']
-
-# Dynamic Artwork Service
-ArtService_Enabled = REAL_SETTINGS.getSetting("art.enable")
-ArtService_Msg = REAL_SETTINGS.getSetting('ArtService_notify')
-ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]  
-ArtService_Background = REAL_SETTINGS.getSetting('ArtService_Background') 

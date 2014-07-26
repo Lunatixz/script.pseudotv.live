@@ -96,10 +96,8 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                 try:
                     shutil.rmtree(BCT_LOC)
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "BCT Cache Cleared", 4000, THUMB) )
-                    REAL_SETTINGS.setSetting('ClearBCT', "false")
                     xbmc.log('script.pseudotv.live-default: BCT Folder Purged!')
                 except Exception,e:
-                    REAL_SETTINGS.setSetting('ClearBCT', "false")
                     xbmc.log('script.pseudotv.live-default: BCT Folder Purge Failed! ' + str(e))  
                     pass
 
@@ -134,7 +132,6 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                 daily.delete("%") 
                 weekly.delete("%")
                 monthly.delete("%")
-                xmltv.delete("%")
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "System Cache Cleared", 4000, THUMB) )
                 REAL_SETTINGS.setSetting('ClearCache', "false")
 

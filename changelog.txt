@@ -1,3 +1,7 @@
+[*] Movie ratings bumper option, Misc bug fixes...
+[*] Dynamic Artwork disabled while spooling and before first run. EPG/Overlay Tweaking...
+[*] PseudoCinema missing channel name fix, Last Channel Recall tweaking.
+[*] [COLOR=blue]^ v.0.4.8 ^[/COLOR] 
 [*] Hub-Edition activated by having "XBMCHUB ADDONINSTALLER" installed.
 [*] NEW! Internet Bumper option (Community Bumper list Requires Vimeo & Youtube plugin).
 [*] Last Channel recall, requires Virtual Keyboard "ACTION_SHIFT" to be key-mapped.

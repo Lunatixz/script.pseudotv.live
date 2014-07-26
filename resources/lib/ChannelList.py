@@ -120,7 +120,7 @@ class ChannelList:
             daily.delete("%") 
             weekly.delete("%")
             REAL_SETTINGS.setSetting("INTRO_PLAYED","false")
-            REAL_SETTINGS.setSetting("ArtService_LastRun",'')
+            REAL_SETTINGS.setSetting("ArtService_LastRun","")
             REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
             self.forceReset = False
 
@@ -337,13 +337,7 @@ class ChannelList:
         needsreset = False
         self.background = background
         self.settingChannel = channel
-
-        # try:
-            # if ArtSpoolThreadTimer.isAlive():
-                # ArtSpoolThreadTimer.join()
-        # except:
-            # pass
-            
+        
         try:
             chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
             chsetting1 = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_1')
@@ -467,13 +461,6 @@ class ChannelList:
                             ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'False')
                             self.channels[channel - 1].isSetup = True
                     
-                
-                
-                # self.Artdownloader = Artdownloader()
-                # ArtSpoolThreadTimer = threading.Timer(1, self.Artdownloader.ArtSpool, args=[chtype, channel])
-                # ArtSpoolThreadTimer.start()
-                # self.Artdownloader.ArtSpool(chtype, channel)
-
         self.runActions(RULES_ACTION_BEFORE_CLEAR, channel, self.channels[channel - 1])
 
         # Don't clear history when appending channels
@@ -509,7 +496,7 @@ class ChannelList:
             self.runActions(RULES_ACTION_FINAL_MADE, channel, self.channels[channel - 1])
         else:
             self.runActions(RULES_ACTION_FINAL_LOADED, channel, self.channels[channel - 1])
-
+        
         return returnval
 
         
@@ -794,10 +781,8 @@ class ChannelList:
 
         if append == False:
             channelplaylist.write(uni("#EXTM3U\n"))
-
-            # if channel == 1:
-                # channelplaylist.write(uni("#EXTINF:17,PseudoTV Live//Welcome to PseudoTV Live////Unknown////tvshow|0|0|False|1|NR|") + uni("\n") + uni("plugin://plugin.video.youtube/?action=play_video&videoid=Y8WlAhpHzkM\n"))
-        
+            #first queue m3u
+            
         if fileList != None:  
             if len(fileList) == 0:
                 self.log("Unable to get information about channel " + str(channel), xbmc.LOGERROR)
@@ -1567,9 +1552,9 @@ class ChannelList:
                         
                         if ratings:
                             if type == 'tvshow':
-                                rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                             else:
-                                rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                                 rating = rating[0:5]
 
                                 try:
@@ -1731,6 +1716,8 @@ class ChannelList:
                                     except:
                                         year = ''
                                         pass
+                            else:
+                                year = years.group(1)
                                 
                             if genres:
                                 genre = ascii((genres.group(1).split(',')[0]).replace('"',''))
@@ -1744,9 +1731,9 @@ class ChannelList:
                             
                             if ratings:
                                 if type == 'tvshow':
-                                    rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                    rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                                 else:
-                                    rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                    rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                                     rating = rating[0:5]
 
                                     try:
@@ -1820,7 +1807,12 @@ class ChannelList:
 
 
                             else:
-                                tmpstr += title.group(1) + "//"
+                            
+                                if year != '':
+                                    tmpstr += title.group(1) + ' (' + str(year) + ')' + "//"
+                                else:
+                                    tmpstr += title.group(1) + "//"
+                                    
                                 album = re.search('"album" *: *"(.*?)"', f)
 
                                 # This is a movie
@@ -1961,6 +1953,8 @@ class ChannelList:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding LiveTV", 'parsing ' + str(setting3.lower()))
 
         context = ET.iterparse(f, events=("start", "end")) 
+        context = iter(context)
+        
         event, root = context.next()
         inSet = False
         
@@ -1988,10 +1982,11 @@ class ChannelList:
                         iconElement = elem.find("icon")
                         icon = None
                         
+                        # todo download channel icon for EPG guide.
                         if iconElement is not None:
                             icon = iconElement.get("src")
-                        subtitle = elem.findtext("sub-title")
                         
+                        subtitle = elem.findtext("sub-title")
                         if not description:
                             if not subtitle:
                                 description = title  
@@ -2873,23 +2868,21 @@ class ChannelList:
         elif setting3 != '':
             self.xmlTvFile = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'), str(setting3) +'.xml'))
             self.log("xmltv_ok, testing " + str(self.xmlTvFile))
-            
-            try:
-                FileAccess.exists(self.xmlTvFile)
+
+            if FileAccess.exists(self.xmlTvFile):
                 self.log("INFO: XMLTV File Found...")
-                f = FileAccess.open(self.xmlTvFile, "rb")
-                context = ET.iterparse(f, events=("start", "end")) 
-                event, root = context.next()
-                for event, elem in context:
-                    if event == "end":
-                        if elem.tag == "programme":
-                            channel = elem.get("channel")
-                            if setting1 in channel:
-                                self.log("INFO: XMLTV ZAPIT Data Found...")
                 self.xmltvValid = True
-                root.clear()                
-            except IOError as e:
-                self.log("ERROR: Problem accessing " + str(setting3) +".xml, ERROR: " + str(e))
+            # f = FileAccess.open(self.xmlTvFile, "rb")
+            # context = ET.iterparse(f, events=("start", "end")) 
+            # event, root = context.next()
+            # for event, elem in context:
+                # if event == "end":
+                    # if elem.tag == "programme":
+                        # channel = elem.get("channel")
+                        # if setting1 in channel:
+                            # self.log("INFO: XMLTV ZAPIT Data Found...")
+            # self.xmltvValid = True
+            # root.clear()                
 
         self.log("xmltvValid = " + str(self.xmltvValid))
         return self.xmltvValid
@@ -3140,7 +3133,11 @@ class ChannelList:
             random.shuffle(BumperLST)
             BumperNum = len(BumperLST)#number of Bumpers items in full list
             self.logDebug("insertBCTfiles, Bumpers.numbumpers = " + str(numbumpers))
-            
+        
+        #Ratings
+        if (REAL_SETTINGS.getSetting('bumpers') != "0" and REAL_SETTINGS.getSetting('bumperratings') == 'true' and type == 'movies'):
+            fileList = self.GetRatingList(channel, fileList)
+
         #Commercial
         if REAL_SETTINGS.getSetting('commercials') != '0' and type != 'movies': # commercials not disabled, and not a movie
             CommercialLST = self.GetCommercialList(channel, fileList)#build full Commercial list
@@ -3170,7 +3167,6 @@ class ChannelList:
                 for n in range(numbumpers):
                     if self.background == False:
                         self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Bumpers", '')
-                        
                     Bumper = random.choice(BumperLST)#random fill Bumper per show by user selected amount
                     BumperDur = int(Bumper.split(',')[0]) #duration of Bumper
                     bctDur += BumperDur
@@ -3327,6 +3323,32 @@ class ChannelList:
                     
         return (BumperLST)        
         
+    
+    def GetRatingList(self, channel, fileList):
+        self.log("GetRatingList")
+        URL = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=qlRaA8tAfc0'
+        newFileList = []
+        Ratings = (['NR','qlRaA8tAfc0'],['R','s0UuXOKjH-w'],['NC-17','Cp40pL0OaiY'],['PG-13','lSg2vT5qQAQ'],['PG','oKrzhhKowlY'],['G','QTKEIFyT4tk'],['18','g6GjgxMtaLA'],['16','zhB_xhL_BXk'],['12','o7_AGpPMHIs'],['6','XAlKSm8D76M'],['0','_YTMglW0yk'])
+
+        for i in range(len(fileList)):
+            file = fileList[i]
+            lineLST = ascii(fileList[i]).split('movie|')[1]
+            mpaa = ascii(lineLST.split('\n')[0]).split('|')[4]
+   
+            if self.background == False:
+                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Ratings", str(mpaa))
+                            
+            for i in range(len(Ratings)):
+                rating = Ratings[i]        
+                if mpaa == rating[0]:
+                    ID = rating[1]
+                    URL = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + ID
+            
+            tmpstr = '7,//////Rating////' + 'tvshow|0|0|False|1|NR|' + '\n' + (URL) + '\n' + '#EXTINF:' + file
+            newFileList.append(tmpstr)
+
+        return newFileList
+    
     
     def GetCommercialList (self, channel, fileList):
         self.log("GetCommercialList")
@@ -3538,7 +3560,7 @@ class ChannelList:
                     match = [s for s in JsonLST if genre in s]
                     for i in range(len(match)):    
                         if self.background == False:
-                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Library Genre " + match)
+                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Library Genre")
                         duration = 120
                         json = uni(match[i])
                         trailer = json.split(',"trailer":"',1)[-1]
@@ -3548,7 +3570,7 @@ class ChannelList:
                             trailer = trailer[:-1]
                         if trailer != '' or trailer != None or trailer != '"}]}':
                             if 'http://www.youtube.com/watch?hd=1&v=' in trailer:
-                                trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", "plugin://plugin.video.youtube/?action=play_video&videoid=").replace("http://www.youtube.com/watch?v=", "plugin://plugin.video.youtube/?action=play_video&videoid=")
+                                trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=").replace("http://www.youtube.com/watch?v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=")
                             JsonTrailer = (str(duration) + ',' + trailer)
                             if JsonTrailer != '120,':
                                 JsonTrailerLST.append(JsonTrailer)
@@ -3569,7 +3591,7 @@ class ChannelList:
                             trailer = trailer[:-1]
                         if trailer != '' or trailer != None or trailer != '"}]}':
                             if 'http://www.youtube.com/watch?hd=1&v=' in trailer:
-                                trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", "plugin://plugin.video.youtube/?action=play_video&videoid=").replace("http://www.youtube.com/watch?v=", "plugin://plugin.video.youtube/?action=play_video&videoid=")
+                                trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=").replace("http://www.youtube.com/watch?v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=")
                             JsonTrailer = (str(duration) + ',' + trailer)
                             if JsonTrailer != '120,':
                                 JsonTrailerLST.append(JsonTrailer)
@@ -3882,7 +3904,7 @@ class ChannelList:
         if not rating or rating == 'None' or rating == 'Empty':
             rating = 'NR'
             
-        return rating.replace('NA','NR').replace('M','R')
+        return rating.replace('NA','NR').replace('Not','NR').replace('Approved','NR').replace('M','R')
 
 
     def getTVDBID(self, title, year):
@@ -4265,9 +4287,9 @@ class ChannelList:
                                 
                                 if ratings:
                                     if type == 'tvshow':
-                                        rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                        rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                                     else:
-                                        rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                        rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                                         rating = rating[0:5]
 
                                         try:
@@ -4632,9 +4654,9 @@ class ChannelList:
                                     
                                     if ratings:
                                         if type == 'tvshow':
-                                            rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                            rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                                         else:
-                                            rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR')
+                                            rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
                                             rating = rating[0:5]
 
                                             try:

@@ -28,10 +28,10 @@
 <!--Visual-->
     <category label="30200">
         <setting id="SkinSelector" type="enum"  label="30202" values="Classic PTV|Default|PTVL|Custom" default="2"/>
-        <setting id="art.enable" label="30201" type="bool" default="false" /> 
+        <setting id="ArtService_Enabled" label="30201" type="bool" default="false" /> 
         <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
-        <setting id="ArtService_Background" type="bool" label="34047" subsetting="true" visible="eq(-2,true)" default="true"/>
-        <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-3,true)" default="2"/>
+        <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-2,true)" default="2"/>
+        <setting id="DynamicArt_Enabled" type="bool" label="34047" subsetting="true" visible="false" default="false"/>
         <setting id="ShowSeEp" type="bool" label="30301" default="false"/>
         <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>
         <setting label="30210" type="lsep"/>
@@ -125,6 +125,7 @@
         <setting label="30501" id="bumpers" type="enum" values="Disabled|Local|Internet" default="0" />
         <setting label="30502" id="bumpersfolder" type="folder" source="auto" visible="eq(-1,1)" default="" />
         <setting label="30503" id="numbumpers" type="enum" visible="!eq(-2,0)" values="1|2|3|4|5" default="0"/>
+        <setting label="39504" id="bumperratings" type="bool" visible="!eq(-3,0)" default="false" />
     <setting label="30510" type="lsep"/>
         <setting label="39002" id="COM_Donor" type="bool" visible="false" default="false" />
         <setting label="30511" id="commercials" type="enum" values="Disabled|Local|Youtube|Internet" default="0"/>

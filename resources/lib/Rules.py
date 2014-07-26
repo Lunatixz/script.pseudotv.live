@@ -1330,6 +1330,7 @@ class SetResetTime(BaseRule):
             self.name = "Reset Every x Days"
             self.optionLabels = ['Number of Days']
             self.optionValues = ['5']
+        
         self.myId = 13
         self.actions = RULES_ACTION_START
 

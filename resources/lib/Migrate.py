@@ -25,6 +25,7 @@ from Globals import *
 from xml.etree import ElementTree as ET
 from FileAccess import FileLock, FileAccess
 from urllib import unquote
+from utils import *
 
 try:
     from Donor import *
@@ -1084,7 +1085,7 @@ class Migrate:
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", flename)
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'IMAX')
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", '')            
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "6")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "5")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "PseudoCinema")  
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "8")
@@ -1092,10 +1093,8 @@ class Migrate:
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_3_opt_1", "No")  
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_4_id", "17")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_4_opt_1", "No")  
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_id", "13")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_opt_1", "1")    
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_6_id", "15")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_6_opt_1", "No")  
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_id", "15")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_opt_1", "No")    
             
             channelNum = channelNum + 1
             self.logDebug('channelNum = ' + str(channelNum))
