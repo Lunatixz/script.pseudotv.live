@@ -27,7 +27,6 @@ from Globals import *
 from Playlist import PlaylistItem
 
 
-
 class RulesList:
     def __init__(self):
         self.ruleList = [BaseRule(), ScheduleChannelRule(), HandleChannelLogo(), NoShowRule(), DontAddChannel(), EvenShowsRule(), ForceRandom(), ForceRealTime(), ForceResume(), HandleIceLibrary(), HandleBCT(), HandlePOP(), InterleaveChannel(), OnlyUnWatchedRule(), OnlyWatchedRule(), AlwaysPause(), PlayShowInOrder(), RenameRule(), SetResetTime()]

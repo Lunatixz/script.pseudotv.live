@@ -1,4 +1,10 @@
-[*] Movie ratings bumper option, Misc bug fixes...
+[*] GMTOffset fix? for USTVnow and F.T.V Source *Thanks kurumushi
+[*] Two Work in Progress skins (ConCast, Time Whorner Cable).
+[*] Added some visual debugging, disable "Enable Debugging" under "MISC" if not needed.
+[*] Plugin and Strm smart seek (Avoids loading applicable media near the end of it runtime).
+[*] Youtube "Autostart"; resume a paused channel. Improved overall error handling...
+[*] Youtube Plugin Detection (Switches default Youtube player to Bromix's Youtube(Alpha) if available).
+[*] NEW! Movie ratings bumper option, Misc bug fixes, improved "Coming Up Next" overlay.
 [*] Dynamic Artwork disabled while spooling and before first run. EPG/Overlay Tweaking...
 [*] PseudoCinema missing channel name fix, Last Channel Recall tweaking.
 [*] [COLOR=blue]^ v.0.4.8 ^[/COLOR] 

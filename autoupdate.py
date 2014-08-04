@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Blazetamer 2013, Lunatixz
+#   Copyright (C) 2013 Blazetamer, Lunatixz
 #
 #
 # This file is part of PseudoTV Live.

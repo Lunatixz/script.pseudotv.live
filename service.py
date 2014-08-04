@@ -17,7 +17,7 @@ xbmc.log("script.pseudotv.live-service: Service Started...")
 
 
 def ChangeMonitor(seconds=300):
-    print 'ChangeMonitor' 
+    print 'ChangeMonitor'         
     ChangeMonitorThread = threading.Timer(float(seconds), ChangeMonitor)
     ChangeMonitorThread.name = 'script.pseudotv.live-service: ChangeMonitor_Thread'
     ChangeMonitorThread.start()

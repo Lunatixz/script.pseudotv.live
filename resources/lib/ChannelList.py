@@ -258,7 +258,7 @@ class ChannelList:
             return
 
         xml.close()
-
+                
         try:
             plname = dom.getElementsByTagName('webserver')
             self.httpJSON = (plname[0].childNodes[0].nodeValue.lower() == 'true')
@@ -600,6 +600,7 @@ class ChannelList:
         self.log('makeChannelList, CHANNEL: ' + str(channel))
         israndom = False
         reverseOrder = False
+        fileListCHK = False
         fileList = []
                       
         #DEFAULT
@@ -636,7 +637,7 @@ class ChannelList:
                 xmltvValid = self.xmltv_ok(setting1, setting3)
             
             if xmltvValid == True:
-            
+                
                 # Validate Feed #
                 fileListCHK = self.Valid_ok(setting2)
                 if fileListCHK == True:
@@ -659,18 +660,25 @@ class ChannelList:
                 
         # Youtube                          
         elif chtype == 10:
-            self.log("Building Youtube Channel " + setting1 + " using type " + setting2 + "...")
-            fileList = self.createYoutubeFilelist(setting1, setting2, setting3, setting4, channel)                            
+            # Validate Feed #
+            fileListCHK = self.youtube_player()
+            print 'fileListCHK', fileListCHK
+            if fileListCHK != False:
+                self.log("Building Youtube Channel " + setting1 + " using type " + setting2 + "...")
+                fileList = self.createYoutubeFilelist(setting1, setting2, setting3, setting4, channel)            
+            else:
+                self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'fileListCHK invalid: ' + str(setting2))
+                return                 
 
         # RSS/iTunes/feedburner/Podcast   
         elif chtype == 11:
             self.log("Building RSS Feed " + setting1 + " using type " + setting2 + "...")
             fileList = self.createRSSFileList(setting1, setting2, setting3, setting4, channel)                       
 
-        # lastFM
+        # MusicVideos
         elif chtype == 13:
-            self.log("Building Last.FM User " + setting2 + "...")
-            fileList = self.lastFM(setting1, setting2, setting3, setting4, channel)
+            self.log("Building Music Videos")
+            fileList = self.MusicVideos(setting1, setting2, setting3, setting4, channel)
                     
         # Extras
         elif chtype == 14 and Donor_Downloaded == True:
@@ -1542,8 +1550,6 @@ class ChannelList:
                                 
                         if genres:
                             genre = ascii((genres.group(1).split(',')[0]).replace('"',''))
-                        else:
-                            genre = 'Unknown'
                         
                         if playcounts:
                             playcount = playcounts.group(1)
@@ -1721,8 +1727,6 @@ class ChannelList:
                                 
                             if genres:
                                 genre = ascii((genres.group(1).split(',')[0]).replace('"',''))
-                            else:
-                                genre = 'Unknown'
                             
                             if playcounts:
                                 playcount = playcounts.group(1)
@@ -1908,13 +1912,13 @@ class ChannelList:
         return fileList
 
     
-    def parseXMLTVDate(self, dateString):
+    def parseXMLTVDate(self, dateString, tzOffset=0):
         if dateString is not None:
             if dateString.find(' ') != -1:
                 # remove timezone information
                 dateString = dateString[:dateString.find(' ')]
             t = time.strptime(dateString, '%Y%m%d%H%M%S')
-            return datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec)
+            return datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec) + datetime.timedelta(hours = tzOffset)
         else:
             return None
     
@@ -2073,11 +2077,15 @@ class ChannelList:
                                 now = now + datetime.timedelta(hours = 1)
                             else: 
                                 now = now
+                            
+                            tzOffset = (time.timezone / -3600) + 4
+                            stopDate = self.parseXMLTVDate(elem.get('stop'), tzOffset)
+                            startDate = self.parseXMLTVDate(elem.get('start'), tzOffset)
                         else:
                             now = datetime.datetime.now()
                                                         
-                        stopDate = self.parseXMLTVDate(elem.get('stop'))
-                        startDate = self.parseXMLTVDate(elem.get('start'))
+                        stopDate = self.parseXMLTVDate(elem.get('stop'), 0)
+                        startDate = self.parseXMLTVDate(elem.get('start'), 0)
                         
                         if (((now > startDate and now < stopDate) or (now < startDate))):
                             if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and ignoreParse == False: 
@@ -2330,6 +2338,7 @@ class ChannelList:
         global youtube
         youtube = ''
         LiveID = 'tvshow|0|0|False|1|NR|'
+        youtube_plugin = self.youtube_player()
         
         if setting3 == '':
             limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
@@ -2342,22 +2351,22 @@ class ChannelList:
             
         if setting2 == '1' or setting2 == '3' or setting2 == '4':
             stop = (limit / 25)
-            MSG = setting1
+            YTMSG = setting1
         elif setting2 == '2':
             stop = 2
-            MSG = 'Playlist'
+            YTMSG = 'Playlist'
         elif setting2 == '5':
             stop = (limit / 25)
-            MSG = 'Search Query'
+            YTMSG = 'Search Query'
         elif setting2 == '9': 
             stop = 2 # If Setting2 = User playlist pagination disabled, else loop through pagination of 25 entries per page and stop at limit.
-            MSG = 'Raw gdata'
+            YTMSG = 'Raw gdata'
 
         if self.background == False:
             if REAL_SETTINGS.getSetting('commercials') == '2' or REAL_SETTINGS.getSetting('AsSeenOn') == 'true':
                 self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Youtube", "")
             else:
-                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Youtube", "parsing " + str(MSG))
+                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Youtube", "parsing " + str(YTMSG))
                          
         startIndex = 1
         for x in range(stop):    
@@ -2498,14 +2507,14 @@ class ChannelList:
                     
                     # Build M3U
                     istvshow = True
-                    tmpstr = str(duration) + ',' + eptitle + '//' + "Youtube - " + showtitle + "//" + summary + "//" + genre + "////" + LiveID + '\n' + 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid='+url
+                    tmpstr = str(duration) + ',' + eptitle + '//' + "Youtube - " + showtitle + "//" + summary + "//" + genre + "////" + LiveID + '\n' + youtube_plugin + url
                     tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
                     self.log("createYoutubeFilelist, CHANNEL: " + str(self.settingChannel) + ", " + eptitle + "  DUR: " + str(duration))
                     showList.append(tmpstr)
                     showcount += 1
 
                     if self.background == False:
-                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Youtube, parsing " + str(MSG), "added " + str(showcount) + " entries")
+                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Youtube, parsing " + str(YTMSG), "added " + str(showcount) + " entries")
                 
                 except Exception,e:
                     pass
@@ -2689,7 +2698,19 @@ class ChannelList:
         return showList
 
      
+    def MusicVideos(self, setting1, setting2, setting3, setting4, channel):
+        self.log("MusicVideos")
+        showList = []
+        if setting1 == '1':
+            msg_type = "Last.FM"
+            showList = self.lastFM(setting1, setting2, setting3, setting4, channel)
+        elif setting1 == '2':
+            msg_type = "My MusicTV"
+            
+        return showList
+    
     def lastFM(self, setting1, setting2, setting3, setting4, channel):
+                
         if Cache_Enabled:
             self.log("lastFM Cache")
             try:
@@ -2777,7 +2798,7 @@ class ChannelList:
 
                 xmlurl = dom.getElementsByTagName('url')[0].toxml()
                 url = xmlurl.replace('<url>','').replace('</url>','')  
-                url = url.replace("https://", "").replace("http://", "").replace("www.youtube.com/watch?v=", "").replace("&feature=youtube_gdata_player", "")     
+                url = url.replace("https://", "").replace("http://", "").replace("www.youtube.com/watch?v=", "").replace("&feature=youtube_gdata_player", "").replace("&amp;feature=youtube_gdata_player", "")
 
                 xmlduration = dom.getElementsByTagName('duration')[0].toxml()
                 duration = xmlduration.replace('<duration>','').replace('</duration>','')
@@ -2794,8 +2815,7 @@ class ChannelList:
                 eptitle = uni(artist + ' - ' + track)
                 epdesc = uni('Rated ' + rating + '/5.00')
                 
-                url = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid='+url
-                tmpstr = str(duration) + ',' + eptitle + "//" + "Last.FM" + "//" + epdesc + "//" + 'Music' + "////" + LiveID + '\n' + url
+                tmpstr = str(duration) + ',' + eptitle + "//" + "Last.FM" + "//" + epdesc + "//" + 'Music' + "////" + LiveID + '\n' + youtube_plugin + url
                 tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
                 self.log("LastFM, CHANNEL: " + str(self.settingChannel) + ", " + eptitle + "  DUR: " + str(duration))
                 showList.append(tmpstr)
@@ -2808,7 +2828,6 @@ class ChannelList:
                 pass
                             
         return showList
-
 
 
     def xmltv_ok(self, setting1, setting3):
@@ -3099,6 +3118,21 @@ class ChannelList:
         return self.Pluginvalid
                 
     
+    def youtube_player(self):
+        self.log("youtube_player")
+        Plugin_1 = self.plugin_ok('plugin.video.bromix.youtube')
+        Plugin_2 = self.plugin_ok('plugin.video.youtube')
+        
+        if Plugin_1 == True:
+            path = 'plugin://plugin.video.bromix.youtube/?action=play&id='
+        elif Plugin_2 == True:
+            path = 'plugin://plugin.video.youtube/?action=play_video&videoid='
+        else:
+            path = False
+            
+        return path
+            
+            
     def trim(self, content, limit, suffix):
         if len(content) <= limit:
             return content
@@ -3279,10 +3313,8 @@ class ChannelList:
         #Internet
         elif REAL_SETTINGS.getSetting('bumpers') == "2":
             self.log("GetBumperList - Internet")
-            Pluginvalid1 = self.plugin_ok('plugin.video.vimeo')
-            Pluginvalid2 = self.plugin_ok('plugin.video.youtube')
-            
-            if Pluginvalid1 and Pluginvalid2:
+            youtube_plugin = self.youtube_player()
+            if youtube_plugin != False:
                 try:
                     InternetBumperLST = []
                     duration = 3
@@ -3311,7 +3343,7 @@ class ChannelList:
                             if BumperSource == 'vimeo':
                                 url = 'plugin://plugin.video.vimeo/?path=/root/video&action=play_video&videoid=' + BumperID
                             else:
-                                url = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + BumperID
+                                url = youtube_plugin + BumperID
                             
                             if chname.lower() == ChannelName.lower():
                                 InternetBumper = (str(duration) + ',' + url)
@@ -3326,26 +3358,28 @@ class ChannelList:
     
     def GetRatingList(self, channel, fileList):
         self.log("GetRatingList")
-        URL = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=qlRaA8tAfc0'
         newFileList = []
-        Ratings = (['NR','qlRaA8tAfc0'],['R','s0UuXOKjH-w'],['NC-17','Cp40pL0OaiY'],['PG-13','lSg2vT5qQAQ'],['PG','oKrzhhKowlY'],['G','QTKEIFyT4tk'],['18','g6GjgxMtaLA'],['16','zhB_xhL_BXk'],['12','o7_AGpPMHIs'],['6','XAlKSm8D76M'],['0','_YTMglW0yk'])
+        youtube_plugin = self.youtube_player()
+        if youtube_plugin != False:
+            URL = youtube_plugin + 'qlRaA8tAfc0'
+            Ratings = (['NR','qlRaA8tAfc0'],['R','s0UuXOKjH-w'],['NC-17','Cp40pL0OaiY'],['PG-13','lSg2vT5qQAQ'],['PG','oKrzhhKowlY'],['G','QTKEIFyT4tk'],['18','g6GjgxMtaLA'],['16','zhB_xhL_BXk'],['12','o7_AGpPMHIs'],['6','XAlKSm8D76M'],['0','_YTMglW0yk'])
 
-        for i in range(len(fileList)):
-            file = fileList[i]
-            lineLST = ascii(fileList[i]).split('movie|')[1]
-            mpaa = ascii(lineLST.split('\n')[0]).split('|')[4]
-   
-            if self.background == False:
-                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Ratings", str(mpaa))
-                            
-            for i in range(len(Ratings)):
-                rating = Ratings[i]        
-                if mpaa == rating[0]:
-                    ID = rating[1]
-                    URL = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + ID
-            
-            tmpstr = '7,//////Rating////' + 'tvshow|0|0|False|1|NR|' + '\n' + (URL) + '\n' + '#EXTINF:' + file
-            newFileList.append(tmpstr)
+            for i in range(len(fileList)):
+                file = fileList[i]
+                lineLST = ascii(fileList[i]).split('movie|')[1]
+                mpaa = ascii(lineLST.split('\n')[0]).split('|')[4]
+       
+                if self.background == False:
+                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Ratings", str(mpaa))
+                                
+                for i in range(len(Ratings)):
+                    rating = Ratings[i]        
+                    if mpaa == rating[0]:
+                        ID = rating[1]
+                        URL = youtube_plugin + ID
+                
+                tmpstr = '7,//////Rating////' + 'tvshow|0|0|False|1|NR|' + '\n' + (URL) + '\n' + '#EXTINF:' + file
+                newFileList.append(tmpstr)
 
         return newFileList
     
@@ -3534,70 +3568,72 @@ class ChannelList:
         if (REAL_SETTINGS.getSetting('trailers') == '2'):
             json_query = uni('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":["genre","trailer","runtime"]}, "id": 1}')
             genre = chname
+            youtube_plugin = self.youtube_player()
+            if youtube_plugin != False:
             
-            if REAL_SETTINGS.getSetting('trailersgenre') == 'true' and GenreChtype == True:
-                TrailerInternetCache = 'Trailer_Json_Cache_' + genre + '.xml'
-            else:
-                TrailerInternetCache = 'Trailer_Json_Cache_All.xml'
-
-            CacheExpired = self.Cache_ok(TrailerCachePath, TrailerInternetCache) 
-
-            if CacheExpired == False:
-                TrailerLST = self.readCache(TrailerCachePath, TrailerInternetCache)
-                
-            elif CacheExpired == True:
-            
-                if not self.cached_json_detailed_trailers:
-                    self.logDebug('GetTrailerList, json_detail creating cache')
-                    self.cached_json_detailed_trailers = self.sendJSON(json_query)   
-                    json_detail = self.cached_json_detailed_trailers.encode('utf-8')   
-                else:
-                    json_detail = self.cached_json_detailed_trailers.encode('utf-8')   
-                    self.logDebug('GetTrailerList, json_detail using cache')
-                
                 if REAL_SETTINGS.getSetting('trailersgenre') == 'true' and GenreChtype == True:
-                    JsonLST = uni(json_detail.split("},{"))
-                    match = [s for s in JsonLST if genre in s]
-                    for i in range(len(match)):    
-                        if self.background == False:
-                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Library Genre")
-                        duration = 120
-                        json = uni(match[i])
-                        trailer = json.split(',"trailer":"',1)[-1]
-                        if ')"' in trailer:
-                            trailer = trailer.split(')"')[0]
-                        else:
-                            trailer = trailer[:-1]
-                        if trailer != '' or trailer != None or trailer != '"}]}':
-                            if 'http://www.youtube.com/watch?hd=1&v=' in trailer:
-                                trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=").replace("http://www.youtube.com/watch?v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=")
-                            JsonTrailer = (str(duration) + ',' + trailer)
-                            if JsonTrailer != '120,':
-                                JsonTrailerLST.append(JsonTrailer)
-                    TrailerLST.extend(JsonTrailerLST)
-                    self.writeCache(TrailerLST, TrailerCachePath, TrailerInternetCache)
+                    TrailerInternetCache = 'Trailer_Json_Cache_' + genre + '.xml'
                 else:
-                    JsonLST = uni(json_detail.split("},{"))
-                    match = [s for s in JsonLST if 'trailer' in s]
-                    for i in range(len(match)):    
-                        if self.background == False:
-                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Library Trailers")
-                        duration = 120
-                        json = uni(match[i])
-                        trailer = json.split(',"trailer":"',1)[-1]
-                        if ')"' in trailer:
-                            trailer = trailer.split(')"')[0]
-                        else:
-                            trailer = trailer[:-1]
-                        if trailer != '' or trailer != None or trailer != '"}]}':
-                            if 'http://www.youtube.com/watch?hd=1&v=' in trailer:
-                                trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=").replace("http://www.youtube.com/watch?v=", "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=")
-                            JsonTrailer = (str(duration) + ',' + trailer)
-                            if JsonTrailer != '120,':
-                                JsonTrailerLST.append(JsonTrailer)
-                    TrailerLST.extend(JsonTrailerLST)     
-                    self.writeCache(TrailerLST, TrailerCachePath, TrailerInternetCache)
+                    TrailerInternetCache = 'Trailer_Json_Cache_All.xml'
+
+                CacheExpired = self.Cache_ok(TrailerCachePath, TrailerInternetCache) 
+
+                if CacheExpired == False:
+                    TrailerLST = self.readCache(TrailerCachePath, TrailerInternetCache)
+                    
+                elif CacheExpired == True:
                 
+                    if not self.cached_json_detailed_trailers:
+                        self.logDebug('GetTrailerList, json_detail creating cache')
+                        self.cached_json_detailed_trailers = self.sendJSON(json_query)   
+                        json_detail = self.cached_json_detailed_trailers.encode('utf-8')   
+                    else:
+                        json_detail = self.cached_json_detailed_trailers.encode('utf-8')   
+                        self.logDebug('GetTrailerList, json_detail using cache')
+                    
+                    if REAL_SETTINGS.getSetting('trailersgenre') == 'true' and GenreChtype == True:
+                        JsonLST = uni(json_detail.split("},{"))
+                        match = [s for s in JsonLST if genre in s]
+                        for i in range(len(match)):    
+                            if self.background == False:
+                                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Library Genre")
+                            duration = 120
+                            json = uni(match[i])
+                            trailer = json.split(',"trailer":"',1)[-1]
+                            if ')"' in trailer:
+                                trailer = trailer.split(')"')[0]
+                            else:
+                                trailer = trailer[:-1]
+                            if trailer != '' or trailer != None or trailer != '"}]}':
+                                if 'http://www.youtube.com/watch?hd=1&v=' in trailer:
+                                    trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", youtube_plugin).replace("http://www.youtube.com/watch?v=", youtube_plugin)
+                                JsonTrailer = (str(duration) + ',' + trailer)
+                                if JsonTrailer != '120,':
+                                    JsonTrailerLST.append(JsonTrailer)
+                        TrailerLST.extend(JsonTrailerLST)
+                        self.writeCache(TrailerLST, TrailerCachePath, TrailerInternetCache)
+                    else:
+                        JsonLST = uni(json_detail.split("},{"))
+                        match = [s for s in JsonLST if 'trailer' in s]
+                        for i in range(len(match)):    
+                            if self.background == False:
+                                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Library Trailers")
+                            duration = 120
+                            json = uni(match[i])
+                            trailer = json.split(',"trailer":"',1)[-1]
+                            if ')"' in trailer:
+                                trailer = trailer.split(')"')[0]
+                            else:
+                                trailer = trailer[:-1]
+                            if trailer != '' or trailer != None or trailer != '"}]}':
+                                if 'http://www.youtube.com/watch?hd=1&v=' in trailer:
+                                    trailer = trailer.replace("http://www.youtube.com/watch?hd=1&v=", youtube_plugin).replace("http://www.youtube.com/watch?v=", youtube_plugin)
+                                JsonTrailer = (str(duration) + ',' + trailer)
+                                if JsonTrailer != '120,':
+                                    JsonTrailerLST.append(JsonTrailer)
+                        TrailerLST.extend(JsonTrailerLST)     
+                        self.writeCache(TrailerLST, TrailerCachePath, TrailerInternetCache)
+                    
         #Internet
         if REAL_SETTINGS.getSetting('trailers') == '4' and Donor_Downloaded == True:
             TrailerInternetCache = 'Trailer_Internet_Cache.xml'
@@ -4477,6 +4513,7 @@ class ChannelList:
         filter = []
         seasoneplist = []
         dirs = []
+        DetailLST_CHK = []
         GenreLiveID = ['Unknown','tvshow',0,0,False,1,'NR']
         filecount = 0
         imdbid = 0
@@ -4523,9 +4560,14 @@ class ChannelList:
 
         Match = True
         while Match:
-
+            
             DetailLST = self.PluginInfo(plugin)
-
+            
+            #Plugin listitems return parent list during error, catch repeat list and break.
+            if DetailLST_CHK == DetailLST:
+                break
+            DetailLST_CHK = DetailLST
+            
             if len(Directs) >= 1 or len(recursive) >= 1:
                 Match = True
             else:
@@ -4566,10 +4608,12 @@ class ChannelList:
                        
                         if len(Directs) != 0:
                             if filetype == 'directory':
+                                reccount += 1
                                 if Directs[0] in label:
                                     Directs.pop(0) #remove old directory, search next element
                                     plugin = (file)
                         elif filetype == 'file':
+                            reccount = 0
                             if setting1[0:40] == 'plugin://plugin.program.super.favourites':
                                 try:
                                     file = unquote(file)
@@ -4808,6 +4852,7 @@ class ChannelList:
                                 pass
                                         
                         else:
+                            reccount = 0
                             if len(recursive) != 0:
 
                                 if recursive[0] in label:
@@ -4836,7 +4881,7 @@ class ChannelList:
                 fileList.append(seepitem[2])
 
         if filecount == 0:
-            self.logDebug(DetailLST)
+            self.logDebug(str(DetailLST))
 
         self.log("buildFileList return")
         

@@ -27,7 +27,7 @@
     </category>
 <!--Visual-->
     <category label="30200">
-        <setting id="SkinSelector" type="enum"  label="30202" values="Classic PTV|Default|PTVL|Custom" default="2"/>
+        <setting id="SkinSelector" type="enum"  label="30202" values="Classic PTV|Default|PTVL|Custom|ConCast|Time Whorner" default="2"/>
         <setting id="ArtService_Enabled" label="30201" type="bool" default="false" /> 
         <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
         <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-2,true)" default="2"/>

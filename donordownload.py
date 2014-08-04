@@ -1,4 +1,20 @@
-#Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2011 Lunatixz
+#
+#
+# This file is part of PseudoTV Live.
+#
+# PseudoTV is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# PseudoTV is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import os, sys, time, fileinput, re
@@ -47,14 +63,14 @@ def autopatch():
     try:
         urllib.urlretrieve(DonorURLPath, (xbmc.translatePath(DL_DonorPath)))
         xbmc.log('script.pseudotv.live-donordownload: autopatch, Downloading DL_DonorPath')   
+        
         if xbmcvfs.exists(DL_DonorPath):
             REAL_SETTINGS.setSetting("AT_Donor", "true")
             REAL_SETTINGS.setSetting("COM_Donor", "true")
             REAL_SETTINGS.setSetting("TRL_Donor", "true")
             REAL_SETTINGS.setSetting("CAT_Donor", "true")
-            if REAL_SETTINGS.getSetting('AT_Donor') and REAL_SETTINGS.getSetting('COM_Donor') and REAL_SETTINGS.getSetting('TRL_Donor') and REAL_SETTINGS.getSetting('CAT_Donor'):
-                xbmc.log('script.pseudotv.live-donordownload: autopatch, Settings.xml Patched')
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 1000, THUMB) ) 
+            xbmc.log('script.pseudotv.live-donordownload: autopatch, Settings.xml Patched')
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) ) 
     except:
         pass
     

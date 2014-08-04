@@ -86,8 +86,7 @@ class Migrate:
                 
         self.updateDialog = xbmcgui.DialogProgress()
         self.updateDialog.create("PseudoTV Live", "Auto Tune")
-        
-        Youtube = chanlist.plugin_ok('plugin.video.youtube')
+        Youtube = chanlist.youtube_player()
         
         limit = MEDIA_LIMIT[int(Globals.REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
         if limit == 0 or limit < 50 or limit >= 250:
@@ -139,7 +138,7 @@ class Migrate:
         self.updateDialogProgress = 5
         if Globals.REAL_SETTINGS.getSetting("autoFindSuperFav") == "true" :
             self.log("BuildSuperFav")
-            SuperFav = chanlist.plugin_ok('plugin.video.youtube')
+            SuperFav = chanlist.plugin_ok('plugin.program.super.favourites')
             
             if SuperFav == True:
                 plugin_details = chanlist.PluginInfo('plugin://plugin.program.super.favourites')
@@ -573,8 +572,7 @@ class Migrate:
             self.log("autoTune, Adding Last.FM Music Videos")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Last.FM Music Videos","")
                
-            if Youtube == True:
-            
+            if Youtube != False:
                 user = Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosLastFMuser")
                 
                 # add Last.fm user presets
@@ -597,7 +595,7 @@ class Migrate:
             self.log("autoTune, Adding Youtube Music Videos")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Youtube Music Videos","")
 
-            if Youtube == True:
+            if Youtube != False:
 
                 # add HungaryRChart presets
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
@@ -698,7 +696,7 @@ class Migrate:
             Username = Globals.REAL_SETTINGS.getSetting("autoFindYoutubeUser")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Youtube Favourites & Subscriptions","User " + Username)
             
-            if Youtube == True:
+            if Youtube != False:
             
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -953,7 +951,7 @@ class Migrate:
                     setting_1 = line[0]
                     channel_name = line[1]
                                         
-                    if Youtube == True:
+                    if Youtube != False:
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
@@ -992,7 +990,7 @@ class Migrate:
                     setting_1 = line[0]
                     channel_name = line[1]
                                         
-                    if Youtube == True:
+                    if Youtube != False:
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
@@ -1045,7 +1043,7 @@ class Migrate:
             self.log("autoTune, Adding Bring The Popcorn Movies")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Bring The Popcorn Movies","")
             
-            if Youtube == True:
+            if Youtube != False:
             
                 # AT_PopCat = ['action','adventure','animation','british','comedy','crime','disaster','documentary','drama','eastern','erotic','family','fan+film','fantasy','film+noir','foreign','history','holiday','horror','indie','kids','music','musical','mystery','neo-noir','road+movie','romance','science+fiction','short','sport','sports+film','suspense','thriller','tv+movie','war','western']
                 # ATPopCat = AT_PopCat[int(Globals.REAL_SETTINGS.getSetting('autoFindPopcornGenre'))]

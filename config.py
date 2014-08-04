@@ -529,10 +529,12 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
         elif chantype == 12:
             return "Music"
         elif chantype == 13:
-            return "Last.FM"
+            return "Music Videos"
         elif chantype == 14:
             return "Extras"
         elif chantype == 15:
+            return "PluginTV"
+        elif chantype == 16:
             return "PluginTV"
         elif chantype == 9999:
             return "None"
@@ -631,10 +633,12 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             elif chantype == 12:
                 newlabel = channame + " - Music"
             elif chantype == 13:
-                newlabel = channame + " - Last.FM"
+                newlabel = channame + " - Music Videos"
             elif chantype == 14:
                 newlabel = channame + " - Extras"
             elif chantype == 15:
+                newlabel = channame + " - PluginTV"
+            elif chantype == 16:
                 newlabel = channame + " - PluginTV"
             elif chantype == 7:
                 if chansetting1[-1] == '/' or chansetting1[-1] == '\\':

@@ -139,6 +139,10 @@ elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
     Skin_Select = 'PTVL'   
 elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
     Skin_Select = 'Custom' 
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
+    Skin_Select = 'ConCast' 
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
+    Skin_Select = 'TWC' 
     
 # Original Skin Location changes    
 elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
@@ -340,7 +344,6 @@ ACTION_TELETEXT_BLUE = 218
 #define ACTION_GESTURE_SWIPE_DOWN_TEN   550
 #// 5xx is reserved for additional gesture actions
 #define ACTION_GESTURE_END            599
-
 
 #Cinema Experience
 CE_THEME = ['Default', 'IMAX']

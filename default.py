@@ -43,9 +43,10 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
     shouldrestart = False
     UPDATED = False
 
-    if shouldrestart == False:
-    
+    if shouldrestart == False: 
+        # Compare git version with local version.
         xbmc.log('script.pseudotv.live-default: CheckVersion')
+        
         try:        
             curver=xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
             source= open( curver, mode = 'r' )
@@ -55,6 +56,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             
             for vernum in match:
                     print 'Original Version is ' + vernum
+            
             try:
                 link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/addon.xml')
             except:

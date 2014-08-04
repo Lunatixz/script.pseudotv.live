@@ -323,7 +323,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             del self.channelButtons[row][:]
 
             # if the channel is paused, then only 1 button needed
-
             nowDate = datetime.datetime.now()
             self.logDebug("setbuttonnowtime " + str(nowDate))
             playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
@@ -353,7 +352,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     
                     #Live TV pull date from the playlist entry
                     if chtype == 8:
-                        # playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                         #episodetitle is actually the start time of each show that the playlist gets from channellist.py
                         tmpDate = self.MyOverlayWindow.channels[curchannel - 1].getItemtimestamp(playlistpos)
                         self.logDebug("setButtons.setbuttonnowtime2 " + str(tmpDate))
@@ -365,12 +363,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                             pass
                             
                         epochBeginDate = time.mktime(t)
-                        #beginDate = datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec)
-                        #videotime = (nowDate - beginDate).seconds
                         videotime = time.time() - epochBeginDate
                         reftime = time.time()
                     else:
-                        playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                         videotime = xbmc.Player().getTime()
                         reftime = time.time()
                    
@@ -378,7 +373,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     #Live TV pull date from the playlist entry
                     if chtype == 8:
                         playlistpos = self.MyOverlayWindow.channels[curchannel - 1].playlistPosition
-                        #playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                         #episodetitle is actually the start time of each show that the playlist gets from channellist.py
                         tmpDate = self.MyOverlayWindow.channels[curchannel - 1].getItemtimestamp(playlistpos)
                         self.logDebug("setButtons.setbuttonnowtime2 " + str(tmpDate))
@@ -390,8 +384,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                             pass
                             
                         epochBeginDate = time.mktime(t)
-                        #beginDate = datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec)
-                        #videotime = (nowDate - beginDate).seconds
                         #loop to ensure we get the current show in the playlist
                         while epochBeginDate + self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <  time.time():
                             epochBeginDate += self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos)
@@ -1121,6 +1113,22 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             except:
                 pass
         
+        elif REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "false" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true": 
+            #hide xbmc.videoplayer art since using dynamic art
+            try:
+                self.getControl(511).setVisible(False)  
+                self.getControl(512).setVisible(False)  
+                self.getControl(513).setVisible(False)
+            except:
+                pass  
+            try:
+                self.getControl(508).setImage(THUMB)
+            except:
+                pass   
+            try:
+                self.getControl(510).setImage(THUMB)
+            except:
+                pass   
         else:
             #use xbmc.videoplayer art since not using dynamic art
             try:
@@ -1257,6 +1265,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
         self.lastExitTime = ADDON_SETTINGS.getSetting("LastExitTime")
         nowDate = datetime.datetime.now()
+        playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
+        
         # if the channel is paused, then it's just the current item
         if self.MyOverlayWindow.channels[channel - 1].isPaused:
             self.log('determinePlaylistPosAtTime paused return')
@@ -1270,7 +1280,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             if channel == self.MyOverlayWindow.currentChannel: #currentchannel epg
                 #Live TV pull date from the playlist entry
                 if chtype == 8:
-                    playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                     tmpDate = self.MyOverlayWindow.channels[channel - 1].getItemtimestamp(playlistpos)
                     self.log("setbuttonnowtime2 " + str(tmpDate))
                    
@@ -1284,7 +1293,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     videotime = time.time() - epochBeginDate
                     reftime = time.time()
                 else:
-                    playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                     try:
                         videotime = xbmc.Player().getTime()
                     except:
