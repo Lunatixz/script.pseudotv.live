@@ -25,7 +25,6 @@ from resources.lib.FileAccess import FileLock, FileAccess
 from resources.lib.utils import *
 
 try:
-    import Donor
     from Donor import *
 except:
     pass
@@ -120,6 +119,7 @@ def DonorDownloader():
             xbmc.log('script.pseudotv.live-donordownload: Downloading DL_DonorPath Failed! ' + str(e))  
             pass
         
+        
 def BumperDownloader():
     xbmc.log('script.pseudotv.live-donordownload: BumperDownloader')
     
@@ -193,6 +193,7 @@ def LogoDownloader():
         pass
         
     REAL_SETTINGS.openSettings()
+        
         
 def CEDownloader():
     xbmc.log('script.pseudotv.live-donordownload: CEDownloader')

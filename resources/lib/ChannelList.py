@@ -19,7 +19,7 @@
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import subprocess, os, sys, re, threading
 import time, datetime, threading
-import httplib, urllib, urllib2, feedparser
+import httplib, urllib, urllib2, feedparser, socket, json
 import base64, shutil, random, errno
 import Globals, tvdb_api
 
@@ -41,6 +41,8 @@ from urllib2 import HTTPError, URLError
 from datetime import date
 from utils import *
 from Artdownloader import *
+
+socket.setdefaulttimeout(10)
 
 # Commoncache plugin import
 try:
@@ -136,7 +138,7 @@ class ChannelList:
             
             
     def setupList(self):
-        print 'setupList'
+        self.log("setupList")
         self.readConfig()
         self.updateDialog.create("PseudoTV Live", "Updating channel list")
         self.updateDialog.update(0, "Updating channel list")
@@ -662,7 +664,7 @@ class ChannelList:
         elif chtype == 10:
             # Validate Feed #
             fileListCHK = self.youtube_player()
-            print 'fileListCHK', fileListCHK
+            
             if fileListCHK != False:
                 self.log("Building Youtube Channel " + setting1 + " using type " + setting2 + "...")
                 fileList = self.createYoutubeFilelist(setting1, setting2, setting3, setting4, channel)            
@@ -1493,22 +1495,22 @@ class ChannelList:
         try:
             if type == 'tvshow':
                 if not self.cached_json_detailed_TV:
-                    print 'buildGenreLiveID, json_detail creating cache'
+                    self.log("buildGenreLiveID, json_detail creating cache")
                     json_query = uni('{"jsonrpc":"2.0","method":"VideoLibrary.GetTVShows","params":{"properties":["title","year","genre","mpaa","imdbnumber","playcount"]}, "id": 1}')
                     self.cached_json_detailed_TV = self.sendJSON(json_query)
                     json_detail = self.cached_json_detailed_TV
                 else:
                     json_detail = self.cached_json_detailed_TV
-                    print 'buildGenreLiveID, json_detail using cache'
+                    self.log("buildGenreLiveID, json_detail using cache")
             else:
                 if not self.cached_json_detailed_Movie:
-                    print 'buildGenreLiveID, json_detail creating cache'
+                    self.log("buildGenreLiveID, json_detail creating cache")
                     json_query = uni('{"jsonrpc":"2.0","method":"VideoLibrary.GetMovies","params":{"properties":["title","year","genre","mpaa","imdbnumber","playcount"]}, "id": 1}')
                     self.cached_json_detailed_Movie = self.sendJSON(json_query)
                     json_detail = self.cached_json_detailed_Movie
                 else:
                     json_detail = self.cached_json_detailed_Movie
-                    print 'buildGenreLiveID, json_detail using cache'
+                    self.log("buildGenreLiveID, json_detail using cache")
 
             file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_detail)
 
@@ -1555,18 +1557,17 @@ class ChannelList:
                             playcount = playcounts.group(1)
                         else:
                             playcount = 1
-                        
-                        if ratings:
-                            if type == 'tvshow':
-                                rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
-                            else:
-                                rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
-                                rating = rating[0:5]
 
+                        if ratings:
+                            rating = (ratings.group(1))
+                            if type == 'movie':
+                                rating = rating[0:5]
                                 try:
                                     rating = rating.split(' ')[0]
                                 except:
                                     pass
+                                    
+                            rating = self.cleanRating(rating)
                         else:
                             rating = 'NR'
                         
@@ -1734,16 +1735,15 @@ class ChannelList:
                                 playcount = 1
                             
                             if ratings:
-                                if type == 'tvshow':
-                                    rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
-                                else:
-                                    rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
+                                rating = (ratings.group(1))
+                                if type == 'movie':
                                     rating = rating[0:5]
-
                                     try:
                                         rating = rating.split(' ')[0]
                                     except:
                                         pass
+                                        
+                                rating = self.cleanRating(rating)
                             else:
                                 rating = 'NR'
                             
@@ -1843,7 +1843,6 @@ class ChannelList:
                                     GenreLiveID = [genre, type, imdbnumber, dbid, Managed, playcount, rating]
                                     
                                     genre, LiveID = self.packGenreLiveID(GenreLiveID)
-                                    print genre, LiveID
                                                     
                                     tmpstr += "//" + theplot + "//" + (genre) + "////" + (LiveID)
                                 
@@ -1951,8 +1950,6 @@ class ChannelList:
         elif setting3 != '':
             f = FileAccess.open(self.xmlTvFile, "rb")
         
-        print 'GMToffset = ' + str(GMToffset) + ' for ' + setting3
-
         if self.background == False:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding LiveTV", 'parsing ' + str(setting3.lower()))
 
@@ -2089,7 +2086,6 @@ class ChannelList:
                         
                         if (((now > startDate and now < stopDate) or (now < startDate))):
                             if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and ignoreParse == False: 
-                                print 'EnhancedGuideData'
                                 #Enable Enhanced Parsing
                                 
                                 if movie == False:
@@ -2164,7 +2160,6 @@ class ChannelList:
                                         category = episodeGenre
                                 else:
                                     type = 'movie'
-                                    print 'movietest'
                                     
                                     try:
                                         year = (title.split(' ('))[1].replace(')','')
@@ -2227,17 +2222,17 @@ class ChannelList:
                         subtitle = subtitle.replace("\n", "").replace("\r", "")
                         
                         try:
-                            description = ascii(self.trim(description, 350, '...'))
+                            description = (self.trim(description, 350, '...'))
                         except Exception,e:
                             self.log("description Trim failed" + str(e))
-                            description = ascii(description[:350])
+                            description = (description[:350])
                             pass
                             
                         try:
-                            subtitle = ascii(self.trim(subtitle, 350, ''))
+                            subtitle = (self.trim(subtitle, 350, ''))
                         except Exception,e:
                             self.log("subtitle Trim failed" + str(e))
-                            subtitle = uni(subtitle[:350])
+                            subtitle = (subtitle[:350])
                             pass
                         
                         #skip old shows that have already ended
@@ -2703,11 +2698,17 @@ class ChannelList:
         showList = []
         if setting1 == '1':
             msg_type = "Last.FM"
-            showList = self.lastFM(setting1, setting2, setting3, setting4, channel)
+            PluginCHK = self.youtube_player()
+            if PluginCHK != False:
+                showList = self.lastFM(setting1, setting2, setting3, setting4, channel)
         elif setting1 == '2':
-            msg_type = "My MusicTV"
+            PluginCHK = self.plugin_ok('plugin.video.my_music_tv')
+            if PluginCHK != False:
+                msg_type = "My MusicTV"
+                showList = self.myMusicTV(setting1, setting2, setting3, setting4, channel)
             
         return showList
+    
     
     def lastFM(self, setting1, setting2, setting3, setting4, channel):
                 
@@ -2829,7 +2830,80 @@ class ChannelList:
                             
         return showList
 
+    
+    def myMusicTV(self, setting1, setting2, setting3, setting4, channel):
+        self.log("myMusicTV")
+        path = xbmc.translatePath("special://profile/addon_data/plugin.video.my_music_tv/plist")
+        LiveID = 'music|0|0|False|0|NR|'
+        fle = os.path.join(path,setting2+".xml.PlistDir")
+        showcount = 0
+        showList = []
+        
+        if setting3 == '':
+            limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
+            if limit == 0 or limit < 50 or limit >= 250:
+                limit = 50
+            self.log("myMusicTV, Using Global Parse-limit " + str(limit))
+        else:
+            limit = int(setting3)
+            self.log("myMusicTV, Overriding Parse-limit = " + str(limit))
+            
+        try:
+            if FileAccess.exists(fle):
+                f = FileAccess.open(fle, "r")
+                lineLST = f.readlines()
+                
+                if self.background == False:
+                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding My MusicTV", setting2)
 
+                for n in range(len(lineLST)):
+                    line = lineLST[n].replace("['",'').replace("']",'').replace('["','').replace("\n",'')
+                    line = line.split(", ")
+                    title = line[0]
+                    link = line[1].replace("'",'')
+
+                    try:
+                        id = str(os.path.split(link)[1]).split('?url=')[1]
+                        source = str(id).split('&mode=')[1]
+                        id = str(id).split('&mode=')[0]
+                    except:
+                        pass
+
+                    try:
+                        artist = title.split(' - ')[0]
+                        track = title.split(' - ')[1].replace("'",'')
+                    except:
+                        artist = title
+                        track = ''
+                        pass
+
+                    #if source == 'playVevo':
+                        #playVevo()
+                    # def playVevo(id):
+                        # opener = urllib2.build_opener()
+                        # userAgent = "Mozilla/5.0 (Windows NT 6.1; rv:30.0) Gecko/20100101 Firefox/30.0"
+                        # opener.addheaders = [('User-Agent', userAgent)]
+                        # content = opener.open("http://videoplayer.vevo.com/VideoService/AuthenticateVideo?isrc="+id).read()
+                        # content = str(json.loads(content))
+                        # print content
+                    
+                    tmpstr = str(300) + ',' + artist + "//" + "My MusicTV" + "//" + track + "//" + 'Music' + "////" + LiveID + '\n' + link
+                    tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
+                    showList.append(tmpstr)
+                    showcount += 1    
+                    
+                    if showcount > limit:
+                        break
+
+                    if self.background == False:
+                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding My MusicTV, " + setting2, "added " + str(showcount) + " entries")
+        
+        except Exception,e:  
+            pass
+            
+        return showList
+
+        
     def xmltv_ok(self, setting1, setting3):
         self.log("xmltv_ok")
         self.xmltvValid = False
@@ -3354,8 +3428,8 @@ class ChannelList:
                     pass
                     
         return (BumperLST)        
+
         
-    
     def GetRatingList(self, channel, fileList):
         self.log("GetRatingList")
         newFileList = []
@@ -3829,7 +3903,7 @@ class ChannelList:
             
             
     def sbManaged(self, tvdbid):
-        print "sbManaged"
+        self.log("sbManaged")
         sbManaged = False
         if REAL_SETTINGS.getSetting('sickbeard.enabled') == "true":
             try:
@@ -3837,12 +3911,11 @@ class ChannelList:
             except Exception,e:
                 pass
 
-        print sbManaged
         return sbManaged
 
         
     def cpManaged(self, title, imdbid):
-        print "cpManaged"
+        self.log("cpManaged")
         cpManaged = False
         if REAL_SETTINGS.getSetting('couchpotato.enabled') == "true":
             try:
@@ -3854,16 +3927,15 @@ class ChannelList:
             except Exception,e:
                 pass
 
-        print cpManaged
         return cpManaged
 
 
     def getGenre(self, type, title, year):
-        print 'getGenre'
+        self.log("getGenre")
         genre = 'Unknown'
         
         try:
-            print 'metahander'
+            self.log("metahander")
             self.metaget = metahandlers.MetaData(preparezip=False)
             genre = str(self.metaget.get_meta(type, title)['genre'])
             try:
@@ -3881,7 +3953,7 @@ class ChannelList:
 
             if type == 'tvshow':
                 try:
-                    print 'tvdb_api'
+                    self.log("tvdb_api")
                     genre = str((self.t[title]['genre']))
                     try:
                         genre = str((genre.split('|'))[1])
@@ -3890,7 +3962,7 @@ class ChannelList:
                 except Exception,e:
                     pass
             else:
-                print 'tmdb'
+                self.log("tmdb")
                 movieInfo = str(self.tmdbAPI.getMovie(title, year))
                 try:
                     genre = str(movieInfo['genres'][0])
@@ -3902,25 +3974,31 @@ class ChannelList:
             genre = 'Unknown'
             
         return genre.replace('NA','Unknown')
-
+        
+    
+    def cleanRating(self, rating):
+        self.log("cleanRating")
+        rating = rating.replace('Rated ','').replace('US:','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
+        return rating
+    
 
     def getRating(self, type, title, year, imdbid):
-        print 'getRating'
+        self.log("getRating")
         rating = 'NR'
 
         try:
-            print 'metahander'     
+            self.log("metahander")     
             self.metaget = metahandlers.MetaData(preparezip=False)
             rating = self.metaget.get_meta(type, title)['mpaa']
         except Exception,e:
             pass
             
-        rating = rating.replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR')
+        rating = rating.replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('Approved','NR')
         if not rating or rating == 'NR':
         
             if type == 'tvshow':
                 try:
-                    print 'tvdb_api'
+                    self.log("tvdb_api")
                     rating = str(self.t[title]['contentrating'])
                     try:
                         rating = rating.replace('|','')
@@ -3931,16 +4009,16 @@ class ChannelList:
             else:
                 if imdbid or imdbid != 0:
                     try:
-                        print 'tmdb'
+                        self.log("tmdb")
                         rating = str(self.tmdbAPI.getMPAA(imdbid))
                     except Exception,e:
                         pass
 
-        rating = rating.replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR')
+        rating = rating.replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('Approved','NR')
         if not rating or rating == 'None' or rating == 'Empty':
             rating = 'NR'
             
-        return rating.replace('NA','NR').replace('Not','NR').replace('Approved','NR').replace('M','R')
+        return (self.cleanRating(rating)).replace('M','R')
 
 
     def getTVDBID(self, title, year):
@@ -3949,7 +4027,7 @@ class ChannelList:
         imdbid = 0
  
         try:
-            print 'metahander'
+            self.log("metahander")
             self.metaget = metahandlers.MetaData(preparezip=False)
             tvdbid = self.metaget.get_meta('tvshow', title)['tvdb_id']
         except Exception,e:
@@ -3957,7 +4035,7 @@ class ChannelList:
 
         if not tvdbid or tvdbid == 0:
             try:
-                print 'tvdb_api'
+                self.log("tvdb_api")
                 tvdbid = int(self.t[title]['id'])
             except Exception,e:
                 pass
@@ -3983,7 +4061,7 @@ class ChannelList:
         imdbid = 0
 
         try:
-            print 'metahander'
+            self.log("metahander")
             self.metaget = metahandlers.MetaData(preparezip=False)
             imdbid = self.metaget.get_meta('tvshow', title)['imdb_id']
         except Exception,e:
@@ -3991,7 +4069,7 @@ class ChannelList:
 
         if not imdbid or imdbid == 0:
             try:
-                print 'tvdb_api'
+                self.log("tvdb_api")
                 imdbid = self.t[title]['imdb_id']
                 if not imdbid:
                     imdbid = 0
@@ -4022,9 +4100,8 @@ class ChannelList:
     def getIMDBIDmovie(self, showtitle, year):
         print 'getIMDBIDmovie'
         imdbid = 0
-        print showtitle, year
         try:
-            print 'metahander'
+            self.log("metahander")
             self.metaget = metahandlers.MetaData(preparezip=False)
             imdbid = (self.metaget.get_meta('movie', showtitle)['imdb_id'])
         except Exception,e:
@@ -4032,7 +4109,7 @@ class ChannelList:
 
         if not imdbid or imdbid == 0:
             try:
-                print 'tmdb'
+                self.log("tmdb")
                 movieInfo = (self.tmdbAPI.getMovie(showtitle, year))
                 imdbid = (movieInfo['imdb_id'])
                 if not imdbid:
@@ -4042,7 +4119,7 @@ class ChannelList:
                 
         if not imdbid or imdbid == 'None' or imdbid == 'Empty':
             imdbid = 0
-        print imdbid
+            
         return imdbid
         
     
@@ -4321,17 +4398,17 @@ class ChannelList:
                                 else:
                                     playcount = 1
                                 
-                                if ratings:
-                                    if type == 'tvshow':
-                                        rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
-                                    else:
-                                        rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
-                                        rating = rating[0:5]
 
+                                if ratings:
+                                    rating = (ratings.group(1))
+                                    if type == 'movie':
+                                        rating = rating[0:5]
                                         try:
                                             rating = rating.split(' ')[0]
                                         except:
                                             pass
+                                            
+                                    rating = self.cleanRating(rating)
                                 else:
                                     rating = 'NR'
                                 
@@ -4578,7 +4655,6 @@ class ChannelList:
             except:
                 plugchk = setting1
                 pass
-            print plugchk
             
             if self.background == False:
                 plugname = plugchk.replace('plugin.video.','').replace('plugin.program.','')
@@ -4697,16 +4773,15 @@ class ChannelList:
                                         playcount = 1
                                     
                                     if ratings:
-                                        if type == 'tvshow':
-                                            rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
-                                        else:
-                                            rating = (ratings.group(1)).replace('Rated ','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Not','NR').replace('Approved','NR')
+                                        rating = (ratings.group(1))
+                                        if type == 'movie':
                                             rating = rating[0:5]
-
                                             try:
                                                 rating = rating.split(' ')[0]
                                             except:
                                                 pass
+                                                
+                                        rating = self.cleanRating(rating)
                                     else:
                                         rating = 'NR'
                                     

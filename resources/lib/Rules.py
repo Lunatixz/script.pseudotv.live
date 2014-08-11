@@ -1498,7 +1498,7 @@ class HandleBCT(BaseRule):
 class HandlePOP(BaseRule):
     def __init__(self):
         self.name = "Coming up next popup"
-        self.optionLabels = ['Display the popup']
+        self.optionLabels = ['Display Coming Up Next']
         self.optionValues = ['Yes']
         self.myId = 18
         self.actions = RULES_ACTION_OVERLAY_SET_CHANNEL | RULES_ACTION_OVERLAY_SET_CHANNEL_END
@@ -1511,9 +1511,9 @@ class HandlePOP(BaseRule):
 
     def getTitle(self):
         if self.optionValues[0] == 'Yes':
-            return 'Display the popup'
+            return 'Display Coming Up Next'
         else:
-            return 'Hide the popup'
+            return 'Hide Coming Up Next'
 
 
     def onAction(self, act, optionindex):
@@ -1524,7 +1524,6 @@ class HandlePOP(BaseRule):
     def runAction(self, actionid, overlay, channeldata):
         if actionid == RULES_ACTION_OVERLAY_SET_CHANNEL:
             self.storedPopValue = overlay.showNextItem
-            self.log("Option for popup is " + self.optionValues[0])
 
             if self.optionValues[0] == 'Yes':
                 overlay.showNextItem = True
@@ -1533,7 +1532,7 @@ class HandlePOP(BaseRule):
                 overlay.showNextItem = False
         elif actionid == RULES_ACTION_OVERLAY_SET_CHANNEL_END:
             overlay.showNextItem = self.storedPopValue
-            self.log("set popup to " + str(overlay.showNextItem))
+            self.log("set Coming Up Next to " + str(overlay.showNextItem))
 
         return channeldata
        

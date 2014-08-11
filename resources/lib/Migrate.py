@@ -566,6 +566,36 @@ class Migrate:
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Music Genres",Globals.uni(chanlist.musicGenreList[i]) + " Music")
                 channelNum += 1
         
+        #Music Videos - My Music
+        self.updateDialogProgress = 53
+        if Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosMusicTV") == "true":
+            self.log("autoTune, Adding My MusicTV Music Videos")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding My MusicTV Music Videos","")
+               
+            MusicTV = False
+            MusicTV = chanlist.plugin_ok('plugin.video.my_music_tv')
+            
+            if MusicTV == True:
+                for i in range(999):
+                    path = xbmc.translatePath("special://profile/addon_data/plugin.video.my_music_tv/plist")
+                    fle = os.path.join(path,"Channel_" + str(i) + ".xml.PlistDir")
+                    
+                    if os.path.exists(xbmc.translatePath(fle)):
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "13")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "2")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "Channel_" + str(i))
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "1")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "My MusicTV " + str(i))  
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "18")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "No")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding My MusicTV Music Videos","Channel " + str(i))
+                        channelNum += 1
+ 
         #Music Videos - Last.fm user
         self.updateDialogProgress = 53
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosLastFM") == "true":
@@ -582,9 +612,11 @@ class Migrate:
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", user)
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Last.FM")  
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "18")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "No")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Last.FM Music Videos","User " + user)
                 channelNum += 1
@@ -1215,6 +1247,7 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindMovieGenres","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMixGenres","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMusicGenres","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosMusicTV","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosLastFM","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosYoutube","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosVevoTV","false")

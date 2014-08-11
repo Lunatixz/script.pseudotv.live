@@ -1,3 +1,4 @@
+[*] NEW! My MusicTV plugin autotuning, and chtype.
 [*] GMTOffset fix? for USTVnow and F.T.V Source *Thanks kurumushi
 [*] Two Work in Progress skins (ConCast, Time Whorner Cable).
 [*] Added some visual debugging, disable "Enable Debugging" under "MISC" if not needed.
