@@ -1,4 +1,4 @@
-﻿import os, shutil, datetime, random, threading
+﻿import os, shutil, datetime, random#, threading
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
@@ -15,17 +15,7 @@ except Exception,e:
 
 xbmc.log("script.pseudotv.live-service: Service Started...")
 
-
-def ChangeMonitor(seconds=300):
-    print 'ChangeMonitor'         
-    ChangeMonitorThread = threading.Timer(float(seconds), ChangeMonitor)
-    ChangeMonitorThread.name = 'script.pseudotv.live-service: ChangeMonitor_Thread'
-    ChangeMonitorThread.start()
-    CEpack()
-    HubSwap()
-        
-        
-def ArtServiceTimer(time=1800):
+def ArtServiceTimer(time=1800): #only needed when settop box enabled
     print 'ArtServiceTimer'
     Artdown = Artdownloader()
     now  = datetime.datetime.today()
@@ -57,7 +47,7 @@ def ForceArtService():
     Artdown.ArtService()
 
     
-def HubSwap():
+def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
     xbmc.log('script.pseudotv.live-service: HubSwap')
     icon = ADDON_PATH + '/icon'
     chanlist = ChannelList()
@@ -78,7 +68,6 @@ def HubSwap():
     else:
         xbmc.log('script.pseudotv.live-service: HubSwap - Master')
         REAL_SETTINGS.setSetting("Hub","false")
-        REAL_SETTINGS.setSetting("autoFindFilmonFavourites","false")
         try:
             os.remove(icon + '.png')
         except:
@@ -109,12 +98,13 @@ def autostart():
     sleep(IDLE_TIME)
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
 
-ChangeMonitor()
+CEpack()
+HubSwap()
 
-if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true": 
-    ArtServiceTimerThread = threading.Timer(float(1800), ArtServiceTimer)
-    ArtServiceTimerThread.name = 'script.pseudotv.live-service: ArtServiceTimer_Thread'
-    ArtServiceTimerThread.start()
+# if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true": 
+    # ArtServiceTimerThread = threading.Timer(float(1800), ArtServiceTimer)
+    # ArtServiceTimerThread.name = 'script.pseudotv.live-service: ArtServiceTimer_Thread'
+    # ArtServiceTimerThread.start()
     
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
     autostart()

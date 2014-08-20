@@ -105,7 +105,8 @@ class ChannelListThread(threading.Thread):
         REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
         self.chanlist.sleepTime = 0.3
 
-        if ArtService_Enabled == 'true': 
+        if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
+            InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
             self.ArtServiceThread = threading.Timer(float(InfoTimer), self.Artdownloader.ArtService)
             self.ArtServiceThread.start()
             

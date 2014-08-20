@@ -118,18 +118,12 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                 except:
                     pass
                                 
-                artwork.delete("%") 
-                artwork1.delete("%")
-                artwork2.delete("%")
-                artwork3.delete("%")
-                artwork4.delete("%")
-                artwork5.delete("%")
-                artwork6.delete("%")
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Cache Cleared", 4000, THUMB) )
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Folders Cleared", 4000, THUMB) )
+                xbmc.log('script.pseudotv.live-default: Art Folders Purged!')
                 REAL_SETTINGS.setSetting('ClearLiveArt', "false")
-                xbmc.log('script.pseudotv.live-default: ArtCache Purged!')
-
-            # Clear All Caches    
+                REAL_SETTINGS.setSetting('ClearLiveArtCache', "true")
+                
+            # Clear System Caches    
             if REAL_SETTINGS.getSetting("ClearCache") == "true":
                 daily.delete("%") 
                 weekly.delete("%")

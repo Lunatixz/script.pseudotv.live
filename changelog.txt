@@ -1,9 +1,11 @@
+[*] Temporarily disabled Artwork Service timer (Until Settop box mode is finished).
+[*] Youtube artwork, Misc tweaks and fixes.
 [*] NEW! My MusicTV plugin autotuning, and chtype.
-[*] GMTOffset fix? for USTVnow and F.T.V Source *Thanks kurumushi
+[*] NEW! MultiYoutube, GMTOffset fix? *Thanks kurumushi
 [*] Two Work in Progress skins (ConCast, Time Whorner Cable).
 [*] Added some visual debugging, disable "Enable Debugging" under "MISC" if not needed.
-[*] Plugin and Strm smart seek (Avoids loading applicable media near the end of it runtime).
-[*] Youtube "Autostart"; resume a paused channel. Improved overall error handling...
+[*] Plugin and Strm smart seek (Avoids loading applicable media near the end of its runtime).
+[*] "Auto Unpause"; auto resume a paused channel. Improved overall error handling...
 [*] Youtube Plugin Detection (Switches default Youtube player to Bromix's Youtube(Alpha) if available).
 [*] NEW! Movie ratings bumper option, Misc bug fixes, improved "Coming Up Next" overlay.
 [*] Dynamic Artwork disabled while spooling and before first run. EPG/Overlay Tweaking...

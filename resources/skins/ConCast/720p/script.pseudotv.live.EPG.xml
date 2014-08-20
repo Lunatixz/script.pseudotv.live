@@ -12,7 +12,7 @@
         <!--focused text color-->
         <control type="button" id="99">
             <visible>false</visible>
-            <label>0xFFFFFFFF</label>
+            <label>0xFF000000</label>
         </control>
         
         <!--text color-->
@@ -110,47 +110,47 @@
             <visible></visible>
         </control>
         <!--Date-->
-        <control type="grouplist">      
-            <posx>65</posx>
-            <posy>250</posy>
+        <control type="grouplist">             
+            <posx>25</posx>    
+            <posy>292</posy>
             <itemgap>100</itemgap>
             <orientation>horizontal</orientation>
 		<control type="label" id="104">
             <description>Date Label</description>
-            <width>270</width>
-            <height>26</height>
+            <width>240</width>
+            <height>60</height>
             <label>Current Date</label>
-            <font>font12</font>
+            <font>font14</font>
             <align>left</align>
             <aligny>center</aligny>
             <textcolor>FFFFFFFF</textcolor>
         </control>
          <control type="label" id="101">
             <description>Time Left Label</description>
-            <width>270</width>
-            <height>26</height>
+            <width>240</width>
+            <height>60</height>
             <label>Time 1</label>
-            <font>font12</font>
+            <font>font14</font>
             <align>left</align>
             <aligny>center</aligny>
             <textcolor>FFFFFFFF</textcolor>
         </control>
 		<control type="label" id="102">
             <description>Time Middle Label</description>
-            <width>270</width>
-            <height>26</height>
+            <width>240</width>
+            <height>60</height>
             <label>Time 2</label>
-            <font>font12</font>
+            <font>font14</font>
             <align>left</align>
             <aligny>center</aligny>
             <textcolor>FFFFFFFF</textcolor>
         </control>
 		<control type="label" id="103">
             <description>Time Right Label</description>
-            <width>270</width>
-            <height>26</height>
+            <width>240</width>
+            <height>60</height>
             <label>Time 3</label>
-            <font>font12</font>
+            <font>font14</font>
             <align>left</align>
             <aligny>center</aligny>
             <textcolor>FFFFFFFF</textcolor>
@@ -166,65 +166,21 @@
             <aspectratio>keep</aspectratio>
             <align>left</align>
             <aligny>center</aligny>
+            <visible>false</visible>
         </control>              
-        <control type="grouplist">            
-            <posx>0</posx>
-            <posy>225</posy>
-            <itemgap>0</itemgap>
-            <orientation>vertical</orientation>
-            <control type="image">
-                <description>Channel Overlay</description>
-                <width>274</width>
-                <height>50</height>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-            </control>
-            <control type="image">
-                <description>Channel Overlay</description>
-                <width>274</width>
-                <height>50</height>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-            </control>
-            <control type="image">
-                <description>Channel Overlay</description>
-                <width>274</width>
-                <height>50</height>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-            </control>    
-            <control type="image">
-                <description>Channel Overlay</description>
-                <width>274</width>
-                <height>50</height>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-            </control>
-            <control type="image">
-                <description>Channel Overlay</description>
-                <width>274</width>
-                <height>50</height>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-            </control>
-            <control type="image">
-                <description>Channel Overlay</description>
-                <width>274</width>
-                <height>50</height>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-            </control>
-        </control> 
         <control type="grouplist">
-            <posx>285</posx>
-            <posy>0</posy>
-            <width>950</width>
-            <height>40</height>
+            <posx>55</posx>
+            <posy>145</posy>
             <align>left</align>
-            <aligny>bottom</aligny>
+            <aligny>top</aligny>
             <orientation>horizontal</orientation>
             <itemgap>5</itemgap>
             <control type="label" id="500">
                 <description>Show Name Label</description>
                 <width min="55" max="600">auto</width>
-                <height>30</height>
-                <label></label>
+                <height>20</height>
                 <font>font14</font>
-                <textcolor>FF0297eb</textcolor>
+                <textcolor>FFFFFF99</textcolor>
                 <scroll>true</scroll>
                 <wrapmultiline>false</wrapmultiline>
                 <scrollspeed>50</scrollspeed>
@@ -233,17 +189,15 @@
             <control type="label">
                 <description>Showtitle Sep Label</description>
                 <width>10</width>
-                <height>30</height>
+                <height>20</height>
                 <label>•</label>
                 <font>font14</font>
-                <textcolor>FF0297eb</textcolor>
-                <visible>!VideoPlayer.Content(movie)</visible>
+                <textcolor>FFFFFFFF</textcolor>
             </control>
             <control type="label" id="501">
                 <description>Show Title Label</description>
                 <width min="55" max="600">auto</width>
-                <height>30</height>
-                <label></label>
+                <height>20</height>
                 <font>font14</font>
                 <textcolor>FFFFFFFF</textcolor>
                 <scroll>true</scroll>
@@ -254,106 +208,105 @@
         </control>
         <control type="label" id="502">
             <description>Show Description</description>
-            <posx>285</posx>
-            <posy>50</posy>
-            <width>950</width>
-            <height>100</height>
+            <posx>55</posx>
+            <posy>175</posy>
+            <width>600</width>
+            <height>60</height>
             <align>left</align>
-            <aligny>top</aligny>
-            <label></label>
+            <aligny>bottom</aligny>
             <textcolor>FFFFFFFF</textcolor>
-            <font>font12</font>
+            <font>font14</font>
             <wrapmultiline>true</wrapmultiline>
             <autoscroll time="1000" delay="1000" repeat="2000">Skin.HasSetting(AutoScroll)</autoscroll>
         </control>
         <control type="grouplist">            
-            <posx>0</posx>
-            <posy>350</posy>
-            <itemgap>9</itemgap>
+            <posx>0</posx>    
+            <posy>352</posy>
+            <itemgap>1</itemgap>
             <orientation>vertical</orientation>
             <!--CHANNEL Number-->
             <control type="label" id="311">
                 <description>Channel 1 Number</description>
                 <width>40</width>
-                <height>42</height>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
-                <textcolor>FFFFFFFF</textcolor>
+                <textcolor>FF000000 </textcolor>
             </control>
             <control type="label" id="312">
                 <description>Channel 2 Number</description>
                 <width>40</width>
-                <height>42</height>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
-                <textcolor>FFFFFFFF</textcolor>
+                <textcolor>FF000000 </textcolor>
             </control>
             <control type="label" id="313">
                 <description>Channel 3 Number</description>
                 <width>40</width>
-                <height>42</height>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
-                <textcolor>FFFFFFFF</textcolor>
+                <textcolor>FF000000 </textcolor>
             </control>
             <control type="label" id="314">
                 <description>Channel 4 Number</description>
                 <width>40</width>
-                <height>42</height>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
-                <textcolor>FFFFFFFF</textcolor>
+                <textcolor>FF000000 </textcolor>
             </control>
             <control type="label" id="315">
                 <description>Channel 5 Number</description>
                 <width>40</width>
-                <height>42</height>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
-                <textcolor>FFFFFFFF</textcolor>
+                <textcolor>FF000000 </textcolor>
             </control>      
             <control type="label" id="316">
                 <description>Channel 6 Number</description>
                 <width>40</width>
-                <height>42</height>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>right</align>
                 <aligny>center</aligny>
-                <textcolor>FFFFFFFF</textcolor>
+                <textcolor>FF000000 </textcolor>
             </control>
         </control>
-        <control type="grouplist">            
-            <posx>55</posx>
-            <posy>350</posy>
-            <itemgap>9</itemgap>
+        <control type="grouplist">             
+            <posx>55</posx>    
+            <posy>352</posy>
+            <itemgap>1</itemgap>
             <orientation>vertical</orientation>
             <!--CHANNEL Name/Icon-->
             <control type="label" id="301">
                 <description>Channel 1 Name</description>
                 <width>200</width>
-                <height>42</height>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
-                <textcolor>FF0297eb</textcolor>
+                <textcolor>FF000000 </textcolor>
                 <visible>StringCompare(Control.GetLabel(321),)</visible>
             </control>
             <control type="image" id="321">
                 <description>Channel 1 Icon</description>
                 <width>200</width>
-                <height>42</height>
+                <height>60</height>
                 <align>left</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
@@ -362,19 +315,18 @@
             <control type="label" id="302">
                 <description>Channel 2 Name</description>
                 <width>200</width>
-                <height>42</height>
-                <posy>2</posy>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
-                <textcolor>FF0297eb</textcolor>
+                <textcolor>FF000000 </textcolor>
                 <visible>StringCompare(Control.GetLabel(322),)</visible>
             </control>
             <control type="image" id="322">
                 <description>Channel 2 Icon</description>
                 <width>200</width>
-                <height>42</height>
+                <height>60</height>
                 <align>left</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
@@ -383,19 +335,18 @@
             <control type="label" id="303">
                 <description>Channel 3 Name</description>
                 <width>200</width>
-                <height>42</height>
-                <posy>4</posy>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
-                <textcolor>FF0297eb</textcolor>
+                <textcolor>FF000000 </textcolor>
                 <visible>StringCompare(Control.GetLabel(323),)</visible>
             </control>
             <control type="image" id="323">
                 <description>Channel 3 Icon</description>
                 <width>200</width>
-                <height>42</height>
+                <height>60</height>
                 <align>left</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
@@ -404,19 +355,18 @@
             <control type="label" id="304">
                 <description>Channel 4 Name</description>
                 <width>200</width>
-                <height>42</height>
-                <posy>6</posy>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
-                <textcolor>FF0297eb</textcolor>
+                <textcolor>FF000000 </textcolor>
                 <visible>StringCompare(Control.GetLabel(324),)</visible>
             </control>
             <control type="image" id="324">
                 <description>Channel 4 Icon</description>
                 <width>200</width>
-                <height>42</height>
+                <height>60</height>
                 <align>left</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
@@ -425,19 +375,18 @@
             <control type="label" id="305">
                 <description>Channel 5 Name</description>
                 <width>200</width>
-                <height>42</height>
-                <posy>8</posy>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
-                <textcolor>FF0297eb</textcolor>
+                <textcolor>FF000000 </textcolor>
                 <visible>StringCompare(Control.GetLabel(325),)</visible>
             </control>
             <control type="image" id="325">
                 <description>Channel 5 Icon</description>
                 <width>200</width>
-                <height>42</height>
+                <height>60</height>
                 <align>left</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
@@ -446,19 +395,18 @@
             <control type="label" id="306">
                 <description>Channel 6 Name</description>
                 <width>200</width>
-                <height>42</height>
-                <posy>10</posy>
+                <height>60</height>
                 <label></label>
                 <font>font14</font>
                 <align>left</align>
                 <aligny>center</aligny>
-                <textcolor>FF0297eb</textcolor>
+                <textcolor>FF000000 </textcolor>
                 <visible>StringCompare(Control.GetLabel(326),)</visible>
             </control>
             <control type="image" id="326">
                 <description>Channel 6 Icon</description>
                 <width>200</width>
-                <height>42</height>
+                <height>60</height>
                 <align>left</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
@@ -474,40 +422,40 @@
         </control>
         <control type="group" id="112">
             <posx>258</posx>
-            <posy>413</posy>
+            <posy>412</posy>
             <width>1080</width>
-            <height>59</height>
+            <height>60</height>
         </control>
         <control type="group" id="113">
             <posx>258</posx>
-            <posy>471</posy>
+            <posy>474</posy>
             <width>1080</width>
-            <height>59</height>
+            <height>60</height>
         </control>
         <control type="group" id="114">
             <posx>258</posx>
-            <posy>530</posy>
+            <posy>535</posy>
             <width>1080</width>
-            <height>59</height>
+            <height>60</height>
         </control>
         <control type="group" id="115">
             <posx>258</posx>
-            <posy>589</posy>
+            <posy>596</posy>
             <width>1080</width>
-            <height>59</height>
+            <height>60</height>
         </control>
         <control type="group" id="116">
             <posx>258</posx>
-            <posy>648</posy>
+            <posy>656</posy>
             <width>1080</width>
-            <height>59</height>
+            <height>60</height>
         </control>
-        <!-- ComingUp POPUP -->
+        <!-- Timebar -->
         <control type="image" id="120">
-            <posx>274</posx>
-            <posy>225</posy>
-            <width>15</width>
-            <height>300</height>
+            <posx>258</posx>
+            <posy>352</posy>
+            <width>20</width>
+            <height>365</height>
             <aspectratio>keep</aspectratio>
         </control>
     </controls>

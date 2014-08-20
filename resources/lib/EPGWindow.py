@@ -74,11 +74,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.setArtwork1_Unlocked = False
         self.setArtwork2_Unlocked = False
         self.VideoWindow = False
-        self.type1 = ''
-        self.type2 = ''
-        self.type1EXT = ''
-        self.type2EXT = ''
-        self.ArtLST = []
 
         for i in range(self.rowCount):
             self.channelButtons[i] = []
@@ -979,21 +974,26 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         now = time.time()
         chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
         setting3 = ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_3')
-
+        chanlist = ChannelList()
+        
         mediapath = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemFilename(plpos))
         mediaduration = int((self.MyOverlayWindow.channels[newchan - 1].getItemDuration(plpos)) - now)  
         chname = ascii(self.MyOverlayWindow.channels[newchan - 1].name)
         genre = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemgenre(plpos))
         title = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemTitle(plpos))
         LiveID = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemLiveID(plpos))
-        chanlist = ChannelList()
+        youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube/?path=/root']
         
         if mediapath[0:5] == 'stack':
             smpath = (mediapath.split(' , ')[0]).replace('stack://','')
             mpath = (os.path.split(smpath)[0])
         else:
             mpath = (os.path.split(mediapath)[0])
-                
+        
+        if mpath in youtube:
+            YTid = mediapath.split('id=')[1]
+            mpath = (mpath + '/' + YTid).replace('/?path=/root','')
+            
         self.PVRchtype = chtype
         self.PVRmediapath = mediapath
         self.PVRchname = chname

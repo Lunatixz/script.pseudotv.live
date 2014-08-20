@@ -30,12 +30,11 @@ from utils import *
 try:
     from Donor import *
     Donor_Downloaded = True
-    xbmc.log("script.pseudotv.live-ChannelList: Donor Imported")
+    xbmc.log("script.pseudotv.live-Migrate: Donor Imported")
 except Exception,e:
     Donor_Downloaded = False
-    xbmc.log("script.pseudotv.live-ChannelList: Donor Import Failed, Disabling Donor Features" + str(e))
+    xbmc.log("script.pseudotv.live-Migrate: Donor Import Failed, Disabling Donor Features" + str(e))
     pass
-       
        
 class Migrate:
 
@@ -577,8 +576,8 @@ class Migrate:
             
             if MusicTV == True:
                 for i in range(999):
-                    path = xbmc.translatePath("special://profile/addon_data/plugin.video.my_music_tv/plist")
-                    fle = os.path.join(path,"Channel_" + str(i) + ".xml.PlistDir")
+                    path = xbmc.translatePath("special://profile/addon_data/plugin.video.my_music_tv/cache/plist")
+                    fle = os.path.join(path,"Channel_" + str(i) + ".xml.plist")
                     
                     if os.path.exists(xbmc.translatePath(fle)):
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "13")
