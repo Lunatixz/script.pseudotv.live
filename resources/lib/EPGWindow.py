@@ -18,6 +18,7 @@
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import subprocess, os, sys, re
+import _strptime
 import time, threading, datetime, traceback
 import urllib, urllib2
 import ChannelList
