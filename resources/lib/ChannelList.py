@@ -2045,7 +2045,8 @@ class ChannelList:
                             # startDate = self.parseXMLTVDate(elem.get('start'), 0)
                             
                         now = datetime.datetime.now()
-                        offset = 0
+                        # Our difference from GMT in hours, minus 4 hours for the initial offset of the tv guide data
+                        offset = ((time.timezone / 3600) - 4 ) * -1
                         stopDate = self.parseXMLTVDate(elem.get('stop'), offset)
                         startDate = self.parseXMLTVDate(elem.get('start'), offset)
                         
