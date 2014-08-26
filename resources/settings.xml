@@ -5,13 +5,13 @@
             <setting type="action" label="30002" action="RunScript($CWD/config.py)"/>
         <setting label="30003" type="lsep"/>
             <setting id="Auto_Start" type="bool" label="30044" default="false"/>
-            <setting id="notify" type="bool" label="30046" subsetting="true" visible="eq(-1,true)" default="true"/>
             <setting id="timer_amount" type="enum" values="0|5|10|15|20" label="30045" subsetting="true" visible="eq(-2,true)" default="1"/>
             <setting id="AutoOff" type="enum" label="30004" values="Disable|30|60|90|120|150|180|210|240" default="0"/>
             <setting id="ForceChannelReset" type="bool" label="30005" default="false" />
             <setting id="ChannelResetSetting" type="enum" label="30006" values="Automatic|Daily|Weekly|Monthly|Never|Every Time" default="0"/>
             <setting id="StartMode" type="enum" label="30007" values="Resume|Real Time|Random" default="1" />
             <setting id="ThreadMode" type="enum" label="30008" values="On|Minimum Use|Off" default="1" />
+            <setting id="notify" type="bool" label="30046" default="true"/>
     </category>
 <!--Tweaks-->
     <category label="30300">

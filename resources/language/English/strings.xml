@@ -4,7 +4,7 @@
     <string id="30002">Open Channel Configuration</string>    
     <string id="30003">General Options:</string>
         <string id="30044">Enable Autostart</string>
-        <string id="30046">Show Notification</string>
+        <string id="30046">Show Notifications</string>
         <string id="30045">Delay Service (seconds)</string>
         <string id="30004">Auto-off Timer (minutes)</string>
         <string id="30005">Force channel reset on next start</string>

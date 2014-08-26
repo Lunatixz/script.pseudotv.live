@@ -17,13 +17,10 @@
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
-import subprocess, os
-import time, threading
-import datetime
-import sys, re
+import subprocess, os, sys, re
+import datetime, time, threading, _strptime
 import random, traceback
 import urllib, urllib2, json
-import ChannelList
 
 from fanarttv import *
 from Playlist import Playlist
@@ -191,7 +188,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.Artdownloader = Artdownloader()
 
         for i in range(3):
-            self.channelLabel.append(xbmcgui.ControlImage(50 + (50 * i), 50, 50, 50, DEFAULT_IMAGES_LOC + 'solid.png', colorDiffuse = self.channelbugcolor))
+            self.channelLabel.append(xbmcgui.ControlImage(50 + (50 * i), 50, 50, 50, IMAGES_LOC + 'solid.png', colorDiffuse = self.channelbugcolor))
             self.addControl(self.channelLabel[i])
             self.channelLabel[i].setVisible(False)
         self.doModal()
@@ -212,6 +209,34 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         pass
 
         
+    def Backup(self, org, bak):
+        self.log('Backup ' + str(org) + ' - ' + str(bak))
+        if FileAccess.exists(org):
+            if FileAccess.exists(bak):
+                os.remove(bak)
+            FileAccess.copy(org, bak)
+        
+        if NOTIFY == 'true':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Channel Configuration - Backup Complete", 1000, THUMB) )
+            
+            
+    def Restore(self, bak, org):
+        self.log('Restore ' + str(bak) + ' - ' + str(org))
+        if FileAccess.exists(bak):
+            if FileAccess.exists(org):
+                os.remove(org)
+            FileAccess.copy(bak, org)
+        
+        if NOTIFY == 'true':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Channel Configuration - Restore Complete", 1000, THUMB) )
+    
+    
+    def getSize(self, fileobject):
+        fileobject.seek(0,2) # move the cursor to the end of the file
+        size = fileobject.tell()
+        return size
+        
+        
     # override the doModal function so we can setup everything first
     def onInit(self):
         self.log('onInit')
@@ -221,6 +246,33 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         nsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.bak.xml'))
         dlg = xbmcgui.Dialog()
         
+        try:
+            NormalShutdown = REAL_SETTINGS.getSetting('Normal_Shutdown')
+        except:
+            NormalShutdown = "true"
+            REAL_SETTINGS.setSetting('Normal_Shutdown', "true")
+            pass
+            
+        if FileAccess.exists(settingsFile):
+            settingsFile_flesize = 0
+            nsettingsFile_flesize = 0
+            file1 = FileAccess.open(settingsFile, "rb")
+            settingsFile_flesize = self.getSize(file1)
+            file1.close()
+            
+            if FileAccess.exists(nsettingsFile):
+                file2 = FileAccess.open(nsettingsFile, "rb")
+                nsettingsFile_flesize = self.getSize(file2)
+                file2.close()
+            
+                if settingsFile_flesize == 0 and nsettingsFile_flesize != 0:
+                    if NormalShutdown == "false":
+                        self.log('Setting2 Restore onInit') 
+                        self.Restore(nsettingsFile, settingsFile)
+     
+            if nsettingsFile_flesize != settingsFile_flesize:
+                self.Backup(settingsFile, nsettingsFile)
+        
         # Clear Setting2 for fresh autotune
         if REAL_SETTINGS.getSetting("Autotune") == "true" and REAL_SETTINGS.getSetting("Warning1") == "true":
             self.log('Autotune onInit') 
@@ -228,23 +280,15 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             #Reserve channel check            
             if REAL_SETTINGS.getSetting("reserveChannels") == "false":
                 self.log('Autotune not reserved') 
-                
-                if os.path.exists(settingsFile):
-                    if os.path.exists(nsettingsFile):
-                        os.remove(nsettingsFile)
-                        xbmc.log('Autotune, Removing old Backup...')
-                    
-                    FileAccess.rename(settingsFile, nsettingsFile)
-                    xbmc.log('Autotune, Backing up Setting2...')
-                                    
-                    if os.path.exists(nsettingsFile):
-                        xbmc.log('Autotune, Back Complete!')
-                        
-                        f = FileAccess.open(settingsFile, "w")
-                        f.write('\n')
-                        self.log('Autotune, Setting2 Deleted...')
-                        f.close()
-                            
+
+                if FileAccess.exists(nsettingsFile):
+                    xbmc.log('Autotune, Back Complete!')
+                    f = FileAccess.open(settingsFile, "w")
+                    f.write('\n')
+                    self.log('Autotune, Setting2 Deleted...')
+                    f.close()
+            
+            REAL_SETTINGS.setSetting('Normal_Shutdown', "false")       
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Initializing Autotuning...", 4000, THUMB) )
 
         if FileAccess.exists(GEN_CHAN_LOC) == False:
@@ -386,8 +430,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             time.sleep(17) 
             self.background.setVisible(True)
             REAL_SETTINGS.setSetting("INTRO_PLAYED","true")
-            REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
         
+        REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
         self.resetChannelTimes()
         self.setChannel(self.currentChannel)
         self.background.setVisible(False)
@@ -911,9 +955,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             if Managed == 'True':
                 self.getControl(511).setVisible(True)  
                 if type == 'tvshow':
-                    self.getControl(511).setImage(DEFAULT_IMAGES_LOC + 'SB.png')
+                    self.getControl(511).setImage(IMAGES_LOC + 'SB.png')
                 else:
-                    self.getControl(511).setImage(DEFAULT_IMAGES_LOC + 'CP.png')                          
+                    self.getControl(511).setImage(IMAGES_LOC + 'CP.png')                          
             else:
                 self.getControl(511).setVisible(False)  
         except:
@@ -1067,23 +1111,17 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if channel > 99:
             if FileAccess.exists(IMAGES_LOC):
                 self.channelLabel[curlabel].setImage(IMAGES_LOC + 'label_' + str(channel // 100) + '.png')
-            else:
-                self.channelLabel[curlabel].setImage(DEFAULT_IMAGES_LOC + 'label_' + str(channel // 100) + '.png')
             self.channelLabel[curlabel].setVisible(True)
             curlabel += 1
 
         if channel > 9:
             if FileAccess.exists(IMAGES_LOC):
                 self.channelLabel[curlabel].setImage(IMAGES_LOC + 'label_' + str((channel % 100) // 10) + '.png')
-            else:
-                self.channelLabel[curlabel].setImage(DEFAULT_IMAGES_LOC + 'label_' + str((channel % 100) // 10) + '.png')
             self.channelLabel[curlabel].setVisible(True)
             curlabel += 1
             
         if FileAccess.exists(IMAGES_LOC):
             self.channelLabel[curlabel].setImage(IMAGES_LOC + 'label_' + str(channel % 10) + '.png')
-        else:
-            self.channelLabel[curlabel].setImage(DEFAULT_IMAGES_LOC + 'label_' + str(channel % 10) + '.png')
         self.channelLabel[curlabel].setVisible(True)
 
         if self.inputChannel == -1 and self.infoOnChange == True:
@@ -1113,12 +1151,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                                 converted_img.save(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
                                 self.getControl(103).setImage(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
                             else:
-                                self.getControl(103).setImage(DEFAULT_IMAGES_LOC + 'Default.png')
+                                self.getControl(103).setImage(IMAGES_LOC + 'Default.png')
                     else:
                         if FileAccess.exists(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png'):
                             self.getControl(103).setImage(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
                         else:
-                            self.getControl(103).setImage(DEFAULT_IMAGES_LOC + 'Default.png')
+                            self.getControl(103).setImage(IMAGES_LOC + 'Default.png')
             else:
                 self.getControl(103).setImage('NA.png')
         except:
@@ -1551,7 +1589,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     
                     self.log('notification.init')     
                     mediapath = (self.channels[self.currentChannel - 1].getItemFilename(nextshow))
-                    THUMB = (DEFAULT_IMAGES_LOC + 'icon.png')
+                    THUMB = (IMAGES_LOC + 'icon.png')
                     ChannelLogo = (self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
                     chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
                     if chtype != '':
@@ -1673,8 +1711,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         
 
     def end(self):
-        self.log('end')
-        
+        self.log('end')        
         try:
             if self.ArtServiceThread.isAlive():
                 self.ArtServiceThread.cancel()
@@ -1830,7 +1867,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                                
                                 
                 self.storeFiles()
-
+                
+        REAL_SETTINGS.setSetting('Normal_Shutdown', "true")
         updateDialog.close()
         self.background.setVisible(False)
         self.close()

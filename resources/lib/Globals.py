@@ -113,21 +113,22 @@ IPP2 = (REAL_SETTINGS.getSetting("UPNP2_IPP"))
 IPP3 = (REAL_SETTINGS.getSetting("UPNP3_IPP"))
 
 #LOCATIONS
-SETTINGS_LOC = REAL_SETTINGS.getAddonInfo('profile')
-CHANNELS_LOC = os.path.join(SETTINGS_LOC, 'cache') + '/'
-MADE_CHAN_LOC = os.path.join(CHANNELS_LOC, 'stored') + '/'
-GEN_CHAN_LOC = os.path.join(CHANNELS_LOC, 'generated') + '/'
-LOCK_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache')) + '/'
-PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder')))
-ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/'
-BCT_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'bct')) + '/'
-LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder'))
-LOGO_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'logos')) + '/'
-EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/'
-BUMPER_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'bumpers')) + '/'
+SETTINGS_LOC = REAL_SETTINGS.getAddonInfo('profile') #LOCKED
+CHANNELS_LOC = os.path.join(SETTINGS_LOC, 'cache') + '/' #LOCKED
+MADE_CHAN_LOC = os.path.join(CHANNELS_LOC, 'stored') + '/' #LOCKED
+GEN_CHAN_LOC = os.path.join(CHANNELS_LOC, 'generated') + '/' #LOCKED
+LOCK_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache')) + '/' #LOCKED
+PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder'))) #PVR Download location
+ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/' #Missing Artwork cache location
+BCT_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'bct')) + '/' #BCT cache location
+FLST_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'filelist')) + '/' #Filelist cache (tmpstr caching) location
+LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location
+LOGO_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'logos')) + '/' #Post Channel logo IMG Processing location
+EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
+BUMPER_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'bumpers')) + '/' #Local bumper location
+IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
 
 # Core Default Image Locations
-DEFAULT_IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', 'images')) + '/'
 DEFAULT_MEDIA_LOC =  xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', 'media')) + '/'
 DEFAULT_EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', 'media', 'epg-genres')) + '/'
 DEFAULT_LOGO_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'logos')) + '/'
@@ -136,8 +137,8 @@ DEFAULT_LOGO_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'logos')) + '/'
 TIME_BAR = 'pstvTimeBar.png'
 BUTTON_FOCUS = 'pstvButtonFocus.png'
 BUTTON_NO_FOCUS = 'pstvButtonNoFocus.png'
-THUMB = (DEFAULT_IMAGES_LOC + 'icon.png')
-INTRO = (DEFAULT_IMAGES_LOC + 'PTVL_INTRO.mp4')
+THUMB = (IMAGES_LOC + 'icon.png')
+INTRO = (IMAGES_LOC + 'PTVL_INTRO.mp4')
 
 #Channel Sharing location
 if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
@@ -147,38 +148,52 @@ if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
 else:
     CHANNEL_SHARING = False
     
-# SKIN SELECT
-if int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
-    Skin_Select = 'Default'
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
-    Skin_Select = 'PTVL'   
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
-    Skin_Select = 'Custom' 
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
-    Skin_Select = 'ConCast' 
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
-    Skin_Select = 'TWC'     
-else: # Default if Skin_Select value isn't found
-    Skin_Select = 'Default'
-    
-MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'
-        
 # Original Skin Location changes    
 if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
     if os.path.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Original', xbmc.getSkinDir()))):
-        Skin_Select = 'Original/' + xbmc.getSkinDir()
+        Skin_Select = os.path.join('Original', xbmc.getSkinDir())
+        print 'Skin_Select', Skin_Select
         MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'
-    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live/')):
-        Skin_Select = xbmc.getSkinDir()
-        MEDIA_LOC = xbmc.translatePath('special://skin/media/script.pseudotv.live/')
-    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv/')):
-        Skin_Select = xbmc.getSkinDir()
-        MEDIA_LOC = xbmc.translatePath('special://skin/media/script.pseudotv/')
-        
-# Core Skin_Select Image Locations
-IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'images')) + '/'
-EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'     
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
+    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live')):
+        Skin_Select = 'special://skin/media'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv.live')) + '/'
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
+    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv')):
+        Skin_Select = 'special://skin/media'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv')) + '/'
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
 
+    if not xbmcvfs.exists(MEDIA_LOC):
+        MEDIA_LOC = DEFAULT_MEDIA_LOC 
+    if not xbmcvfs.exists(EPGGENRE_LOC):
+        EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC         
+else:
+    # SKIN SELECT
+    if int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
+        Skin_Select = 'Default'
+    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
+        Skin_Select = 'PTVL'   
+    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
+        Skin_Select = 'Custom' 
+    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
+        Skin_Select = 'ConCast' 
+    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
+        Skin_Select = 'TWC'     
+    else: # Default if Skin_Select value isn't found
+        Skin_Select = 'Default'
+                     
+    # Core Skin_Select Image Locations     
+    if xbmcvfs.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'):
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/' 
+    else:
+        MEDIA_LOC = DEFAULT_MEDIA_LOC
+            
+    if xbmcvfs.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'):
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
+    else:  
+        EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC 
+        
 # Find XBMC Skin path
 if xbmcvfs.exists(os.path.join('special://skin' ,'1080i')):
     skinPath = (os.path.join('special://skin' ,'1080i'))
@@ -198,6 +213,7 @@ dlg = xbmcgui.Dialog()
 ADDON_SETTINGS = Settings.Settings()
 GlobalFileLock = FileLock()
 Donor_Downloaded = False
+NOTIFY = REAL_SETTINGS.getSetting('notify')
 
 # Common Cache types, 22hr clock allows overlap.  
 daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22) #System Purge, Force Reset

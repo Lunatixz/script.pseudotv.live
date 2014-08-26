@@ -609,9 +609,11 @@ class ChannelList:
         if setting4 == '0':
             israndom = False  
             reverseOrder = False
+            
         #RANDOM
         elif setting4 == '1':
             israndom = True  
+            
         #REVERSE ORDER
         elif setting4 == '2':
             reverseOrder = True
@@ -673,7 +675,7 @@ class ChannelList:
 
         # RSS/iTunes/feedburner/Podcast   
         elif chtype == 11:# Validate Feed #
-            fileListCHK = self.Valid_ok(setting2)
+            fileListCHK = self.Valid_ok(setting1)
             if fileListCHK == True:
                 self.log("Building RSS Feed " + setting1 + " using type " + setting2 + "...")
                 fileList = self.createRSSFileList(setting1, setting2, setting3, setting4, channel)      
@@ -2045,7 +2047,8 @@ class ChannelList:
                             # startDate = self.parseXMLTVDate(elem.get('start'), 0)
                             
                         now = datetime.datetime.now()
-                        offset = 0
+                        #offset = 0# Our difference from GMT in hours, minus 4 hours for the initial offset of the tv guide data
+                        offset = ((time.timezone / 3600) - 5 ) * -1
                         stopDate = self.parseXMLTVDate(elem.get('stop'), offset)
                         startDate = self.parseXMLTVDate(elem.get('start'), offset)
                         
@@ -2313,8 +2316,8 @@ class ChannelList:
             stop = (limit / 25)
             YTMSG = 'Search Query'
         elif setting2 == '8':
-            showList = self.BuildMultiYoutubeChannelNetwork(setting1, setting2, setting3, setting4, channel)
             YTMSG = 'MultiTube'
+            showList = self.BuildMultiYoutubeChannelNetwork(setting1, setting2, setting3, setting4, channel)
         elif setting2 == '9': 
             stop = 2 # If Setting2 = User playlist pagination disabled, else loop through pagination of 25 entries per page and stop at limit.
             YTMSG = 'Raw gdata'
@@ -2722,38 +2725,23 @@ class ChannelList:
         self.log("MusicVideos")
         showList = []
         if setting1 == '1':
+            self.log("MusicVideos - LastFM")
             msg_type = "Last.FM"
             PluginCHK = self.youtube_player()
             if PluginCHK != False:
                 showList = self.lastFM(setting1, setting2, setting3, setting4, channel)
         elif setting1 == '2':
+            self.log("MusicVideos - MyMusicTV")
             PluginCHK = self.plugin_ok('plugin.video.my_music_tv')
             if PluginCHK != False:
                 msg_type = "My MusicTV"
                 showList = self.myMusicTV(setting1, setting2, setting3, setting4, channel)
+                
         return showList
-    
+
     
     def lastFM(self, setting1, setting2, setting3, setting4, channel):
-        if Cache_Enabled:
-            self.log("lastFM Cache")
-            try:
-                result = weekly.cacheFunction(self.lastFM_NEW, setting1, setting2, setting3, setting4, channel)
-            except:
-                result = self.lastFM_NEW(setting1, setting2, setting3, setting4, channel)
-                self.log("lastFM Cache Failed Forwarding to lastFM_NEW")
-                pass
-        else:
-            self.log("lastFM Cache Disabled")
-            result = self.lastFM_NEW(setting1, setting2, setting3, setting4, channel)    
-        if not result:
-            result = []
-        return result        
-    
-    
-    def lastFM_NEW(self, setting1, setting2, setting3, setting4, channel):
-        self.log("lastFM Creating Cache")
-        LiveID = 'music|0|0|False|0|NR|'
+        self.log("lastFM")
         # Sample xml output:
         # <clip>
             # <artist url="http://www.last.fm/music/Tears+for+Fears">Tears for Fears</artist>
@@ -2764,10 +2752,12 @@ class ChannelList:
             # <rating max="5">4.9660454</rating>
             # <stats hits="1" misses="4" />
         # </clip>
+        LiveID = 'music|0|0|False|0|NR|'
         showList = [] 
-        
+        LastFMList = []
+        tmpstr = ''
+        youtube_plugin = self.youtube_player()
         api = 'http://api.tv.timbormans.com/user/'+setting2+'/topartists.xml'
-        
         limit = 0
         duration = 0
         artist = ''
@@ -2791,65 +2781,79 @@ class ChannelList:
         if self.background == False:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Last.FM", "User " + setting2)
         
-        for i in range(limit):
+        LastFMCachePath = xbmc.translatePath(os.path.join(FLST_LOC, 'lastfm')) + '/'  
+        LastFMCache = 'LastFM_Cache_'+str(setting2)+'.xml'
+        CacheExpired = self.Cache_ok(LastFMCachePath, LastFMCache) 
+
+        if CacheExpired == False:
+            LastFMList = self.readCache(LastFMCachePath, LastFMCache)
+            for i in range(len(LastFMList)):
+                try:
+                    tmpstr = str(LastFMList[i]) + '\n' + str(LastFMList[i+1])
+                    LastFMList.pop(i+1)
+                    showList.append(tmpstr)
+                except:
+                    pass
             
-            if self.threadPause() == False:
-                del fileList[:]
-                break
-            
-            try:
-                file = urllib2.urlopen(api)
-                self.log('file' + str(file))
-                data = file.read()
-                self.log('data' + str(data))
-                file.close()
-                dom = parseString(data)
+        elif CacheExpired == True: 
+            for n in range(limit):
 
-                xmlartist = dom.getElementsByTagName('artist')[0].toxml()
-                artist = xmlartist.replace('<artist>','').replace('</artist>','')
-                artist = artist.rsplit('>', -1)
-                artist = artist[1]
-                # artist = str(artist)
-                artist = self.uncleanString(artist)
-
-                xmltrack = dom.getElementsByTagName('track')[0].toxml()
-                track = xmltrack.replace('<track url>','').replace('</track>','')
-                track = track.rsplit('>', -1)
-                track = track[1]
-                # track = str(track)
-                track = self.uncleanString(track)
-
-                xmlurl = dom.getElementsByTagName('url')[0].toxml()
-                url = xmlurl.replace('<url>','').replace('</url>','')  
-                url = url.replace("https://", "").replace("http://", "").replace("www.youtube.com/watch?v=", "").replace("&feature=youtube_gdata_player", "").replace("&amp;feature=youtube_gdata_player", "")
-
-                xmlduration = dom.getElementsByTagName('duration')[0].toxml()
-                duration = xmlduration.replace('<duration>','').replace('</duration>','')
-
-                xmlthumbnail = dom.getElementsByTagName('thumbnail')[0].toxml()
-                thumburl = xmlthumbnail.replace('<thumbnail>','').replace('</thumbnail>','')
-
-                xmlrating = dom.getElementsByTagName('rating')[0].toxml()
-                rating = xmlrating.replace('<rating>','').replace('</rating>','')
-                rating = rating.rsplit('>', -1)
-                rating = rating[1]
-                rating = rating[0:4]
-                # rating = uni("%.2f" % uni(rating))
-                eptitle = uni(artist + ' - ' + track)
-                epdesc = uni('Rated ' + rating + '/5.00')
+                if self.threadPause() == False:
+                    del fileList[:]
+                    break
                 
-                tmpstr = str(duration) + ',' + eptitle + "//" + "Last.FM" + "//" + epdesc + "//" + 'Music' + "////" + LiveID + '\n' + youtube_plugin + url
-                tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
-                self.log("LastFM, CHANNEL: " + str(self.settingChannel) + ", " + eptitle + "  DUR: " + str(duration))
-                showList.append(tmpstr)
-                showcount += 1    
-                          
-                if self.background == False:
-                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Last.FM, User " + setting2, "added " + str(showcount) + " entries")
+                try:
+                    file = urllib2.urlopen(api)
+                    self.log('file' + str(file))
+                    data = file.read()
+                    self.log('data' + str(data))
+                    file.close()
+                    dom = parseString(data)
+
+                    xmlartist = dom.getElementsByTagName('artist')[0].toxml()
+                    artist = xmlartist.replace('<artist>','').replace('</artist>','')
+                    artist = artist.rsplit('>', -1)
+                    artist = artist[1]
+                    # artist = str(artist)
+                    artist = self.uncleanString(artist)
+
+                    xmltrack = dom.getElementsByTagName('track')[0].toxml()
+                    track = xmltrack.replace('<track url>','').replace('</track>','')
+                    track = track.rsplit('>', -1)
+                    track = track[1]
+                    # track = str(track)
+                    track = self.uncleanString(track)
+
+                    xmlurl = dom.getElementsByTagName('url')[0].toxml()
+                    url = xmlurl.replace('<url>','').replace('</url>','')  
+                    url = url.replace("https://", "").replace("http://", "").replace("www.youtube.com/watch?v=", "").replace("&feature=youtube_gdata_player", "").replace("&amp;feature=youtube_gdata_player", "")
+
+                    xmlduration = dom.getElementsByTagName('duration')[0].toxml()
+                    duration = xmlduration.replace('<duration>','').replace('</duration>','')
+
+                    xmlthumbnail = dom.getElementsByTagName('thumbnail')[0].toxml()
+                    thumburl = xmlthumbnail.replace('<thumbnail>','').replace('</thumbnail>','')
+
+                    xmlrating = dom.getElementsByTagName('rating')[0].toxml()
+                    rating = xmlrating.replace('<rating>','').replace('</rating>','')
+                    rating = rating.rsplit('>', -1)
+                    rating = rating[1]
+                    rating = rating[0:4]
+                    eptitle = uni(artist + ' - ' + track)
+                    epdesc = uni('Rated ' + rating + '/5.00')
                     
-            except Exception,e:
-                pass
-                            
+                    tmpstr = str(duration) + ',' + eptitle + "//" + "Last.FM" + "//" + epdesc + "//" + 'Music' + "////" + LiveID + '\n' + youtube_plugin + url
+                    tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
+                    showList.append(tmpstr)
+                    showcount += 1    
+                              
+                    if self.background == False:
+                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Last.FM, User " + setting2, "added " + str(showcount) + " entries")
+                    
+                except Exception,e:
+                    pass   
+            self.writeCache(showList, LastFMCachePath, LastFMCache)   
+                
         return showList
 
     
@@ -2859,7 +2863,7 @@ class ChannelList:
         LiveID = 'music|0|0|False|0|NR|'
         fle = os.path.join(path,setting2+".xml.plist")
         showcount = 0
-        showList = []
+        MyMusicLST = []
         
         if setting3 == '':
             limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
@@ -2912,7 +2916,7 @@ class ChannelList:
                     
                     tmpstr = str(300) + ',' + artist + "//" + "My MusicTV" + "//" + track + "//" + 'Music' + "////" + LiveID + '\n' + link
                     tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
-                    showList.append(tmpstr)
+                    MyMusicLST.append(tmpstr)
                     showcount += 1    
                     
                     if showcount > limit:
@@ -2924,7 +2928,7 @@ class ChannelList:
         except Exception,e:  
             pass
             
-        return showList
+        return MyMusicLST
 
         
     def xmltv_ok(self, setting1, setting3):
@@ -3805,11 +3809,12 @@ class ChannelList:
                 LastItem = len(thelist) - 1
                 thelist.pop(LastItem)#remove last line (empty line)
                 thelist.pop(0)#remove first line (datetime)
-                self.logDebug("readCache, thelist.count = " + str(len(thelist)))
                 fle.close()
-                return thelist
             except Exception,e:
                 pass
+                
+            self.logDebug("readCache, thelist.count = " + str(len(thelist)))
+            return thelist
     
     
     def Cache_ok(self, thepath, thefile):
@@ -3822,14 +3827,16 @@ class ChannelList:
         if FileAccess.exists(thefile):
             try:
                 fle = FileAccess.open(thefile, "r")
-                cacheDate = str(fle.readlines()[0])
+                cacheline = fle.readlines()
+                cacheDate = str(cacheline[0])
                 cacheDate = cacheDate.split('.')[0]
                 cacheDate = datetime.datetime.strptime(cacheDate, '%Y-%m-%d %H:%M:%S')
                 self.logDebug("Cache_ok, cacheDate = " + str(cacheDate))
                 cacheDateEXP = (cacheDate + datetime.timedelta(days=30))
                 self.logDebug("Cache_ok, cacheDateEXP = " + str(cacheDateEXP))
                 fle.close()  
-                if now >= cacheDateEXP:
+                
+                if now >= cacheDateEXP or len(cacheline) == 2:
                     CacheExpired = True         
             except Exception,e:
                 self.logDebug("Cache_ok, exception")

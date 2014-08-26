@@ -1315,12 +1315,10 @@ class PlayShowInOrder(BaseRule):
 
 class SetResetTime(BaseRule):
     def __init__(self):
-        SETTOP = False
         Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]     
-        if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
-            SETTOP = True
+        self.SETTOP = REAL_SETTINGS.getSetting("EnableSettop")
         
-        if SETTOP == True:
+        if self.SETTOP == True:
             self.name = "Reset Every x Hours"
             self.optionLabels = ['Number of Hours']
             Hour = str((Refresh / 60) / 60)
@@ -1340,7 +1338,7 @@ class SetResetTime(BaseRule):
 
     def getTitle(self):
         if len(self.optionValues[0]) > 0:
-            if SETTOP == True:
+            if self.SETTOP == True:
                 if self.optionValues[0] == '1':
                     return "Reset Every Hour"
                 else:
@@ -1369,7 +1367,7 @@ class SetResetTime(BaseRule):
             curchan = channeldata.channelNumber
             numdays = 0
 
-            if SETTOP == True:
+            if self.SETTOP == True:
                 try:
                     numdays = int(Refresh)
                 except:
@@ -1393,7 +1391,7 @@ class SetResetTime(BaseRule):
             except:
                 pass
                 
-            if SETTOP == True:
+            if self.SETTOP == True:
                 
                 if rightnow >= nextreset:
                     channeldata.isValid = False

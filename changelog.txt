@@ -1,6 +1,7 @@
+[*] Automatic settings2 backup/restore, LastFM Filecache.
 [*] Temporarily disabled Artwork Service timer (Until Settop box mode is finished).
 [*] Youtube artwork, Misc tweaks and fixes.
-[*] NEW! My MusicTV plugin autotuning, and chtype.
+[*] NEW! My MusicTV plugin autotuning, chtype and Lastfm filecaching.
 [*] NEW! MultiYoutube, GMTOffset fix? *Thanks kurumushi
 [*] Two Work in Progress skins (ConCast, Time Whorner Cable).
 [*] Added some visual debugging, disable "Enable Debugging" under "MISC" if not needed.

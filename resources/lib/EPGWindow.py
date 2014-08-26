@@ -18,9 +18,8 @@
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import subprocess, os, sys, re
-import time, threading, datetime, traceback
+import time, threading, datetime, traceback, _strptime
 import urllib, urllib2
-import ChannelList
 
 from Playlist import Playlist
 from Globals import *
@@ -475,41 +474,36 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                             
                         if not FileAccess.exists(EPGGENRE_CACHE_LOC):
                             FileAccess.makedirs(EPGGENRE_CACHE_LOC)
-                                
-                        if FileAccess.exists(EPGGENRE_LOC):
-                            EPGTEXTURE_LOC = EPGGENRE_LOC
-                        else:
-                            EPGTEXTURE_LOC = DEFAULT_EPGGENRE_LOC
-                            
+
                         def EPGtype(genre):
                             if genre in COLOR_RED_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_RED.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_RED.png')
                             elif genre in COLOR_GREEN_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_GREEN.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_GREEN.png')
                             elif genre in COLOR_mdGREEN_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_mdGREEN.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_mdGREEN.png')
                             elif genre in COLOR_BLUE_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_BLUE.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_BLUE.png')
                             elif genre in COLOR_ltBLUE_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_ltBLUE.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_ltBLUE.png')
                             elif genre in COLOR_CYAN_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_CYAN.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_CYAN.png')
                             elif genre in COLOR_ltCYAN_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_ltCYAN.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_ltCYAN.png')
                             elif genre in COLOR_PURPLE_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_PURPLE.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_PURPLE.png')
                             elif genre in COLOR_ltPURPLE_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_ltPURPLE.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_ltPURPLE.png')
                             elif genre in COLOR_ORANGE_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_ORANGE.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_ORANGE.png')
                             elif genre in COLOR_YELLOW_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_YELLOW.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_YELLOW.png')
                             elif genre in COLOR_GRAY_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_GRAY.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_GRAY.png')
                             elif genre in COLOR_ltGRAY_TYPE:
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_ltGRAY.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_ltGRAY.png')
                             else:#Unknown
-                                EPGTEXTURE = (EPGTEXTURE_LOC + 'COLOR_ltGRAY.png')
+                                EPGTEXTURE = (EPGGENRE_LOC + 'COLOR_ltGRAY.png')
                                 
                             return EPGTEXTURE
                             
@@ -531,7 +525,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         # textureButtonNoFocusFLEname = os.path.split(self.textureButtonNoFocus)[1]        
                         # textureButtonNoFocusFLEname = os.path.splitext(textureButtonNoFocusFLEname)[0]
 
-                        # ButtonHD = (EPGTEXTURE_LOC + 'HD.png')                                      
+                        # ButtonHD = (EPGGENRE_LOC + 'HD.png')                                      
                         # print xpos, basey, width, baseh
                         # overlayWidth = 35
                         # overlayHeight = 17
@@ -540,10 +534,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         
                         # if ImageEnhance == True:
                             # print 'ImageEnhance'
-                            # Background = Image.open(EPGTEXTURE_LOC + 'BG.png')                
+                            # Background = Image.open(EPGGENRE_LOC + 'BG.png')                
                             # Background = Background.convert("RGBA")
                             
-                            # ButtonHD = Image.open(EPGTEXTURE_LOC + 'HD.png')               
+                            # ButtonHD = Image.open(EPGGENRE_LOC + 'HD.png')               
                             # ButtonHD = ButtonHD.convert("RGBA")
         
                             # Background = Background.resize((basey,baseh), Image.ANTIALIAS)
@@ -554,8 +548,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                             
                         #######################################################################
                         # overlay = Image.open(self.textureButtonNoFocus)
-                        # background = Image.open(EPGTEXTURE_LOC + 'blank.png')   
-                        # mask = Image.open(EPGTEXTURE_LOC + 'HD.png') 
+                        # background = Image.open(EPGGENRE_LOC + 'blank.png')   
+                        # mask = Image.open(EPGGENRE_LOC + 'HD.png') 
                         # background = background.convert("RGBA")
                         # overlay = overlay.convert("RGBA")
                         # mask = mask.convert("RGBA")
@@ -1077,9 +1071,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 if Managed == 'True':
                     self.getControl(511).setVisible(True)  
                     if type == 'tvshow':
-                        self.getControl(511).setImage(DEFAULT_IMAGES_LOC + 'SB.png')
+                        self.getControl(511).setImage(IMAGES_LOC + 'SB.png')
                     else:
-                        self.getControl(511).setImage(DEFAULT_IMAGES_LOC + 'CP.png')                          
+                        self.getControl(511).setImage(IMAGES_LOC + 'CP.png')                          
                 else:
                     self.getControl(511).setVisible(False)  
             except:
