@@ -1916,13 +1916,13 @@ class ChannelList:
         return fileList
 
     
-    def parseXMLTVDate(self, dateString, tzOffset=0):
+    def parseXMLTVDate(self, dateString):
         if dateString is not None:
             if dateString.find(' ') != -1:
                 # remove timezone information
                 dateString = dateString[:dateString.find(' ')]
             t = time.strptime(dateString, '%Y%m%d%H%M%S')
-            return datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec) + datetime.timedelta(hours = tzOffset)
+            return datetime.datetime(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec)
         else:
             return None
     
@@ -2078,13 +2078,11 @@ class ChannelList:
                                 now = now + datetime.timedelta(hours = 1)
                             else: 
                                 now = now
-                            tzOffset = (time.timezone / -3600) + 4
-                            stopDate = self.parseXMLTVDate(elem.get('stop'), tzOffset)
-                            startDate = self.parseXMLTVDate(elem.get('start'), tzOffset)
                         else:
                             now = datetime.datetime.now()
-                            stopDate = self.parseXMLTVDate(elem.get('stop'), 0)
-                            startDate = self.parseXMLTVDate(elem.get('start'), 0)
+                                                        
+                        stopDate = self.parseXMLTVDate(elem.get('stop'))
+                        startDate = self.parseXMLTVDate(elem.get('start'))
                         
                         if (((now > startDate and now < stopDate) or (now < startDate))):
                             if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and ignoreParse == False: 
