@@ -163,7 +163,10 @@ if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
         Skin_Select = 'special://skin/media'
         MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv')) + '/'
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-
+    else:
+        Skin_Select = 'Default'
+        REAL_SETTINGS.setSetting("SkinSelector","2")
+        
     if not xbmcvfs.exists(MEDIA_LOC):
         MEDIA_LOC = DEFAULT_MEDIA_LOC 
     if not xbmcvfs.exists(EPGGENRE_LOC):
@@ -171,11 +174,11 @@ if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
 else:
     # SKIN SELECT
     if int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
-        Skin_Select = 'Default'
-    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
-        Skin_Select = 'PTVL'   
-    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
         Skin_Select = 'Custom' 
+    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
+        Skin_Select = 'Default'
+    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
+        Skin_Select = 'PTVL'   
     elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
         Skin_Select = 'ConCast' 
     elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
@@ -214,6 +217,7 @@ ADDON_SETTINGS = Settings.Settings()
 GlobalFileLock = FileLock()
 Donor_Downloaded = False
 NOTIFY = REAL_SETTINGS.getSetting('notify')
+DEBUG = REAL_SETTINGS.getSetting('enable_Debug')
 
 # Common Cache types, 22hr clock allows overlap.  
 daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22) #System Purge, Force Reset

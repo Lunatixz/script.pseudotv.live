@@ -43,7 +43,7 @@ class Migrate:
 
         
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
-        if Globals.REAL_SETTINGS.getSetting('enable_Debug') == "true":
+        if Globals.DEBUG == 'true':
             Globals.log('Migrate: ' + msg, level)
             
             
@@ -141,7 +141,7 @@ class Migrate:
             
             if SuperFav == True:
                 plugin_details = chanlist.PluginInfo('plugin://plugin.program.super.favourites')
-                filter =['Create New Super Folder','Explore XBMC favourites','iSearch']
+                filter =['Create New Super Folder','Explore Kodi favourites','iSearch']
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Super Favourites","")
 
                 Match = True
@@ -171,18 +171,18 @@ class Migrate:
                                         if SFmatch[0:9] != '/Channel_':
                                             Match = False
                                 
-                                SFname = SFmatch.replace('/PseudoTV_Live/','').replace('/','')
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'plugin://plugin.program.super.favourites' + SFmatch)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "Create New Super Folder,Explore XBMC favourites,iSearch")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", SFname)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                channelNum += 1
+                                    SFname = SFmatch.replace('/PseudoTV_Live/','').replace('/','')
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'plugin://plugin.program.super.favourites' + SFmatch)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "Create New Super Folder,Explore XBMC favourites,iSearch")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", SFname)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                    channelNum += 1
                             
                             
         # LiveTV - PVR

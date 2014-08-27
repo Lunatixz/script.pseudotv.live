@@ -1,15 +1,16 @@
-[*] Automatic settings2 backup/restore, LastFM Filecache.
+[*] Replaced old mute toggle, with a "Smart Switch". Show Notification option under "General" settings. 
+[*] Automatic settings2 backup/restore after improper exit, Pre-Autotune settings2 restore option under "Misc" settings.
 [*] Temporarily disabled Artwork Service timer (Until Settop box mode is finished).
 [*] Youtube artwork, Misc tweaks and fixes.
-[*] NEW! My MusicTV plugin autotuning, chtype and Lastfm filecaching.
-[*] NEW! MultiYoutube, GMTOffset fix? *Thanks kurumushi
+[*] NEW! My MusicTV plugin autotuning, chtype and Lastfm file caching.
+[*] NEW! MultiYoutube Channel, GMTOffset fix? *Thanks kurumushi
 [*] Two Work in Progress skins (ConCast, Time Whorner Cable).
-[*] Added some visual debugging, disable "Enable Debugging" under "MISC" if not needed.
+[*] Added visual debugging, disable "Enable Debugging" under "Misc" if not needed.
 [*] Plugin and Strm smart seek (Avoids loading applicable media near the end of its runtime).
-[*] "Auto Unpause"; auto resume a paused channel. Improved overall error handling...
+[*] "Auto Unpause"; auto resume a paused channel, Improved overall error handling...
 [*] Youtube Plugin Detection (Switches default Youtube player to Bromix's Youtube(Alpha) if available).
 [*] NEW! Movie ratings bumper option, Misc bug fixes, improved "Coming Up Next" overlay.
-[*] Dynamic Artwork disabled while spooling and before first run. EPG/Overlay Tweaking...
+[*] Dynamic Artwork disabled while spooling, EPG/Overlay Tweaks.
 [*] PseudoCinema missing channel name fix, Last Channel Recall tweaking.
 [*] [COLOR=blue]^ v.0.4.8 ^[/COLOR] 
 [*] Hub-Edition activated by having "XBMCHUB ADDONINSTALLER" installed.

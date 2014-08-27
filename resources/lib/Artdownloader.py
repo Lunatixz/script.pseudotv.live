@@ -56,7 +56,7 @@ class Artdownloader:
 
     
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
-        if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+        if DEBUG == 'true':
             log('Artdownloader: ' + msg, level)
     
     
@@ -603,9 +603,9 @@ class Artdownloader:
     
     def ArtService(self, Art_Msg=ArtService_Msg):
         print 'ArtService'
+        REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
         type1EXT = ''
         type2EXT = ''
-        REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
         
         global ArtService_Running
         if not ArtService_Running:
@@ -616,7 +616,7 @@ class Artdownloader:
             ArtLst = self.PreArtService()
             
             if (Art_Msg == 'true'):
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Spooling Started", 4000, THUMB) )
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Spooler Started", 4000, THUMB) )
             
             # Clear Artwork Cache Folders
             if REAL_SETTINGS.getSetting("ClearLiveArtCache") == "true":
@@ -662,7 +662,7 @@ class Artdownloader:
             
             stop = datetime.datetime.today()
             finished = stop - start
-            MSSG = ("Artwork Spooling Finished in %d seconds" %finished.seconds)
+            MSSG = ("Artwork Spooled in %d seconds" %finished.seconds)
             print str(MSSG)
             
             REAL_SETTINGS.setSetting("DynamicArt_Enabled","true")

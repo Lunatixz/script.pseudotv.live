@@ -64,7 +64,7 @@ class MyPlayer(xbmc.Player):
         xbmc.sleep(100)
         if self.is_playback_paused():
             xbmc.Player().pause()
-            if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+            if DEBUG == 'true':
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "resume_playback", 1000, THUMB) )
     
     
@@ -213,24 +213,32 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log('Backup ' + str(org) + ' - ' + str(bak))
         if FileAccess.exists(org):
             if FileAccess.exists(bak):
-                os.remove(bak)
+                try:
+                    os.remove(bak)
+                except:
+                    pass
             FileAccess.copy(org, bak)
         
         if NOTIFY == 'true':
-            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Channel Configuration - Backup Complete", 1000, THUMB) )
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Backup Complete", 1000, THUMB) )
             
             
     def Restore(self, bak, org):
         self.log('Restore ' + str(bak) + ' - ' + str(org))
         if FileAccess.exists(bak):
             if FileAccess.exists(org):
-                os.remove(org)
+                try:
+                    os.remove(org)
+                except:
+                    pass
             FileAccess.copy(bak, org)
         
         if NOTIFY == 'true':
-            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Channel Configuration - Restore Complete", 1000, THUMB) )
-    
-    
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Restore Complete", 1000, THUMB) )
+        
+        xbmc.executebuiltin('XBMC.AlarmClock( RestartPTVL, XBMC.RunScript(' + ADDON_PATH + '/default.py),0.5,false)')
+        self.end()
+        
     def getSize(self, fileobject):
         fileobject.seek(0,2) # move the cursor to the end of the file
         size = fileobject.tell()
@@ -244,8 +252,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.channelList = ChannelList()
         settingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml'))
         nsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.bak.xml'))
+        atsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.pretune.xml'))
         dlg = xbmcgui.Dialog()
-        
+
         try:
             NormalShutdown = REAL_SETTINGS.getSetting('Normal_Shutdown')
         except:
@@ -256,23 +265,21 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if FileAccess.exists(settingsFile):
             settingsFile_flesize = 0
             nsettingsFile_flesize = 0
+            atsettingsFile_flesize = 0
             file1 = FileAccess.open(settingsFile, "rb")
             settingsFile_flesize = self.getSize(file1)
             file1.close()
             
-            if FileAccess.exists(nsettingsFile):
-                file2 = FileAccess.open(nsettingsFile, "rb")
-                nsettingsFile_flesize = self.getSize(file2)
-                file2.close()
-            
-                if settingsFile_flesize == 0 and nsettingsFile_flesize != 0:
-                    if NormalShutdown == "false":
-                        self.log('Setting2 Restore onInit') 
-                        self.Restore(nsettingsFile, settingsFile)
-     
-            if nsettingsFile_flesize != settingsFile_flesize:
-                self.Backup(settingsFile, nsettingsFile)
-        
+        if FileAccess.exists(nsettingsFile):
+            file2 = FileAccess.open(nsettingsFile, "rb")
+            nsettingsFile_flesize = self.getSize(file2)
+            file2.close()
+                
+        if FileAccess.exists(atsettingsFile):
+            file3 = FileAccess.open(atsettingsFile, "rb")
+            atsettingsFile_flesize = self.getSize(file3)
+            file3.close()
+
         # Clear Setting2 for fresh autotune
         if REAL_SETTINGS.getSetting("Autotune") == "true" and REAL_SETTINGS.getSetting("Warning1") == "true":
             self.log('Autotune onInit') 
@@ -280,8 +287,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             #Reserve channel check            
             if REAL_SETTINGS.getSetting("reserveChannels") == "false":
                 self.log('Autotune not reserved') 
+                if settingsFile_flesize != 0:
+                    self.Backup(settingsFile, atsettingsFile)
 
-                if FileAccess.exists(nsettingsFile):
+                if FileAccess.exists(atsettingsFile):
                     xbmc.log('Autotune, Back Complete!')
                     f = FileAccess.open(settingsFile, "w")
                     f.write('\n')
@@ -355,7 +364,25 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.actionSemaphore.acquire()
         updateDialog.close()
         self.timeStarted = time.time()
-
+              
+        if REAL_SETTINGS.getSetting("ATRestore") == "true" and REAL_SETTINGS.getSetting("Warning2") == "true":
+            self.log('Setting2 Restore onInit') 
+            if atsettingsFile_flesize != 0:
+                REAL_SETTINGS.setSetting("ATRestore","false")
+                REAL_SETTINGS.setSetting("Warning2","false")
+                REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
+                self.Restore(atsettingsFile, settingsFile)       
+                return
+                
+        elif NormalShutdown == "false":
+            if settingsFile_flesize == 0 and nsettingsFile_flesize != 0:
+                self.log('Setting2 Restore onInit') 
+                self.Restore(nsettingsFile, settingsFile)
+                return
+        else:
+            if settingsFile_flesize != 0:
+                self.Backup(settingsFile, nsettingsFile)
+        
         if self.readConfig() == False:
             return
         
@@ -424,6 +451,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         except:
             self.currentChannel = self.fixChannel(1)
         
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
+        self.channelList.sendJSON(json_query)
+        
         if REAL_SETTINGS.getSetting('INTRO_PLAYED') != 'true':
             self.background.setVisible(False)
             xbmc.Player().play(INTRO)
@@ -431,7 +461,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.background.setVisible(True)
             REAL_SETTINGS.setSetting("INTRO_PLAYED","true")
         
-        REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
         self.resetChannelTimes()
         self.setChannel(self.currentChannel)
         self.background.setVisible(False)
@@ -597,7 +626,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
         
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
-        if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+        if DEBUG == 'true':
             log('TVOverlay: ' + msg, level) 
 
             
@@ -704,7 +733,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         
         self.log("about to mute");
         # Mute the channel before changing
-        xbmc.executebuiltin("Mute()");   
+        # xbmc.executebuiltin("Mute()");           
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+        self.channelList.sendJSON(json_query)
         xbmc.sleep(self.channelDelay)
         # set the show offset
         self.Player.playselected(self.channels[self.currentChannel - 1].playlistPosition)
@@ -731,7 +762,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         self.Player.pause()
 
                         if self.waitForVideoPaused() == False:
-                            xbmc.executebuiltin("Mute()");
+                            # xbmc.executebuiltin("Mute()");
+                            json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+                            self.channelList.sendJSON(json_query)
                             return
                 except:
                     self.log('Exception during seek on paused channel', xbmc.LOGERROR)
@@ -756,7 +789,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 if (mediapath[-4:].lower() == 'strm' or mediapath[0:6] == 'plugin'):
                     overtime = float((int(self.channels[self.currentChannel - 1].getItemDuration(self.channels[self.currentChannel - 1].playlistPosition))/8)*7)
                     if seektime >= overtime:
-                        if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+                        if DEBUG == 'true':
                             self.log('seektime' + str(seektime))
                             self.log('overtime' + str(overtime))
                             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Overriding Seektime", 1000, THUMB) )
@@ -789,7 +822,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         
         # Unmute
         self.log("Finished, unmuting");
-        xbmc.executebuiltin("Mute()");
+        # xbmc.executebuiltin("Mute()");
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
+        self.channelList.sendJSON(json_query)
+        
         self.showChannelLabel(self.currentChannel)
         self.lastActionTime = time.time()
         self.runActions(RULES_ACTION_OVERLAY_SET_CHANNEL_END, channel, self.channels[channel - 1])
@@ -1468,8 +1504,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             json_query = '{"jsonrpc": "2.0", "method": "Input.ExecuteAction","params":{"action":"aspectratio"}, "id": 1}'
             self.channelList.sendJSON(json_query);
             
-        elif action == ACTION_OSD:
-            xbmc.executebuiltin("ActivateWindow(12901)")
+        # elif action == ACTION_OSD:
+            # xbmc.executebuiltin("ActivateWindow(12901)")
         
         elif action == ACTION_RECORD:
             self.log('ACTION_RECORD')
@@ -1681,7 +1717,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 self.notPlayingCount += 1
                 self.log("Adding to notPlayingCount, " + str(self.notPlayingCount))  
                 
-                if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+                if DEBUG == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "notPlayingCount " + str(self.notPlayingCount), 1000, THUMB) )
                       
         if self.notPlayingCount > 6:

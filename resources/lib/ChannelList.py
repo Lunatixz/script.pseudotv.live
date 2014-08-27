@@ -191,7 +191,7 @@ class ChannelList:
 
     
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
-        if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+        if DEBUG == 'true':
             log('ChannelList: ' + msg, level)
             
             
@@ -4262,7 +4262,7 @@ class ChannelList:
         json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["title","year","mpaa","imdbnumber","description","season","episode","playcount","genre","duration","runtime","showtitle","album","artist","plot","plotoutline","tagline"]}, "id": 1}' % (self.escapeDirJSON(path), FleType))
         
         #filter out unwanted folders, keep from looping...
-        filter = ['Back','Previous','Home','Search','Create New Super Folder','Explore XBMC favourites','iSearch']
+        filter = ['Back','Previous','Home','Search','Create New Super Folder','Explore Kodi favourites','iSearch']
         LiveID = 'tvshow|0|0|False|1|NR|'
                                                 
         try:
@@ -4944,6 +4944,15 @@ class ChannelList:
         self.log("buildFileList return")
         
         return fileList
+
+        
+    def BuildPlayon(self, setting1, setting2, setting3, setting4, channel):
+        self.log("getPlayon")
+        # get playon upnp id, {"jsonrpc":"2.0","method":"Files.GetSources","params":{"media":"video"},"id":2}
+        # main folders /hulu/,/netflix/, /amazon/, /crackle/
+        
+       #parse for upnp id, then add main source (ie hulu, etc), json query.
+       #parse query for matching directory ie "Your subscriptions" get file path and parse.
 
         
     # Run rules for a channel

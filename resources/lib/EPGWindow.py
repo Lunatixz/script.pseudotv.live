@@ -108,7 +108,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
 
     
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
-        if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+        if DEBUG == 'true':
             log('EPGWindow: ' + msg, level)
                 
     
@@ -304,7 +304,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             baseh = self.getControl(111 + row).getHeight()
             basew = self.getControl(111 + row).getWidth()
 
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
+            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))        
+            if chtype != '':
+                chtype = int(chtype)
+            
             chname = ascii(self.MyOverlayWindow.channels[curchannel - 1].name)
             self.lastExitTime = (ADDON_SETTINGS.getSetting("LastExitTime"))
             if xbmc.Player().isPlaying() == False:
@@ -453,7 +456,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         mylabel = self.MyOverlayWindow.channels[curchannel - 1].getItemTitle(playlistpos)
                         mygenre = self.MyOverlayWindow.channels[curchannel - 1].getItemgenre(playlistpos)
                         myLiveID = self.MyOverlayWindow.channels[curchannel - 1].getItemLiveID(playlistpos)
-                        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
+                        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))       
+                        if chtype != '':
+                            chtype = int(chtype)
+                            
                         type = (chanlist.unpackLiveID(myLiveID))[0]
                         playcount = int((chanlist.unpackLiveID(myLiveID))[4])
                         rating = (chanlist.unpackLiveID(myLiveID))[5]
@@ -966,10 +972,12 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             return
 
         now = time.time()
-        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
+        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))       
+        if chtype != '':
+            chtype = int(chtype)
+        
         setting3 = ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_3')
         chanlist = ChannelList()
-        
         mediapath = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemFilename(plpos))
         mediaduration = int((self.MyOverlayWindow.channels[newchan - 1].getItemDuration(plpos)) - now)  
         chname = ascii(self.MyOverlayWindow.channels[newchan - 1].name)
@@ -1179,8 +1187,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     chnoffset += 1
 
             plpos = self.determinePlaylistPosAtTime(starttime, newchan)
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
-            
+            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))       
+            if chtype != '':
+                chtype = int(chtype)
+                
             if plpos == -1:
                 self.log('Unable to find the proper playlist to set from EPG', xbmc.LOGERROR)
                 return
@@ -1253,8 +1263,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
     def determinePlaylistPosAtTime(self, starttime, channel):
         self.log('determinePlaylistPosAtTime ' + str(starttime) + ', ' + str(channel))
         channel = self.MyOverlayWindow.fixChannel(channel)
-
-        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
+        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))  
+        if chtype != '':
+            chtype = int(chtype)
+            
         self.lastExitTime = ADDON_SETTINGS.getSetting("LastExitTime")
         nowDate = datetime.datetime.now()
         playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
