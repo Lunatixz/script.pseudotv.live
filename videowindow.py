@@ -165,13 +165,15 @@ def videowindow():
             # # pass
             
     if (Installed and Patched and SeekPatched) or (Patched and SeekPatched):
-        MSG = "VideoWindow Patched!\nXBMC Restart Required"
+        MSG = "VideoWindow Patched!"
         __settings__.setSetting("videowindow","true")
-
+        xbmc.executebuiltin("ReloadSkin()")
+    
     if Uninstall or UnPatch:
-        MSG = "VideoWindow Patch Removed!\nXBMC Restart Required"
+        MSG = "VideoWindow Patch Removed!"
         __settings__.setSetting("videowindow","false")
-
+        xbmc.executebuiltin("ReloadSkin()")
+    
     if Error:
         MSG = "VideoWindow Patch Error!"
         
@@ -225,13 +227,12 @@ def autopatch():
             xbmc.log('script.pseudotv.live-VideoWindow: autopatch script.pseudotv.live.EPG.xml Patch Failed' + str(e))
             MSG = "VideoWindow Patch Error!"
             pass
-        xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 1000, THUMB) )
+        xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) )
    
     else:
         xbmc.log('script.pseudotv.live-videowindow: autopatch fle not found')
             
-    
-    
+
 if sys.argv[1] == '-autopatch':
     autopatch()
 elif sys.argv[1] == '-videowindow':

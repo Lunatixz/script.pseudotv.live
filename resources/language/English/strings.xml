@@ -4,7 +4,7 @@
     <string id="30002">Open Channel Configuration</string>    
     <string id="30003">General Options:</string>
         <string id="30044">Enable Autostart</string>
-        <string id="30046">Show Notification</string>
+        <string id="30046">Show Notifications</string>
         <string id="30045">Delay Service (seconds)</string>
         <string id="30004">Auto-off Timer (minutes)</string>
         <string id="30005">Force channel reset on next start</string>
@@ -23,10 +23,8 @@
     <string id="30106">Playback Offset (milliseconds)</string>  
 <string id="30200">Visuals</string>
     <string id="30201">Enable Dynamic Artwork (Incl. Service)</string>
-    <string id="34041">Enable Artwork Spooling</string>
     <string id="34046">Show Notification</string>
     <string id="34045">Run Service Every (hours)</string>
-    <string id="34047">Run Service During Playback?</string>
     <string id="30202">Select Skin</string> 
     <string id="30225">Channel Logo Folder</string>  
     <string id="30210">EPG Options:</string> 
@@ -49,7 +47,7 @@
         <string id="30227">Coming Up Artwork Type</string>
 <string id="30300">Tweaks</string>
     <string id="30301">Use (S01E01), Instead of (01x01)</string>
-	<string id="30405">Find Missing Guide Data (Slower Channel Building)</string>
+	<string id="30405">Find Missing Guide Data</string>
     <string id="30302">Channel Change Delay (seconds)</string>
     <string id="30303">Choose Startup Channel</string> 
     <string id="30304">Enter Preferred Channel</string>
@@ -91,6 +89,7 @@
                     <string id="30082">Find Mixed Genres</string>
                     <string id="30083">Music:</string>
                         <string id="30084">Find Music Genres</string>
+                        <string id="30898">Find Music Videos using My MusicTV</string>
                         <string id="30087">Find Music Videos using Last.FM</string>
                         <string id="30088">Last.FM Username</string>
                         <string id="30085">Find Music Videos using Youtube</string>
@@ -119,6 +118,7 @@
         <string id="30501">Enable Bumpers</string>
         <string id="30502">Select Bumpers Folder</string>
         <string id="30503">Number of Bumpers Between Shows</string>
+        <string id="39504">Add Ratings Between Movies</string>
         <string id="30510">(C)ommercials:</string> 
             <string id="30511">Enable Commercials</string>
             <string id="30512">Select Commercials Folder</string>

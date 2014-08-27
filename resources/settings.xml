@@ -5,13 +5,13 @@
             <setting type="action" label="30002" action="RunScript($CWD/config.py)"/>
         <setting label="30003" type="lsep"/>
             <setting id="Auto_Start" type="bool" label="30044" default="false"/>
-            <setting id="notify" type="bool" label="30046" subsetting="true" visible="eq(-1,true)" default="true"/>
             <setting id="timer_amount" type="enum" values="0|5|10|15|20" label="30045" subsetting="true" visible="eq(-2,true)" default="1"/>
             <setting id="AutoOff" type="enum" label="30004" values="Disable|30|60|90|120|150|180|210|240" default="0"/>
             <setting id="ForceChannelReset" type="bool" label="30005" default="false" />
             <setting id="ChannelResetSetting" type="enum" label="30006" values="Automatic|Daily|Weekly|Monthly|Never|Every Time" default="0"/>
             <setting id="StartMode" type="enum" label="30007" values="Resume|Real Time|Random" default="1" />
             <setting id="ThreadMode" type="enum" label="30008" values="On|Minimum Use|Off" default="1" />
+            <setting id="notify" type="bool" label="30046" default="true"/>
     </category>
 <!--Tweaks-->
     <category label="30300">
@@ -27,11 +27,11 @@
     </category>
 <!--Visual-->
     <category label="30200">
-        <setting id="SkinSelector" type="enum"  label="30202" values="Classic PTV|Default|PTVL|Custom" default="2"/>
-        <setting id="art.enable" label="30201" type="bool" default="false" /> 
+        <setting id="SkinSelector" type="enum"  label="30202" values="Classic|Custom|Default|PTVL|(WIP) ConCast|(N/A) Time Whorner" default="3"/>
+        <setting id="ArtService_Enabled" label="30201" type="bool" default="false" /> 
         <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
-        <setting id="ArtService_Background" type="bool" label="34047" subsetting="true" visible="eq(-2,true)" default="true"/>
-        <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-3,true)" default="2"/>
+        <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-2,true)" default="2"/>
+        <setting id="DynamicArt_Enabled" type="bool" label="34047" subsetting="true" visible="false" default="false"/>
         <setting id="ShowSeEp" type="bool" label="30301" default="false"/>
         <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>
         <setting label="30210" type="lsep"/>
@@ -87,26 +87,27 @@
             <setting id="autoFindMusicGenres" type="bool" label="30084" subsetting="true" visible="eq(-16,true)" default="false"/>
             <setting id="autoFindMusicVideosYoutube" type="bool" label="30085" subsetting="true" visible="eq(-17,true)" default="false"/>
             <setting id="autoFindMusicVideosVevoTV" type="bool" label="30086" subsetting="true" visible="eq(-18,true)" default="false"/>
-            <setting id="autoFindMusicVideosLastFM" type="bool" label="30087" subsetting="true" visible="eq(-19,true)" default="false"/>
-            <setting id="autoFindMusicVideosLastFMuser" subsetting="true" label="30088" visible="eq(-1,true) + eq(-20,true)" type="text" default="Enter Username"/>
-            <setting id="autoFindMusicVideosLocal" type="folder" source="auto" label="30089" subsetting="true" visible="eq(-21,true)" default=""/>  
-        <setting type="lsep" label="30094" visible="eq(-22,true)"/>  
-            <setting id="autoFindYoutube" type="bool" label="30095" subsetting="true" visible="eq(-23,true)" default="false"/>
-            <setting id="autoFindYoutubeUser" type="text" label="30096" visible="eq(-24,true) + eq(-1,true)" default="Enter Username"/>
-        <setting type="lsep" label="30110" visible="eq(-25,true)"/>
-            <setting id="autoFindCommunity_Plugins" type="bool" label="30111" subsetting="true" visible="eq(-26,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-27,true)" default="false"/>
-            <setting id="autoFindCommunity_RSS" type="bool" label="30112" subsetting="true" visible="eq(-28,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-29,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-30,true)" default="false"/>
+            <setting id="autoFindMusicVideosMusicTV" type="bool" label="30898" subsetting="true" visible="eq(-19,true)" default="false"/>
+            <setting id="autoFindMusicVideosLastFM" type="bool" label="30087" subsetting="true" visible="eq(-20,true)" default="false"/>
+            <setting id="autoFindMusicVideosLastFMuser" subsetting="true" label="30088" visible="eq(-1,true) + eq(-21,true)" type="text" default="Enter Username"/>
+            <setting id="autoFindMusicVideosLocal" type="folder" source="auto" label="30089" subsetting="true" visible="eq(-22,true)" default=""/>  
+        <setting type="lsep" label="30094" visible="eq(-23,true)"/>  
+            <setting id="autoFindYoutube" type="bool" label="30095" subsetting="true" visible="eq(-24,true)" default="false"/>
+            <setting id="autoFindYoutubeUser" type="text" label="30096" visible="eq(-25,true) + eq(-1,true)" default="Enter Username"/>
+        <setting type="lsep" label="30110" visible="eq(-26,true)"/>
+            <setting id="autoFindCommunity_Plugins" type="bool" label="30111" subsetting="true" visible="eq(-27,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-28,true)" default="false"/>
+            <setting id="autoFindCommunity_RSS" type="bool" label="30112" subsetting="true" visible="eq(-29,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-30,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-31,true)" default="false"/>
         <setting id="AT_Donor" label="39001" type="bool" visible="false" default="false" />    
-        <setting type="lsep" label="30090" visible="eq(-32,true), eq(-1,true)"/>  
-            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-2,true)" visible="eq(-33,true)" default="false"/>
+        <setting type="lsep" label="30090" visible="eq(-33,true), eq(-1,true)"/>  
+            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-2,true)" visible="eq(-34,true)" default="false"/>
             <setting id="CinemaPack" label="30959" type="bool" visible="false" default="false"/>
-            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-4,true) + eq(-1,true)" visible="eq(-35,true)" default="false"/>
+            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-4,true) + eq(-1,true)" visible="eq(-36,true)" default="false"/>
         <setting id="Hub" label="30951" type="bool" visible="false" default="false" /> 
-        <setting label="30952" type="lsep" visible="eq(-37,true) + eq(-1,true)"/>  
-            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-38  ,true) + eq(-2,true)" default="false"/>
+        <setting label="30952" type="lsep" visible="eq(-38,true) + eq(-1,true)"/>  
+            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-39,true) + eq(-2,true)" default="false"/>
       </category>
 <!--Community Network-->
     <category label="30700"> 
@@ -125,6 +126,7 @@
         <setting label="30501" id="bumpers" type="enum" values="Disabled|Local|Internet" default="0" />
         <setting label="30502" id="bumpersfolder" type="folder" source="auto" visible="eq(-1,1)" default="" />
         <setting label="30503" id="numbumpers" type="enum" visible="!eq(-2,0)" values="1|2|3|4|5" default="0"/>
+        <setting label="39504" id="bumperratings" type="bool" visible="!eq(-3,0)" default="false" />
     <setting label="30510" type="lsep"/>
         <setting label="39002" id="COM_Donor" type="bool" visible="false" default="false" />
         <setting label="30511" id="commercials" type="enum" values="Disabled|Local|Youtube|Internet" default="0"/>
@@ -179,7 +181,7 @@
     <!--MISC-->
     <category label="30900">  
         <setting id="ATRestore" type="bool" label="30909" default="false"/>
-      	<setting id="Warning2" type="action" subsetting="true" label="30069" visible="eq(-1,true)" action="RunScript($CWD/restore.py)"/>
+      	<setting id="Warning2" type="bool" label="30069" subsetting="true" visible="eq(-1,true)" default="false"/>
         <setting label="30990" type="lsep"/>
         <setting id="enable_Debug" type="bool" label="30993" default="false"/>
         <setting id="Override_ok" type="bool" label="30991" default="false"/>

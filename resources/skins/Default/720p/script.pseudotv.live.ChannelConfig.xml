@@ -33,7 +33,7 @@
             <posy>130</posy>
             <width>600</width>
             <height>40</height>
-            <label>PseudoTV</label>
+            <label>PseudoTV Live</label>
 			<font>font24_title</font>
             <textcolor>FF000000</textcolor>
             <aligny>center</aligny>

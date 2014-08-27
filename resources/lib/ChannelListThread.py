@@ -26,7 +26,7 @@ import random, traceback
 from ChannelList import ChannelList
 from Channel import Channel
 from Globals import *
-
+from Artdownloader import *
 
 class ChannelListThread(threading.Thread):
     def __init__(self):
@@ -36,6 +36,7 @@ class ChannelListThread(threading.Thread):
         self.chanlist = ChannelList()
         self.paused = False
         self.fullUpdating = True
+        self.Artdownloader = Artdownloader()
 
     def log(self, msg, level = xbmc.LOGDEBUG):
         log('ChannelListThread: ' + msg, level)
@@ -46,8 +47,6 @@ class ChannelListThread(threading.Thread):
         self.chanlist.exitThread = False
         self.chanlist.readConfig()
         self.chanlist.sleepTime = 0.1
-        MEDIA_LOC =  xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', 'media')) + '/'
-        thumb = (DEFAULT_IMAGES_LOC + 'icon.png')
 
         if self.myOverlay == None:
             self.log("Overlay not defined. Exiting.")
@@ -67,7 +66,8 @@ class ChannelListThread(threading.Thread):
         if self.fullUpdating and self.myOverlay.isMaster:
             if validchannels < self.chanlist.enteredChannelCount:
                 title = 'PseudoTV Live, Background Loading...'
-                xbmc.executebuiltin('XBMC.Notification(%s, %s, %s)' % (title, 4000 , thumb))
+                xbmc.executebuiltin('XBMC.Notification(%s, %s, %s)' % (title, 4000 , THUMB))
+
             for i in range(self.myOverlay.maxChannels):
                 if self.myOverlay.channels[i].isValid == False:
                     while True:
@@ -95,7 +95,8 @@ class ChannelListThread(threading.Thread):
 
                             if self.myOverlay.channels[i].isValid == True:
                                 title = "PseudoTV Live, Channel " + str(i + 1) + " Added"
-                                xbmc.executebuiltin('XBMC.Notification(%s, %s, %s)' % (title, 4000, thumb))
+                                xbmc.executebuiltin('XBMC.Notification(%s, %s, %s)' % (title, 4000, THUMB))
+                                
                     except Exception,e:
                         self.log("Unknown Channel Creation Exception", xbmc.LOGERROR)
                         self.log(traceback.format_exc(), xbmc.LOGERROR)
@@ -104,6 +105,11 @@ class ChannelListThread(threading.Thread):
         REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
         self.chanlist.sleepTime = 0.3
 
+        if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
+            InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
+            self.ArtServiceThread = threading.Timer(float(InfoTimer), self.Artdownloader.ArtService)
+            self.ArtServiceThread.start()
+            
         while True:
             for i in range(self.myOverlay.maxChannels):
                 modified = True
@@ -198,7 +204,6 @@ class ChannelListThread(threading.Thread):
                 timeslept += 2
 
         self.log("All channels up to date.  Exiting thread.")
-
 
     def pause(self):
         self.paused = True

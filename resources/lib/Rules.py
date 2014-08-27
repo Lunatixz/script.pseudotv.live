@@ -27,7 +27,6 @@ from Globals import *
 from Playlist import PlaylistItem
 
 
-
 class RulesList:
     def __init__(self):
         self.ruleList = [BaseRule(), ScheduleChannelRule(), HandleChannelLogo(), NoShowRule(), DontAddChannel(), EvenShowsRule(), ForceRandom(), ForceRealTime(), ForceResume(), HandleIceLibrary(), HandleBCT(), HandlePOP(), InterleaveChannel(), OnlyUnWatchedRule(), OnlyWatchedRule(), AlwaysPause(), PlayShowInOrder(), RenameRule(), SetResetTime()]
@@ -1316,12 +1315,10 @@ class PlayShowInOrder(BaseRule):
 
 class SetResetTime(BaseRule):
     def __init__(self):
-        SETTOP = False
         Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]     
-        if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
-            SETTOP = True
+        self.SETTOP = REAL_SETTINGS.getSetting("EnableSettop")
         
-        if SETTOP == True:
+        if self.SETTOP == True:
             self.name = "Reset Every x Hours"
             self.optionLabels = ['Number of Hours']
             Hour = str((Refresh / 60) / 60)
@@ -1330,6 +1327,7 @@ class SetResetTime(BaseRule):
             self.name = "Reset Every x Days"
             self.optionLabels = ['Number of Days']
             self.optionValues = ['5']
+        
         self.myId = 13
         self.actions = RULES_ACTION_START
 
@@ -1340,7 +1338,7 @@ class SetResetTime(BaseRule):
 
     def getTitle(self):
         if len(self.optionValues[0]) > 0:
-            if SETTOP == True:
+            if self.SETTOP == True:
                 if self.optionValues[0] == '1':
                     return "Reset Every Hour"
                 else:
@@ -1369,7 +1367,7 @@ class SetResetTime(BaseRule):
             curchan = channeldata.channelNumber
             numdays = 0
 
-            if SETTOP == True:
+            if self.SETTOP == True:
                 try:
                     numdays = int(Refresh)
                 except:
@@ -1393,7 +1391,7 @@ class SetResetTime(BaseRule):
             except:
                 pass
                 
-            if SETTOP == True:
+            if self.SETTOP == True:
                 
                 if rightnow >= nextreset:
                     channeldata.isValid = False
@@ -1498,7 +1496,7 @@ class HandleBCT(BaseRule):
 class HandlePOP(BaseRule):
     def __init__(self):
         self.name = "Coming up next popup"
-        self.optionLabels = ['Display the popup']
+        self.optionLabels = ['Display Coming Up Next']
         self.optionValues = ['Yes']
         self.myId = 18
         self.actions = RULES_ACTION_OVERLAY_SET_CHANNEL | RULES_ACTION_OVERLAY_SET_CHANNEL_END
@@ -1511,9 +1509,9 @@ class HandlePOP(BaseRule):
 
     def getTitle(self):
         if self.optionValues[0] == 'Yes':
-            return 'Display the popup'
+            return 'Display Coming Up Next'
         else:
-            return 'Hide the popup'
+            return 'Hide Coming Up Next'
 
 
     def onAction(self, act, optionindex):
@@ -1524,7 +1522,6 @@ class HandlePOP(BaseRule):
     def runAction(self, actionid, overlay, channeldata):
         if actionid == RULES_ACTION_OVERLAY_SET_CHANNEL:
             self.storedPopValue = overlay.showNextItem
-            self.log("Option for popup is " + self.optionValues[0])
 
             if self.optionValues[0] == 'Yes':
                 overlay.showNextItem = True
@@ -1533,7 +1530,7 @@ class HandlePOP(BaseRule):
                 overlay.showNextItem = False
         elif actionid == RULES_ACTION_OVERLAY_SET_CHANNEL_END:
             overlay.showNextItem = self.storedPopValue
-            self.log("set popup to " + str(overlay.showNextItem))
+            self.log("set Coming Up Next to " + str(overlay.showNextItem))
 
         return channeldata
        

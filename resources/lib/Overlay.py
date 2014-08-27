@@ -17,13 +17,10 @@
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
-import subprocess, os
-import time, threading
-import datetime
-import sys, re
+import subprocess, os, sys, re
+import datetime, time, threading, _strptime
 import random, traceback
 import urllib, urllib2, json
-import ChannelList
 
 from fanarttv import *
 from Playlist import Playlist
@@ -57,6 +54,20 @@ class MyPlayer(xbmc.Player):
         log('Player: ' + msg, level)
     
     
+    def is_playback_paused(self):
+        self.log('is_playback_paused')
+        return bool(xbmc.getCondVisibility("Player.Paused"))
+
+    
+    def resume_playback(self):
+        self.log('resume_playback')
+        xbmc.sleep(100)
+        if self.is_playback_paused():
+            xbmc.Player().pause()
+            if DEBUG == 'true':
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "resume_playback", 1000, THUMB) )
+    
+    
     def onPlayBackPaused(self):
         self.log('onPlayBackPaused')
         
@@ -85,22 +96,19 @@ class MyPlayer(xbmc.Player):
             pass
     
     
-    def onQueueNextItem(self):
-        self.log('onQueueNextItem')
-        
-        
-    def onPlayBackEnded(self):
-        self.log('onPlayBackEnded')
-    
-    
     def onPlayBackStarted(self):
         self.log('onPlayBackStarted')
+        self.resume_playback()
         
-        #UPNP Forwarding
         try:
             file = xbmc.Player().getPlayingFile()
             file = file.replace("\\\\","\\")
-            seektime = xbmc.Player().getTime()
+            
+            global seektime
+            seektime = 0
+            
+            if seektime == 0:
+                seektime = xbmc.Player().getTime()
            
             if REAL_SETTINGS.getSetting("UPNP1") == "true":
                 self.log('UPNP1 Sharing')
@@ -115,13 +123,17 @@ class MyPlayer(xbmc.Player):
             pass
     
     
+    def onPlayBackEnded(self):
+        self.log('onPlayBackEnded')   
+        
+    
     def onPlayBackStopped(self):
         if self.stopped == False:
             self.log('Playback stopped')
 
             if self.ignoreNextStop == False:
                 if self.overlay.sleepTimeValue == 0:
-                    self.overlay.sleepTimer = threading.Timer(1, self.overlay.sleepAction)
+                    self.overlay.sleepTimer = threading.Timer(2.0, self.overlay.sleepAction)
 
                 self.overlay.background.setVisible(True)#Visible channel number?
                 self.overlay.sleepTimeValue = 1
@@ -152,6 +164,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.infoOffset = 0
         self.invalidatedChannelCount = 0
         self.showingInfo = False
+        self.showingPop = False
         self.showChannelBug = False
         self.showNextItem = False
         self.notificationLastChannel = 0
@@ -166,18 +179,16 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.channelDelay = 0
         self.channelbugcolor = CHANBUG_COLOR
         self.showSeasonEpisode = REAL_SETTINGS.getSetting("ShowSeEp") == "true"
-        self.PVRchtype = ''
+        self.PVRchtype = 0
         self.PVRmediapath = ''
         self.PVRchname = ''
         self.PVRtitle = ''
         self.LastChannel = 0
-        
-        global InfoTimer 
-        InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
-        self.log("InfoTimer = " + str(InfoTimer))
+        self.InfTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
+        self.Artdownloader = Artdownloader()
 
         for i in range(3):
-            self.channelLabel.append(xbmcgui.ControlImage(50 + (50 * i), 50, 50, 50, DEFAULT_IMAGES_LOC + 'solid.png', colorDiffuse = self.channelbugcolor))
+            self.channelLabel.append(xbmcgui.ControlImage(50 + (50 * i), 50, 50, 50, IMAGES_LOC + 'solid.png', colorDiffuse = self.channelbugcolor))
             self.addControl(self.channelLabel[i])
             self.channelLabel[i].setVisible(False)
         self.doModal()
@@ -198,6 +209,42 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         pass
 
         
+    def Backup(self, org, bak):
+        self.log('Backup ' + str(org) + ' - ' + str(bak))
+        if FileAccess.exists(org):
+            if FileAccess.exists(bak):
+                try:
+                    os.remove(bak)
+                except:
+                    pass
+            FileAccess.copy(org, bak)
+        
+        if NOTIFY == 'true':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Backup Complete", 1000, THUMB) )
+            
+            
+    def Restore(self, bak, org):
+        self.log('Restore ' + str(bak) + ' - ' + str(org))
+        if FileAccess.exists(bak):
+            if FileAccess.exists(org):
+                try:
+                    os.remove(org)
+                except:
+                    pass
+            FileAccess.copy(bak, org)
+        
+        if NOTIFY == 'true':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Restore Complete", 1000, THUMB) )
+        
+        xbmc.executebuiltin('XBMC.AlarmClock( RestartPTVL, XBMC.RunScript(' + ADDON_PATH + '/default.py),0.5,false)')
+        self.end()
+        
+    def getSize(self, fileobject):
+        fileobject.seek(0,2) # move the cursor to the end of the file
+        size = fileobject.tell()
+        return size
+        
+        
     # override the doModal function so we can setup everything first
     def onInit(self):
         self.log('onInit')
@@ -205,8 +252,34 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.channelList = ChannelList()
         settingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml'))
         nsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.bak.xml'))
+        atsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.pretune.xml'))
         dlg = xbmcgui.Dialog()
-        
+
+        try:
+            NormalShutdown = REAL_SETTINGS.getSetting('Normal_Shutdown')
+        except:
+            NormalShutdown = "true"
+            REAL_SETTINGS.setSetting('Normal_Shutdown', "true")
+            pass
+            
+        if FileAccess.exists(settingsFile):
+            settingsFile_flesize = 0
+            nsettingsFile_flesize = 0
+            atsettingsFile_flesize = 0
+            file1 = FileAccess.open(settingsFile, "rb")
+            settingsFile_flesize = self.getSize(file1)
+            file1.close()
+            
+        if FileAccess.exists(nsettingsFile):
+            file2 = FileAccess.open(nsettingsFile, "rb")
+            nsettingsFile_flesize = self.getSize(file2)
+            file2.close()
+                
+        if FileAccess.exists(atsettingsFile):
+            file3 = FileAccess.open(atsettingsFile, "rb")
+            atsettingsFile_flesize = self.getSize(file3)
+            file3.close()
+
         # Clear Setting2 for fresh autotune
         if REAL_SETTINGS.getSetting("Autotune") == "true" and REAL_SETTINGS.getSetting("Warning1") == "true":
             self.log('Autotune onInit') 
@@ -214,23 +287,17 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             #Reserve channel check            
             if REAL_SETTINGS.getSetting("reserveChannels") == "false":
                 self.log('Autotune not reserved') 
-                
-                if os.path.exists(settingsFile):
-                    if os.path.exists(nsettingsFile):
-                        os.remove(nsettingsFile)
-                        xbmc.log('Autotune, Removing old Backup...')
-                    
-                    FileAccess.rename(settingsFile, nsettingsFile)
-                    xbmc.log('Autotune, Backing up Setting2...')
-                                    
-                    if os.path.exists(nsettingsFile):
-                        xbmc.log('Autotune, Back Complete!')
-                        
-                        f = FileAccess.open(settingsFile, "w")
-                        f.write('\n')
-                        self.log('Autotune, Setting2 Deleted...')
-                        f.close()
-                            
+                if settingsFile_flesize != 0:
+                    self.Backup(settingsFile, atsettingsFile)
+
+                if FileAccess.exists(atsettingsFile):
+                    xbmc.log('Autotune, Back Complete!')
+                    f = FileAccess.open(settingsFile, "w")
+                    f.write('\n')
+                    self.log('Autotune, Setting2 Deleted...')
+                    f.close()
+            
+            REAL_SETTINGS.setSetting('Normal_Shutdown', "false")       
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Initializing Autotuning...", 4000, THUMB) )
 
         if FileAccess.exists(GEN_CHAN_LOC) == False:
@@ -249,11 +316,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
         self.background = self.getControl(101)
         self.getControl(102).setVisible(False)
-        self.background.setVisible(True)
-        updateDialog = xbmcgui.DialogProgress()
-        updateDialog.create("PseudoTV Live", "Initializing")
-        self.backupFiles(updateDialog)
-        ADDON_SETTINGS.loadSettings()
 
         try:
             self.getControl(101).setLabel('Loading...')
@@ -265,6 +327,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         except:
             pass
             
+        self.background.setVisible(True)
+        updateDialog = xbmcgui.DialogProgress()
+        updateDialog.create("PseudoTV Live", "Initializing")
+        self.backupFiles(updateDialog)
+        ADDON_SETTINGS.loadSettings()
+        
         if CHANNEL_SHARING:
             FileAccess.makedirs(LOCK_LOC)
             updateDialog.update(70, "Initializing", "Checking Other Instances")
@@ -279,9 +347,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             migratemaster.migrate()
 
         self.channelLabelTimer = threading.Timer(5.0, self.hideChannelLabel)
-        self.playerTimer = threading.Timer(1.5, self.playerTimerAction)
+        self.playerTimer = threading.Timer(1.0, self.playerTimerAction)
         self.playerTimer.name = "PlayerTimer"
         self.infoTimer = threading.Timer(5.0, self.hideInfo)
+        self.popTimer = threading.Timer(5.0, self.hidePOP)
         
         try:
             self.myEPG = EPGWindow("script.pseudotv.live.EPG.xml", ADDON_PATH, Skin_Select)
@@ -295,10 +364,28 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.actionSemaphore.acquire()
         updateDialog.close()
         self.timeStarted = time.time()
-
+              
+        if REAL_SETTINGS.getSetting("ATRestore") == "true" and REAL_SETTINGS.getSetting("Warning2") == "true":
+            self.log('Setting2 Restore onInit') 
+            if atsettingsFile_flesize != 0:
+                REAL_SETTINGS.setSetting("ATRestore","false")
+                REAL_SETTINGS.setSetting("Warning2","false")
+                REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
+                self.Restore(atsettingsFile, settingsFile)       
+                return
+                
+        elif NormalShutdown == "false":
+            if settingsFile_flesize == 0 and nsettingsFile_flesize != 0:
+                self.log('Setting2 Restore onInit') 
+                self.Restore(nsettingsFile, settingsFile)
+                return
+        else:
+            if settingsFile_flesize != 0:
+                self.Backup(settingsFile, nsettingsFile)
+        
         if self.readConfig() == False:
             return
-
+        
         self.myEPG.channelLogos = self.channelLogos
         self.maxChannels = len(self.channels)
 
@@ -364,10 +451,13 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         except:
             self.currentChannel = self.fixChannel(1)
         
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
+        self.channelList.sendJSON(json_query)
+        
         if REAL_SETTINGS.getSetting('INTRO_PLAYED') != 'true':
             self.background.setVisible(False)
             xbmc.Player().play(INTRO)
-            time.sleep(15) 
+            time.sleep(17) 
             self.background.setVisible(True)
             REAL_SETTINGS.setSetting("INTRO_PLAYED","true")
         
@@ -377,23 +467,37 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.startSleepTimer()
         self.startNotificationTimer()
         self.playerTimer.start()
-            
-        #SETTOP BOX
+        
         if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
-            print 'SETTOP BOX Enabled'
-            Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]     
-            self.channelThread_Timer = threading.Timer((float(Refresh)), self.channelList.setupList)
-            self.channelThread_Timer.name = "ChannelThread_Timer"
-            self.channelThread_Timer.start()
-              
+            Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
+            self.channelThread_Timer = threading.Timer((float(Refresh)), self.Settop)
+
         if self.backgroundUpdating < 2 or self.isMaster == False:
             self.channelThread.name = "ChannelThread"
             self.channelThread.start()
+        else:
+            self.ArtServiceThread = threading.Timer(float(self.InfTimer), self.Artdownloader.ArtService)
+            self.ArtServiceThread.start()
               
         self.actionSemaphore.release()
         self.log('onInit return')
-
         
+        
+    #SETTOP BOX
+    def Settop(self):
+        print 'SETTOP BOX Enabled'
+        
+        if self.channelThread_Timer.isAlive():
+            self.channelThread_Timer.cancel()
+        
+        Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
+        self.channelThread_Timer = threading.Timer((float(Refresh)), self.Settop)
+        self.channelThread_Timer.name = "ChannelThread_Timer"
+        self.channelThread_Timer.start()
+        self.channelThread.name = "ChannelThread"
+        self.channelThread.start()
+            
+            
     # setup all basic configuration parameters, including creating the playlists that
     # will be used to actually run this thing
     def readConfig(self):
@@ -405,8 +509,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log('Show info label on channel change is ' + str(self.infoOnChange))
         self.showChannelBug = REAL_SETTINGS.getSetting("ShowChannelBug") == "true"
         self.log('Show channel bug - ' + str(self.showChannelBug))
-        self.showNextItem = REAL_SETTINGS.getSetting('showNextItem') == "true"
-        self.log("Show Next Item - " + str(self.showNextItem))
         self.forceReset = REAL_SETTINGS.getSetting('ForceChannelReset') == "true"
         self.channelResetSetting = REAL_SETTINGS.getSetting('ChannelResetSetting')
         self.log("Channel reset setting - " + str(self.channelResetSetting))
@@ -419,8 +521,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("Short item length - " + str(self.shortItemLength))
         self.channelDelay = int(REAL_SETTINGS.getSetting("ChannelDelay")) * 250
 
-        if REAL_SETTINGS.getSetting("EnableComingUp") == "0":
-            self.showNextItem = False
+        if REAL_SETTINGS.getSetting("EnableComingUp") != "0":
+            self.showNextItem = True
             
         if FileAccess.exists(self.channelLogos) == False:
             self.channelLogos = DEFAULT_LOGO_LOC
@@ -456,12 +558,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             return
 
         self.background.setVisible(True)
-        
-        try:
-            self.getControl(120).setVisible(False)
-        except:
-            pass
-        
         channel = self.fixChannel(self.currentChannel - 1, False)
         self.setChannel(channel)
         self.background.setVisible(False)         
@@ -512,12 +608,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             return
 
         self.background.setVisible(True)
-        
-        try:
-            self.getControl(120).setVisible(False)
-        except:
-            pass
-        
         channel = self.fixChannel(self.currentChannel + 1)
         self.setChannel(channel)
         self.background.setVisible(False)
@@ -536,13 +626,14 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
         
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
-        if REAL_SETTINGS.getSetting('enable_Debug') == "true":
+        if DEBUG == 'true':
             log('TVOverlay: ' + msg, level) 
 
             
     # set the channel, the proper show offset, and time offset
     def setChannel(self, channel):
         self.log('setChannel ' + str(channel))
+        global seektime
         self.runActions(RULES_ACTION_OVERLAY_SET_CHANNEL, channel, self.channels[channel - 1])
 
         if self.Player.stopped:
@@ -560,13 +651,15 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.lastActionTime = 0
         timedif = 0
         self.getControl(102).setVisible(False)
-        self.getControl(103).setImage('')
-        self.showingInfo = False
         
         try:
             self.getControl(120).setVisible(False)
         except:
             pass
+            
+        self.getControl(103).setImage('')
+        self.showingInfo = False
+        self.showingPop = False
 
         # first of all, save playing state, time, and playlist offset for
         # the currently playing channel
@@ -601,7 +694,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         xbmc.executebuiltin("PlayerControl(repeatall)")
         curtime = time.time()
         timedif = (curtime - self.channels[self.currentChannel - 1].lastAccessTime)
-        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
+        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+        if chtype != '':
+            chtype = int(chtype)
         
         if self.channels[self.currentChannel - 1].isPaused == False:
             # adjust the show and time offsets to properly position inside the playlist
@@ -635,10 +730,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)[-4:].lower() == 'strm' or chtype == 8 or chtype == 9:
             self.log("Ignoring a stop because of a strm or chtype = 8 or 9")
             self.Player.ignoreNextStop = True
-
+        
         self.log("about to mute");
         # Mute the channel before changing
-        xbmc.executebuiltin("Mute()");
+        # xbmc.executebuiltin("Mute()");           
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+        self.channelList.sendJSON(json_query)
         xbmc.sleep(self.channelDelay)
         # set the show offset
         self.Player.playselected(self.channels[self.currentChannel - 1].playlistPosition)
@@ -656,7 +753,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if self.channels[self.currentChannel - 1].isPaused:
             self.channels[self.currentChannel - 1].setPaused(False)
           
-            if chtype != 8 and chtype != 9 and mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp' and plugchk not in BYPASS_SEEK:
+            if ((chtype != 8 and chtype != 9) and (mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp') and plugchk not in BYPASS_SEEK):
                 self.log("Seeking")
                 try:
                     self.Player.seekTime(self.channels[self.currentChannel - 1].showTimeOffset)
@@ -665,34 +762,50 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         self.Player.pause()
 
                         if self.waitForVideoPaused() == False:
-                            xbmc.executebuiltin("Mute()");
+                            # xbmc.executebuiltin("Mute()");
+                            json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+                            self.channelList.sendJSON(json_query)
                             return
                 except:
                     self.log('Exception during seek on paused channel', xbmc.LOGERROR)
         else:
                 
-            if chtype != 8 and chtype != 9 and mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp' and plugchk not in BYPASS_SEEK:
+            if ((chtype != 8 and chtype != 9) and (mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp') and plugchk not in BYPASS_SEEK):
                 self.log("Seeking")
                 # Seek without infobar work around todo? needs testing...
                 # http://forum.xbmc.org/showthread.php?pid=1547665#pid1547665
-                
                 seektime = self.channels[self.currentChannel - 1].showTimeOffset + timedif + int((time.time() - curtime))
 
                 try:
                     self.log("Seeking");
-                    self.Player.seekTime(seektime)
                 except:
                     self.log("Unable to set proper seek time, trying different value")
 
                     try:
                         seektime = self.channels[self.currentChannel - 1].showTimeOffset + timedif
-                        self.Player.seekTime(seektime)
                     except:
                         self.log('Exception during seek', xbmc.LOGERROR)
-   
+                
+                if (mediapath[-4:].lower() == 'strm' or mediapath[0:6] == 'plugin'):
+                    overtime = float((int(self.channels[self.currentChannel - 1].getItemDuration(self.channels[self.currentChannel - 1].playlistPosition))/8)*7)
+                    if seektime >= overtime:
+                        if DEBUG == 'true':
+                            self.log('seektime' + str(seektime))
+                            self.log('overtime' + str(overtime))
+                            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Overriding Seektime", 1000, THUMB) )
+                    else:
+                        try:
+                            self.Player.seekTime(seektime)
+                        except:
+                            pass
+                else:
+                    try:
+                        self.Player.seekTime(seektime)
+                    except:
+                        pass
+            
             #UPNP
             try:
-                # seektime = xbmc.Player().getTime()
                 file = self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)
                 file = file.replace("\\\\","\\")
                 if REAL_SETTINGS.getSetting("UPNP1") == "true":
@@ -709,7 +822,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         
         # Unmute
         self.log("Finished, unmuting");
-        xbmc.executebuiltin("Mute()");
+        # xbmc.executebuiltin("Mute()");
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
+        self.channelList.sendJSON(json_query)
+        
         self.showChannelLabel(self.currentChannel)
         self.lastActionTime = time.time()
         self.runActions(RULES_ACTION_OVERLAY_SET_CHANNEL_END, channel, self.channels[channel - 1])
@@ -765,10 +881,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
     def setShowInfo(self):
         self.log('setShowInfo')
-        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
-        setting3 = ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_3')
-        self.Artdownloader = Artdownloader()
         mpath = ''
+        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+        if chtype != '':
+            chtype = int(chtype)
   
         try:
             self.getControl(101).setLabel('Loading Channel...')
@@ -802,7 +918,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         except:   
             pass
             
-        if self.hideShortItems and self.infoOffset != 0 and chtype <= 7:
+        if self.hideShortItems and self.infoOffset != 0:
             position = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition()
             curoffset = 0
             modifier = 1
@@ -838,12 +954,13 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             else: #original code
                 position = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition() + self.infoOffset
         
-        mediapath = ascii(self.channels[self.currentChannel - 1].getItemFilename(position))
-        genre = ascii(self.channels[self.currentChannel - 1].getItemgenre(position))
-        title = ascii(self.channels[self.currentChannel - 1].getItemTitle(position))
-        LiveID = ascii(self.channels[self.currentChannel - 1].getItemLiveID(position))
-        EpisodeTitle = ascii(self.channels[self.currentChannel - 1].getItemEpisodeTitle(position))
-        chname = ascii(self.channels[self.currentChannel - 1].name)
+        mediapath = (self.channels[self.currentChannel - 1].getItemFilename(position))
+        genre = (self.channels[self.currentChannel - 1].getItemgenre(position))
+        title = (self.channels[self.currentChannel - 1].getItemTitle(position))
+        LiveID = (self.channels[self.currentChannel - 1].getItemLiveID(position))
+        EpisodeTitle = (self.channels[self.currentChannel - 1].getItemEpisodeTitle(position))
+        chname = (self.channels[self.currentChannel - 1].name)
+        youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube/?path=/root']
         
         if mediapath[0:5] == 'stack':
             smpath = (mediapath.split(' , ')[0]).replace('stack://','')
@@ -851,12 +968,17 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         else:
             mpath = (os.path.split(mediapath)[0])
         
+        if mpath in youtube:
+            YTid = mediapath.split('id=')[1]
+            mpath = (mpath + '/' + YTid).replace('/?path=/root','')
+        
         self.PVRchtype = chtype
         self.PVRmediapath = mediapath
         self.PVRchname = chname
         self.PVRtitle = title
         
         LiveID = self.channelList.unpackLiveID(LiveID)
+        print 'LLiveID', LiveID
         type = LiveID[0]
         id = LiveID[1]
         dbid = LiveID[2]
@@ -869,9 +991,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             if Managed == 'True':
                 self.getControl(511).setVisible(True)  
                 if type == 'tvshow':
-                    self.getControl(511).setImage(DEFAULT_IMAGES_LOC + 'SB.png')
+                    self.getControl(511).setImage(IMAGES_LOC + 'SB.png')
                 else:
-                    self.getControl(511).setImage(DEFAULT_IMAGES_LOC + 'CP.png')                          
+                    self.getControl(511).setImage(IMAGES_LOC + 'CP.png')                          
             else:
                 self.getControl(511).setVisible(False)  
         except:
@@ -910,8 +1032,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     media_type = 'movie'
                     season = ''
                     episode = ''
-                
                     self.Unwatch(media_type, title, id, season, episode, '', playcount)
+                    
         SEtitle = self.channels[self.currentChannel - 1].getItemEpisodeTitle(position)
 
         try:
@@ -934,9 +1056,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.getControl(503).setLabel((self.channels[self.currentChannel - 1].getItemTitle(position)).replace("*NEW*",""))
         self.getControl(504).setLabel(swtitle)
         self.getControl(505).setLabel(self.channels[self.currentChannel - 1].getItemDescription(position))
-        self.getControl(506).setImage(self.channelLogos + ascii(self.channels[self.currentChannel - 1].name) + '.png') 
+        self.getControl(506).setImage(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png') 
         
-        if REAL_SETTINGS.getSetting("art.enable") == "true":    
+        if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":   
             self.log('setShowInfo.Dynamic artwork enabled')  
                            
             #hide xbmc.videoplayer art since using dynamic art
@@ -948,25 +1070,33 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             try:
                 type1 = str(self.getControl(507).getLabel())
                 type1EXT = self.Artdownloader.EXTtype(type1)
-                REAL_SETTINGS.setSetting("type1EXT",type1EXT)
                 self.setArtwork1(type, chtype, id, mpath, type1EXT)
-                # self.getControl(508).setImage('NA.png')
-                # setImage1 = self.Artdownloader.FindArtwork(type, chtype, id, mpath, type1EXT)
-                # self.getControl(508).setImage(setImage1)
             except:
                 pass
                
             try:
                 type2 = str(self.getControl(509).getLabel())
                 type2EXT = self.Artdownloader.EXTtype(type2)
-                REAL_SETTINGS.setSetting("type2EXT",type2EXT)
                 self.setArtwork2(type, chtype, id, mpath, type2EXT)
-                # # self.getControl(510).setImage('NA.png')
-                # # setImage2 = self.Artdownloader.FindArtwork(type, chtype, id, mpath, type2EXT)
-                # # self.getControl(510).setImage(setImage2)
             except:
                 pass
 
+        elif REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "false" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
+            #hide xbmc.videoplayer art since using dynamic art
+            try:
+                self.getControl(511).setVisible(False)  
+                self.getControl(512).setVisible(False)  
+                self.getControl(513).setVisible(False)
+            except:
+                pass  
+            try:
+                self.getControl(508).setImage(THUMB)
+            except:
+                pass   
+            try:
+                self.getControl(510).setImage(THUMB)
+            except:
+                pass   
         else:
             #use xbmc.videoplayer art since not using dynamic art
             try:
@@ -1001,13 +1131,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
     # Start the timer to hide it.
     def showChannelLabel(self, channel):
         self.log('showChannelLabel ' + str(channel))
-        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
-        
-        try:
-            self.getControl(120).setVisible(False)
-        except:
-            pass
-        
+        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+        if chtype != '':
+            chtype = int(chtype)
+
         if self.channelLabelTimer.isAlive():
             self.channelLabelTimer.cancel()
             self.channelLabelTimer = threading.Timer(5.0, self.hideChannelLabel)
@@ -1020,28 +1147,22 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if channel > 99:
             if FileAccess.exists(IMAGES_LOC):
                 self.channelLabel[curlabel].setImage(IMAGES_LOC + 'label_' + str(channel // 100) + '.png')
-            else:
-                self.channelLabel[curlabel].setImage(DEFAULT_IMAGES_LOC + 'label_' + str(channel // 100) + '.png')
             self.channelLabel[curlabel].setVisible(True)
             curlabel += 1
 
         if channel > 9:
             if FileAccess.exists(IMAGES_LOC):
                 self.channelLabel[curlabel].setImage(IMAGES_LOC + 'label_' + str((channel % 100) // 10) + '.png')
-            else:
-                self.channelLabel[curlabel].setImage(DEFAULT_IMAGES_LOC + 'label_' + str((channel % 100) // 10) + '.png')
             self.channelLabel[curlabel].setVisible(True)
             curlabel += 1
             
         if FileAccess.exists(IMAGES_LOC):
             self.channelLabel[curlabel].setImage(IMAGES_LOC + 'label_' + str(channel % 10) + '.png')
-        else:
-            self.channelLabel[curlabel].setImage(DEFAULT_IMAGES_LOC + 'label_' + str(channel % 10) + '.png')
         self.channelLabel[curlabel].setVisible(True)
 
         if self.inputChannel == -1 and self.infoOnChange == True:
             self.infoOffset = 0
-            self.showInfo(InfoTimer)
+            self.showInfo(self.InfTimer)
 
         if xbmc.getCondVisibility('Player.ShowInfo'):
             json_query = '{"jsonrpc": "2.0", "method": "Input.Info", "id": 1}'
@@ -1049,29 +1170,29 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.channelList.sendJSON(json_query);
             
         try:
-            if self.showChannelBug == True and chtype != '8':
-            
-                if REAL_SETTINGS.getSetting('COLOR_CHANBUG') != 'true':
-                
-                    if not FileAccess.exists(LOGO_CACHE_LOC):
-                        FileAccess.makedirs(LOGO_CACHE_LOC)
-                        
-                    if FileAccess.exists(LOGO_CACHE_LOC + ascii(self.channels[self.currentChannel - 1].name) + '.png'):
-                        self.getControl(103).setImage(LOGO_CACHE_LOC + ascii(self.channels[self.currentChannel - 1].name) + '.png')
+            if self.showChannelBug == True:
+                if chtype != 8:
+                    if REAL_SETTINGS.getSetting('COLOR_CHANBUG') == 'false':
                     
-                    else:
-                        if FileAccess.exists(self.channelLogos + ascii(self.channels[self.currentChannel - 1].name) + '.png'):
-                            original = Image.open(self.channelLogos + ascii(self.channels[self.currentChannel - 1].name) + '.png')                  
-                            converted_img = original.convert('LA')
-                            converted_img.save(LOGO_CACHE_LOC + ascii(self.channels[self.currentChannel - 1].name) + '.png')
-                            self.getControl(103).setImage(LOGO_CACHE_LOC + ascii(self.channels[self.currentChannel - 1].name) + '.png')
+                        if not FileAccess.exists(LOGO_CACHE_LOC):
+                            FileAccess.makedirs(LOGO_CACHE_LOC)
+                            
+                        if FileAccess.exists(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png'):
+                            self.getControl(103).setImage(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
+                        
                         else:
-                            self.getControl(103).setImage(DEFAULT_IMAGES_LOC + 'Default.png')
-                else:
-                    if FileAccess.exists(self.channelLogos + ascii(self.channels[self.currentChannel - 1].name) + '.png'):
-                        self.getControl(103).setImage(self.channelLogos + ascii(self.channels[self.currentChannel - 1].name) + '.png')
+                            if FileAccess.exists(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png'):
+                                original = Image.open(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')                  
+                                converted_img = original.convert('LA')
+                                converted_img.save(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
+                                self.getControl(103).setImage(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
+                            else:
+                                self.getControl(103).setImage(IMAGES_LOC + 'Default.png')
                     else:
-                        self.getControl(103).setImage(DEFAULT_IMAGES_LOC + 'Default.png')
+                        if FileAccess.exists(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png'):
+                            self.getControl(103).setImage(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
+                        else:
+                            self.getControl(103).setImage(IMAGES_LOC + 'Default.png')
             else:
                 self.getControl(103).setImage('NA.png')
         except:
@@ -1102,19 +1223,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
         
     def hideInfo(self):
-        
-        try:
-            self.getControl(102).setVisible(False)
-            self.getControl(120).setVisible(False)
-        except:
-            pass
-            
-        # self.getControl(120).setVisible(True) #TEMP POPUP TEST
-        # self.getControl(122).setImage('smb://192.168.0.51/TV/Longmire/landscape.jpg')
-        # self.getControl(123).setLabel('Coming Up Next')
-        # self.getControl(124).setLabel('Longmire')
-        # self.getControl(125).setLabel('A Damn Shame')
-        ##
+        self.getControl(102).setVisible(False)
         self.infoOffset = 0
         self.showingInfo = False
 
@@ -1122,14 +1231,17 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.infoTimer.cancel()
 
         self.infoTimer = threading.Timer(5.0, self.hideInfo)
-    
 
+        
     def showInfo(self, timer):
-        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))  
-        if self.hideShortItems and chtype <= 7:
+    
+        if self.hideShortItems:
             position = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition() + self.infoOffset
+            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+            if chtype != '':
+                chtype = int(chtype)
 
-            if self.channels[self.currentChannel - 1].getItemDuration(xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition()) < self.shortItemLength:
+            if chtype <= 7 and self.channels[self.currentChannel - 1].getItemDuration(position) < self.shortItemLength:
                 return
 
         self.getControl(102).setVisible(True)
@@ -1138,12 +1250,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             json_query = '{"jsonrpc": "2.0", "method": "Input.Info", "id": 1}'
             self.ignoreInfoAction = True
             self.channelList.sendJSON(json_query);
-            
-        try:
-            self.getControl(120).setVisible(False)
-        except:
-            pass
-            
+
         self.showingInfo = True
         self.setShowInfo()
 
@@ -1156,6 +1263,53 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.infoTimer.start()
         
         
+    def hidePOP(self):
+        self.log("hidePOP")
+        
+        try:
+            self.getControl(120).setVisible(False)
+        except:
+            pass
+            
+        self.showingPop = False
+
+        if self.popTimer.isAlive():
+            self.popTimer.cancel()
+
+        self.popTimer = threading.Timer(5.0, self.hidePOP)
+        self.getControl(103).setVisible(True)
+        
+
+    def showPOP(self, timer):
+        self.log("showPOP")
+        #disable channel bug
+        self.getControl(103).setVisible(False)
+        
+        try:
+            self.getControl(120).setVisible(True)
+        except:
+            pass
+  
+        if self.hideShortItems:
+            position = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition() + self.infoOffset
+            # chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+            # if chtype != '':
+                # chtype = int(chtype)
+            
+            if self.channels[self.currentChannel - 1].getItemDuration(position) < self.shortItemLength:
+                return
+            
+        self.showingPop = True
+
+        if self.popTimer.isAlive():
+            self.popTimer.cancel()
+
+        self.popTimer = threading.Timer(timer, self.hidePOP)
+        self.popTimer.name = "popTimer"
+            
+        self.popTimer.start()
+            
+            
     # return a valid channel in the proper range
     def fixChannel(self, channel, increasing = True):
         while channel < 1 or channel > self.maxChannels:
@@ -1179,8 +1333,14 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log('onAction ' + str(action))
         
         try:
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
+            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
             mediapath = self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)
+            
+            try:
+                plugchk = mediapath.split('/')[2]
+            except:
+                plugchk = mediapath
+                pass
         except:
             pass
         
@@ -1225,6 +1385,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         self.sleepTimer = threading.Timer(self.sleepTimeValue, self.sleepAction)
 
                 self.hideInfo()
+                self.hidePOP()
                 self.newChannel = 0
                 self.myEPG.doModal()
 
@@ -1247,8 +1408,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         elif action == ACTION_MOVE_LEFT:
             if self.showingInfo:
                 self.infoOffset -= 1
-                self.showInfo(InfoTimer)
-            elif chtype != 8 and chtype != 9 and chtype != 15 and chtype != 16 and mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp' and mediapath[0:6] != 'plugin':
+                self.showInfo(self.InfTimer)
+            elif ((chtype != 8 and chtype != 9) and (mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp') and plugchk not in BYPASS_SEEK):
                 xbmc.executebuiltin("PlayerControl(SmallSkipBackward)")
                 self.log("SmallSkipBackward")
                            
@@ -1265,8 +1426,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         elif action == ACTION_MOVE_RIGHT:
             if self.showingInfo:
                 self.infoOffset += 1
-                self.showInfo(InfoTimer)
-            elif chtype != 8 and chtype != 9 and chtype != 15 and chtype != 16 and mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp' and mediapath[0:6] != 'plugin':
+                self.showInfo(self.InfTimer)
+            elif ((chtype != 8 and chtype != 9) and (mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp') and plugchk not in BYPASS_SEEK):
                 xbmc.executebuiltin("PlayerControl(SmallSkipForward)")
                 self.log("SmallSkipForward")
         
@@ -1286,6 +1447,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         elif action in ACTION_PREVIOUS_MENU:
             if self.showingInfo:
                 self.hideInfo()
+                self.hidePOP()
             else:
                 dlg = xbmcgui.Dialog()
 
@@ -1308,6 +1470,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             else:
                 if self.showingInfo:
                     self.hideInfo()
+                    self.hidePOP()
 
                     if xbmc.getCondVisibility('Player.ShowInfo'):
                         json_query = '{"jsonrpc": "2.0", "method": "Input.Info", "id": 1}'
@@ -1315,7 +1478,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         self.channelList.sendJSON(json_query);
   
                 else:
-                    self.showInfo(InfoTimer)
+                    self.showInfo(self.InfTimer)
         
         elif action >= ACTION_NUMBER_0 and action <= ACTION_NUMBER_9:
             if self.inputChannel < 0:
@@ -1341,16 +1504,18 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             json_query = '{"jsonrpc": "2.0", "method": "Input.ExecuteAction","params":{"action":"aspectratio"}, "id": 1}'
             self.channelList.sendJSON(json_query);
             
-        elif action == ACTION_OSD:
-            xbmc.executebuiltin("ActivateWindow(12901)")
+        # elif action == ACTION_OSD:
+            # xbmc.executebuiltin("ActivateWindow(12901)")
         
         elif action == ACTION_RECORD:
             self.log('ACTION_RECORD')
             PVRrecord(self.PVRchtype, self.PVRmediapath, self.PVRchname, self.PVRtitle)
         
-        elif action == ACTION_SHIFT: #Previous channel button todo
+        elif action == ACTION_SHIFT: #Previous channel button
             self.log('ACTION_SHIFT')
             self.LastChannel = int(REAL_SETTINGS.getSetting('LastChannel'))
+            CurChannel = self.fixChannel(self.currentChannel)
+            REAL_SETTINGS.setSetting('LastChannel', str(CurChannel))
             self.setChannel(self.LastChannel)
         
         self.actionSemaphore.release()
@@ -1421,13 +1586,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("notificationAction")
         ClassicPOPUP = False
         docheck = False
-        chname = ascii(self.channels[self.currentChannel - 1].name)
+        # chname = (self.channels[self.currentChannel - 1].name)
         
-        if chname in BYPASS_OVERLAY: #Disable shownext for CE, move to rules todo
-            return
-        
-        if self.showNextItem == False:
-            return
+        # if chname in BYPASS_OVERLAY: #Disable shownext for CE, move to rules todo
+            # return
 
         if self.Player.isPlaying():
             if self.notificationLastChannel != self.currentChannel:
@@ -1448,7 +1610,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     # Don't show any notification if the current show is < 60 seconds
                     if self.channels[self.currentChannel - 1].getItemDuration(self.notificationLastShow) < self.shortItemLength:
                         self.notificationShowedNotif = True
-
+                        
                 timedif = self.channels[self.currentChannel - 1].getItemDuration(self.notificationLastShow) - self.Player.getTime()
                 if self.notificationShowedNotif == False and timedif < NOTIFICATION_TIME_BEFORE_END and timedif > NOTIFICATION_DISPLAY_TIME:
                     nextshow = self.channels[self.currentChannel - 1].fixPlaylistIndex(self.notificationLastShow + 1)
@@ -1462,17 +1624,30 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                             nextshow = self.channels[self.currentChannel - 1].fixPlaylistIndex(nextshow + 1)
                     
                     self.log('notification.init')     
-                    mediapath = ascii(self.channels[self.currentChannel - 1].getItemFilename(nextshow))
-                    THUMB = (DEFAULT_IMAGES_LOC + 'icon.png')
-                    ChannelLogo = (self.channelLogos + ascii(self.channels[self.currentChannel - 1].name) + '.png')
+                    mediapath = (self.channels[self.currentChannel - 1].getItemFilename(nextshow))
+                    THUMB = (IMAGES_LOC + 'icon.png')
+                    ChannelLogo = (self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
                     chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+                    if chtype != '':
+                        chtype = int(chtype)
+                        
                     title = 'Coming Up Next'   
                     ShowTitle = self.channels[self.currentChannel - 1].getItemTitle(nextshow).replace(',', '')
                     myLiveID = self.channels[self.currentChannel - 1].getItemLiveID(nextshow)
                     chanlist = ChannelList()
                     type = (chanlist.unpackLiveID(myLiveID))[0]
                     id = (chanlist.unpackLiveID(myLiveID))[1]
-                    mpath = os.path.split(mediapath)[0]
+                    youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube/?path=/root']
+        
+                    if mediapath[0:5] == 'stack':
+                        smpath = (mediapath.split(' , ')[0]).replace('stack://','')
+                        mpath = (os.path.split(smpath)[0])
+                    else:
+                        mpath = (os.path.split(mediapath)[0])
+                    
+                    if mpath in youtube:
+                        YTid = mediapath.split('id=')[1]
+                        mpath = (mpath + '/' + YTid).replace('/?path=/root','')
                     
                     try:
                         ShowEpisode = (self.channels[self.currentChannel - 1].getItemEpisodeTitle(nextshow).replace(',', ''))
@@ -1498,78 +1673,63 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         ClassicPOPUP = True
                         pass
 
-                    self.Artdownloader = Artdownloader()
                     typeEXT = self.Artdownloader.EXTtype(ArtType)
                     self.log('notification.type.ext = ' + str(typeEXT))  
-                    THUMB = self.Artdownloader.FindArtwork(type, chtype, id, mpath, typeEXT)
+                    THUMB = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, typeEXT)
                     self.log("notification.plugin.thumb = " + THUMB)   
                     
-                    if REAL_SETTINGS.getSetting("EnableComingUp") == "2" or ClassicPOPUP == True:
-                        xbmc.executebuiltin('XBMC.Notification(%s, %s, %s, %s)' % (title, self.channels[self.currentChannel - 1].getItemTitle(nextshow).replace(',', ''), str(NOTIFICATION_DISPLAY_TIME * 2000), THUMB))
-                    else:
-                        try:
-                            if self.showingInfo == False:
-                                self.getControl(122).setImage(THUMB)
-                                self.getControl(103).setVisible(False)#disable channel bug
-                                self.getControl(120).setVisible(True)
-                                self.showingPOPUP = True
-                                xbmc.sleep(8000)
-                                self.getControl(120).setVisible(False)
-                                self.getControl(103).setVisible(True)
-                                self.showingPOPUP = False
-                        except:
-                            pass
+                    if self.showingInfo == False and self.notificationShowedNotif == False:
+                        if REAL_SETTINGS.getSetting("EnableComingUp") == "2" or ClassicPOPUP == True:
+                            xbmc.executebuiltin('XBMC.Notification(%s, %s, %s, %s)' % (title, self.channels[self.currentChannel - 1].getItemTitle(nextshow).replace(',', ''), str(NOTIFICATION_DISPLAY_TIME * 2000), THUMB))
+                        else:
+                            self.getControl(122).setImage(THUMB)
+                            self.showPOP(self.InfTimer + 2.5)
 
-                    self.log("notification.THUMB = " + ascii(THUMB))
+                    self.log("notification.THUMB = " + (THUMB))
                     self.notificationShowedNotif = True
                     
         self.startNotificationTimer()
 
 
     def playerTimerAction(self):
-        self.playerTimer = threading.Timer(1.5, self.playerTimerAction)    
-        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
-
+        self.log("playerTimerAction")
+        self.playerTimer = threading.Timer(1.0, self.playerTimerAction)  
+        position = self.channels[self.currentChannel - 1].playlistPosition  
+        genre = (self.channels[self.currentChannel - 1].getItemgenre(position))
+            
+        try:
+            self.getControl(101).setLabel('Loading Channel...')
+        except:
+            pass
+        
+        if genre == 'Bumper' or genre == 'Rating' or genre == 'Commercial' or genre == 'Trailer':
+            BCT = True
+        else:
+            BCT = False
+            
         if self.Player.isPlaying():
             self.lastPlayTime = int(self.Player.getTime())
             self.lastPlaylistPosition = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition()
-            self.notPlayingCount = 0
+            self.notPlayingCount = 0                
         else:
-            self.notPlayingCount += 1
-            self.log("Adding to notPlayingCount")      
-        
-        if self.notPlayingCount >= 3:
-        
-            if chtype == 8 or chtype == 9 or self.channels[self.currentChannel - 1].getCurrentFilename()[-4:].lower() == 'strm':
+            #Ignore BCT's to avoid notPlayingCount loop on a dead channel.
+            if not BCT:
+                self.notPlayingCount += 1
+                self.log("Adding to notPlayingCount, " + str(self.notPlayingCount))  
                 
-                try:
-                    self.getControl(101).setLabel('Error Loading: Changing Channel')
-                except:
-                    pass
-                    
-                #self.channelUp()
-                json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"Select"},"id":1}'
-                self.channelList.sendJSON(json_query)
-                json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"up"},"id":1}'
-                self.channelList.sendJSON(json_query)
-                self.log("error three peat invalid channel, changing channel")
-                return
-            else:       
+                if DEBUG == 'true':
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "notPlayingCount " + str(self.notPlayingCount), 1000, THUMB) )
+                      
+        if self.notPlayingCount > 6:
+            try:
+                self.getControl(101).setLabel('Error Loading: Changing Channel')
+            except:
+                pass
             
-                try:
-                    self.getControl(101).setLabel('Error Loading: Skipping Program')
-                except:
-                    pass
-                    
-                #xbmc.executebuiltin("PlayerControl(SmallSkipForward)")
-                json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"Select"},"id":1}'
-                self.channelList.sendJSON(json_query)
-                json_query = '{"jsonrpc":"2.0","method":"Input.ExecuteAction","params":{"action":"skipnext"},"id":1}'
-                self.channelList.sendJSON(json_query)
-                self.log("error three peat invalid channel, skipping program")
-                return  
-        
-                
+            self.channelUp()
+            self.log("error three peat invalid channel, Changing Channel")
+            return
+            
         if self.Player.stopped == False:
             self.playerTimer.name = "PlayerTimer"
             self.playerTimer.start()
@@ -1585,10 +1745,15 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.log('Unwatch Failed')
             pass
         
-    # cleanup and end
+
     def end(self):
-        self.log('end')
-        
+        self.log('end')        
+        try:
+            if self.ArtServiceThread.isAlive():
+                self.ArtServiceThread.cancel()
+        except:
+            pass
+            
         try:
             self.getControl(101).setLabel('Exiting...')
         except:
@@ -1738,7 +1903,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                                
                                 
                 self.storeFiles()
-
+                
+        REAL_SETTINGS.setSetting('Normal_Shutdown', "true")
         updateDialog.close()
         self.background.setVisible(False)
         self.close()

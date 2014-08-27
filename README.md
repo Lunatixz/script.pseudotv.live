@@ -15,20 +15,20 @@ Special thanks to:
 
 - XBMC - Foundation
 
-- XBMCHUB - Fourm
+- XBMCHUB - Forum, and home to extremely talented developers.
 
 - jason102, angrycamel, jtucker1972 - Core Code and inspiration.
 
 - ARYEZ, thedarkonaut, tman12 - Skinning contributions.
 
-- peppy6582, earlieb, Steveb1968, blazin912 - Code contributions.
+- peppy6582, earlieb, Steveb1968, blazin912, kurumushi - Code contributions.
                     
 - twinther, LordIndy, ronie, mcorcoran, sphere, giftie, 
-  spoyser, Eldorados, lambda81, kickin and bradvido88  - Various coding, All-Star Plugin Developers .
+  spoyser, Eldorados, lambda81, kickin and bradvido88  - All-Star Plugin Developers.
 
-- RagnaroktA - CE Intro Video
+- RagnaroktA - CE Intro Video, Visit http://www.cinemavision.org/
 
-* All work is either original, or a modified code from the properly credited creators
+* All work is either original, or modified code from the properly credited creators.
 
 ------------------
 What is it?
