@@ -261,11 +261,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             NormalShutdown = "true"
             REAL_SETTINGS.setSetting('Normal_Shutdown', "true")
             pass
+
+        settingsFile_flesize = 0
+        nsettingsFile_flesize = 0
+        atsettingsFile_flesize = 0
             
         if FileAccess.exists(settingsFile):
-            settingsFile_flesize = 0
-            nsettingsFile_flesize = 0
-            atsettingsFile_flesize = 0
             file1 = FileAccess.open(settingsFile, "rb")
             settingsFile_flesize = self.getSize(file1)
             file1.close()
