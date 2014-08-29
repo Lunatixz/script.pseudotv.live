@@ -1225,7 +1225,75 @@ class Migrate:
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding F.T.V Favourites",'F.T.V Movies')
                 channelNum = channelNum + 1
                 self.logDebug('channelNum = ' + str(channelNum))
-           
+        
+        # # Playon
+        # if Globals.REAL_SETTINGS.getSetting("autoFindPlayonAmazon") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindPlayonHulu") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindPlayonNetflix") == "true":
+            # self.updateDialogProgress = 95
+            # self.log("Playon")
+            # self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Playon","")
+            # PlayonPath = chanlist.playon_player()
+        
+        # if PlayonPath != False:
+            # if Globals.REAL_SETTINGS.getSetting("autoFindPlayonAmazon") == "true":
+                # self.log("Playon - Amazon") 
+                # self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Playon","Amazon")
+
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "18")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", PlayonPath + 'amazon/')
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                # channelNum += 1
+                
+            # elif Globals.REAL_SETTINGS.getSetting("autoFindPlayonHulu") == "true":
+                # self.log("Playon - Hulu") 
+                # self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Playon","Hulu")
+                
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "18")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", PlayonPath + 'hulu/Your Subscriptions')
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu Subs")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                # channelNum += 1
+                
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "18")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", PlayonPath + 'Recently Added/Recently Added Feature Films')
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu Movies")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                # channelNum += 1
+                
+            # elif Globals.REAL_SETTINGS.getSetting("autoFindPlayonNetflix") == "true":
+                # self.log("Playon - Netflix") 
+                # self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Playon","Netflix")
+                
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "18")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", PlayonPath + 'netflix/')
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "Create New Super Folder,Explore XBMC favourites,iSearch")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", 'netflix')
+                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                # channelNum += 1       
+        
         Globals.ADDON_SETTINGS.writeSettings()
 
         #set max channels
@@ -1261,6 +1329,9 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindPopcorn","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCinema","false")
         Globals.REAL_SETTINGS.setSetting("autoFindFilmonFavourites","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindPlayonAmazon","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindPlayonHulu","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindPlayonNetflix","false")
         Globals.REAL_SETTINGS.setSetting("ForceChannelReset","true")
         Globals.ADDON_SETTINGS.setSetting('LastExitTime', str(int(curtime)))
         self.updateDialog.close()

@@ -1,3 +1,5 @@
+[*] Start on mute fix, Youtube playlist limit fix
+[*] [COLOR=blue]^ v.0.4.8a ^[/COLOR] 
 [*] Replaced old mute toggle, with a "Smart Switch". Show Notification option under "General" settings. 
 [*] Automatic settings2 backup/restore after improper exit, Pre-Autotune settings2 restore option under "Misc" settings.
 [*] Temporarily disabled Artwork Service timer (Until Settop box mode is finished).

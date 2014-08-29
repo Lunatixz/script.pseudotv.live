@@ -22,6 +22,7 @@ import time, threading
 import datetime
 import sys, re
 import random, traceback
+import random, traceback
 
 from ChannelList import ChannelList
 from Channel import Channel
@@ -109,6 +110,15 @@ class ChannelListThread(threading.Thread):
             InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
             self.ArtServiceThread = threading.Timer(float(InfoTimer), self.Artdownloader.ArtService)
             self.ArtServiceThread.start()
+            
+        if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+            if DEBUG == 'true':
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Settop Started", 1000, THUMB) )
+                
+            Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]
+            self.channelThread_Timer = threading.Timer(((60.0)), self.chanlist.Settop)
+            self.channelThread_Timer.start()
+            
             
         while True:
             for i in range(self.myOverlay.maxChannels):

@@ -250,6 +250,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log('onInit')
         self.log('PTVL Version = ' + ADDON_VERSION)
         self.channelList = ChannelList()
+        settingsFile_flesize = 0
+        nsettingsFile_flesize = 0
+        atsettingsFile_flesize = 0
         settingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml'))
         nsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.bak.xml'))
         atsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.pretune.xml'))
@@ -263,9 +266,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             pass
             
         if FileAccess.exists(settingsFile):
-            settingsFile_flesize = 0
-            nsettingsFile_flesize = 0
-            atsettingsFile_flesize = 0
             file1 = FileAccess.open(settingsFile, "rb")
             settingsFile_flesize = self.getSize(file1)
             file1.close()
@@ -450,10 +450,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 self.currentChannel = self.fixChannel(1)
         except:
             self.currentChannel = self.fixChannel(1)
-        
-        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
-        self.channelList.sendJSON(json_query)
-        
+
         if REAL_SETTINGS.getSetting('INTRO_PLAYED') != 'true':
             self.background.setVisible(False)
             xbmc.Player().play(INTRO)
@@ -467,37 +464,25 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.startSleepTimer()
         self.startNotificationTimer()
         self.playerTimer.start()
-        
-        if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
-            Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
-            self.channelThread_Timer = threading.Timer((float(Refresh)), self.Settop)
-
+       
         if self.backgroundUpdating < 2 or self.isMaster == False:
             self.channelThread.name = "ChannelThread"
             self.channelThread.start()
         else:
             self.ArtServiceThread = threading.Timer(float(self.InfTimer), self.Artdownloader.ArtService)
             self.ArtServiceThread.start()
-              
+
+            if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
+                Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
+                self.channelThread_Timer = threading.Timer(((60.0)), self.channelList.Settop)
+                self.channelThread_Timer.start()
+                
+                if DEBUG == 'true':
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Settop Start", 1000, THUMB) )
+            
         self.actionSemaphore.release()
         self.log('onInit return')
-        
-        
-    #SETTOP BOX
-    def Settop(self):
-        print 'SETTOP BOX Enabled'
-        
-        if self.channelThread_Timer.isAlive():
-            self.channelThread_Timer.cancel()
-        
-        Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
-        self.channelThread_Timer = threading.Timer((float(Refresh)), self.Settop)
-        self.channelThread_Timer.name = "ChannelThread_Timer"
-        self.channelThread_Timer.start()
-        self.channelThread.name = "ChannelThread"
-        self.channelThread.start()
-            
-            
+
     # setup all basic configuration parameters, including creating the playlists that
     # will be used to actually run this thing
     def readConfig(self):
@@ -734,8 +719,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("about to mute");
         # Mute the channel before changing
         # xbmc.executebuiltin("Mute()");           
-        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
-        self.channelList.sendJSON(json_query)
+        # json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+        # self.channelList.sendJSON(json_query)
         xbmc.sleep(self.channelDelay)
         # set the show offset
         self.Player.playselected(self.channels[self.currentChannel - 1].playlistPosition)
@@ -763,8 +748,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
                         if self.waitForVideoPaused() == False:
                             # xbmc.executebuiltin("Mute()");
-                            json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
-                            self.channelList.sendJSON(json_query)
+                            # json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+                            # self.channelList.sendJSON(json_query)
                             return
                 except:
                     self.log('Exception during seek on paused channel', xbmc.LOGERROR)
@@ -823,8 +808,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         # Unmute
         self.log("Finished, unmuting");
         # xbmc.executebuiltin("Mute()");
-        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
-        self.channelList.sendJSON(json_query)
+        # json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
+        # self.channelList.sendJSON(json_query)
         
         self.showChannelLabel(self.currentChannel)
         self.lastActionTime = time.time()
@@ -1634,9 +1619,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     title = 'Coming Up Next'   
                     ShowTitle = self.channels[self.currentChannel - 1].getItemTitle(nextshow).replace(',', '')
                     myLiveID = self.channels[self.currentChannel - 1].getItemLiveID(nextshow)
-                    chanlist = ChannelList()
-                    type = (chanlist.unpackLiveID(myLiveID))[0]
-                    id = (chanlist.unpackLiveID(myLiveID))[1]
+                    type = (self.channelList.unpackLiveID(myLiveID))[0]
+                    id = (self.channelList.unpackLiveID(myLiveID))[1]
                     youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube/?path=/root']
         
                     if mediapath[0:5] == 'stack':

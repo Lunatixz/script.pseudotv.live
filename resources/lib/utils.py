@@ -121,7 +121,7 @@ class TextBox:
 
     def setControls(self):
         # set heading
-        heading = "Changelog - PseudoTV Live v%s" % (ADDON_VERSION)
+        heading = "Changelog - PseudoTV Live"
         self.win.getControl(self.CONTROL_LABEL).setLabel(heading)
         # set text
         faq_path =(os.path.join(ADDON_PATH, 'changelog.txt'))
