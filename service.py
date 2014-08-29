@@ -49,33 +49,38 @@ def ForceArtService():
     
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
     xbmc.log('script.pseudotv.live-service: HubSwap')
-    icon = ADDON_PATH + '/icon'
-    chanlist = ChannelList()
-    HUB = chanlist.plugin_ok('plugin.program.addoninstaller')
     
-    if HUB == True:
-        xbmc.log('script.pseudotv.live-service: HubSwap - Hub Edition')
-        REAL_SETTINGS.setSetting("Hub","true")
-        try:
-            os.remove(icon + '.png')
-        except:
-            pass
-        try:
-            shutil.copy2(icon + 'HUB', icon + '.png')
-        except:
-            pass   
-            
-    else:
-        xbmc.log('script.pseudotv.live-service: HubSwap - Master')
+    try:#unknown amazon firetv error encountered here, requires investigation
+        icon = ADDON_PATH + '/icon'
+        chanlist = ChannelList()
+        HUB = chanlist.plugin_ok('plugin.program.addoninstaller')
+        
+        if HUB == True:
+            xbmc.log('script.pseudotv.live-service: HubSwap - Hub Edition')
+            REAL_SETTINGS.setSetting("Hub","true")
+            try:
+                os.remove(icon + '.png')
+            except:
+                pass
+            try:
+                shutil.copy2(icon + 'HUB', icon + '.png')
+            except:
+                pass   
+                
+        else:
+            xbmc.log('script.pseudotv.live-service: HubSwap - Master')
+            REAL_SETTINGS.setSetting("Hub","false")
+            try:
+                os.remove(icon + '.png')
+            except:
+                pass
+            try:
+                shutil.copy2(icon + 'OEM', icon + '.png')
+            except:
+                pass    
+    except:
         REAL_SETTINGS.setSetting("Hub","false")
-        try:
-            os.remove(icon + '.png')
-        except:
-            pass
-        try:
-            shutil.copy2(icon + 'OEM', icon + '.png')
-        except:
-            pass    
+        pass
           
  
 def CEpack():

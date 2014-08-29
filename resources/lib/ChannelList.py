@@ -40,7 +40,6 @@ from tmdb import *
 from urllib2 import HTTPError, URLError
 from datetime import date
 from utils import *
-from Artdownloader import *
 socket.setdefaulttimeout(10)
 
 # Commoncache plugin import
@@ -193,7 +192,19 @@ class ChannelList:
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
         if DEBUG == 'true':
             log('ChannelList: ' + msg, level)
-            
+
+    #SETTOP BOX
+    def Settop(self):
+        print 'SETTOP BOX Enabled'      
+        if DEBUG == 'true':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Settop refresh", 1000, THUMB) )
+              
+        Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
+        self.channelThread_Timer = threading.Timer(((60.0)), self.Settop)
+        self.channelThread_Timer.name = "ChannelThread_Timer"
+        self.channelThread_Timer.start()
+        self.myOverlay.channelThread.name = "ChannelThread"
+        self.myOverlay.channelThread.start()
             
     # Determine the maximum number of channels by opening consecutive
     # playlists until we don't find one
@@ -2310,7 +2321,7 @@ class ChannelList:
             stop = (limit / 25)
             YTMSG = setting1
         elif setting2 == '2':
-            stop = 2
+            stop = 8
             YTMSG = 'Playlist'
         elif setting2 == '5':
             stop = (limit / 25)
@@ -3213,6 +3224,29 @@ class ChannelList:
         return path
             
             
+    def playon_player(self):
+        print ("playon_player")
+        PlayonPath = False
+        json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetSources", "params": {"media":"video"}, "id": 2}')
+        json_folder_detail = self.sendJSON(json_query)
+        file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+
+        for f in file_detail:
+            labels = re.search('"label" *: *"(.*?)"', f)
+            files = re.search('"file" *: *"(.*?)"', f)
+            try:
+                label = (labels.group(1)).lower()
+                upnp = (files.group(1))
+                print label
+                if label == 'playon':
+                    PlayonPath = upnp
+                    break
+            except:
+                pass
+
+        return PlayonPath
+        
+        
     def trim(self, content, limit, suffix):
         if len(content) <= limit:
             return content
