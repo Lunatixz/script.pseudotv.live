@@ -48,7 +48,7 @@ class MyPlayer(xbmc.Player):
         xbmc.Player.__init__(self, xbmc.PLAYER_CORE_AUTO)
         self.stopped = False
         self.ignoreNextStop = False
-
+        self.onPlayBackStarted = False
     
     def log(self, msg, level = xbmc.LOGDEBUG):
         log('Player: ' + msg, level)
@@ -99,6 +99,7 @@ class MyPlayer(xbmc.Player):
     def onPlayBackStarted(self):
         self.log('onPlayBackStarted')
         self.resume_playback()
+        self.onPlayBackStarted = True
         
         try:
             file = xbmc.Player().getPlayingFile()
@@ -347,7 +348,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             migratemaster.migrate()
 
         self.channelLabelTimer = threading.Timer(5.0, self.hideChannelLabel)
-        self.playerTimer = threading.Timer(1.0, self.playerTimerAction)
+        self.playerTimer = threading.Timer(2.0, self.playerTimerAction)
         self.playerTimer.name = "PlayerTimer"
         self.infoTimer = threading.Timer(5.0, self.hideInfo)
         self.popTimer = threading.Timer(5.0, self.hidePOP)
@@ -470,15 +471,16 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.channelThread.start()
         else:
             self.ArtServiceThread = threading.Timer(float(self.InfTimer), self.Artdownloader.ArtService)
+            self.ArtServiceThread.name = "ArtServiceThread"
             self.ArtServiceThread.start()
 
-            if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
-                Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
-                self.channelThread_Timer = threading.Timer(((60.0)), self.channelList.Settop)
-                self.channelThread_Timer.start()
+        if SETTOP ==  'true':
+            Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
+            self.channelThread_Timer = threading.Timer(((60.0)), self.channelList.Settop)
+            self.channelThread_Timer.start()
                 
-                if DEBUG == 'true':
-                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Settop Start", 1000, THUMB) )
+            if DEBUG == 'true':
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Settop Start", 1000, THUMB) )
             
         self.actionSemaphore.release()
         self.log('onInit return')
@@ -719,8 +721,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("about to mute");
         # Mute the channel before changing
         # xbmc.executebuiltin("Mute()");           
-        # json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
-        # self.channelList.sendJSON(json_query)
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+        self.channelList.sendJSON(json_query)
         xbmc.sleep(self.channelDelay)
         # set the show offset
         self.Player.playselected(self.channels[self.currentChannel - 1].playlistPosition)
@@ -748,8 +750,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
                         if self.waitForVideoPaused() == False:
                             # xbmc.executebuiltin("Mute()");
-                            # json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
-                            # self.channelList.sendJSON(json_query)
+                            json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+                            self.channelList.sendJSON(json_query)
                             return
                 except:
                     self.log('Exception during seek on paused channel', xbmc.LOGERROR)
@@ -808,8 +810,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         # Unmute
         self.log("Finished, unmuting");
         # xbmc.executebuiltin("Mute()");
-        # json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
-        # self.channelList.sendJSON(json_query)
+        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
+        self.channelList.sendJSON(json_query)
         
         self.showChannelLabel(self.currentChannel)
         self.lastActionTime = time.time()
@@ -1488,10 +1490,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         elif action == ACTION_ASPECT_RATIO:
             json_query = '{"jsonrpc": "2.0", "method": "Input.ExecuteAction","params":{"action":"aspectratio"}, "id": 1}'
             self.channelList.sendJSON(json_query);
-            
-        # elif action == ACTION_OSD:
-            # xbmc.executebuiltin("ActivateWindow(12901)")
-        
+
         elif action == ACTION_RECORD:
             self.log('ACTION_RECORD')
             PVRrecord(self.PVRchtype, self.PVRmediapath, self.PVRchname, self.PVRtitle)
@@ -1502,6 +1501,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             CurChannel = self.fixChannel(self.currentChannel)
             REAL_SETTINGS.setSetting('LastChannel', str(CurChannel))
             self.setChannel(self.LastChannel)
+                    
+        # elif action == ACTION_OSD:
+            # xbmc.executebuiltin("ActivateWindow(12901)")
         
         self.actionSemaphore.release()
         self.log('onAction return')
@@ -1677,7 +1679,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
     def playerTimerAction(self):
         self.log("playerTimerAction")
-        self.playerTimer = threading.Timer(1.0, self.playerTimerAction)  
+        self.playerTimer = threading.Timer(2.0, self.playerTimerAction)  
         position = self.channels[self.currentChannel - 1].playlistPosition  
         genre = (self.channels[self.currentChannel - 1].getItemgenre(position))
             
@@ -1704,7 +1706,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 if DEBUG == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "notPlayingCount " + str(self.notPlayingCount), 1000, THUMB) )
                       
-        if self.notPlayingCount > 6:
+        if self.notPlayingCount > 3:
             try:
                 self.getControl(101).setLabel('Error Loading: Changing Channel')
             except:

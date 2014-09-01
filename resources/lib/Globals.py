@@ -40,9 +40,9 @@ def log(msg, level = xbmc.LOGDEBUG):
 def uni(string, encoding = 'utf-8'):
     if isinstance(string, basestring):
         if not isinstance(string, unicode):
-           string = unicode(string, encoding)
+            string = unicode(string, encoding, errors='ignore')
     return string
-    
+
     
 def utf(string):
     if isinstance(string, basestring):
@@ -217,7 +217,8 @@ ADDON_SETTINGS = Settings.Settings()
 GlobalFileLock = FileLock()
 Donor_Downloaded = False
 NOTIFY = REAL_SETTINGS.getSetting('notify')
-DEBUG = REAL_SETTINGS.getSetting('enable_Debug')
+DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
+SETTOP = REAL_SETTINGS.getSetting("EnableSettop")
 
 # Common Cache types, 22hr clock allows overlap.  
 daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22) #System Purge, Force Reset
@@ -372,8 +373,8 @@ CE_RATINGS_LOC = xbmc.translatePath(os.path.join(CE_LOC, 'ratings')) + '/'
 UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V']
 
 #Dynamic Artwork plugin types
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd'] #Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn'] #Title format must be "Movie (Year)"
 
 # Plugin seek blacklist
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow']
