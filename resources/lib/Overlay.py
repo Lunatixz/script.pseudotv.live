@@ -474,9 +474,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.ArtServiceThread.name = "ArtServiceThread"
             self.ArtServiceThread.start()
 
-        if SETTOP ==  'true':
+        if SETTOP == 'true':
             Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
             self.channelThread_Timer = threading.Timer(((60.0)), self.channelList.Settop)
+            self.ArtServiceThread.name = "channelThread_Timer"
             self.channelThread_Timer.start()
                 
             if DEBUG == 'true':
@@ -1733,13 +1734,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         
 
     def end(self):
-        self.log('end')        
-        try:
-            if self.ArtServiceThread.isAlive():
-                self.ArtServiceThread.cancel()
-        except:
-            pass
-            
+        self.log('end')     
+        
         try:
             self.getControl(101).setLabel('Exiting...')
         except:
@@ -1775,11 +1771,28 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             GlobalFileLock.unlockFile('MasterLock')
         
         GlobalFileLock.close()
+        
+        try:
+            if self.playerTimer.isAlive():
+                self.playerTimer.cancel()
+                self.playerTimer.join()
+        except:
+            pass
+   
+        try:
+            if self.channelThread_Timer.isAlive():
+                self.channelThread_Timer.cancel()
+                self.channelThread_Timer.join()
+        except:
+            pass
 
-        if self.playerTimer.isAlive():
-            self.playerTimer.cancel()
-            self.playerTimer.join()
-
+        try:
+            if self.ArtServiceThread.isAlive():
+                self.ArtServiceThread.cancel()
+                self.ArtServiceThread.join()
+        except:
+            pass
+            
         if self.Player.isPlaying():
             self.lastPlayTime = self.Player.getTime()
             self.lastPlaylistPosition = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition()

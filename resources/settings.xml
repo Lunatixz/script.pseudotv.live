@@ -108,6 +108,10 @@
         <setting id="Hub" label="30951" type="bool" visible="false" default="false" /> 
         <setting label="30952" type="lsep" visible="eq(-38,true) + eq(-1,true)"/>  
             <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-39,true) + eq(-2,true)" default="false"/>
+        <setting type="lsep" label="30954" visible="eq(-40,true)"/>
+            <setting id="autoFindPlayonAmazon" type="bool" label="30955" subsetting="true" visible="eq(-41,true)" default="false"/>
+            <setting id="autoFindPlayonHulu" type="bool" label="30956" subsetting="true" visible="eq(-42,true)" default="false"/>
+            <setting id="autoFindPlayonNetflix" type="bool" label="30957" subsetting="true" visible="eq(-43,true)" default="false"/>
       </category>
 <!--Community Network-->
     <category label="30700"> 

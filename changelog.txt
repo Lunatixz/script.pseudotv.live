@@ -1,3 +1,5 @@
+[*] NEW! Playon Hulu/Amazon/Netflix autotuning 
+[*] [COLOR=blue]^ v.0.4.9 ^[/COLOR] 
 [*] Start on mute fix, Youtube playlist limit fix
 [*] [COLOR=blue]^ v.0.4.8a ^[/COLOR] 
 [*] Replaced old mute toggle, with a "Smart Switch". Show Notification option under "General" settings. 
