@@ -63,11 +63,14 @@ class TMDB(object):
         # return 'TMDB(apikey=%s, baseurl=%s, imagebaseurl=%s)' % (self.apikey,self.baseurl,self.imagebaseurl)
 
     def _buildUrl(self, cmd, parms={}):
+        # try:
         parmsCopy = parms.copy()
         parmsCopy.update({'api_key' : self.apikey})
         url = '%s/%s?%s' % (self.baseurl, cmd, urllib.urlencode(parmsCopy))
         #self.xbmc.log(url)
         return url
+        # except:
+            # pass
 
     # def _getPosterBaseUrl(self):
         # response = json.loads(urllib2.urlopen(urllib2.Request(self._buildUrl('configuration'), headers={"Accept": "application/json"})).read())
@@ -92,14 +95,18 @@ class TMDB(object):
 
     def getMovie_NEW(self, movieName, year):
         #self.xbmc.log('movieName: %s' % movieName)
-        response = json.loads(urllib2.urlopen(urllib2.Request(self._buildUrl('search/movie', {'query' : movieName, 'year' : year}), headers={"Accept": "application/json"})).read())
-        if response['total_results'] > 0:
-            #self.xbmc.log('Response: \r\n%s' % response)
-            response = json.loads(urllib2.urlopen(urllib2.Request(self._buildUrl('movie/%s' % (response['results'][0]['id'])), headers={"Accept": "application/json"})).read())
-        else:
-            #self.xbmc.log('No matches found for %s' % movieName)
-            response = json.loads('{"imdb_id":"", "poster_path":""}')
-        #print response
+        try:
+            response = json.loads(urllib2.urlopen(urllib2.Request(self._buildUrl('search/movie', {'query' : movieName, 'year' : year}), headers={"Accept": "application/json"})).read())
+            if response['total_results'] > 0:
+                #self.xbmc.log('Response: \r\n%s' % response)
+                response = json.loads(urllib2.urlopen(urllib2.Request(self._buildUrl('movie/%s' % (response['results'][0]['id'])), headers={"Accept": "application/json"})).read())
+            else:
+                #self.xbmc.log('No matches found for %s' % movieName)
+                response = json.loads('{"imdb_id":"", "poster_path":""}')
+            #print response
+        except:
+            response = ''
+            pass
         return response
         
     def getMPAA(self, imdbid):

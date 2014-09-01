@@ -4330,11 +4330,12 @@ class ChannelList:
         LiveID = 'tvshow|0|0|False|1|NR|'
         fileList = []
         dirs = []
+        Managed = False
         PluginPath = str(os.path.split(path)[0])
         PluginName = PluginPath.replace('plugin://plugin.video.','').replace('plugin://plugin.program.','')
         
         print excludeLST
-        excludeLST.append(['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search'])#filter out unwanted folders, keep from looping...
+        excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']#filter out unwanted folders, keep from looping...
         print 'excludeLST', excludeLST
         
         json_query = ('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["title","year","mpaa","imdbnumber","description","season","episode","playcount","genre","duration","runtime","showtitle","album","artist","plot","plotoutline","tagline"]}, "id": 1}' % ((path), FleType))
@@ -4630,7 +4631,7 @@ class ChannelList:
         
         for item in dirs:
             #recursively scan all subfolders
-            fileList += self.PluginWalk(item, excludeLST, limit, channel)
+            fileList += self.PluginWalk(item, excludeLST, limit, channel, xType, FleType)
 
         if self.channels[channel - 1].mode & MODE_ORDERAIRDATE > 0:
             seasoneplist.sort(key=lambda seep: seep[1])
@@ -4656,7 +4657,7 @@ class ChannelList:
             Directs = (setting1.split('/')) # split folders
             Directs = ([x for x in Directs if x != '']) # remove empty elements
             plugins = Directs[1] # element 1 in split is plugin name
-            Directs = Directs[2:] # slice two unwanted elements. ie (plugin:/, plugin name)
+            Directs = Directs[2:] # slice two unwanted elements. ie (plugin:, plugin name)
             plugin = 'plugin://' + plugins
             PluginName = plugins.replace('plugin.video.','').replace('plugin.program.','')
         except:
@@ -4670,7 +4671,7 @@ class ChannelList:
             excludeLST = []
             pass
         
-        excludeLST.append(['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search'])#filter out unwanted folders, keep from looping...
+        excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']#filter out unwanted folders, keep from looping...
         
         if self.background == False:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building PluginTV", 'parsing ' + (PluginName))
@@ -4721,13 +4722,17 @@ class ChannelList:
                             Directs.pop(0) #remove old directory, search next element
                             plugin = file
                             break
-
-        showList = self.PluginWalk(plugin, excludeLST, limit, channel)
+        
+        #all directories found, walk final folder
+        if len(Directs) == 0:              
+            showList = self.PluginWalk(plugin, excludeLST, limit, channel, 'PluginTV', 'video')
+            
         return showList    
         
         
     def BuildPlayonFileList(self, setting1, setting2, setting3, setting4, channel):
         print ("BuildPlayonFileList")
+        showList = []
         DetailLST = []
         DetailLST_CHK = []
         upnpID = self.playon_player()
@@ -4737,6 +4742,10 @@ class ChannelList:
             try:
                 Directs = (setting1.split('/')) # split folders
                 Directs = ([x for x in Directs if x != '']) # remove empty elements
+                plugins = Directs[1] # element 1 in split is plugin name
+                Directs = Directs[2:] # slice two unwanted elements. ie (upnp:, app name)
+                plugin = 'plugin://' + plugins
+                PluginName = plugins
             except:
                 Directs = []
                 pass
@@ -4744,14 +4753,15 @@ class ChannelList:
             try:
                 excludeLST = setting2.split(',')
                 excludeLST = ([x.lower() for x in excludeLST if x != '']) # remove empty elements
-                filtercount = len(excludeLST)
             except:
                 excludeLST = []
                 pass
-                
-        if self.background == False:
-            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building PlayOn", 'parsing ' + str(Directs[0]))
             
+            excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']#filter out unwanted folders, keep from looping...
+                    
+            if self.background == False:
+                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building PlayOn", 'parsing ' + str(PluginName))
+                
             if setting3 == '':
                 limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
                 if limit == 0 or limit < 50 or limit >= 250:
@@ -4787,14 +4797,17 @@ class ChannelList:
                     description = Detail[4]
                     file = Detail[5]
 
-                    if filetype == 'directory':
-                        if Directs[0].lower() == title.lower():
-                            print Directs[0].lower() + ' MATCH ' + title.lower(), file
-                            Directs.pop(0) #remove old directory, search next element
-                            upnpID = file
-                            break
-
-            showList = self.PluginWalk(upnpID, excludeLST, limit, channel, 'PlayOn', 'video')
+                    if title.lower() not in excludeLST and title != '':
+                        if filetype == 'directory':
+                            if Directs[0].lower() == title.lower():
+                                print Directs[0].lower() + ' MATCH ' + title.lower(), file
+                                Directs.pop(0) #remove old directory, search next element
+                                upnpID = file
+                                break
+                                
+            #all directories found, walk final folder
+            if len(Directs) == 0:
+                showList = self.PluginWalk(upnpID, excludeLST, limit, channel, 'PlayOn', 'video')
 
             return showList
         
