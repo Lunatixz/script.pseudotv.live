@@ -11,6 +11,8 @@
             <setting id="ChannelResetSetting" type="enum" label="30006" values="Automatic|Daily|Weekly|Monthly|Never|Every Time" default="0"/>
             <setting id="StartMode" type="enum" label="30007" values="Resume|Real Time|Random" default="1" />
             <setting id="ThreadMode" type="enum" label="30008" values="On|Minimum Use|Off" default="1" />
+            <setting id="EnableSettop" type="bool" label="30998" default="false"/>
+            <setting id="REFRESH_INT" subsetting="true"  visible="eq(-1,true)" type="enum" label="31000" values="1|3|6|12|24|48|72" default="2"/>
             <setting id="notify" type="bool" label="30046" default="true"/>
     </category>
 <!--Tweaks-->
@@ -96,18 +98,24 @@
             <setting id="autoFindYoutubeUser" type="text" label="30096" visible="eq(-25,true) + eq(-1,true)" default="Enter Username"/>
         <setting type="lsep" label="30110" visible="eq(-26,true)"/>
             <setting id="autoFindCommunity_Plugins" type="bool" label="30111" subsetting="true" visible="eq(-27,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-28,true)" default="false"/>
-            <setting id="autoFindCommunity_RSS" type="bool" label="30112" subsetting="true" visible="eq(-29,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-30,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-31,true)" default="false"/>
+            <setting id="autoFindCommunity_Playon" type="bool" label="30116" subsetting="true" visible="eq(-28,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-29,true)" default="false"/>
+            <setting id="autoFindCommunity_InternetTV" type="bool" label="30117" subsetting="true" visible="eq(-30,true)" default="false"/>
+            <setting id="autoFindCommunity_RSS" type="bool" label="30112" subsetting="true" visible="eq(-31,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-32,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-33,true)" default="false"/>
         <setting id="AT_Donor" label="39001" type="bool" visible="false" default="false" />    
-        <setting type="lsep" label="30090" visible="eq(-33,true), eq(-1,true)"/>  
-            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-2,true)" visible="eq(-34,true)" default="false"/>
+        <setting type="lsep" label="30090" visible="eq(-35,true), eq(-1,true)"/>  
+            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-2,true)" visible="eq(-36,true)" default="false"/>
             <setting id="CinemaPack" label="30959" type="bool" visible="false" default="false"/>
-            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-4,true) + eq(-1,true)" visible="eq(-36,true)" default="false"/>
+            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-4,true) + eq(-1,true)" visible="eq(-38,true)" default="false"/>
         <setting id="Hub" label="30951" type="bool" visible="false" default="false" /> 
-        <setting label="30952" type="lsep" visible="eq(-38,true) + eq(-1,true)"/>  
-            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-39,true) + eq(-2,true)" default="false"/>
+        <setting label="30952" type="lsep" visible="eq(-40,true) + eq(-1,true)"/>  
+            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-41,true) + eq(-2,true)" default="false"/>
+        <setting type="lsep" label="30954" visible="eq(-42,true)"/>
+            <setting id="autoFindPlayonAmazon" type="bool" label="30955" subsetting="true" visible="eq(-43,true)" default="false"/>
+            <setting id="autoFindPlayonHulu" type="bool" label="30956" subsetting="true" visible="eq(-44,true)" default="false"/>
+            <setting id="autoFindPlayonNetflix" type="bool" label="30957" subsetting="true" visible="eq(-45,true)" default="false"/>
       </category>
 <!--Community Network-->
     <category label="30700"> 
@@ -194,8 +202,6 @@
         <setting id="showNextItem" type="bool" label="39994" visible="false" default="true"/>
         <setting id="plugin_ok_level" type="enum" label="30994" values="Low|High" default="0"/>
         <setting id="ga_disable" type="bool" label="30992" default="false"/>
-        <setting id="EnableSettop" type="bool" label="30998" default="false"/>
-        <setting id="REFRESH_INT" subsetting="true"  visible="eq(-1,true)" type="enum" label="31000" values="6|12|24|48|72" default="2"/>
         <setting type="action" label="30999" action="RunScript($CWD/defrag.py)"/>
     </category>
 </settings>

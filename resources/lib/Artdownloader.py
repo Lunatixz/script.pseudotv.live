@@ -189,7 +189,10 @@ class Artdownloader:
                                 elif FileAccess.exists(DefaultImage):
                                     #Default Skin media
                                     setImage = DefaultImage
-                
+        # elif chtype == 16:
+        # {"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["thumbnail"]},"id":4}
+        
+        
         else:
             print ('FindArtwork, Chtype > 7')
             if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':  

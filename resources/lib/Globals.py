@@ -40,9 +40,9 @@ def log(msg, level = xbmc.LOGDEBUG):
 def uni(string, encoding = 'utf-8'):
     if isinstance(string, basestring):
         if not isinstance(string, unicode):
-           string = unicode(string, encoding)
+            string = unicode(string, encoding, errors='ignore')
     return string
-    
+
     
 def utf(string):
     if isinstance(string, basestring):
@@ -77,7 +77,7 @@ AUTOSTART_TIMER = [0,5,10,15,20]#in seconds
 SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
 MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]#Media Per/Channel, 0 = Unlimited
-REFRESH_INT = [21600,43200,86400,172800,216000]#in seconds (6,12,24,48,72hrs)
+REFRESH_INT = [3600,10800,21600,43200,86400,172800,216000]#in seconds (1,3,6,12,24,48,72hrs)
 TIMEOUT = 15 * 1000
 TOTAL_FILL_CHANNELS = 20
 PREP_CHANNEL_TIME = 60 * 60 * 24 * 5
@@ -217,7 +217,8 @@ ADDON_SETTINGS = Settings.Settings()
 GlobalFileLock = FileLock()
 Donor_Downloaded = False
 NOTIFY = REAL_SETTINGS.getSetting('notify')
-DEBUG = REAL_SETTINGS.getSetting('enable_Debug')
+DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
+SETTOP = REAL_SETTINGS.getSetting("EnableSettop")
 
 # Common Cache types, 22hr clock allows overlap.  
 daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22) #System Purge, Force Reset
@@ -372,8 +373,8 @@ CE_RATINGS_LOC = xbmc.translatePath(os.path.join(CE_LOC, 'ratings')) + '/'
 UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V']
 
 #Dynamic Artwork plugin types
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd'] #Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn'] #Title format must be "Movie (Year)"
 
 # Plugin seek blacklist
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow']
