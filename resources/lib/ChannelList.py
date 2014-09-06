@@ -40,7 +40,7 @@ from tmdb import *
 from urllib2 import HTTPError, URLError
 from datetime import date
 from utils import *
-socket.setdefaulttimeout(10)
+socket.setdefaulttimeout(15)
 
 # Commoncache plugin import
 try:
@@ -182,6 +182,41 @@ class ChannelList:
 
         self.updateDialog.update(100, "Update complete")
         self.updateDialog.close()
+        return self.channels        
+    
+    
+    def RefreshList(self):
+        self.log("RefreshList")
+        self.readConfig()
+        foundvalid = False
+        makenewlists = True
+        self.background = True
+        
+        if NOTIFY == 'true':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Background Updating...", 1000, THUMB) )
+            
+        if self.backgroundUpdating > 0 and self.myOverlay.isMaster == True:
+            makenewlists = True
+            
+        # Go through all channels, create their arrays, and setup the new playlist
+        for i in range(self.maxChannels):
+            self.channels.append(Channel())
+            self.setupChannel(i + 1, False, makenewlists, False)
+            
+            if self.channels[i].isValid:
+                foundvalid = True
+
+        if makenewlists == True:
+            self.log('makenewlists, Common Cache Purged')
+            REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
+
+        if foundvalid == False and makenewlists == False:
+            for i in range(self.maxChannels):
+                self.setupChannel(i + 1, False, True, False)
+
+                if self.channels[i].isValid:
+                    foundvalid = True
+                    break
         return self.channels
 
 
@@ -192,19 +227,7 @@ class ChannelList:
     def logDebug(self, msg, level = xbmc.LOGDEBUG):
         if DEBUG == 'true':
             log('ChannelList: ' + msg, level)
-
-    #SETTOP BOX
-    def Settop(self):
-        print 'SETTOP BOX Enabled'      
-        if DEBUG == 'true':
-            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Settop refresh", 1000, THUMB) )
-              
-        Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
-        self.channelThread_Timer = threading.Timer(((60.0)), self.Settop)
-        self.channelThread_Timer.name = "ChannelThread_Timer"
-        self.channelThread_Timer.start()
-        self.myOverlay.channelThread.name = "ChannelThread"
-        self.myOverlay.channelThread.start()
+            
             
     # Determine the maximum number of channels by opening consecutive
     # playlists until we don't find one
@@ -348,7 +371,7 @@ class ChannelList:
         needsreset = False
         self.background = background
         self.settingChannel = channel
-        
+
         try:
             chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
             chsetting1 = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_1')
@@ -2321,7 +2344,7 @@ class ChannelList:
             stop = (limit / 25)
             YTMSG = setting1
         elif setting2 == '2':
-            stop = 8
+            stop = (limit / 25)
             YTMSG = 'Playlist'
         elif setting2 == '5':
             stop = (limit / 25)
@@ -2330,7 +2353,7 @@ class ChannelList:
             YTMSG = 'MultiTube'
             showList = self.BuildMultiYoutubeChannelNetwork(setting1, setting2, setting3, setting4, channel)
         elif setting2 == '9': 
-            stop = 2 # If Setting2 = User playlist pagination disabled, else loop through pagination of 25 entries per page and stop at limit.
+            stop = 1 # If Setting2 = User playlist pagination disabled, else loop through pagination of 25 entries per page and stop at limit.
             YTMSG = 'Raw gdata'
 
         if self.background == False:
@@ -2351,7 +2374,7 @@ class ChannelList:
                 youtube = youtubechannel
             elif setting2 == '2': #youtube playlist 
                 self.log("createYoutubeFilelist, CHANNEL: " + str(self.settingChannel) + ", Youtube Playlists" + ", Limit = " + str(stop))
-                youtubeplaylist = 'https://gdata.youtube.com/feeds/api/playlists/' +setting1+ '?start-index=1'
+                youtubeplaylist = 'https://gdata.youtube.com/feeds/api/playlists/' +setting1+ '?start-index=' +str(startIndex)
                 youtube = youtubeplaylist                        
             elif setting2 == '3': #youtube new subscriptions
                 self.log("createYoutubeFilelist, CHANNEL: " + str(self.settingChannel) + ", Youtube New Subscription" + ", Limit = " + str(limit))
@@ -3237,7 +3260,6 @@ class ChannelList:
             try:
                 label = (labels.group(1)).lower()
                 upnp = (files.group(1))
-                print label
                 if label == 'playon':
                     PlayonPath = upnp
                     break
@@ -4322,10 +4344,10 @@ class ChannelList:
         return DetailLST
 
 
-    #recursivly walk through plugin directories, return tmpstr of all files found.
+    #recursively walk through plugin directories, return tmpstr of all files found.
     def PluginWalk(self, path, excludeLST, limit, channel, xType='PluginTV', FleType='video'):
         print "PluginWalk"
-        filecount = 0
+        dirlimit = limit / 4
         tmpstr = ''
         LiveID = 'tvshow|0|0|False|1|NR|'
         fileList = []
@@ -4333,11 +4355,7 @@ class ChannelList:
         Managed = False
         PluginPath = str(os.path.split(path)[0])
         PluginName = PluginPath.replace('plugin://plugin.video.','').replace('plugin://plugin.program.','')
-        
-        print excludeLST
-        excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']#filter out unwanted folders, keep from looping...
-        print 'excludeLST', excludeLST
-        
+
         json_query = ('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["title","year","mpaa","imdbnumber","description","season","episode","playcount","genre","duration","runtime","showtitle","album","artist","plot","plotoutline","tagline"]}, "id": 1}' % ((path), FleType))
         json_folder_detail = self.sendJSON(json_query)
         file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
@@ -4362,38 +4380,33 @@ class ChannelList:
             filetypes = re.search('"filetype" *: *"(.*?)"', f)
             labels = re.search('"label" *: *"(.*?)"', f)
             files = re.search('"file" *: *"(.*?)"', f)
-            titles = re.search('"title" *: *"(.*?)"', f)
-            showtitles = re.search('"showtitle" *: *"(.*?)"', f)
             
             #if core variables have info proceed
             if filetypes and labels and files:
                 filetype = filetypes.group(1)
-                label = labels.group(1)
                 file = files.group(1)
+                label = labels.group(1)
                 
                 if label.lower() not in excludeLST and label != '':
-                    
-                    if showtitles != None and len(showtitles.group(1)) > 0:
-                        FolderName = showtitles.group(1)
-                    else:
-                        FolderName = label
-
                     if filetype == 'directory':
-                        #if no return (bad file), try unquote
-                        if not self.PluginInfo(file):
-                            print 'unquote'
-                            file = unquote(file).replace('",return)','')
-                            #remove unwanted reference to super.favorites plugin
-                            try:
-                                file = (file.split('ActivateWindow(10025,"')[1])
-                            except:
-                                pass
+                        #try to speed up parsing by not over searching directories when media limit is low
+                        if self.dircount < limit and self.filecount < limit:
+                        
+                            #if no return (bad file), try unquote
+                            if not self.PluginInfo(file):
+                                print 'unquote'
+                                file = unquote(file).replace('",return)','')
+                                #remove unwanted reference to super.favorites plugin
+                                try:
+                                    file = (file.split('ActivateWindow(10025,"')[1])
+                                except:
+                                    pass
 
-                        if self.background == False:
-                            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building " + xType + ", parsing " + (xName), "found " + label)
-                            
-                        dirs.append(file)
-                        filecount += 1
+                            if self.background == False:
+                                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building " + xType + ", parsing " + (xName), "found " + label)
+                                
+                            dirs.append(file)
+                            self.dircount += 1
                         
                     elif filetype == 'file':
                     
@@ -4425,20 +4438,18 @@ class ChannelList:
                             
                             if not runtimes or dur == 0 or dur == '0':
                                 dur = 3600
-
+                        
+                        #correct playon default duration
+                        if dur == 18000:
+                            dur = 3600
+                            
                         self.log("buildFileList.dur = " + str(dur))
 
                         if dur > 0:
-                            filecount += 1
+                            self.filecount += 1
                             seasonval = -1
                             epval = -1
-
-                            if self.background == False:
-                                if filecount == 1:
-                                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding " + xType + ", parsing " + FolderName, "added " + str(filecount) + " entry")
-                                else:
-                                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding " + xType + ", parsing " + FolderName, "added " + str(filecount) + " entries")
-                    
+                            
                             tmpstr = str(dur) + ','
                             labels = re.search('"label" *: *"(.*?)"', f)
                             titles = re.search('"title" *: *"(.*?)"', f)
@@ -4451,14 +4462,23 @@ class ChannelList:
                             imdbnumbers = re.search('"imdbnumber" *: *"(.*?)"', f)
                             ratings = re.search('"mpaa" *: *"(.*?)"', f)
                             descriptions = re.search('"description" *: *"(.*?)"', f)
+                            episodes = re.search('"episode" *: *(.*?),', f)
 
-                            if showtitles != None and len(showtitles.group(1)) > 0:
+                            if episodes.group(1) != '-1' and showtitles != None and len(showtitles.group(1)) > 0:
                                 type = 'tvshow'
-                                dbids = re.search('"tvshowid" *: *([0-9]*?),', f)    
+                                dbids = re.search('"tvshowid" *: *([0-9]*?),', f)   
+                                FolderName = showtitles.group(1) 
                             else:
                                 type = 'movie'
                                 dbids = re.search('"movieid" *: *([0-9]*?),', f)
+                                FolderName = label
                             
+                            if self.background == False:
+                                if self.filecount == 1:
+                                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding " + xType + ", parsing " + FolderName, "added " + str(self.filecount) + " entry")
+                                else:
+                                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding " + xType + ", parsing " + FolderName, "added " + str(self.filecount) + " entries")
+                    
                             if years == None or len(years.group(1)) == 0:
                                 try:
                                     year = int(((showtitles.group(1)).split(' ('))[1].replace(')',''))
@@ -4519,37 +4539,65 @@ class ChannelList:
                             theplot = theplot.replace('//', ' ')
 
                             # This is a TV show
-                            if showtitles != None and len(showtitles.group(1)) > 0:
-                                season = re.search('"season" *: *(.*?),', f)
-                                episode = re.search('"episode" *: *(.*?),', f)
+                            if episodes.group(1) != '-1' and showtitles != None and len(showtitles.group(1)) > 0:
+                                seasons = re.search('"season" *: *(.*?),', f)
+                                episodes = re.search('"episode" *: *(.*?),', f)
                                 swtitle = (labels.group(1)).replace('\\','')
                                 swtitle = (swtitle.split('.', 1)[-1]).replace('. ','')
-                                
-                                try:
-                                    seasonval = int(season.group(1))
-                                    epval = int(episode.group(1))
 
-                                    swtitle = (('0' if seasonval < 10 else '') + str(seasonval) + 'x' + ('0' if epval < 10 else '') + str(epval) + ' - ' + (swtitle)).replace('  ',' ')
+                                try:
+                                    seasonval = int(seasons.group(1))      
+                                    epval = int(episodes.group(1))     
                                     
+                                    if seasonval == 0 or epval == 0:
+                                        try:
+                                            SEinfo = (swtitle.split(' -')[0])
+                                            season = SEinfo.split('e')[0].replace('s','')
+                                            episode = SEinfo.split('e')[1]
+                                            eptitles = (swtitle.split('- ', 1)[1])
+                                            
+                                            if season:
+                                                seasonval = season
+                                            if episode:
+                                                epval = episode
+                                        except Exception,e:
+                                            try:
+                                                SEinfo = swtitle.split(' ',1)[0]
+                                                season = SEinfo.split('E')[0].replace('S','')
+                                                episode = SEinfo.split('E')[1]
+                                                eptitles = (swtitle.split(' ', 1)[1])
+                                            
+                                                if season:
+                                                    seasonval = season
+                                                if episode:
+                                                    epval = episode
+                                            except: 
+                                                eptitles = swtitle
+                                                pass
+
+                                    swtitle = (('0' if seasonval < 10 else '') + str(seasonval) + 'x' + ('0' if epval < 10 else '') + str(epval) + ' - ' + (eptitles)).replace('  ',' ')
+
                                 except Exception,e:
                                     self.log("Season/Episode formatting failed" + str(e))
                                     seasonval = -1
                                     epval = -1
 
+                                showtitle = (showtitles.group(1)).replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','')
+                                    
                                 if PlugCHK in DYNAMIC_PLUGIN_TV:
                                     print 'DYNAMIC_PLUGIN_TV'
-                                                      
+         
                                     if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true': 
                                         print 'EnhancedGuideData' 
 
                                         if imdbnumber == 0:
-                                            imdbnumber = self.getTVDBID(showtitles.group(1), year)
+                                            imdbnumber = self.getTVDBID(showtitle, year)
                                                 
                                         if genre == 'Unknown':
-                                            genre = (self.getGenre(type, showtitles.group(1), year))
+                                            genre = (self.getGenre(type, showtitle, year))
                                             
                                         if rating == 'NR':
-                                            rating = (self.getRating(type, showtitles.group(1), year, imdbnumber))
+                                            rating = (self.getRating(type, showtitle, year, imdbnumber))
 
                                     if imdbnumber != 0:
                                         Managed = self.sbManaged(imdbnumber)
@@ -4557,16 +4605,16 @@ class ChannelList:
                                     GenreLiveID = [genre, type, imdbnumber, dbid, Managed, playcount, rating]
                                     genre, LiveID = self.packGenreLiveID(GenreLiveID)
                                 
-                                tmpstr += showtitles.group(1) + "//" + swtitle + "//" + theplot + "//" + genre + "////" + LiveID
+                                tmpstr += showtitle + "//" + swtitle + "//" + theplot + "//" + genre + "////" + LiveID
                                 istvshow = True
 
                             else:
                                                                 
                                 if labels:
-                                    label = labels.group(1)
+                                    label = (labels.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','')
                                 
                                 if titles:
-                                    title = titles.group(1)
+                                    title = (titles.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','')
                                    
                                 tmpstr += (label).replace('\\','') + "//"
                                     
@@ -4626,12 +4674,17 @@ class ChannelList:
                             else:
                                 fileList.append(tmpstr)
                                 
-            if filecount >= limit:
+            if self.filecount >= limit:
                 break
         
-        for item in dirs:
-            #recursively scan all subfolders
-            fileList += self.PluginWalk(item, excludeLST, limit, channel, xType, FleType)
+        for item in dirs: 
+        
+            if self.filecount >= limit:
+                break
+                
+            #recursively scan all subfolders  
+            fileList += self.PluginWalk(item, excludeLST, limit, channel, xType, FleType)           
+            
 
         if self.channels[channel - 1].mode & MODE_ORDERAIRDATE > 0:
             seasoneplist.sort(key=lambda seep: seep[1])
@@ -4640,7 +4693,7 @@ class ChannelList:
             for seepitem in seasoneplist:
                 fileList.append(seepitem[2])
 
-        if filecount == 0:
+        if self.filecount == 0:
             self.logDebug(json_folder_detail)
 
         self.log("buildFileList return")
@@ -4652,7 +4705,9 @@ class ChannelList:
         showList = []
         DetailLST = []
         DetailLST_CHK = []
-                                                
+        self.dircount = 0
+        self.filecount = 0
+        
         try:
             Directs = (setting1.split('/')) # split folders
             Directs = ([x for x in Directs if x != '']) # remove empty elements
@@ -4670,8 +4725,9 @@ class ChannelList:
         except:
             excludeLST = []
             pass
-        
-        excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']#filter out unwanted folders, keep from looping...
+            
+        #filter out unwanted folders
+        excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']
         
         if self.background == False:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building PluginTV", 'parsing ' + (PluginName))
@@ -4685,8 +4741,6 @@ class ChannelList:
             limit = int(setting3)
             self.log("BuildPluginFileList, Overriding Global Parse-limit to " + str(limit))
 
-        print plugin , Directs, limit
-        
         Match = True
         while Match:
 
@@ -4701,32 +4755,35 @@ class ChannelList:
             #end while when no more directories to walk
             if len(Directs) <= 1:
                 Match = False
-
-            for i in range(len(DetailLST)):
-            
-                if self.background == False:
-                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building PluginTV, parsing " + (PluginName), str(Directs[0]))
-                    
-                Detail = str(DetailLST[i]).split(',')
-                filetype = Detail[0]
-                title = Detail[1]
-                genre = Detail[2]
-                dur = Detail[3]
-                description = Detail[4]
-                file = Detail[5]
                 
-                if title.lower() not in excludeLST and title != '':
-                    if filetype == 'directory':
-                        if Directs[0].lower() == title.lower():
-                            print Directs[0].lower() + ' MATCH ' + title.lower(), file
-                            Directs.pop(0) #remove old directory, search next element
-                            plugin = file
-                            break
-        
+            try:
+                for i in range(len(DetailLST)):
+                
+                    if self.background == False:
+                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building PluginTV, parsing " + (PluginName), str(Directs[0]))
+                        
+                    Detail = (DetailLST[i]).split(',')
+                    filetype = Detail[0]
+                    title = Detail[1]
+                    genre = Detail[2]
+                    dur = Detail[3]
+                    description = Detail[4]
+                    file = Detail[5]
+                    
+                    if title.lower() not in excludeLST and title != '':
+                        if filetype == 'directory':
+                            if Directs[0].lower() == title.lower():
+                                print 'directory match'
+                                Directs.pop(0) #remove old directory, search next element
+                                plugin = file
+                                break
+            except Exception,e:
+                pass
+                
         #all directories found, walk final folder
         if len(Directs) == 0:              
             showList = self.PluginWalk(plugin, excludeLST, limit, channel, 'PluginTV', 'video')
-            
+                
         return showList    
         
         
@@ -4735,6 +4792,8 @@ class ChannelList:
         showList = []
         DetailLST = []
         DetailLST_CHK = []
+        self.dircount = 0
+        self.filecount = 0
         upnpID = self.playon_player()
 
         if upnpID != False:
@@ -4742,12 +4801,10 @@ class ChannelList:
             try:
                 Directs = (setting1.split('/')) # split folders
                 Directs = ([x for x in Directs if x != '']) # remove empty elements
-                plugins = Directs[1] # element 1 in split is plugin name
-                Directs = Directs[2:] # slice two unwanted elements. ie (upnp:, app name)
-                plugin = 'plugin://' + plugins
-                PluginName = plugins
+                PluginName = Directs[0]
             except:
                 Directs = []
+                PluginName = setting1
                 pass
 
             try:
@@ -4756,8 +4813,9 @@ class ChannelList:
             except:
                 excludeLST = []
                 pass
-            
-            excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']#filter out unwanted folders, keep from looping...
+                
+            #filter out unwanted folders
+            excludeLST += ['back','previous','home','create new super folder','explore xbmc favourites','explore kodi favourites','isearch','search','clips','seasons','trailers']
                     
             if self.background == False:
                 self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "Building PlayOn", 'parsing ' + str(PluginName))
@@ -4770,8 +4828,6 @@ class ChannelList:
             else:
                 limit = int(setting3)
                 self.log("BuildPlayonFileList, Overriding Global Parse-limit to " + str(limit))
-
-            print upnpID, Directs, limit
 
             Match = True
             while Match:
@@ -4789,7 +4845,7 @@ class ChannelList:
                     Match = False
 
                 for i in range(len(DetailLST)):
-                    Detail = str(DetailLST[i]).split(',')
+                    Detail = (DetailLST[i]).split(',')
                     filetype = Detail[0]
                     title = Detail[1]
                     genre = Detail[2]
@@ -4800,7 +4856,7 @@ class ChannelList:
                     if title.lower() not in excludeLST and title != '':
                         if filetype == 'directory':
                             if Directs[0].lower() == title.lower():
-                                print Directs[0].lower() + ' MATCH ' + title.lower(), file
+                                print 'directory match'
                                 Directs.pop(0) #remove old directory, search next element
                                 upnpID = file
                                 break

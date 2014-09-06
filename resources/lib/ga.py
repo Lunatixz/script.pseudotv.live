@@ -24,20 +24,63 @@ PROPERTY_ID = environ.get("GA_PROPERTY_ID", "UA-45979766-1")
 # environment, calculate the SHA1 sum of it, convert this from base 16
 # to base 10 and get first 10 digits of this number.
 
-bcts = ''
-if REAL_SETTINGS.getSetting('bumpers') == 'true':
-    bcts = 'B/'
-if REAL_SETTINGS.getSetting('commercials') != '0':
-    bcts = bcts + 'C/'
-if REAL_SETTINGS.getSetting('trailers') != '0':
-    bcts = bcts + 'T/'
+bcts = 'BCT:/'
+if REAL_SETTINGS.getSetting('bumpers') == '1':
+    bcts += 'BL/'
+elif REAL_SETTINGS.getSetting('bumpers') == '2':
+    bcts += 'BI/'
+    
+if REAL_SETTINGS.getSetting('bumperratings') == 'true':
+    bcts += 'R/'
+    
+if REAL_SETTINGS.getSetting('commercials') == '1':
+    bcts += 'CL/'
+elif REAL_SETTINGS.getSetting('commercials') == '2':
+    bcts += 'CY/'
+elif REAL_SETTINGS.getSetting('commercials') == '3':
+    bcts += 'CI/'
+    
+if REAL_SETTINGS.getSetting('AsSeenOn') == 'true':
+    bcts += 'A/'
+    
+if REAL_SETTINGS.getSetting('trailers') == '1':
+    bcts += 'TL/'
+elif REAL_SETTINGS.getSetting('trailers') == '2':
+    bcts += 'TX/'
+elif REAL_SETTINGS.getSetting('trailers') == '3':
+    bcts += 'TY/'
+elif REAL_SETTINGS.getSetting('trailers') == '4':
+    bcts += 'TI/'
+    
+# cn_genre = 'CN:/'
+# if REAL_SETTINGS.getSetting('CN_TV') == 'true':
+    # cn_genre += 'T'
+# if REAL_SETTINGS.getSetting('CN_Movies') == 'true':
+    # cn_genre += 'M'
+# if REAL_SETTINGS.getSetting('CN_Episodes') == 'true':
+    # cn_genre += 'E'
+# if REAL_SETTINGS.getSetting('CN_Sports') == 'true':
+    # cn_genre += 'S'
+# if REAL_SETTINGS.getSetting('CN_News') == 'true':
+    # cn_genre += 'N'
+# if REAL_SETTINGS.getSetting('CN_Kids') == 'true':
+    # cn_genre += 'K'
+# if REAL_SETTINGS.getSetting('CN_Other') == 'true':
+    # cn_genre += 'O'
+# cn_genre = (cn_genre + '/').replace('//','')
 
+# share = 'CH:/'
+# if REAL_SETTINGS.getSetting('ChannelSharing') == 'true':
+    # share += 'CS/'
+# if REAL_SETTINGS.getSetting('UPNP1') == 'true' or REAL_SETTINGS.getSetting('UPNP2') == 'true' or REAL_SETTINGS.getSetting('UPNP3') == 'true':
+    # share += 'CU/'
+    
 if REAL_SETTINGS.getSetting('Donor_Enabled') == 'true':
     try:
         donor = REAL_SETTINGS.getSetting('Donor_UP')
         donor = donor.split(':')[0]
     except Exception,e:
-        donor = 'UknownUser'
+        donor = 'Unknown'
 else:
     donor = 'FreeUser'
 

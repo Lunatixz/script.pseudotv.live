@@ -1,4 +1,7 @@
-[*] NEW! Playon Hulu/Amazon/Netflix autotuning 
+[*] Youtube playlist pagination fix.
+[*] Direct Plugin (Chtype 15) Code rewrite/setting2 format change.
+[*] NEW! Playon & InternetTV Community List autotuning.
+[*] NEW! Playon Amazon/Hulu/Netflix autotuning.
 [*] [COLOR=blue]^ v.0.4.9 ^[/COLOR] 
 [*] Start on mute fix, Youtube playlist limit fix
 [*] [COLOR=blue]^ v.0.4.8a ^[/COLOR] 

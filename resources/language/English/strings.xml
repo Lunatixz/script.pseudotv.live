@@ -108,7 +108,9 @@
                             <string id="30095">Select Resolution</string>
                         <string id="30110">Community List:</string>
                             <string id="30111">Find Plugin Channels</string>
+                            <string id="30116">Find Playon Channels</string>
                             <string id="30115">Find Network Channels</string>
+                            <string id="30117">Find InternetTV Channels</string>
                             <string id="30112">Find Random RSS Channels</string>
                             <string id="30113">Find Random Youtube Channels</string>
                             <string id="30114">Find Random Youtube Playlists</string>

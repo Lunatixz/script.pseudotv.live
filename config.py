@@ -533,9 +533,9 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
         elif chantype == 14:
             return "Extras"
         elif chantype == 15:
-            return "PluginTV"
+            return "Plugin"
         elif chantype == 16:
-            return "PluginTV"
+            return "Playon"
         elif chantype == 9999:
             return "None"
 
@@ -637,9 +637,9 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             elif chantype == 14:
                 newlabel = channame + " - Extras"
             elif chantype == 15:
-                newlabel = channame + " - PluginTV"
+                newlabel = channame + " - Plugin"
             elif chantype == 16:
-                newlabel = channame + " - PluginTV"
+                newlabel = channame + " - Playon"
             elif chantype == 7:
                 if chansetting1[-1] == '/' or chansetting1[-1] == '\\':
                     newlabel = os.path.split(chansetting1[:-1])[1]

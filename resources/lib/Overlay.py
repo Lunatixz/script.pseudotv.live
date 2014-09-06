@@ -257,6 +257,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         settingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml'))
         nsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.bak.xml'))
         atsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.pretune.xml'))
+        self.Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
         dlg = xbmcgui.Dialog()
 
         try:
@@ -400,10 +401,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 REAL_SETTINGS.setSetting("autoFindCustom","true")
                 REAL_SETTINGS.setSetting("autoFindNetworks","true")
                 REAL_SETTINGS.setSetting("autoFindMovieGenres","true")
+                REAL_SETTINGS.setSetting("autoFindMixGenres","true")
                 REAL_SETTINGS.setSetting("autoFindMusicVideosVevoTV","true")
+                REAL_SETTINGS.setSetting("autoFindCommunity_RSS","true")
                 REAL_SETTINGS.setSetting("autoFindCommunity_Plugins","true")
                 REAL_SETTINGS.setSetting("autoFindCommunity_Youtube_Networks","true")
-                REAL_SETTINGS.setSetting("autoFindInternetStrms","true")
+                REAL_SETTINGS.setSetting("autoFindCommunity_Youtube_Channels","true")
                 autoTune = True
                 
                 if autoTune:
@@ -465,7 +468,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.startSleepTimer()
         self.startNotificationTimer()
         self.playerTimer.start()
-       
+
         if self.backgroundUpdating < 2 or self.isMaster == False:
             self.channelThread.name = "ChannelThread"
             self.channelThread.start()
@@ -474,17 +477,18 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.ArtServiceThread.name = "ArtServiceThread"
             self.ArtServiceThread.start()
 
-        if SETTOP == 'true':
-            Refresh = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]   
-            self.channelThread_Timer = threading.Timer(((60.0)), self.channelList.Settop)
-            self.ArtServiceThread.name = "channelThread_Timer"
-            self.channelThread_Timer.start()
-                
-            if DEBUG == 'true':
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Settop Start", 1000, THUMB) )
-            
         self.actionSemaphore.release()
         self.log('onInit return')
+    
+    
+    #SETTOP BOX
+    def Settop(self):
+        print 'SETTOP BOX Enabled'   
+        self.channelList.setupList() 
+        self.channelThread_Timer = threading.Timer(float(self.Refresh), self.Settop)
+        self.channelThread_Timer.name = "ChannelThread_Timer"
+        self.channelThread_Timer.start()
+            
 
     # setup all basic configuration parameters, including creating the playlists that
     # will be used to actually run this thing
@@ -514,8 +518,13 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             
         if FileAccess.exists(self.channelLogos) == False:
             self.channelLogos = DEFAULT_LOGO_LOC
-
         self.log('Channel logo folder - ' + self.channelLogos)
+        
+        if SETTOP == 'true':
+            self.channelThread_Timer = threading.Timer(float(self.Refresh), self.Settop)
+            self.channelThread_Timer.name = "channelThread_Timer"
+            self.channelThread_Timer.start()
+           
         self.channelList = ChannelList()
         self.channelList.myOverlay = self
         self.channels = self.channelList.setupList()
