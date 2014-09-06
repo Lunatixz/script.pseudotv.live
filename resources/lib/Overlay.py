@@ -731,8 +731,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("about to mute");
         # Mute the channel before changing
         # xbmc.executebuiltin("Mute()");           
-        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
-        self.channelList.sendJSON(json_query)
+        #json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+        #self.channelList.sendJSON(json_query)
         xbmc.sleep(self.channelDelay)
         # set the show offset
         self.Player.playselected(self.channels[self.currentChannel - 1].playlistPosition)
@@ -760,8 +760,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
                         if self.waitForVideoPaused() == False:
                             # xbmc.executebuiltin("Mute()");
-                            json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
-                            self.channelList.sendJSON(json_query)
+                            #json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":true}, "id": 2}')
+                            #self.channelList.sendJSON(json_query)
                             return
                 except:
                     self.log('Exception during seek on paused channel', xbmc.LOGERROR)
@@ -820,8 +820,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         # Unmute
         self.log("Finished, unmuting");
         # xbmc.executebuiltin("Mute()");
-        json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
-        self.channelList.sendJSON(json_query)
+        #json_query = uni('{"jsonrpc": "2.0", "method": "Application.SetMute", "params": {"mute":false}, "id": 2}')
+        #self.channelList.sendJSON(json_query)
         
         self.showChannelLabel(self.currentChannel)
         self.lastActionTime = time.time()
