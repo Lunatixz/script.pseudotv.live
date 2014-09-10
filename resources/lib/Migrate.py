@@ -89,8 +89,8 @@ class Migrate:
         PlayonPath = chanlist.playon_player()
         
         limit = MEDIA_LIMIT[int(Globals.REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-        if limit == 0 or limit < 50 or limit >= 250:
-            limit = 50
+        if limit == 0 or limit < 25 or limit >= 100:
+            limit = 25
 
         # Custom Playlists
         self.updateDialogProgress = 1
@@ -141,50 +141,52 @@ class Migrate:
             SuperFav = chanlist.plugin_ok('plugin.program.super.favourites')
             
             if SuperFav == True:
-                plugin_details = chanlist.PluginInfo('plugin://plugin.program.super.favourites')
-                filter =['Create New Super Folder','Explore Kodi favourites','iSearch']
+                plugin_details = chanlist.PluginQuery('plugin://plugin.program.super.favourites')
+                filter =['create new super folder','explore favourites','explore  favourites','explore xbmc favourites','explore kodi favourites','isearch','search']
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding Super Favourites","")
 
-                Match = True
-                while Match:
+                try:
+                    Match = True
+                    while Match:
+                        
+                        for f in (plugin_details):
+                            filetypes = re.search('"filetype" *: *"(.*?)"', f)
+                            labels = re.search('"label" *: *"(.*?)"', f)
+                            files = re.search('"file" *: *"(.*?)"', f)
 
-                    for f in (plugin_details):
-                        filetypes = re.search('"filetype" *: *"(.*?)"', f)
-                        labels = re.search('"label" *: *"(.*?)"', f)
-                        files = re.search('"file" *: *"(.*?)"', f)
+                            #if core variables have info proceed
+                            if filetypes and files and labels:
 
-                        #if core variables have info proceed
-                        if filetypes and files and labels:
+                                filetype = filetypes.group(1)
+                                file = (files.group(1))
+                                label = (labels.group(1))
 
-                            filetype = filetypes.group(1)
-                            file = (files.group(1))
-                            label = (labels.group(1))
-
-                            if label not in filter and label != '':
-                                if filetype == 'directory':
-                                    SFmatch = unquote(file)
-                                    SFmatch = SFmatch.split('Super+Favourites')[1].replace('\\','/')
-                                    print SFmatch
-                                    if SFmatch == '/PseudoTV_Live':
-                                        plugin_details = chanlist.PluginInfo(file)
-                                        break
-                                    else:
-                                        if SFmatch[0:9] != '/Channel_':
-                                            Match = False
-                                
-                                    SFname = SFmatch.replace('/PseudoTV_Live/','').replace('/','')
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'plugin://plugin.program.super.favourites' + SFmatch)
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "Create New Super Folder,Explore Kodi favourites,iSearch")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", SFname)
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                    channelNum += 1
-                            
+                                if label.lower() not in filter and label != '':
+                                    if filetype == 'directory':
+                                        SFmatch = unquote(file)
+                                        SFmatch = SFmatch.split('Super+Favourites')[1].replace('\\','/')
+                                        print SFmatch
+                                        if SFmatch == '/PseudoTV_Live':
+                                            plugin_details = chanlist.PluginQuery(file)
+                                            break
+                                        else:
+                                            if SFmatch[0:9] != '/Channel_':
+                                                Match = False
+                                    
+                                        SFname = SFmatch.replace('/PseudoTV_Live/','').replace('/','')
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'plugin://plugin.program.super.favourites' + SFmatch)
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "Create New Super Folder,Explore favourites,iSearch")
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", SFname)
+                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                        channelNum += 1
+                except:
+                    pass
                             
         # LiveTV - PVR
         self.updateDialogProgress = 10
@@ -983,11 +985,12 @@ class Migrate:
                 data = f.readlines()
                 f.close()
                 data = data[2:] #remove first two unwanted lines
+                random.shuffle(data)#shuffle channel table
             except urllib2.URLError as e:
                 return
             
             try:
-                for i in range(len(data)):
+                for i in range(limit):
                     line = str(data[i]).replace("\n","").replace('""',"")
                     line = line.split("|")
                     chtype = line[0]
@@ -1302,7 +1305,7 @@ class Migrate:
                                 channelNum += 1
                                 
                             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Adding F.T.V Favourites",label)
-                except Exception,e:
+                except:
                     pass 
                                 
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
@@ -1499,7 +1502,7 @@ class Migrate:
                 chsetting2 = Globals.ADDON_SETTINGS.getSetting('Channel_' + str(i + 1) + '_2')
                 chsetting3 = Globals.ADDON_SETTINGS.getSetting('Channel_' + str(i + 1) + '_3')
                 chsetting4 = Globals.ADDON_SETTINGS.getSetting('Channel_' + str(i + 1) + '_4')
-            except Exception,e:
+            except:
                 pass
 
             if chtype == 0:

@@ -48,11 +48,11 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
         xbmc.log('script.pseudotv.live-default: CheckVersion')
         
         try:        
-            curver=xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
-            source= open( curver, mode = 'r' )
-            link = source . read( )
-            source . close ( )
-            match=re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+            curver = xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
+            source = open(curver, mode = 'r')
+            link = source.read()
+            source.close()
+            match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
             
             for vernum in match:
                     print 'Original Version is ' + vernum
@@ -62,16 +62,18 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             except:
                 link='nill'
 
-            link=link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
-            match=re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+            link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
+            match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
             
-            if len(match)>0:
+            if len(match) > 0:
                 if vernum != str(match[0]):
                     dialog = xbmcgui.Dialog()
-                    confirm=xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to update now?',"Cancel","Update")
+                    confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to update now?',"Cancel","Update")
                     if confirm:
                         UPDATEFILES() 
                         UPDATED = True
+                    else:
+                        UPDATED = False
         except Exception:
             pass
             
@@ -83,9 +85,9 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             REAL_SETTINGS.setSetting("TRL_Donor", "false")
             REAL_SETTINGS.setSetting("CAT_Donor", "false")
             REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
-            REAL_SETTINGS.setSetting('ClearCache', 'true')
             xbmc.executebuiltin("RunScript("+__cwd__+"/videowindow.py,-autopatch)")
             xbmc.executebuiltin("RunScript("+__cwd__+"/donordownload.py,-autopatch)")
+            xbmc.executebuiltin("UpdateLocalAddons")
             TextBox()
             
             
