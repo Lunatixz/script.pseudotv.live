@@ -379,7 +379,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 return
                 
         elif NormalShutdown == "false":
-            xbmc.executebuiltin("Mute()");
             if settingsFile_flesize == 0 and nsettingsFile_flesize != 0:
                 self.log('Setting2 Restore onInit') 
                 self.Restore(nsettingsFile, settingsFile)
