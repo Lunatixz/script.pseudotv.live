@@ -359,22 +359,12 @@ ACTION_TELETEXT_BLUE = 218
 #// 5xx is reserved for additional gesture actions
 #define ACTION_GESTURE_END            599
 
-#Cinema Experience
-CE_THEME = ['Default', 'IMAX']
-CE_INTRO = ['ptvl_intro.mp4']
-CE_INTERMISSION = ['intermission.mp4']
-CE_COMING_SOON = ['coming_soon.mp4', 'imax_coming_soon.mp4']
-CE_FEATURE_PRESENTATION = ['feature_presentation.mp4', 'imax_feature_presentation.mp4']
-CE_PREMOVIE = ['premovie1.mp4', 'premovie2.mp4']
-CE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'ce')) + '/'
-CE_RATINGS_LOC = xbmc.translatePath(os.path.join(CE_LOC, 'ratings')) + '/'
-
 #UTC LiveTV plugin
 UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V']
 
 #Dynamic Artwork plugin types
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn'] #Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn'] #Title format must be "Movie (Year)"
 
 # Plugin seek blacklist
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow']

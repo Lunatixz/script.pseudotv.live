@@ -919,7 +919,7 @@
             <description>Now watching Label</description>
             <width>300</width>
             <height>30</height>
-            <label>Now Playing</label>
+            <label></label>
             <font>font12</font>
             <align>center</align>
             <textcolor>C0C0C0C0</textcolor>

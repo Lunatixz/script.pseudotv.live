@@ -82,18 +82,30 @@ def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
         REAL_SETTINGS.setSetting("Hub","false")
         pass
           
- 
-def CEpack():
-    xbmc.log('script.pseudotv.live-service: CEpack')
-
-    if xbmcvfs.exists(CE_LOC):
-        REAL_SETTINGS.setSetting("CinemaPack","true")
-        xbmc.log('script.pseudotv.live-service: CEpack - Installed')
+          
+def donorCHK():
+    xbmc.log('script.pseudotv.live-service: donorCHK')
+    
+    DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
+    DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
+    
+    if FileAccess.exists(DonorPath):
+        REAL_SETTINGS.setSetting("AT_Donor", "true")
+        REAL_SETTINGS.setSetting("COM_Donor", "true")
+        REAL_SETTINGS.setSetting("TRL_Donor", "true")
+        REAL_SETTINGS.setSetting("CAT_Donor", "true")
+    elif FileAccess.exists(DL_DonorPath):  
+        REAL_SETTINGS.setSetting("AT_Donor", "true")
+        REAL_SETTINGS.setSetting("COM_Donor", "true")
+        REAL_SETTINGS.setSetting("TRL_Donor", "true")
+        REAL_SETTINGS.setSetting("CAT_Donor", "true")
     else:
-        REAL_SETTINGS.setSetting("CinemaPack","false")
-        xbmc.log('script.pseudotv.live-service: CEpack - Not Found!')
-        
-        
+        REAL_SETTINGS.setSetting("AT_Donor", "false")
+        REAL_SETTINGS.setSetting("COM_Donor", "false")
+        REAL_SETTINGS.setSetting("TRL_Donor", "false")
+        REAL_SETTINGS.setSetting("CAT_Donor", "false")
+    
+
 def autostart():
     xbmc.log('script.pseudotv.live-service: autostart')
     IDLE_TIME = AUTOSTART_TIMER[int(REAL_SETTINGS.getSetting('timer_amount'))] 
@@ -103,8 +115,8 @@ def autostart():
     sleep(IDLE_TIME)
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
 
-CEpack()
 HubSwap()
+donorCHK()
 
 # if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true": 
     # ArtServiceTimerThread = threading.Timer(float(1800), ArtServiceTimer)

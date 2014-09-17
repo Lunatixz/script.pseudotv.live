@@ -1,3 +1,10 @@
+[*] Initial Smoothstreams.tv support via Hub-Edition Only! Thanks aaearon
+[*] USTVnow XMLTV fix, InternetTV Autotune now Hub-Edition Only!
+[*] PseudoCinema rewrite (Removed Local CEPACK, Youtube sources only).
+[*] Super Favourites, Plugin Autotune and Seek fix.
+[*] Playon and RSS chtype tweaks.
+[*] EPG speed tweaks.
+[*] [COLOR=blue]^ v.0.5.0 ^[/COLOR] 
 [*] Youtube playlist pagination fix.
 [*] Direct Plugin (Chtype 15) Code rewrite/setting2 format change.
 [*] NEW! Playon & InternetTV Community List autotuning.

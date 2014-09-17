@@ -72,7 +72,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.PVRtitle = ''
         self.setArtwork1_Unlocked = False
         self.setArtwork2_Unlocked = False
-        self.VideoWindow = False
 
         for i in range(self.rowCount):
             self.channelButtons[i] = []
@@ -304,9 +303,11 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             baseh = self.getControl(111 + row).getHeight()
             basew = self.getControl(111 + row).getWidth()
 
-            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))        
-            if chtype != '':
-                chtype = int(chtype)
+            try:
+                chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))        
+            except:
+                chtype = ''
+                pass
             
             chname = ascii(self.MyOverlayWindow.channels[curchannel - 1].name)
             self.lastExitTime = (ADDON_SETTINGS.getSetting("LastExitTime"))
@@ -361,6 +362,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         videotime = time.time() - epochBeginDate
                         reftime = time.time()
                     else:
+                        playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                         videotime = xbmc.Player().getTime()
                         reftime = time.time()
                    
@@ -456,9 +458,12 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         mylabel = self.MyOverlayWindow.channels[curchannel - 1].getItemTitle(playlistpos)
                         mygenre = self.MyOverlayWindow.channels[curchannel - 1].getItemgenre(playlistpos)
                         myLiveID = self.MyOverlayWindow.channels[curchannel - 1].getItemLiveID(playlistpos)
-                        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))       
-                        if chtype != '':
-                            chtype = int(chtype)
+                        
+                        try:
+                            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
+                        except:
+                            chtype = ''
+                            pass
                             
                         type = (chanlist.unpackLiveID(myLiveID))[0]
                         playcount = int((chanlist.unpackLiveID(myLiveID))[4])
@@ -955,7 +960,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         chnoffset = self.focusRow - 2
         newchan = self.centerChannel
         self.Artdownloader = Artdownloader()  
-        mpath = ''
         
         while chnoffset != 0:
             if chnoffset > 0:
@@ -972,30 +976,30 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             return
 
         now = time.time()
-        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))       
-        if chtype != '':
-            chtype = int(chtype)
+        
+        try:
+            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))       
+        except:
+            chtype = ''
+            pass
         
         setting3 = ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_3')
         chanlist = ChannelList()
         mediapath = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemFilename(plpos))
-        mediaduration = int((self.MyOverlayWindow.channels[newchan - 1].getItemDuration(plpos)) - now)  
         chname = ascii(self.MyOverlayWindow.channels[newchan - 1].name)
-        genre = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemgenre(plpos))
         title = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemTitle(plpos))
         LiveID = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemLiveID(plpos))
-        youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube/?path=/root']
         
         if mediapath[0:5] == 'stack':
             smpath = (mediapath.split(' , ')[0]).replace('stack://','')
             mpath = (os.path.split(smpath)[0])
+        elif mediapath.startswith('plugin://plugin.video.bromix.youtube') or mediapath.startswith('plugin://plugin.video.youtube/?path=/root'):
+            mpath = (os.path.split(mediapath)[0])
+            YTid = mediapath.split('id=')[1]
+            mpath = (mpath + '/' + YTid).replace('/?path=/root','')
         else:
             mpath = (os.path.split(mediapath)[0])
         
-        if mpath in youtube:
-            YTid = mediapath.split('id=')[1]
-            mpath = (mpath + '/' + YTid).replace('/?path=/root','')
-            
         self.PVRchtype = chtype
         self.PVRmediapath = mediapath
         self.PVRchname = chname
@@ -1004,14 +1008,11 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         LiveID = chanlist.unpackLiveID(LiveID)
         type = LiveID[0]
         id = LiveID[1]
-        dbid = LiveID[2]
         Managed = LiveID[3]
         playcount = int(LiveID[4])
-        rating = LiveID[5]
                 
         #Check if VideoWindow Patch found, change label.
-        if FileAccess.exists(os.path.join(skinPath, 'custom_script.pseudotv.live_9506.xml')):
-            self.VideoWindow = True
+        if self.MyOverlayWindow.VideoWindow == True:
             try:
                 self.getControl(523).setLabel('NOW WATCHING:')
             except:
@@ -1019,40 +1020,28 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 
         #Change Label when Dynamic artwork enabled
         try:
-            if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":      
-            
-                if self.infoOffset > 0:
-                    self.getControl(522).setLabel('COMING UP:')
-                    self.getControl(515).setVisible(False)
-                    
-                elif self.infoOffset < 0:
-                    self.getControl(522).setLabel('ALREADY SEEN:')
-                    self.getControl(515).setVisible(False)
-                    
-                elif self.infoOffset == 0 and self.infoOffsetV == 0:
-                    self.getControl(522).setLabel('NOW WATCHING:')
-                    self.getControl(515).setVisible(False)
-                    
-                elif self.infoOffsetV != 0 and self.infoOffset == 0:
-                    self.getControl(522).setLabel('ON NOW:')                  
-                    self.getControl(515).setVisible(False)
-                                     
-            else:       
-                self.getControl(522).setLabel('NOW WATCHING:')
-                self.getControl(515).setVisible(True)    
+            self.getControl(522).setVisible(False)
+
+            if self.infoOffset > 0:
+                self.getControl(515).setVisible(False)
+            elif self.infoOffset < 0:
+                self.getControl(515).setVisible(False)
+            elif self.infoOffset == 0 and self.infoOffsetV == 0:
+                self.getControl(515).setVisible(False) 
+            elif self.infoOffsetV != 0 and self.infoOffset == 0:           
+                self.getControl(515).setVisible(False)
         except:
             pass
-
+    
         SEtitle = self.MyOverlayWindow.channels[newchan - 1].getItemEpisodeTitle(plpos) 
         
         try:
-            SEinfo = SEtitle.split(' -')[0]
-            season = int(SEinfo.split('x')[0])
-            episode = int(SEinfo.split('x')[1])
-            eptitles = SEtitle.split('- ')
-            eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
-            
             if self.showSeasonEpisode:
+                SEinfo = SEtitle.split(' -')[0]
+                season = int(SEinfo.split('x')[0])
+                episode = int(SEinfo.split('x')[1])
+                eptitles = SEtitle.split('- ')
+                eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
                 swtitle = ('S' + ('0' if season < 10 else '') + str(season) + 'E' + ('0' if episode < 10 else '') + str(episode) + ' - ' + (eptitle)).replace('  ',' ')
             else:
                 swtitle = SEtitle      
@@ -1104,6 +1093,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 type1EXT = self.Artdownloader.EXTtype(type1)
                 self.setArtwork1(type, chtype, id, mpath, type1EXT)
             except:
+                print 'setShowInfo.Label 507 not found'
                 pass
                
             try:
@@ -1111,31 +1101,31 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 type2EXT = self.Artdownloader.EXTtype(type2)
                 self.setArtwork2(type, chtype, id, mpath, type2EXT)
             except:
+                print 'setShowInfo.Label 509 not found'
                 pass
-        
-        elif REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "false" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true": 
-            #hide xbmc.videoplayer art since using dynamic art
-            try:
-                self.getControl(511).setVisible(False)  
-                self.getControl(512).setVisible(False)  
-                self.getControl(513).setVisible(False)
-            except:
-                pass  
-            try:
-                self.getControl(508).setImage(THUMB)
-            except:
-                pass   
-            try:
-                self.getControl(510).setImage(THUMB)
-            except:
-                pass   
         else:
             #use xbmc.videoplayer art since not using dynamic art
+            try:
+                self.getControl(508).setImage('NA.png')   
+            except:
+                pass   
+            try:
+                self.getControl(510).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(511).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(512).setImage('NA.png') 
+            except:
+                pass   
             try:
                 self.getControl(513).setVisible(True)
             except:
                 pass   
-                
+
         self.log('setShowInfo return')
 
         
@@ -1187,9 +1177,12 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     chnoffset += 1
 
             plpos = self.determinePlaylistPosAtTime(starttime, newchan)
-            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))       
-            if chtype != '':
-                chtype = int(chtype)
+            
+            try:
+                chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
+            except:
+                chtype = ''
+                pass
                 
             if plpos == -1:
                 self.log('Unable to find the proper playlist to set from EPG', xbmc.LOGERROR)
@@ -1263,9 +1256,12 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
     def determinePlaylistPosAtTime(self, starttime, channel):
         self.log('determinePlaylistPosAtTime ' + str(starttime) + ', ' + str(channel))
         channel = self.MyOverlayWindow.fixChannel(channel)
-        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))  
-        if chtype != '':
-            chtype = int(chtype)
+        
+        try:
+            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))  
+        except:
+            chtype = ''
+            pass
             
         self.lastExitTime = ADDON_SETTINGS.getSetting("LastExitTime")
         nowDate = datetime.datetime.now()
@@ -1284,6 +1280,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             if channel == self.MyOverlayWindow.currentChannel: #currentchannel epg
                 #Live TV pull date from the playlist entry
                 if chtype == 8:
+                    playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                     tmpDate = self.MyOverlayWindow.channels[channel - 1].getItemtimestamp(playlistpos)
                     self.log("setbuttonnowtime2 " + str(tmpDate))
                    
@@ -1297,6 +1294,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     videotime = time.time() - epochBeginDate
                     reftime = time.time()
                 else:
+                    playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                     try:
                         videotime = xbmc.Player().getTime()
                     except:

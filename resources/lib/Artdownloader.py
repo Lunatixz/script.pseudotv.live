@@ -124,8 +124,6 @@ class Artdownloader:
 
     def FindArtwork_NEW(self, type, chtype, id, mediapath, arttypeEXT):
         print ('FindArtwork_NEW')
-        print type, chtype, id, mediapath, arttypeEXT
-
         setImage = ''
         arttype = arttypeEXT.split(".")[0]
         fle = str(id) + '-' + arttypeEXT
@@ -138,37 +136,35 @@ class Artdownloader:
         
         if chtype <= 7:
             print ('FindArtwork, Chtype <= 7')
-            print ('Find Json Artwork')
-            setImage = self.LocalArtwork(mediapath, type, arttype)
-            
-            if not setImage:
-                print ('Find Json Artwork - Fallback')
-                arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
-                setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
+            print ('Find Infolder Artwork')                        
+            artSeries = xbmc.translatePath(os.path.join(smpath, arttypeEXT))
+            artSeason = xbmc.translatePath(os.path.join(mediapath, arttypeEXT))
+        
+            if FileAccess.exists(artSeries): 
+                setImage = artSeries
+            elif FileAccess.exists(artSeason):
+                setImage = artSeason
+            else:
+                print ('Find Infolder Artwork - Fallback')
+                arttypeEXT_fallback = arttypeEXT.replace('landscape','fanart')
+                artSeries_fallback = xbmc.translatePath(os.path.join(smpath, arttypeEXT_fallback))
+                artSeason_fallback = xbmc.translatePath(os.path.join(mediapath, arttypeEXT_fallback))
+
+                if FileAccess.exists(artSeries_fallback): 
+                    setImage = artSeries_fallback
+                elif FileAccess.exists(artSeason_fallback):
+                    setImage = artSeason_fallback
+                else:   
+                    print ('Find Json Artwork')
+                    setImage = self.LocalArtwork(mediapath, type, arttype)
                     
-                if not setImage:
-                    print ('Find Infolder Artwork')                        
-                    artSeries = xbmc.translatePath(os.path.join(smpath, arttypeEXT))
-                    artSeason = xbmc.translatePath(os.path.join(mediapath, arttypeEXT))
-                    print arttypeEXT, artSeries, artSeason
-
-                    if FileAccess.exists(artSeries): 
-                        setImage = artSeries
-                    elif FileAccess.exists(artSeason):
-                        setImage = artSeason
-                    else:
-                        print ('Find Infolder Artwork - Fallback')
-                        arttypeEXT_fallback = arttypeEXT.replace('landscape','fanart')
-                        artSeries_fallback = xbmc.translatePath(os.path.join(smpath, arttypeEXT_fallback))
-                        artSeason_fallback = xbmc.translatePath(os.path.join(mediapath, arttypeEXT_fallback))
-                        print arttypeEXT_fallback, artSeries_fallback, artSeason_fallback
-
-                        if FileAccess.exists(artSeries_fallback): 
-                            setImage = artSeries_fallback
-                        elif FileAccess.exists(artSeason_fallback):
-                            setImage = artSeason_fallback
-                        else:
-                            if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                    if not setImage:
+                        print ('Find Json Artwork - Fallback')
+                        arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
+                        setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
+                        
+                        if not setImage:   
+                            if id != '0' and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
                                 print ('Find Artwork Cache')
                                 if FileAccess.exists(ArtCache):
                                     setImage = ArtCache
@@ -179,23 +175,12 @@ class Artdownloader:
                                     if not setImage:
                                         print ('Find Download Artwork - Fallback')
                                         setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
-       
-                            if not setImage:    
-                                print ('Find Default Artwork')
-                                #Default fallbacks
-                                if FileAccess.exists(MediaImage):
-                                    #Skin media
-                                    setImage = MediaImage
-                                elif FileAccess.exists(DefaultImage):
-                                    #Default Skin media
-                                    setImage = DefaultImage
-        # elif chtype == 16:
-        # {"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["thumbnail"]},"id":4}
         
-        
+        # elif chtype == 11:
+            
         else:
             print ('FindArtwork, Chtype > 7')
-            if (id != 0 or id != '0') and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':  
+            if id != '0' and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':  
                 #PseudoTV Artwork Cache
                 print ('Find Artwork Cache')
                 if FileAccess.exists(ArtCache):
@@ -210,80 +195,46 @@ class Artdownloader:
                         #Download Artwork - Fallback
                         arttype_fallback = arttypeEXT.replace('landscape','fanart')
                         setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
-
-                        if not setImage:
-                            if mediapath[0:15] == 'plugin://plugin':
-                                print ('Find Plugin Artwork')
-                                try:
-                                    addon = ''
-                                    plugin = os.path.split(mediapath)
-                                    addon = os.path.split(plugin[0])[1]
-                                    YTid = plugin[1]
-                                    print addon, YTid
-                                    
-                                    icon = 'special://home/addons/'+YTid+ '/icon.png'
-                                    fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
-                                    youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
-                                    
-                                    if addon in youtube:
-                                        print ('Find Plugin Artwork - Youtube')
-                                        setImage = "http://img.youtube.com/vi/"+YTid+"/0.jpg"
-
-                                    else:
-                                        print ('Find Plugin Artwork - Other')
-                                        if FileAccess.exists(xbmc.translatePath(icon)):
-                                            setImage = icon
-                                except:
-                                    pass     
                     
-                            if not setImage:     
-                                #if chtype watermark setimage
-                                print ('Find Default Artwork')
-                                #Default fallbacks
-                                if FileAccess.exists(MediaImage):
-                                    #Skin media
-                                    setImage = MediaImage
-                                elif FileAccess.exists(DefaultImage):
-                                    #Default Skin media
-                                    setImage = DefaultImage   
-            
-            else:
-                if mediapath[0:15] == 'plugin://plugin':
-                    if not setImage:
-                        print ('Find Plugin Artwork')
-                        try:
-                            addon = ''
-                            plugin = os.path.split(mediapath)
-                            addon = os.path.split(plugin[0])[1]
-                            YTid = plugin[1]
-                            print addon, YTid
-                            
-                            icon = 'special://home/addons/'+YTid+ '/icon.png'
-                            fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
-                            youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
-                            
-                            if addon in youtube:
-                                print ('Find Plugin Artwork - Youtube')
-                                setImage = "http://img.youtube.com/vi/"+YTid+"/0.jpg"
+            elif mediapath.startswith('plugin://') and id == '0':
+                print ('Find Plugin Artwork')
+                try:
+                    addon = ''
+                    plugin = os.path.split(mediapath)
+                    addon = os.path.split(plugin[0])[1]
+                    YTid = plugin[1]
+                    
+                    icon = 'special://home/addons/'+YTid+ '/icon.png'
+                    fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
+                    youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
+                    
+                    if addon in youtube:
+                        print ('Find Plugin Artwork - Youtube')
+                        setImage = "http://img.youtube.com/vi/"+YTid+"/0.jpg"
 
-                            else:
-                                print ('Find Plugin Artwork - Other')
-                                if FileAccess.exists(xbmc.translatePath(icon)):
-                                    setImage = icon
-                        except:
-                            pass     
-                    
-                            if not setImage:     
-                                #if chtype watermark setimage
-                                print ('Find Default Artwork')
-                                #Default fallbacks
-                                if FileAccess.exists(MediaImage):
-                                    #Skin media
-                                    setImage = MediaImage
-                                elif FileAccess.exists(DefaultImage):
-                                    #Default Skin media
-                                    setImage = DefaultImage   
-                    
+                    else:
+                        print ('Find Plugin Artwork - Other')
+                        if FileAccess.exists(xbmc.translatePath(icon)):
+                            setImage = icon
+                except:
+                    pass     
+        
+            # elif mediapath.startswith('upnp://') and id == '0':
+                 # {"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["thumbnail"]},"id":4}
+        
+        
+        
+        #Default image
+        if not setImage:    
+            print ('Find Default Artwork')
+            #Default fallbacks
+            if FileAccess.exists(MediaImage):
+                #Skin media
+                setImage = MediaImage
+            elif FileAccess.exists(DefaultImage):
+                #Default Skin media
+                setImage = DefaultImage
+                       
         return setImage
         
                 
@@ -337,17 +288,14 @@ class Artdownloader:
         
         if type == 'tvshow':
             FanTVDownload = False
-            TVFilePath = os.path.join(ART_LOC, fle)
-            print ('TVFilePath = ' + TVFilePath) 
-            
+            TVFilePath = os.path.join(ART_LOC, fle) 
             tvdb_Types = ['banner', 'fanart', 'folder', 'poster']
             
             if ArtType in tvdb_Types:
                 ArtType = ArtType.replace('banner', 'graphical').replace('folder', 'poster')
                 tvdb = str(tvdbAPI.getBannerByID(id, ArtType))
                 try:
-                    tvdbPath = tvdb.split(', ')[0].replace("[('", "").replace("'", "")
-                    print ('tvdbPath = ' + tvdbPath)  
+                    tvdbPath = tvdb.split(', ')[0].replace("[('", "").replace("'", "") 
                     resource = urllib.urlopen(tvdbPath)
                     output = FileAccess.open(TVFilePath, 'w')
                     output.write(resource.read())
@@ -369,7 +317,6 @@ class Artdownloader:
                     fanPath = str([s for s in data if ArtType in s]).split("', 'art_type: ")[0]
                     match = re.search("url *: *(.*?),", fanPath)
                     fanPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
-                    print ('fanPath = ' + fanPath)
                     resource = urllib.urlopen(fanPath)
                     output = FileAccess.open(TVFilePath, 'w')
                     output.write(resource.read())
@@ -382,21 +329,17 @@ class Artdownloader:
         elif type == 'movie':
             FanMovieDownload = False
             MovieFilePath = os.path.join(ART_LOC, fle)
-            print ('MovieFilePath = ' + MovieFilePath) 
-
             tmdb = ['fanart', 'folder', 'poster']
             
             if ArtType in tmdb:
                 ArtType = ArtType.replace('folder', 'poster')
                 tmdb = tmdbAPI.get_image_list(id)
-                print ('tmdb = ' + str(tmdb))
                 try:
                     data = str(tmdb).replace("[", "").replace("]", "").replace("'", "")
                     data = data.split('}, {')
                     tmdbPath = str([s for s in data if ArtType in s]).split("', 'width: ")[0]
                     match = re.search('url *: *(.*?),', tmdbPath)
                     tmdbPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
-                    print ('tmdbPath = ' + tmdbPath) 
                     resource = urllib.urlopen(tmdbPath)
                     output = FileAccess.open(MovieFilePath, 'w')
                     output.write(resource.read())
@@ -412,15 +355,12 @@ class Artdownloader:
             if FanMovieDownload == True:
                 ArtType = ArtType.replace('folder', 'poster').replace('fanart', 'moviefanart')
                 fan = fanarttv.get_image_list_Movie(id)
-                print ('fan = ' + str(fan))
                 try:
                     data = str(fan).replace("[", "").replace("]", "").replace("'", "")
                     data = data.split('}, {')
                     fanPath = str([s for s in data if ArtType in s]).split("', 'art_type: ")[0]
-                    print ('fanPath = ' + fanPath) 
                     match = re.search("url *: *(.*?),", fanPath)
                     fanPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
-                    print ('fanPath = ' + fanPath)
                     resource = urllib.urlopen(fanPath)
                     output = FileAccess.open(MovieFilePath, 'w')
                     output.write(resource.read())

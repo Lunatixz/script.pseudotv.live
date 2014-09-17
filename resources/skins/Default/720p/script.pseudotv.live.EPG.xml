@@ -43,7 +43,7 @@
             <posy>525</posy>
             <width>300</width>
             <height>30</height>
-            <label>Now Playing</label>
+            <label></label>
             <font>Font_Bold34</font>
             <align>center</align>
             <textcolor>C0C0C0C0</textcolor>
