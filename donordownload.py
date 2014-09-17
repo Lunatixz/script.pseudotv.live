@@ -118,47 +118,7 @@ def DonorDownloader():
         except Exception,e:
             xbmc.log('script.pseudotv.live-donordownload: Downloading DL_DonorPath Failed! ' + str(e))  
             pass
-        
-        
-def BumperDownloader():
-    xbmc.log('script.pseudotv.live-donordownload: BumperDownloader')
-    
-    BUMPERDEST = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'Bumpers.zip'))
-    BumperPath = xbmc.translatePath(os.path.join(SETTINGS_LOC))
-     
-    try:
-        os.remove(BUMPERDEST)
-    except:
-        pass
-    
-    if dlg.yesno("PseudoTV Live", "Download Bumpers?", "700Mb File"):
-        try:
-            os.remove(xbmc.translatePath(LinkPath))
-        except:
-            pass
-         
-        try:       
-            urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
-            f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
-            linesLST = f.readlines()
-            BumperURLPath = linesLST[0]
-            
-            download(BumperURLPath, BUMPERDEST)
-            all(BUMPERDEST, BumperPath)
-                
-            REAL_SETTINGS.setSetting("bumpers", "true")
-            REAL_SETTINGS.setSetting("bumpersfolder", BUMPER_LOC)
-            REAL_SETTINGS.setSetting("numbumpers", "1")
-            
-            os.remove(BUMPERDEST)
-        except:
-            pass
-    
-        REAL_SETTINGS.openSettings()
-        
-    else:
-        REAL_SETTINGS.openSettings()
-            
+           
             
 def LogoDownloader():
     xbmc.log('script.pseudotv.live-donordownload: LogoDownloader')
@@ -194,43 +154,6 @@ def LogoDownloader():
         
     REAL_SETTINGS.openSettings()
         
-        
-def CEDownloader():
-    xbmc.log('script.pseudotv.live-donordownload: CEDownloader')
-
-    CEURL = (BaseURL + 'CEURL.txt')
-    CEDEST = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'PTVL_Cinema_Experience_Pack.zip'))
-    CEPath = xbmc.translatePath(os.path.join(SETTINGS_LOC))
-
-    if dlg.yesno("PseudoTV Live", "Download Cinema Experience Pack", ""):
-        
-        try:
-            os.remove(xbmc.translatePath(LinkPath))
-        except:
-            pass
-            
-        try:
-            urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
-            f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
-            linesLST = f.readlines()
-            CEURLPath = linesLST[3]
-            
-            download(CEURLPath, CEDEST)
-            all(CEDEST, CEPath)
-            
-            if xbmcvfs.exists(CE_LOC):
-                REAL_SETTINGS.setSetting("CinemaPack", "true")
-            else:
-                REAL_SETTINGS.setSetting("CinemaPack", "false")
-
-            os.remove(CEDEST)
-        except:
-            pass  
-            
-            REAL_SETTINGS.openSettings()
-    else:
-        REAL_SETTINGS.openSettings()
-       
        
 if sys.argv[1] == '-autopatch':
     autopatch()   
@@ -238,10 +161,6 @@ elif sys.argv[1] == '-DonorDownloader':
     DonorDownloader()
 elif sys.argv[1] == '-LogoDownloader':
     LogoDownloader()
-elif sys.argv[1] == '-BumperDownloader':
-    BumperDownloader()
-elif sys.argv[1] == '-CEDownloader':
-    CEDownloader()
 elif sys.argv[1] == '-SimpleDownloader':
     xbmcaddon.Addon(id='script.module.simple.downloader').openSettings()
     

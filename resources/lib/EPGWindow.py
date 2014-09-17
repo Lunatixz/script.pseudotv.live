@@ -72,7 +72,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.PVRtitle = ''
         self.setArtwork1_Unlocked = False
         self.setArtwork2_Unlocked = False
-        self.VideoWindow = False
 
         for i in range(self.rowCount):
             self.channelButtons[i] = []
@@ -961,7 +960,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         chnoffset = self.focusRow - 2
         newchan = self.centerChannel
         self.Artdownloader = Artdownloader()  
-        mpath = ''
         
         while chnoffset != 0:
             if chnoffset > 0:
@@ -988,9 +986,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         setting3 = ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_3')
         chanlist = ChannelList()
         mediapath = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemFilename(plpos))
-        mediaduration = int((self.MyOverlayWindow.channels[newchan - 1].getItemDuration(plpos)) - now)  
         chname = ascii(self.MyOverlayWindow.channels[newchan - 1].name)
-        genre = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemgenre(plpos))
         title = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemTitle(plpos))
         LiveID = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemLiveID(plpos))
         
@@ -1004,8 +1000,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         else:
             mpath = (os.path.split(mediapath)[0])
         
-        
-            
         self.PVRchtype = chtype
         self.PVRmediapath = mediapath
         self.PVRchname = chname
@@ -1014,14 +1008,11 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         LiveID = chanlist.unpackLiveID(LiveID)
         type = LiveID[0]
         id = LiveID[1]
-        dbid = LiveID[2]
         Managed = LiveID[3]
         playcount = int(LiveID[4])
-        rating = LiveID[5]
                 
         #Check if VideoWindow Patch found, change label.
-        if FileAccess.exists(os.path.join(skinPath, 'custom_script.pseudotv.live_9506.xml')):
-            self.VideoWindow = True
+        if self.MyOverlayWindow.VideoWindow == True:
             try:
                 self.getControl(523).setLabel('NOW WATCHING:')
             except:
@@ -1029,40 +1020,28 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 
         #Change Label when Dynamic artwork enabled
         try:
-            if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":      
-            
-                if self.infoOffset > 0:
-                    self.getControl(522).setLabel('COMING UP:')
-                    self.getControl(515).setVisible(False)
-                    
-                elif self.infoOffset < 0:
-                    self.getControl(522).setLabel('ALREADY SEEN:')
-                    self.getControl(515).setVisible(False)
-                    
-                elif self.infoOffset == 0 and self.infoOffsetV == 0:
-                    self.getControl(522).setLabel('NOW WATCHING:')
-                    self.getControl(515).setVisible(False)
-                    
-                elif self.infoOffsetV != 0 and self.infoOffset == 0:
-                    self.getControl(522).setLabel('ON NOW:')                  
-                    self.getControl(515).setVisible(False)
-                                     
-            else:       
-                self.getControl(522).setLabel('NOW WATCHING:')
-                self.getControl(515).setVisible(True)    
+            self.getControl(522).setVisible(False)
+
+            if self.infoOffset > 0:
+                self.getControl(515).setVisible(False)
+            elif self.infoOffset < 0:
+                self.getControl(515).setVisible(False)
+            elif self.infoOffset == 0 and self.infoOffsetV == 0:
+                self.getControl(515).setVisible(False) 
+            elif self.infoOffsetV != 0 and self.infoOffset == 0:           
+                self.getControl(515).setVisible(False)
         except:
             pass
-
+    
         SEtitle = self.MyOverlayWindow.channels[newchan - 1].getItemEpisodeTitle(plpos) 
         
         try:
-            SEinfo = SEtitle.split(' -')[0]
-            season = int(SEinfo.split('x')[0])
-            episode = int(SEinfo.split('x')[1])
-            eptitles = SEtitle.split('- ')
-            eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
-            
             if self.showSeasonEpisode:
+                SEinfo = SEtitle.split(' -')[0]
+                season = int(SEinfo.split('x')[0])
+                episode = int(SEinfo.split('x')[1])
+                eptitles = SEtitle.split('- ')
+                eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
                 swtitle = ('S' + ('0' if season < 10 else '') + str(season) + 'E' + ('0' if episode < 10 else '') + str(episode) + ' - ' + (eptitle)).replace('  ',' ')
             else:
                 swtitle = SEtitle      
@@ -1127,14 +1106,26 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         else:
             #use xbmc.videoplayer art since not using dynamic art
             try:
-                self.getControl(508).setImage('NA.png')
-                self.getControl(510).setImage('NA.png')
-                self.getControl(511).setVisible(False)#SB/CP
-                self.getControl(512).setVisible(False)#NEW
-                self.getControl(513).setVisible(True)#ART
+                self.getControl(508).setImage('NA.png')   
             except:
                 pass   
-                
+            try:
+                self.getControl(510).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(511).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(512).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(513).setVisible(True)
+            except:
+                pass   
+
         self.log('setShowInfo return')
 
         

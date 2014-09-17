@@ -185,7 +185,11 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.LastChannel = 0
         self.InfTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
         self.Artdownloader = Artdownloader()
-
+        self.VideoWindow = False
+        
+        if FileAccess.exists(os.path.join(skinPath, 'custom_script.pseudotv.live_9506.xml')):
+            self.VideoWindow = True
+            
         for i in range(3):
             self.channelLabel.append(xbmcgui.ControlImage(50 + (50 * i), 50, 50, 50, IMAGES_LOC + 'solid.png', colorDiffuse = self.channelbugcolor))
             self.addControl(self.channelLabel[i])
@@ -777,72 +781,92 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                             return
                 except:
                     self.log('Exception during seek on paused channel', xbmc.LOGERROR)
+                    pass
         else:
                 
             if chtype != 8 and chtype != 9 and mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp' and plugchk not in BYPASS_SEEK:
                 self.log("Seeking")
                 # Seek without infobar work around todo? needs testing...
                 # http://forum.xbmc.org/showthread.php?pid=1547665#pid1547665
-                seektime = self.channels[self.currentChannel - 1].showTimeOffset + timedif + int((time.time() - curtime))
-
-                try:
-                    self.log("Seeking");
-                except:
-                    self.log("Unable to set proper seek time, trying different value")
-
-                    try:
-                        seektime = self.channels[self.currentChannel - 1].showTimeOffset + timedif
-                    except:
-                        self.log('Exception during seek', xbmc.LOGERROR)
-                
-                if (mediapath[-4:].lower() == 'strm' or mediapath[0:6] == 'plugin'):
-                    overtime = float((int(self.channels[self.currentChannel - 1].getItemDuration(self.channels[self.currentChannel - 1].playlistPosition))/8)*7)
-                    if seektime >= overtime:
-                        if DEBUG == 'true':
-                            self.log('seektime' + str(seektime))
-                            self.log('overtime' + str(overtime))
-                            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Overriding Seektime", 1000, THUMB) )
-                    else:
-                        try:
-                            self.Player.seekTime(seektime)
-                        except:
-                            pass
+                seektime1 = self.channels[self.currentChannel - 1].showTimeOffset + timedif + int((time.time() - curtime))
+                seektime2 = self.channels[self.currentChannel - 1].showTimeOffset + timedif
+                overtime = float((int(self.channels[self.currentChannel - 1].getItemDuration(self.channels[self.currentChannel - 1].playlistPosition))/8)*6)
+        
+                if (mediapath[-4:].lower() == 'strm' or mediapath.startswith('plugin')):
+                    seektime = self.SmartSeek(mediapath, seektime1, seektime2, overtime)
+                    self.PlayUPNP(mediapath, seektime)
                 else:
                     try:
-                        self.Player.seekTime(seektime)
+                        self.log("Seeking");
+                        self.Player.seekTime(seektime1)
+                        seektime = seektime1
                     except:
-                        pass
-            
-            #UPNP
-            try:
-                file = self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)
-                file = file.replace("\\\\","\\")
-                if REAL_SETTINGS.getSetting("UPNP1") == "true":
-                    self.log('UPNP1 Sharing')
-                    UPNP1 = SendUPNP(IPP1, file, seektime)
-                if REAL_SETTINGS.getSetting("UPNP2") == "true":
-                    self.log('UPNP2 Sharing')
-                    UPNP2 = SendUPNP(IPP2, file, seektime)
-                if REAL_SETTINGS.getSetting("UPNP3") == "true":
-                    self.log('UPNP3 Sharing')
-                    UPNP3 = SendUPNP(IPP3, file, seektime)
-            except:
-                pass
-                        
+                        self.log("Unable to set proper seek time, trying different value")
+                        try:
+                            self.Player.seekTime(seektime2)
+                            seektime = seektime2
+                        except:
+                            self.log('Exception during seek', xbmc.LOGERROR)
+                            pass     
+                    
+                    self.PlayUPNP(mediapath, seektime)   
+        
         # Unmute
         self.log("Finished, unmuting");
         xbmc.executebuiltin("Mute()");
-                
         self.showChannelLabel(self.currentChannel)
         self.lastActionTime = time.time()
         self.runActions(RULES_ACTION_OVERLAY_SET_CHANNEL_END, channel, self.channels[channel - 1])
         
-        if not self.PlaybackValid():
-            self.Player.playnext()
-            
+        # if not self.PlaybackValid():
+            # self.Player.playnext()
+
         self.log('setChannel return')
+        
+            
+    def SmartSeek(self, mediapath, seektime1, seektime2, overtime):
+        self.log("SmartSeek")
+        seektime = 0
+        if seektime1 < overtime:
+            try:
+                self.log("Seeking");
+                self.Player.seekTime(seektime1)
+                seektime = seektime1
+            except:
+                self.log("Unable to set proper seek time, trying different value")
+                if seektime2 < overtime:
+                    try:
+                        self.Player.seekTime(seektime2)
+                        seektime = seektime2
+                    except:
+                        self.log('Exception during seek', xbmc.LOGERROR)
+                        pass
+                else:
+                    pass
+        
+        if seektime == 0 and DEBUG == 'true':
+            self.log('seektime' + str(seektime))
+            self.log('overtime' + str(overtime))
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Overriding Seektime", 1000, THUMB) )
+
+        return seektime    
 
         
+    def PlayUPNP(self, file, seektime):
+        self.log("PlayUPNP")
+        #UPNP
+        file = file.replace("\\\\","\\")
+        if REAL_SETTINGS.getSetting("UPNP1") == "true":
+            self.log('UPNP1 Sharing')
+            UPNP1 = SendUPNP(IPP1, file, seektime)
+        if REAL_SETTINGS.getSetting("UPNP2") == "true":
+            self.log('UPNP2 Sharing')
+            UPNP2 = SendUPNP(IPP2, file, seektime)
+        if REAL_SETTINGS.getSetting("UPNP3") == "true":
+            self.log('UPNP3 Sharing')
+            UPNP3 = SendUPNP(IPP3, file, seektime)
+
+            
     def InvalidateChannel(self, channel):
         self.log("InvalidateChannel" + str(channel))
 
@@ -974,7 +998,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         LiveID = (self.channels[self.currentChannel - 1].getItemLiveID(position))
         EpisodeTitle = (self.channels[self.currentChannel - 1].getItemEpisodeTitle(position))
         chname = (self.channels[self.currentChannel - 1].name)
-        youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube/?path=/root']
         
         if mediapath[0:5] == 'stack':
             smpath = (mediapath.split(' , ')[0]).replace('stack://','')
@@ -992,13 +1015,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.PVRtitle = title
         
         LiveID = self.channelList.unpackLiveID(LiveID)
-        print 'LLiveID', LiveID
         type = LiveID[0]
         id = LiveID[1]
-        dbid = LiveID[2]
         Managed = LiveID[3]
         playcount = int(LiveID[4])
-        rating = LiveID[5]
 
         # Unwatch Local Media if applicable    
         if REAL_SETTINGS.getSetting("Disable_Watched") == "true" and self.Player.stopped:
@@ -1026,17 +1046,15 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         SEtitle = self.channels[self.currentChannel - 1].getItemEpisodeTitle(position)
 
         try:
-            SEinfo = SEtitle.split(' -')[0]
-            season = int(SEinfo.split('x')[0])
-            episode = int(SEinfo.split('x')[1])
-            eptitles = SEtitle.split('- ')
-            eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
-            
             if self.showSeasonEpisode:
+                SEinfo = SEtitle.split(' -')[0]
+                season = int(SEinfo.split('x')[0])
+                episode = int(SEinfo.split('x')[1])
+                eptitles = SEtitle.split('- ')
+                eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
                 swtitle = ('S' + ('0' if season < 10 else '') + str(season) + 'E' + ('0' if episode < 10 else '') + str(episode) + ' - ' + (eptitle)).replace('  ',' ')
             else:
-                swtitle = SEtitle
-                
+                swtitle = SEtitle      
         except:
             swtitle = SEtitle
             pass
@@ -1047,15 +1065,15 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.getControl(505).setLabel(self.channels[self.currentChannel - 1].getItemDescription(position))
         self.getControl(506).setImage(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png') 
         
-        if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":   
-            self.log('setShowInfo.Dynamic artwork enabled')  
-                           
+        if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":  
+            self.log('Dynamic artwork enabled')
+            
             #hide xbmc.videoplayer art since using dynamic art
             try:
                 self.getControl(513).setVisible(False)
             except:
                 pass  
-               
+                
             #Sickbeard/Couchpotato == Managed
             try:
                 if Managed == 'True':
@@ -1080,7 +1098,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     self.getControl(512).setVisible(False)      
             except:
                 pass  
-            
+
             try:
                 type1 = str(self.getControl(507).getLabel())
                 type1EXT = self.Artdownloader.EXTtype(type1)
@@ -1096,17 +1114,28 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             except:
                 print 'setShowInfo.Label 509 not found'
                 pass
- 
         else:
             #use xbmc.videoplayer art since not using dynamic art
             try:
-                self.getControl(508).setImage('NA.png')
-                self.getControl(510).setImage('NA.png')
-                self.getControl(511).setVisible(False)  
-                self.getControl(512).setVisible(False)  
-                self.getControl(513).setVisible(True)
+                self.getControl(508).setImage('NA.png')   
             except:
                 pass   
+            try:
+                self.getControl(510).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(511).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(512).setImage('NA.png') 
+            except:
+                pass   
+            try:
+                self.getControl(513).setVisible(True)
+            except:
+                pass  
 
         self.log('setShowInfo return')
         
@@ -1261,8 +1290,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.ignoreInfoAction = True
             self.channelList.sendJSON(json_query);
 
-        self.showingInfo = True
-        self.setShowInfo()
+        if self.showingPop == False:
+            self.showingInfo = True
+            self.setShowInfo()
 
         if self.infoTimer.isAlive():
             self.infoTimer.cancel()
@@ -1275,14 +1305,14 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         
     def hidePOP(self):
         self.log("hidePOP")
+        self.infoOffset = 0
+        self.showingPop = False
         
         try:
             self.getControl(120).setVisible(False)
         except:
             pass
             
-        self.showingPop = False
-
         if self.popTimer.isAlive():
             self.popTimer.cancel()
 
@@ -1294,20 +1324,20 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("showPOP")
         #disable channel bug
         self.getControl(103).setVisible(False)
-        
-        try:
-            self.getControl(120).setVisible(True)
-        except:
-            pass
-  
+
         if self.hideShortItems:
             position = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition() + self.infoOffset
             
             if self.channels[self.currentChannel - 1].getItemDuration(position) < self.shortItemLength:
                 return
             
-        self.showingPop = True
-
+        if self.showingInfo == False:
+            try:
+                self.showingPop = True
+                self.getControl(120).setVisible(True)
+            except:
+                pass
+            
         if self.popTimer.isAlive():
             self.popTimer.cancel()
 
@@ -1499,7 +1529,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.showChannelLabel(self.inputChannel)
         
         elif action == ACTION_SHOW_SUBTITLES:
-            xbmc.executebuiltin("ActivateWindow(subtitlesearch)")
+            xbmc.executebuiltin("ActivateWindow(SubtitleSearch)")
             
         elif action == ACTION_AUDIO_NEXT_LANGUAGE:
             xbmc.executebuiltin("ActivateWindow(NextSubtitle)")

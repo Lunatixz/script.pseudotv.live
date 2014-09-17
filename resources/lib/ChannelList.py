@@ -37,8 +37,10 @@ from sickbeard import *
 from couchpotato import *
 from tvdb import *
 from tmdb import *
+from urllib2 import urlopen
 from urllib2 import HTTPError, URLError
 from datetime import date
+from datetime import timedelta
 from utils import *
 socket.setdefaulttimeout(15)
 
@@ -1636,7 +1638,7 @@ class ChannelList:
         title = ''
         Managed = False
         file_detail = []
-        json_query = ('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["title","year","mpaa","imdbnumber","description","season","episode","playcount","genre","duration","runtime","showtitle","album","artist","plot","plotoutline","tagline"]}, "id": 1}' % (self.escapeDirJSON(dir_name), FleType))
+        json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["title","year","mpaa","imdbnumber","description","season","episode","playcount","genre","duration","runtime","showtitle","album","artist","plot","plotoutline","tagline"]}, "id": 1}' % (self.escapeDirJSON(dir_name), FleType))
 
         if self.background == False:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Videos", "querying database")
@@ -2700,7 +2702,7 @@ class ChannelList:
                             pass
 
                         if runtimex == '':
-                            runtimex = 150
+                            runtimex = 1800
                         
                         try:
                             summary = feed.channel.subtitle
@@ -2917,6 +2919,7 @@ class ChannelList:
         fle = os.path.join(path,setting2+".xml.plist")
         showcount = 0
         MyMusicLST = []
+        youtube_plugin = self.youtube_player()
         
         if setting3 == '':
             limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
@@ -2940,7 +2943,8 @@ class ChannelList:
                     line = line.split(", ")
                     title = line[0]
                     link = line[1].replace("'",'')
-
+                    link = link.replace('plugin://plugin.video.youtube/?action=play_video&videoid=', youtube_plugin)
+                    
                     try:
                         id = str(os.path.split(link)[1]).split('?url=')[1]
                         source = str(id).split('&mode=')[1]
@@ -2994,8 +2998,8 @@ class ChannelList:
         
         if setting3 == 'ustvnow':
             self.log("xmltv_ok, testing " + str(setting3))
-            url_bak = 'https://docs.google.com/uc?export=download&id=0BzyNK_dHGPHkSEhIVlB1bGIyWms'
-            url = 'https://dl.dropboxusercontent.com/s/3pp8j7962l1t4z1/ustvnow.xml'
+            url = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-EMzNTRmpDUTZ0VXM'
+            url_bak = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-ERlNKazAxWjBFSFE'
             try: 
                 urllib2.urlopen(url)
                 self.log("xmltv_ok, INFO: URL Connected...")
@@ -3017,8 +3021,8 @@ class ChannelList:
                     
         elif setting3 == 'ftvguide':
             self.log("xmltv_ok, testing " + str(setting3))
-            url_bak = 'https://docs.google.com/uc?export=download&id=0BzyNK_dHGPHkSFc3WVI0NTV6MWM'
-            url = 'https://dl.dropboxusercontent.com/s/n6wgeamhjvmges7/ftvguide.xml'
+            url = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-ETE0xYVUtc2ZCLVU'
+            url_bak = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-EeXZGRlRJcFVSWEE'
             try: 
                 urllib2.urlopen(url)
                 self.log("xmltv_ok, INFO: URL Connected...")
@@ -3037,6 +3041,16 @@ class ChannelList:
             except urllib2.URLError as e:
                 if "Errno 10054" in e:
                     raise 
+        
+        # elif setting3 == 'smoothstreams':
+            # self.log("xmltv_ok, testing " + str(setting3))
+            # url = 'http://smoothstreams.tv/schedule/feed.xml'
+            # try:
+                # urllib2.urlopen(url)
+                # self.xmlTvFile = url
+                # self.xmltvValid = True
+            # except urllib2.URLError as e:
+                # pass
  
         elif setting3 != '':
             self.xmlTvFile = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'), str(setting3) +'.xml'))
@@ -3240,7 +3254,7 @@ class ChannelList:
                 
             elif REAL_SETTINGS.getSetting("plugin_ok_level") == "1":#High Check todo
                 try:
-                    json_query = ('{"jsonrpc": "2.0", "method": "Files.GetDirectory","params":{"directory":"%s"}, "id": 1}' % (self.escapeDirJSON(stream)))
+                    json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetDirectory","params":{"directory":"%s"}, "id": 1}' % (self.escapeDirJSON(stream)))
                     json_folder_detail = self.sendJSON(json_query)
                     file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
                     self.Pluginvalid = True        
@@ -3250,7 +3264,18 @@ class ChannelList:
         self.log("Pluginvalid = " + str(self.Pluginvalid))
         return self.Pluginvalid
                 
-    
+                
+    def youtube_duration(self, YTID):
+        self.log("youtube_duration")
+        url = 'https://gdata.youtube.com/feeds/api/videos/{0}?v=2'.format(YTID)
+        s = urlopen(url).read()
+        d = parseString(s)
+        e = d.getElementsByTagName('yt:duration')[0]
+        a = e.attributes['seconds']
+        v = int(a.value)
+        return v
+        
+        
     def youtube_player(self):
         self.log("youtube_player")
         Plugin_1 = self.plugin_ok('plugin.video.bromix.youtube')
@@ -3533,7 +3558,7 @@ class ChannelList:
                         ID = rating[1]
                         URL = youtube_plugin + ID
                 
-                tmpstr = '7,//////Rating////' + 'tvshow|0|0|False|1|'+str(mpaa)+'|' + '\n' + (URL) + '\n' + '#EXTINF:' + file
+                tmpstr = '7,//////Rating////' + 'movie|0|0|False|1|'+str(mpaa)+'|' + '\n' + (URL) + '\n' + '#EXTINF:' + file
                 newFileList.append(tmpstr)
 
         return newFileList
@@ -3966,10 +3991,16 @@ class ChannelList:
                 elif setting1 == 'cinema':
                     showList = []
                     
+                    flename = self.createCinemaExperiencePlaylist()        
+                    if setting2 != flename:
+                        flename == (xbmc.translatePath(setting2))
+                                        
+                    PrefileList = self.buildFileList(flename, channel) 
+                    print 'PrefileList', PrefileList
                     if self.background == False:
                         self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras", "populating PseudoCinema Experience")
                     
-                    showList = BuildCinemaExperienceFileList(setting1, setting2, setting3, setting4, channel)
+                    showList = BuildCinemaExperienceFileList(setting1, setting2, setting3, setting4, channel, PrefileList)
                     return showList
             except Exception,e:
                 pass
@@ -4384,8 +4415,9 @@ class ChannelList:
         Managed = False
         PluginPath = str(os.path.split(path)[0])
         PluginName = PluginPath.replace('plugin://plugin.video.','').replace('plugin://plugin.program.','')
-
-        json_query = ('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["title","year","mpaa","imdbnumber","description","season","episode","playcount","genre","duration","runtime","showtitle","album","artist","plot","plotoutline","tagline"]}, "id": 1}' % ((path), FleType))
+        youtube_plugin = self.youtube_player()
+        
+        json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory": "%s", "media": "%s", "properties":["title","year","mpaa","imdbnumber","description","season","episode","playcount","genre","duration","runtime","showtitle","album","artist","plot","plotoutline","tagline"]}, "id": 1}' % ((path), FleType))
         json_folder_detail = self.sendJSON(json_query)
         file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
                 
@@ -4615,7 +4647,7 @@ class ChannelList:
                                         seasonval = -1
                                         epval = -1
 
-                                    showtitle = (showtitles.group(1)).replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','')
+                                    showtitle = (showtitles.group(1)).replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','').replace('[B]','').replace('[/B]','')
                                         
                                     if PlugCHK in DYNAMIC_PLUGIN_TV:
                                         print 'DYNAMIC_PLUGIN_TV'
@@ -4645,10 +4677,10 @@ class ChannelList:
                                 else:
                                                                     
                                     if labels:
-                                        label = (labels.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','')
+                                        label = (labels.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','').replace('[B]','').replace('[/B]','')
                                     
                                     if titles:
-                                        title = (titles.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','')
+                                        title = (titles.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','').replace('[B]','').replace('[/B]','')
                                        
                                     tmpstr += (label).replace('\\','') + "//"
                                         
@@ -4700,6 +4732,7 @@ class ChannelList:
                                         artist = re.search('"artist" *: *"(.*?)"', f)
                                         tmpstr += album.group(1) + "//" + artist.group(1) + "//" + 'Music' + "////" + LiveID
                                 
+                                file = file.replace('plugin://plugin.video.youtube/?action=play_video&videoid=', youtube_plugin)
                                 tmpstr = tmpstr
                                 tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
                                 tmpstr = tmpstr + '\n' + file.replace("\\\\", "\\")
