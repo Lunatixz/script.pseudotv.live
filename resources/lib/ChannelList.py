@@ -667,7 +667,7 @@ class ChannelList:
         elif chtype == 8:
             self.log("Building LiveTV Channel, " + setting1 + " , " + setting2 + " , " + setting3)
             
-            # HDhomerun #
+            # HDHomeRun #
             if setting2[0:9] == 'hdhomerun' and REAL_SETTINGS.getSetting('HdhomerunMaster') == "true":
                 #If you're using a HDHomeRun Dual and want Tuner 1 assign false. *Thanks Blazin912*
                 self.log("Building LiveTV using tuner0")
@@ -1487,9 +1487,9 @@ class ChannelList:
         
     def packGenreLiveID(self, GenreLiveID):
         self.log("packGenreLiveID")
-        genre = str(GenreLiveID[0])
+        genre = GenreLiveID[0]
         GenreLiveID.pop(0)
-        LiveID = str(GenreLiveID).replace("u'",'').replace(',','|').replace('[','').replace(']','').replace("'",'').replace(" ",'') + '|'
+        LiveID = (str(GenreLiveID)).replace("u'",'').replace(',','|').replace('[','').replace(']','').replace("'",'').replace(" ",'') + '|'
         return genre, LiveID
         
         
@@ -1793,7 +1793,7 @@ class ChannelList:
                                     self.log("Season/Episode formatting failed" + str(e))
                                     seasonval = -1
                                     epval = -1
- 
+
                                 if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':  
                                     print 'EnhancedGuideData' 
 
@@ -3042,15 +3042,15 @@ class ChannelList:
                 if "Errno 10054" in e:
                     raise 
         
-        # elif setting3 == 'smoothstreams':
-            # self.log("xmltv_ok, testing " + str(setting3))
-            # url = 'http://smoothstreams.tv/schedule/feed.xml'
-            # try:
-                # urllib2.urlopen(url)
-                # self.xmlTvFile = url
-                # self.xmltvValid = True
-            # except urllib2.URLError as e:
-                # pass
+        elif setting3 == 'smoothstreams':
+            self.log("xmltv_ok, testing " + str(setting3))
+            url = 'http://smoothstreams.tv/schedule/feed.xml'
+            try:
+                urllib2.urlopen(url)
+                self.xmlTvFile = url
+                self.xmltvValid = True
+            except urllib2.URLError as e:
+                pass
  
         elif setting3 != '':
             self.xmlTvFile = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'), str(setting3) +'.xml'))
@@ -3091,7 +3091,7 @@ class ChannelList:
         elif setting2[0:3] == 'pvr':
             return True  
         #upnp check
-        elif setting2[0:3] == 'upnp':
+        elif setting2[0:4] == 'upnp':
             return True 
         #udp check
         elif setting2[0:3] == 'udp':
@@ -3099,7 +3099,7 @@ class ChannelList:
         #rtsp check
         elif setting2[0:4] == 'rtsp':
             return True  
-        #hdhomerun check
+        #HDHomeRun check
         elif setting2[0:9] == 'hdhomerun':
             return True  
         else:
@@ -3706,7 +3706,7 @@ class ChannelList:
         else:
             GenreChtype = False
         
-        self.log("GetTrailerList, GenreChtype = " + str(GenreChtype))
+        self.log("GetTrailerList, GenreChtype = " + GenreChtype)
         PATH = REAL_SETTINGS.getSetting('trailersfolder')
             
         LocalTrailerLST = []
@@ -4345,7 +4345,7 @@ class ChannelList:
         return file_detail
     
     
-    #Parse Plugin, return essential information
+    #Parse Plugin, return essential information. Not tmpstr
     def PluginInfo(self, path):
         print 'PluginInfo'
         json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["genre","runtime","description"]},"id":1}' % ( (path),))
@@ -4405,7 +4405,7 @@ class ChannelList:
 
 
     #recursively walk through plugin directories, return tmpstr of all files found.
-    def PluginWalk(self, path, excludeLST, limit, channel, xType='PluginTV', FleType='video'):
+    def PluginWalk(self, path, excludeLST, limit, channel, xType, FleType='video'):
         print "PluginWalk"
         dirlimit = limit / 4
         tmpstr = ''
@@ -4421,8 +4421,11 @@ class ChannelList:
         json_folder_detail = self.sendJSON(json_query)
         file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
                 
-        try:         
-            if xType == 'PlayOn':
+        try:       
+            if xType == '':    
+                xName = xType
+                PlugCHK = xType
+            elif xType == 'PlayOn':
                 xName = (path.split('/')[3]).split('-')[0]
                 PlugCHK = xType
             else:
@@ -4707,6 +4710,11 @@ class ChannelList:
                                                 except:
                                                     showtitle = label
                                                     year = ''
+                                                    pass
+                                                    
+                                                try:
+                                                    showtitle = showtitle.split('. ')[1]
+                                                except:
                                                     pass
                                     
                                                 if imdbnumber == 0:
@@ -5034,3 +5042,64 @@ class ChannelList:
            seen[marker] = 1
            result.append(item)
         return result
+
+        
+    def findZap2itID(self, CHname, xmltv):
+        print 'findZapitID'
+        CHzapit = '0'
+        
+        #example xmltv
+        # <channel id="I19571.labs.zap2it.com">
+            # <display-name>702 KTVUDT</display-name>
+            # <display-name>702 KTVUDT CA04487:X</display-name>
+            # <display-name>702</display-name>
+            # <display-name>44 KTVUDT fcc</display-name>
+            # <display-name>KTVUDT</display-name>
+            # <display-name>KTVUDT (KTVU-DT)</display-name>
+            # <display-name>Fox Affiliate</display-name>
+        # </channel> 
+        
+        try:
+            CHnum = CHname.split(" ", 1)[0]
+            CHname = CHname.split(" ", 1)[1]
+            CHdisplay = CHnum + ' ' + CHname
+        except:
+            CHdisplay = CHname
+            pass
+            
+        CHname = CHname.replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','')
+        
+        try:
+            f = FileAccess.open(xmltv, "rb")
+        except:
+            f = urllib2.urlopen(xmltv)
+            pass
+            
+        tree = ET.parse(f)
+        root = tree.getroot()
+        f.close()
+        
+        # search xmltv for display-name, then match, return channel-id
+        for elem in root.getiterator():
+            if elem.tag == ("channel"):
+                name = elem.findall('display-name')
+                for i in name:
+                    DPname = i.text
+                    DPname = DPname.replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','')
+
+                    #matching needs smart regex, todo...
+                    if CHdisplay.lower() == DPname.lower() or CHname.lower() == DPname.lower() :
+                        CHzapit = elem.attrib
+                        CHzapit = str(CHzapit)
+                        CHzapit = CHzapit.split(": '", 1)[-1]
+                        CHzapit = CHzapit.split("'")[0]
+                        break
+                        
+        print CHname, CHzapit
+        return CHzapit
+                        
+                        
+                        
+                        
+                        
+                        

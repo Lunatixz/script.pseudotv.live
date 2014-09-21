@@ -187,6 +187,11 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.Artdownloader = Artdownloader()
         self.VideoWindow = False
         
+        if REAL_SETTINGS.getSetting("UPNP1") == "true" or REAL_SETTINGS.getSetting("UPNP2") == "true" or REAL_SETTINGS.getSetting("UPNP3") == "true":
+            self.UPNP = True
+        else:
+            self.UPNP = False
+
         if FileAccess.exists(os.path.join(skinPath, 'custom_script.pseudotv.live_9506.xml')):
             self.VideoWindow = True
             
@@ -709,9 +714,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         timedif = (curtime - self.channels[self.currentChannel - 1].lastAccessTime)
         
         try:
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
         except:
-            chtype = ''
+            chtype = 0
             pass
         
         if self.channels[self.currentChannel - 1].isPaused == False:
@@ -768,7 +773,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.channels[self.currentChannel - 1].setPaused(False)
           
             if chtype != 8 and chtype != 9 and mediapath[0:4] != 'rtmp' and mediapath[0:4] != 'rtsp' and plugchk not in BYPASS_SEEK:
-                self.log("Seeking")
+                self.log("Seeking, paused channel")
                 try:
                     self.Player.seekTime(self.channels[self.currentChannel - 1].showTimeOffset)
 
@@ -793,22 +798,26 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         
                 if (mediapath[-4:].lower() == 'strm' or mediapath.startswith('plugin')):
                     seektime = self.SmartSeek(mediapath, seektime1, seektime2, overtime)
-                    self.PlayUPNP(mediapath, seektime)
+                    
+                    if self.UPNP:
+                        self.PlayUPNP(mediapath, seektime)
                 else:
                     try:
-                        self.log("Seeking");
                         self.Player.seekTime(seektime1)
                         seektime = seektime1
+                        self.log("seektime1")
                     except:
                         self.log("Unable to set proper seek time, trying different value")
                         try:
                             self.Player.seekTime(seektime2)
                             seektime = seektime2
+                            self.log("seektime2")
                         except:
                             self.log('Exception during seek', xbmc.LOGERROR)
-                            pass     
-                    
-                    self.PlayUPNP(mediapath, seektime)   
+                            pass    
+                            
+                    if self.UPNP:
+                        self.PlayUPNP(mediapath, seektime)   
         
         # Unmute
         self.log("Finished, unmuting");
@@ -828,15 +837,16 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         seektime = 0
         if seektime1 < overtime:
             try:
-                self.log("Seeking");
                 self.Player.seekTime(seektime1)
                 seektime = seektime1
+                self.log("seektime1")
             except:
                 self.log("Unable to set proper seek time, trying different value")
                 if seektime2 < overtime:
                     try:
                         self.Player.seekTime(seektime2)
                         seektime = seektime2
+                        self.log("seektime2")
                     except:
                         self.log('Exception during seek', xbmc.LOGERROR)
                         pass
@@ -918,9 +928,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         mpath = ''
         
         try:
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
         except:
-            chtype = ''
+            chtype = 0
             pass
   
         try:
@@ -1165,9 +1175,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log('showChannelLabel ' + str(channel))
         
         try:
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
         except:
-            chtype = ''
+            chtype = 0
             pass
 
         if self.channelLabelTimer.isAlive():
@@ -1274,9 +1284,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             position = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition() + self.infoOffset
             
             try:
-                chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+                chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
             except:
-                chtype = ''
+                chtype = 0
                 pass
 
             if chtype <= 7 and self.channels[self.currentChannel - 1].getItemDuration(position) < self.shortItemLength:
@@ -1665,9 +1675,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     ChannelLogo = (self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
                     
                     try:
-                        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel - 1) + '_type'))
+                        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(self.currentChannel) + '_type'))
                     except:
-                        chtype = ''
+                        chtype = 0
                         pass
                         
                     title = 'Coming Up Next'   

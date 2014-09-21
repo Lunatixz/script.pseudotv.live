@@ -15,7 +15,7 @@
     <string id="30101">Channel Sharing:</string>
         <string id="30009">Enable Channel Sharing</string>
         <string id="30010">Shared Channels Folder</string>    
-        <string id="30011">HDhomerun Master</string>     
+        <string id="30011">HDHomeRun Master</string>     
     <string id="30102">Video Mirroring:</string>
     <string id="30103">Enable UPNP1</string>   
     <string id="30104">Enable UPNP2</string>   
@@ -59,7 +59,7 @@
     <string id="30310">Media Limit Per Channel</string>
     <string id="30372">Reserve Channels 501-999 for Autotune</string>
 <string id="30400">PVR</string>  
-    <string id="30401">Choose Your Operating System</string>  
+    <string id="30401">Operating System</string>  
     <string id="32055">Preferred Language</string>  
 	<string id="30404">XMLTV file location</string>
     <string id="30219">Enable Dynamic Artwork For LiveTV</string>
@@ -69,7 +69,7 @@
     <string id="30709">Enter IP:Port</string>
     <string id="30710">Enter API KEY</string>
     <string id="30711">Enable CouchPotato</string>
-    <string id="30719">Configure Simple Downloader Settings (Coming Soon)</string>
+    <string id="30719">Configure Simple Downloader</string>
     <string id="30070">AutoTune</string>
         <string id="30071">Enable Autotuning</string>
         <string id="30072">Warning!! this will delete your current channel configuration</string>
@@ -78,8 +78,8 @@
             <string id="30093">Find Super Favourites</string>
             <string id="30073">LiveTV:</string>
                 <string id="30075">Find PVR Backend</string>
-                <string id="30097">Find Hdhomerun Strms</string>
-                <string id="30098">Hdhomerun Strm Folder</string>
+                <string id="30097">Find HDHomeRun</string>
+                <string id="30098">HDHomeRun Path</string>
                 <string id="30074">Find USTVNOW</string>
                 <string id="30076">TV/Movie:</string>
                     <string id="30078">Find TV Networks</string>

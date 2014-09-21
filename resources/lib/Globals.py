@@ -360,14 +360,14 @@ ACTION_TELETEXT_BLUE = 218
 #define ACTION_GESTURE_END            599
 
 #UTC LiveTV plugin
-UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V']
+UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V', 'plugin.video.mystreamstv.beta']
 
 #Dynamic Artwork plugin types
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn'] #Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv', 'plugin.video.F.T.V']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'plugin.video.F.T.V'] #Title format must be "Movie (Year)"
 
 # Plugin seek blacklist
-BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow']
+BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow', 'plugin.video.mystreamstv.beta']
 
 # Bypass EPG (paused/stacked) by channel name
 BYPASS_EPG = ['PseudoCinema']

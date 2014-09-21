@@ -62,6 +62,7 @@
    <category label="30400">
         <setting id="os" type="enum" values="Android Arm|Android x86|ATV1 Linux|ATV1 Stock|ATV2|IOS|Linux 32bit|Linux 64bit|Mac 32bit|Mac 64bit|Rasberry Pi|Windows|TLBB" label="30401" default="11" />
         <setting id="limit_preferred_language" type="select" label="32055" values="Chinese|Dutch|English|Finnish|French|German|Hungarian|Italian|Japanese|Polish|Portuguese|Russian|Spanish|Swedish" default="English"/>
+        <setting id="HDhome" type="enum" label="30399" values="Disabled|Dual|Prime" default="0" />
         <setting id="xmltvLOC" type="folder" source="auto" label="30404" default="" />
         <setting id="PVR_Enabled" label="30801" type="bool" default="false"/>
         <setting id="PVR_Folder" subsetting="true" label="30802" visible="eq(-1,true)" type="folder" source="auto" default="" />        
@@ -88,8 +89,8 @@
             <setting id="autoFindSuperFav" type="bool" label="30093" subsetting="true" visible="eq(-3,true)" default="false"/>
         <setting type="lsep" label="30073" visible="eq(-4,true)"/>
             <setting id="autoFindLivePVR" type="bool" label="30075" subsetting="true" visible="eq(-5,true)" default="false"/>
-            <setting id="autoFindLiveHD" type="bool" label="30097" subsetting="true" visible="eq(-6,true)" default="false"/>
-            <setting id="autoFindLiveHDPath" type="folder" source="auto" label="30098" subsetting="true" visible="eq(-1,true) + eq(-7,true)"default="C:\Users\%username%\HDHomeRun XBMC TV\"/>
+            <setting id="autoFindLiveHD" type="enum" label="30097" subsetting="true" visible="eq(-6,true)" values="Disabled|Dual -Strms|Prime - UPNP" default="0" />
+            <setting id="autoFindLiveHDPath" type="folder" source="auto" label="30098" subsetting="true" visible="!eq(-1,0) + eq(-7,true)"default=""/>
             <setting id="autoFindUSTVNOW" type="bool" label="30074" subsetting="true" visible="eq(-8,true)" default="false"/>
         <setting type="lsep" label="30076" visible="eq(-9,true)"/>
             <setting id="autoFindNetworks" type="bool" label="30078" subsetting="true" visible="eq(-10,true)" default="false"/>

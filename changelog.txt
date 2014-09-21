@@ -1,3 +1,7 @@
+[*] NEW! HDHomeRun UPNP autotune option w/xmltv matching.
+[*] Improved LiveTV xmltv autotune pairing.
+[*] Misc. Tweaks and Bug patches.
+[*] [COLOR=blue]^ v.0.5.1 ^[/COLOR] 
 [*] Initial Smoothstreams.tv support via Hub-Edition Only! Thanks aaearon
 [*] USTVnow XMLTV fix, InternetTV Autotune now Hub-Edition Only!
 [*] PseudoCinema rewrite (Removed Local CEPACK, Youtube sources only).
