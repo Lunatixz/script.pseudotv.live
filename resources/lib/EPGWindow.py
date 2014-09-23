@@ -66,7 +66,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.textureButtonFocus = MEDIA_LOC + BUTTON_FOCUS
         self.textureButtonNoFocus = MEDIA_LOC + BUTTON_NO_FOCUS
         self.showSeasonEpisode = REAL_SETTINGS.getSetting("ShowSeEp") == "true"
-        self.PVRchtype = ''
+        self.PVRchtype = 0
         self.PVRmediapath = ''
         self.PVRchname = ''
         self.PVRtitle = ''
@@ -306,7 +306,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:
                 chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))        
             except:
-                chtype = ''
+                chtype = 0
                 pass
             
             chname = ascii(self.MyOverlayWindow.channels[curchannel - 1].name)
@@ -411,7 +411,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 endtime = starttime + 5400
                 totaltime = 0
                 totalloops = 0
-
+                
                 while reftime < endtime and totalloops < 1000:
                     xpos = int(basex + (totaltime * (basew / 5400.0)))
                     tmpdur = self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos)
@@ -427,10 +427,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                             shouldskip = True
 
                     if self.MyOverlayWindow.hideShortItems and shouldskip == False:
-                    
-                        # if chtype >= 10 and chtype != 12 and chtype != 13 and self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <= 450:
-                            # shouldskip = True
-                            # tmpdur = 0              
+                                 
                         if self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) < self.MyOverlayWindow.shortItemLength and (chtype <= 7 and chtype != 13):
                             shouldskip = True
                             tmpdur = 0
@@ -462,7 +459,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         try:
                             chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
                         except:
-                            chtype = ''
+                            chtype = 0
                             pass
                             
                         type = (chanlist.unpackLiveID(myLiveID))[0]
@@ -980,7 +977,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try:
             chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))       
         except:
-            chtype = ''
+            chtype = 0
             pass
         
         setting3 = ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_3')
@@ -1181,7 +1178,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:
                 chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
             except:
-                chtype = ''
+                chtype = 0
                 pass
                 
             if plpos == -1:
@@ -1260,7 +1257,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try:
             chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))  
         except:
-            chtype = ''
+            chtype = 0
             pass
             
         self.lastExitTime = ADDON_SETTINGS.getSetting("LastExitTime")

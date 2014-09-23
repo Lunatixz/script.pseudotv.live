@@ -759,6 +759,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         # set the show offset
         self.Player.playselected(self.channels[self.currentChannel - 1].playlistPosition)
         self.log("playing selected file");
+        xbmc.sleep(100);
         # set the time offset
         self.channels[self.currentChannel - 1].setAccessTime(curtime)
         mediapath = self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)
@@ -1744,31 +1745,33 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.playerTimer = threading.Timer(2.0, self.playerTimerAction)  
         position = self.channels[self.currentChannel - 1].playlistPosition  
         genre = (self.channels[self.currentChannel - 1].getItemgenre(position))
-            
+        bct_type = ['Bumper','Rating','Commercial','Trailer']
+        
         try:
             self.getControl(101).setLabel('Loading Channel...')
         except:
             pass
         
-        if genre == 'Bumper' or genre == 'Rating' or genre == 'Commercial' or genre == 'Trailer':
+        if genre in bct_type:
             BCT = True
         else:
             BCT = False
-            
+        self.log("playerTimerAction, BCT? " + str(BCT))
+        
         if self.Player.isPlaying():
             self.lastPlayTime = int(self.Player.getTime())
             self.lastPlaylistPosition = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition()
             self.notPlayingCount = 0                
         else:
             #Ignore BCT's to avoid notPlayingCount loop on a dead channel.
-            if not BCT:
+            if BCT == False:
                 self.notPlayingCount += 1
                 self.log("Adding to notPlayingCount, " + str(self.notPlayingCount))  
                 
                 if DEBUG == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "notPlayingCount " + str(self.notPlayingCount), 1000, THUMB) )
                       
-        if self.notPlayingCount > 3:
+        if self.notPlayingCount >= 6:
             try:
                 self.getControl(101).setLabel('Error Loading: Changing Channel')
             except:

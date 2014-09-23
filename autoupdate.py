@@ -54,10 +54,10 @@ def UPDATEFILES():
         all(lib,addonpath,'')
         xbmc.log('script.pseudotv.live-autoupdate: extracted new package')
         MSG = 'Update Complete'
-        return
     except: 
         MSG = 'Update Failed, Try Again Later'
         pass
         
     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) )
     xbmc.executebuiltin("UpdateLocalAddons")
+    return

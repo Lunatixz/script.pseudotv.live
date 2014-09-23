@@ -50,7 +50,7 @@ def ForceArtService():
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
     xbmc.log('script.pseudotv.live-service: HubSwap')
     
-    try:#unknown amazon firetv error encountered here, requires investigation
+    try:#unknown Amazon firetv error encountered here, requires investigation
         icon = ADDON_PATH + '/icon'
         chanlist = ChannelList()
         HUB = chanlist.plugin_ok('plugin.program.addoninstaller')
@@ -63,7 +63,8 @@ def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
             except:
                 pass
             try:
-                shutil.copy2(icon + 'HUB', icon + '.png')
+                shutil.copy2(icon + 'HUB', icon + '.tmp')
+                os.rename(icon + '.tmp', icon + '.png')
             except:
                 pass   
                 
@@ -75,9 +76,12 @@ def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
             except:
                 pass
             try:
-                shutil.copy2(icon + 'OEM', icon + '.png')
+                shutil.copy2(icon + 'OEM', icon + '.tmp')
+                os.rename(icon + '.tmp', icon + '.png')
             except:
-                pass    
+                pass      
+        
+        xbmc.executebuiltin("UpdateLocalAddons")
     except:
         REAL_SETTINGS.setSetting("Hub","false")
         pass

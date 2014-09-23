@@ -399,15 +399,16 @@ class ChannelList:
         try:
             needsreset = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_changed') == 'True'
             
-            # force rebuild for livetv
-            #if chtype == 8:
-                #self.log("Force LiveTV rebuild")
-                #needsreset = True
-                #makenewlist = True
-            # if chtype == 16:
-                # self.log("Force Playon rebuild")
-                # needsreset = True
-                # makenewlist = True
+            # force rebuild
+            if SETTOP == 'false':
+                # if chtype == 8:
+                    # self.log("Force LiveTV rebuild")
+                    # needsreset = True
+                    # makenewlist = True
+                if chtype == 16:
+                    self.log("Force Playon rebuild")
+                    needsreset = True
+                    makenewlist = True
             
             if needsreset:
                 self.channels[channel - 1].isSetup = False
@@ -686,7 +687,12 @@ class ChannelList:
                 # Validate Feed #
                 fileListCHK = self.Valid_ok(setting2)
                 if fileListCHK == True:
-                    fileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel) 
+                    if setting3 == 'smoothstreams':
+                        PrefileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel) 
+                        print 'PrefileList', PrefileList
+                        fileList = self.fillLiveTVFileList(PrefileList, setting4, channel)                    
+                    else:
+                        fileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel)      
                 else:
                     self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'fileListCHK invalid: ' + str(setting2))
                     return 
@@ -1911,6 +1917,39 @@ class ChannelList:
         #fileList = self.remDupes(fileList)
         return fileList
 
+
+    def fillLiveTVFileList(self, fileList, CHname, channel):
+        self.log("fillLiveTVFileList")
+        newList = []
+        n = 0
+        now = str(datetime.datetime.now())
+        now = now.split('.')[0]
+        now = datetime.datetime.strptime(now, '%Y-%m-%d %H:%M:%S')
+        nowDate = str(datetime.datetime.utcnow())
+        nowDate = nowDate.split('.')[0]
+        nowDate = datetime.datetime.strptime(nowDate, '%Y-%m-%d %H:%M:%S')
+        
+        for i in range(len(fileList)):
+            tmpstrLST = (fileList[i]).split('\n')[0]
+            file = (fileList[i]).split('\n')[1]
+            Dur = tmpstrLST.split(',')[0]
+            startDate = tmpstrLST.split('//')[4]
+            startDate = datetime.datetime.strptime(startDate, '%Y-%m-%d %H:%M:%S')
+            today = nowDate
+            tomorrow = nowDate + datetime.timedelta(days=n)
+            
+            if (today.day == startDate.day and today.hour < startDate.hour) or (tomorrow.day < startDate.day):
+                print 'match'
+                startDur = int((startDate - nowDate).total_seconds())
+                tmpstr = str(startDur) + ',' + CHname + "//" + 'SmoothStreams - LiveTV' + "//" + CHname + "//" + 'Unknown' + "//" + str(now) + "//" + 'tvshow|0|0|False|1|NA|' + '\n' + file
+                newList.append(tmpstr)
+
+            tmpstr = tmpstrLST +'\n'+ file
+            newList.append(tmpstr)
+            n +=1
+            
+        return newList
+    
     
     def parseXMLTVDate(self, dateString, offset):
         if dateString is not None:
@@ -1946,12 +1985,15 @@ class ChannelList:
             
         self.log("buildLiveTVFileList, Using Global Parse-limit " + str(limit))
         
-        if setting3 == 'ustvnow' or setting3 == 'ftvguide':
+        if setting3 == 'ustvnow' or setting3 == 'ftvguide' or setting3 == 'smoothstreams':
             GMToffset = True
             f = Open_URL(self.xmlTvFile)
-            
-        if setting3 != '':
+        
+        elif setting3 != '':
             f = FileAccess.open(self.xmlTvFile, "rb")
+            
+        else:
+            return
         
         if self.background == False:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding LiveTV", 'parsing ' + str(setting3.lower()))
@@ -2092,7 +2134,7 @@ class ChannelList:
                         stopDate = self.parseXMLTVDate(elem.get('stop'), offset)
                         startDate = self.parseXMLTVDate(elem.get('start'), offset)
                         
-                        if (((now > startDate and now < stopDate) or (now < startDate))):
+                        if (((now > startDate and now <= stopDate) or (now < startDate))):
                             if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and ignoreParse == False: 
                                 #Enable Enhanced Parsing
                                 
@@ -2248,14 +2290,15 @@ class ChannelList:
                             continue
                         
                         #adjust the duration of the current show
-                        if now > startDate:
+                        if now > startDate and now <= stopDate:
                             try:
                                 dur = ((stopDate - startDate).seconds)
+                                #dur = ((stopDate - startDate).seconds) - ((now - startDate).seconds)
                             except Exception,e:
                                 dur = 3600  #60 minute default
                                 self.log("buildLiveTVFileList, CHANNEL: " + str(self.settingChannel) + " - Error calculating show duration (defaulted to 60 min)")
                                 raise
-                        
+                                
                         #use the full duration for an upcoming show
                         if now < startDate:
                             try:
@@ -2285,11 +2328,12 @@ class ChannelList:
 
                         if self.background == False:
                             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding LiveTV, parsing " + str(setting3.lower()), "added " + str(showcount) + " entries")
-                        
+            
             root.clear()
-                
+
         if showcount == 0:
-            self.log("buildLiveTVFileList, CHANNEL: " + str(self.settingChannel) + " 0 SHOWS FOUND")  
+            self.log("buildLiveTVFileList, CHANNEL: " + str(self.settingChannel) + " 0 SHOWS FOUND") 
+
         return showList
 
     
@@ -5096,7 +5140,7 @@ class ChannelList:
                         break
                         
         print CHname, CHzapit
-        return CHzapit
+        return CHname, CHzapit
                         
                         
                         
