@@ -1,11 +1,11 @@
-﻿import os, shutil, datetime, random#, threading
+﻿import os, shutil, datetime, random
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
-from resources.lib.Globals import *
 from resources.lib.ChannelList import *
 from resources.lib.Artdownloader import *
-from resources.lib.FileAccess import FileLock, FileAccess
+from resources.lib.utils import *
+from resources.lib.EPGWindow import *
 
 # Commoncache plugin import
 try:
@@ -13,32 +13,51 @@ try:
 except Exception,e:
     import storageserverdummy as StorageServer
 
+    
+# Plugin Info
+ADDON_ID = 'script.pseudotv.live'
+REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
+ADDON_ID = REAL_SETTINGS.getAddonInfo('id')
+ADDON_NAME = REAL_SETTINGS.getAddonInfo('name')
+ADDON_PATH = REAL_SETTINGS.getAddonInfo('path')
+ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
+xbmc.log(ADDON_ID +' '+ ADDON_NAME +' '+ ADDON_PATH +' '+ ADDON_VERSION)
 xbmc.log("script.pseudotv.live-service: Service Started...")
 
-def ArtServiceTimer(time=1800): #only needed when settop box enabled
-    print 'ArtServiceTimer'
-    Artdown = Artdownloader()
-    now  = datetime.datetime.today()
-    ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]
-    
-    if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
-        ArtServiceTimerThread = threading.Timer(float(time), ArtServiceTimer)
-        ArtServiceTimerThread.name = 'script.pseudotv.live-service: ArtServiceTimer_Thread'
-        ArtServiceTimerThread.start()
-        
-        try:
-            ArtService_Last = REAL_SETTINGS.getSetting('ArtService_LastRun')
-            ArtService_Last = ArtService_Last.split('.')[0]
-            ArtService_LastRun = datetime.datetime.strptime(ArtService_Last, '%Y-%m-%d %H:%M:%S')
-            ArtService_NextRun = (ArtService_LastRun + datetime.timedelta(seconds=ArtService_Timer))
-        except:
-            ArtService_NextRun = now
-            REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
-            REAL_SETTINGS.setSetting("ArtService_LastRun",str(ArtService_NextRun))
-            pass
+chanlist = ChannelList()
+Artdown = Artdownloader()
 
-        if now >= ArtService_NextRun:  
-            Artdown.ArtService()            
+def ServiceTimer():
+    print 'ServiceTimer'
+    
+    while not xbmc.abortRequested:
+        if REAL_SETTINGS.getSetting("SyncXMLTV_Enabled") == "true":
+            SyncXMLTV()
+            
+        if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
+            ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]
+            Update = True
+            now  = datetime.datetime.today()
+            try:
+                ArtService_LastRun = REAL_SETTINGS.getSetting('ArtService_LastRun')
+                ArtService_LastRun = ArtService_LastRun.split('.')[0]
+                ArtService_LastRun = datetime.datetime.strptime(ArtService_LastRun, '%Y-%m-%d %H:%M:%S')
+                ArtService_NextRun = (ArtService_LastRun + datetime.timedelta(seconds=ArtService_Timer))
+            except:
+                ArtService_NextRun = now
+                REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
+                REAL_SETTINGS.setSetting("ArtService_LastRun",str(ArtService_NextRun))
+                pass
+
+            if now >= ArtService_NextRun: 
+                if REAL_SETTINGS.getSetting('ArtService_Enabled_Run') == 'false':
+                    if xbmc.Player().isPlaying():
+                        Update = False 
+                
+                if Update == True:
+                    Artdown.ArtService()
+            
+        xbmc.sleep(4000)            
         
 
 def ForceArtService():
@@ -49,39 +68,40 @@ def ForceArtService():
     
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
     xbmc.log('script.pseudotv.live-service: HubSwap')
-    
-    try:#unknown amazon firetv error encountered here, requires investigation
+    try:#unknown Amazon firetv error encountered here, requires investigation
         icon = ADDON_PATH + '/icon'
-        chanlist = ChannelList()
         HUB = chanlist.plugin_ok('plugin.program.addoninstaller')
         
         if HUB == True:
             xbmc.log('script.pseudotv.live-service: HubSwap - Hub Edition')
             REAL_SETTINGS.setSetting("Hub","true")
             try:
-                os.remove(icon + '.png')
+                xbmcvfs.delete(icon + '.png')
             except:
                 pass
             try:
-                shutil.copy2(icon + 'HUB', icon + '.png')
+                xbmcvfs.copy(icon + 'HUB', icon + '.png')
             except:
                 pass   
+                
+            if NOTIFY == 'true':
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","Hub-Edition Activated", 4000, THUMB) )
                 
         else:
             xbmc.log('script.pseudotv.live-service: HubSwap - Master')
             REAL_SETTINGS.setSetting("Hub","false")
             try:
-                os.remove(icon + '.png')
+                xbmcvfs.delete(icon + '.png')
             except:
                 pass
             try:
-                shutil.copy2(icon + 'OEM', icon + '.png')
+                xbmcvfs.copy(icon + 'OEM', icon + '.png')
             except:
-                pass    
+                pass      
     except:
         REAL_SETTINGS.setSetting("Hub","false")
         pass
-          
+
           
 def donorCHK():
     xbmc.log('script.pseudotv.live-service: donorCHK')
@@ -89,12 +109,12 @@ def donorCHK():
     DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
     DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
     
-    if FileAccess.exists(DonorPath):
+    if xbmcvfs.exists(DonorPath):
         REAL_SETTINGS.setSetting("AT_Donor", "true")
         REAL_SETTINGS.setSetting("COM_Donor", "true")
         REAL_SETTINGS.setSetting("TRL_Donor", "true")
         REAL_SETTINGS.setSetting("CAT_Donor", "true")
-    elif FileAccess.exists(DL_DonorPath):  
+    elif xbmcvfs.exists(DL_DonorPath):  
         REAL_SETTINGS.setSetting("AT_Donor", "true")
         REAL_SETTINGS.setSetting("COM_Donor", "true")
         REAL_SETTINGS.setSetting("TRL_Donor", "true")
@@ -105,23 +125,38 @@ def donorCHK():
         REAL_SETTINGS.setSetting("TRL_Donor", "false")
         REAL_SETTINGS.setSetting("CAT_Donor", "false")
     
-
-def autostart():
-    xbmc.log('script.pseudotv.live-service: autostart')
-    IDLE_TIME = AUTOSTART_TIMER[int(REAL_SETTINGS.getSetting('timer_amount'))] 
     
+def SyncXMLTV():
+    print 'SyncXMLTV'
+    USxmltv = False
+    SSxmltv = False
+    FTVxmltv = False
+    
+    if not xbmcvfs.exists(XMLTV_CACHE_LOC):
+        os.makedirs(XMLTV_CACHE_LOC)
+        
+    USxmltv = chanlist.SyncUSTVnow()
+    SSxmltv = chanlist.SyncSSTV()
+    FTVxmltv = chanlist.SyncFTV()
+    
+    if USxmltv or SSxmltv or FTVxmltv:
+        if NOTIFY == 'true':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Updated", 4000, THUMB) )
+    
+    
+def autostart():
+    xbmc.log('script.pseudotv.live-service: autostart')    
     if REAL_SETTINGS.getSetting("notify") == "true":
         xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("AutoStart PseudoTV Live","Service Starting...", 4000, THUMB) )
+    
+    IDLE_TIME = AUTOSTART_TIMER[int(REAL_SETTINGS.getSetting('timer_amount'))] 
     sleep(IDLE_TIME)
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
-
+    
+    
 HubSwap()
 donorCHK()
+ServiceTimer()
 
-# if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true": 
-    # ArtServiceTimerThread = threading.Timer(float(1800), ArtServiceTimer)
-    # ArtServiceTimerThread.name = 'script.pseudotv.live-service: ArtServiceTimer_Thread'
-    # ArtServiceTimerThread.start()
-    
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
     autostart()

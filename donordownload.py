@@ -21,7 +21,6 @@ import os, sys, time, fileinput, re
 import urllib, urllib2
 
 from resources.lib.Globals import *
-from resources.lib.FileAccess import FileLock, FileAccess
 from resources.lib.utils import *
 
 try:
@@ -30,16 +29,13 @@ except:
     pass
     
 #Globals
-UserPass = REAL_SETTINGS.getSetting('Donor_UP')
-BaseURL = ('http://'+UserPass+'@ptvl.comeze.com/PTVL/')
-
 DonorDownloaded = False
 LogoDownloaded = False
 BumperDownloaded = False
 
 #Donor
-DonorURLPath = (BaseURL + 'Donor.py')
-LinkURLPath = (BaseURL + 'links.py')
+DonorURLPath = (PTVLURL + 'Donor.py')
+LinkURLPath = (PTVLURL + 'links.py')
 LinkPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'links.py'))
 DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
 DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
@@ -50,12 +46,12 @@ def autopatch():
     MSG = 'Donor Autoupdate Complete'
     
     try:
-        os.remove(xbmc.translatePath(DL_DonorPath))
+        xbmcvfs.delete(xbmc.translatePath(DL_DonorPath))
     except:
         pass
         
     try:
-        os.remove(xbmc.translatePath(DonorPath))  
+        xbmcvfs.delete(xbmc.translatePath(DonorPath))  
     except:
         pass
         
@@ -83,7 +79,7 @@ def DonorDownloader():
         InstallStatusMSG = 'Update'
         if dlg.yesno("PseudoTV Live", str(InstallStatusMSG) + " Donor Features?"):
             try:
-                os.remove(xbmc.translatePath(DonorPath))
+                xbmcvfs.delete(xbmc.translatePath(DonorPath))
                 xbmc.log('script.pseudotv.live-donordownload: Removed DonorPath')  
                 Install = True
             except Exception,e:
@@ -133,22 +129,22 @@ def LogoDownloader():
         i = 2
 
     if not DEFAULT_LOGO_LOC:
-        os.makedirs(DEFAULT_LOGO_LOC)
+        xbmcvfs.mkdirs(DEFAULT_LOGO_LOC)
         
     try:
-        os.remove(xbmc.translatePath(LinkPath))
+        xbmcvfs.delete(xbmc.translatePath(LinkPath))
     except:
         pass
          
     try:
         urllib.urlretrieve(LinkURLPath, (xbmc.translatePath(LinkPath)))
-        f = FileAccess.open((xbmc.translatePath(LinkPath)), "r")
+        f = open((xbmc.translatePath(LinkPath)), "r")
         linesLST = f.readlines()
         LogoURLPath = linesLST[i] 
         download(LogoURLPath, LogoDEST)
         all(LogoDEST, LogoPath)
         REAL_SETTINGS.setSetting("ChannelLogoFolder", DEFAULT_LOGO_LOC)
-        os.remove(LogoDEST)
+        xbmcvfs.delete(LogoDEST)
     except:
         pass
         

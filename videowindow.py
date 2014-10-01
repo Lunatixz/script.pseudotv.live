@@ -21,7 +21,6 @@ import os, sys, re, fileinput
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from resources.lib.Globals import *
-from resources.lib.FileAccess import *
 
 
 def replaceAll(file,searchExp,replaceExp):
@@ -94,7 +93,7 @@ def videowindow():
                 pass
                 
             try:
-                f = FileAccess.open(PseudoSkinfle, "r")
+                f = open(PseudoSkinfle, "r")
                 linesLST = f.readlines()            
                 f.close()
                 
@@ -134,7 +133,7 @@ def videowindow():
         
     if Patch:
         try:
-            f = FileAccess.open(PseudoSkinfle, "r")
+            f = open(PseudoSkinfle, "r")
             linesLST = f.readlines()            
             f.close()
             
@@ -211,7 +210,7 @@ def autopatch():
     
     if xbmcvfs.exists(VWPath):
         try:
-            f = FileAccess.open(PseudoSkinfle, "r")
+            f = open(PseudoSkinfle, "r")
             linesLST = f.readlines()            
             f.close()
             

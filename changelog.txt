@@ -1,3 +1,14 @@
+[*] Artwork Service Enabled w/ Dynamic artwork. Added Disable during Playback.
+[*] Improved accuracy of Direct Plugin/Playon Parsing.
+[*] NEW! Smoothstreams.tv EPG tweaks *EPGSync issues
+[*] "Recommend List" Genre types, Limit Autotuning for Plugin, Playon, Youtube Network by Genre.
+[*] "Community List" is now "Recommend List" which includes a toggle between Community List & Donor List.
+[*] Added AutoUpdate "Disable|Stable|Development" options under "Misc" settings.
+[*] NEW! XMLTV Automatic Update Service. Currently for USTVnow, SmoothStreams and F.T.V
+[*] NEW! HDHomeRun UPNP autotune option w/xmltv pairing.
+[*] Improved LiveTV channel pairing, parsing and added local xmltv cache.
+[*] Misc. Tweaks and Bug patches.
+[*] [COLOR=blue]^ v.0.5.1 ^[/COLOR] 
 [*] Initial Smoothstreams.tv support via Hub-Edition Only! Thanks aaearon
 [*] USTVnow XMLTV fix, InternetTV Autotune now Hub-Edition Only!
 [*] PseudoCinema rewrite (Removed Local CEPACK, Youtube sources only).

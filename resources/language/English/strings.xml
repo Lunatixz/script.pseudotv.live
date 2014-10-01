@@ -1,5 +1,5 @@
 <strings>
-<string id="30000">General </string>
+<string id="30000">General</string>
     <string id="30001">Configure Channels</string>
     <string id="30002">Open Channel Configuration</string>    
     <string id="30003">General Options:</string>
@@ -15,7 +15,7 @@
     <string id="30101">Channel Sharing:</string>
         <string id="30009">Enable Channel Sharing</string>
         <string id="30010">Shared Channels Folder</string>    
-        <string id="30011">HDhomerun Master</string>     
+        <string id="30011">HDHomeRun Master</string>     
     <string id="30102">Video Mirroring:</string>
     <string id="30103">Enable UPNP1</string>   
     <string id="30104">Enable UPNP2</string>   
@@ -25,6 +25,7 @@
     <string id="30201">Enable Dynamic Artwork (Incl. Service)</string>
     <string id="34046">Show Notification</string>
     <string id="34045">Run Service Every (hours)</string>
+    <string id="34446">Run During Playback?</string>
     <string id="30202">Select Skin</string> 
     <string id="30225">Channel Logo Folder</string>  
     <string id="30210">EPG Options:</string> 
@@ -59,8 +60,12 @@
     <string id="30310">Media Limit Per Channel</string>
     <string id="30372">Reserve Channels 501-999 for Autotune</string>
 <string id="30400">PVR</string>  
-    <string id="30401">Choose Your Operating System</string>  
+    <string id="30401">Operating System</string>  
     <string id="32055">Preferred Language</string>  
+	<string id="30397">Enable XMLTV Service</string>
+    <string id="30398">Show Notification</string>
+    <string id="30399">Run Service Every (hours)</string>
+    <string id="34499">Run During Playback?</string>
 	<string id="30404">XMLTV file location</string>
     <string id="30219">Enable Dynamic Artwork For LiveTV</string>
     <string id="30801">Enable PVR (Coming Soon)</string>
@@ -69,8 +74,8 @@
     <string id="30709">Enter IP:Port</string>
     <string id="30710">Enter API KEY</string>
     <string id="30711">Enable CouchPotato</string>
-    <string id="30719">Configure Simple Downloader Settings (Coming Soon)</string>
-    <string id="30070">AutoTune</string>
+    <string id="30719">Configure Simple Downloader</string>
+<string id="30070">AutoTune</string>
         <string id="30071">Enable Autotuning</string>
         <string id="30072">Warning!! this will delete your current channel configuration</string>
         <string id="30099">Custom Playlists:</string>
@@ -78,9 +83,10 @@
             <string id="30093">Find Super Favourites</string>
             <string id="30073">LiveTV:</string>
                 <string id="30075">Find PVR Backend</string>
-                <string id="30097">Find Hdhomerun Strms</string>
-                <string id="30098">Hdhomerun Strm Folder</string>
+                <string id="30097">Find HDHomeRun</string>
+                <string id="30098">HDHomeRun Path</string>
                 <string id="30074">Find USTVNOW</string>
+                <string id="30174">Find SmoothStream</string>
                 <string id="30076">TV/Movie:</string>
                     <string id="30078">Find TV Networks</string>
                     <string id="30079">Find Movie Studios</string>
@@ -106,19 +112,31 @@
                             <string id="30953">Find F.T.V Favourites</string>
                             <string id="30094">Select Year</string>
                             <string id="30095">Select Resolution</string>
-                        <string id="30110">Community List:</string>
+                        <string id="30954">Playon:</string>
+                            <string id="30955">Find Amazon</string>
+                            <string id="30956">Find Hulu</string>
+                            <string id="30957">Find Netflix</string>
+                        <string id="30110">Recommended:</string>
+                            <string id="31110">Select Source List</string>
                             <string id="30111">Find Plugin Channels</string>
                             <string id="30116">Find Playon Channels</string>
-                            <string id="30115">Find Network Channels</string>
                             <string id="30117">Find InternetTV Channels</string>
                             <string id="30112">Find Random RSS Channels</string>
+                            <string id="30115">Find Youtube Network Channels</string>
                             <string id="30113">Find Random Youtube Channels</string>
                             <string id="30114">Find Random Youtube Playlists</string>
-                        <string id="30954">Playon:</string>
-                                <string id="30955">Find Amazon</string>
-                                <string id="30956">Find Hulu</string>
-                                <string id="30957">Find Netflix</string>
                                <!-- <string id="39005">Keep Pre-existing Channels During Autotuning (Experimental)</string> -->
+                   
+    <string id="30700">Source List Filter</string>
+    <string id="30702">Include TV Genre</string>
+    <string id="30703">Include Movies Genre</string>
+    <string id="30704">Include Episodes Genre</string>
+    <string id="30705">Include Sports Genre</string>
+    <string id="30706">Include Kids Genre</string>
+    <string id="30707">Include News Genre</string>
+    <string id="30712">Include Music Genre</string>
+    <string id="30713">Include Other Genre</string>
+    
 <string id="30499">BCTs</string> 
     <string id="30500">(B)umpers:</string> 
         <string id="30501">Enable Bumpers</string>
@@ -145,16 +163,6 @@
                 <string id="30528">HD-Trailers.net Movie Title Limit</string>
                 <string id="30530">Number of Trailers Between Shows</string>
                 
-<string id="30700">Community Network</string>
-    <string id="30701">Autotune Options:</string>
-    <string id="30702">Enable TV</string>
-    <string id="30703">Enable Movies</string>
-    <string id="30704">Enable Episodes</string>
-    <string id="30705">Enable Sports</string>
-    <string id="30706">Enable Kids</string>
-    <string id="30707">Enable News</string>
-    <string id="30718">Enable Other</string>
-    
 <string id="39000">Donor</string>
     <string id="30901">Enable Donor Features</string>
     <string id="30902">Enter Username:Password</string>
@@ -166,6 +174,7 @@
     
 <string id="30900">Misc.</string>
     <string id="30990">DEBUGGING: (Use with Caution!)</string>
+    <string id="30971">AutoUpdate Version</string>
     <string id="30909">Restore Pre-Autotune Configuration</string>
     <string id="30069">Warning!! This will restore a previous channel configuration</string>                         
     <string id="30993">Enable Debugging</string>

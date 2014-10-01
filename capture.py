@@ -64,7 +64,7 @@ def readSettings2():
     NEWLST = []
     channelTYPE = 0
 
-    if os.path.exists(settingsFile):
+    if xbmcvfs.exists(settingsFile):
         f = open(settingsFile,'r')
         lineLST = f.readlines()
 
