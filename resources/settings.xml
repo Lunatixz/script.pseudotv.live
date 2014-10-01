@@ -36,6 +36,7 @@
         <setting id="ArtService_Enabled" label="30201" type="bool" default="false" /> 
         <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
         <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-2,true)" default="2"/>
+        <setting id="ArtService_Enabled_Run" type="bool" label="34446" subsetting="true" visible="eq(-3,true)" default="false"/>
         <setting id="DynamicArt_Enabled" type="bool" label="34047" subsetting="true" visible="false" default="false"/>
         <setting id="ShowSeEp" type="bool" label="30301" default="false"/>
         <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>
@@ -62,7 +63,9 @@
    <category label="30400">
         <setting id="os" type="enum" values="Android Arm|Android x86|ATV1 Linux|ATV1 Stock|ATV2|IOS|Linux 32bit|Linux 64bit|Mac 32bit|Mac 64bit|Rasberry Pi|Windows|TLBB" label="30401" default="11" />
         <setting id="limit_preferred_language" type="select" label="32055" values="Chinese|Dutch|English|Finnish|French|German|Hungarian|Italian|Japanese|Polish|Portuguese|Russian|Spanish|Swedish" default="English"/>
-        <setting id="HDhome" type="enum" label="30399" values="Disabled|Dual|Prime" default="0" />
+        <setting id="SyncXMLTV_Enabled" label="30397" type="bool" default="true"/>
+        <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
+        <setting id="ArtService_Enabled_Run" type="bool" label="34446" subsetting="true" visible="eq(-2,true)" default="false"/>
         <setting id="xmltvLOC" type="folder" source="auto" label="30404" default="" />
         <setting id="PVR_Enabled" label="30801" type="bool" default="false"/>
         <setting id="PVR_Folder" subsetting="true" label="30802" visible="eq(-1,true)" type="folder" source="auto" default="" />        
@@ -73,7 +76,7 @@
         <setting id="couchpotato.baseurl" subsetting="true" label="30709" visible="eq(-1,true)" type="text" default="http://localhost:5050"/>
         <setting id="couchpotato.apikey" subsetting="true" label="30710" visible="eq(-2,true)" type="text" default="Enter API KEY"/>
         <setting type="action" label="30719" option="close"  visible="System.HasAddon(script.module.simple.downloader)" action="RunScript($CWD/donordownload.py, -SimpleDownloader)"/>
-        </category>
+    </category>
         
 <!--Autotune-->
     <category label="30070">
@@ -89,12 +92,12 @@
             <setting id="autoFindSuperFav" type="bool" label="30093" subsetting="true" visible="eq(-3,true)" default="false"/>
         <setting type="lsep" label="30073" visible="eq(-4,true)"/>
             <setting id="autoFindLivePVR" type="bool" label="30075" subsetting="true" visible="eq(-5,true)" default="false"/>
-            <setting id="autoFindLiveHD" type="enum" label="30097" subsetting="true" visible="eq(-6,true)" values="Disabled|Dual -Strms|Prime - UPNP" default="0" />
+            <setting id="autoFindLiveHD" type="enum" label="30097" subsetting="true" visible="eq(-6,true)" values=" |Dual -Strms|Prime - UPNP" default="0" />
             <setting id="autoFindLiveHDPath" type="folder" source="auto" label="30098" subsetting="true" visible="!eq(-1,0) + eq(-7,true)"default=""/>
             <setting id="autoFindUSTVNOW" type="bool" label="30074" subsetting="true" visible="eq(-8,true)" default="false"/>
             <setting id="autoFindSmoothStreams" type="bool" label="30174" subsetting="true" visible="eq(-12,true) + eq(-9,true)" default="false"/>
         <setting type="lsep" label="30076" visible="eq(-10,true)"/>
-            <setting id="autoFindNetworks" type="bool" label="30078" subsetting="true" visible="eq(-110,true)" default="false"/>
+            <setting id="autoFindNetworks" type="bool" label="30078" subsetting="true" visible="eq(-11,true)" default="false"/>
             <setting id="autoFindStudios" type="bool" label="30079" subsetting="true" visible="eq(-12,true)" default="false"/>
             <setting id="autoFindTVGenres" type="bool" label="30080" subsetting="true" visible="eq(-13,true)" default="false"/>
             <setting id="autoFindMovieGenres" type="bool" label="30081" subsetting="true" visible="eq(-14,true)" default="false"/>
@@ -110,35 +113,37 @@
         <setting type="lsep" label="30094" visible="eq(-24,true)"/>  
             <setting id="autoFindYoutube" type="bool" label="30095" subsetting="true" visible="eq(-25,true)" default="false"/>
             <setting id="autoFindYoutubeUser" type="text" label="30096" visible="eq(-26,true) + eq(-1,true)" default="Enter Username"/>
-            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-27,true) + eq(-29,true)" default="false"/>
-        <setting type="lsep" label="30110" visible="eq(-28,true)"/>
-            <setting id="autoFindCommunity_Plugins" type="bool" label="30111" subsetting="true" visible="eq(-29,true)" default="false"/>
-            <setting id="autoFindCommunity_Playon" type="bool" label="30116" subsetting="true" visible="eq(-30,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-31,true)" default="false"/>
-            <setting id="autoFindCommunity_InternetTV" type="bool" label="30117" subsetting="true" visible="eq(-32,true) + eq(-34,true)" default="false"/>
-            <setting id="autoFindCommunity_RSS" type="bool" label="30112" subsetting="true" visible="eq(-33,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-34,true)" default="false"/>
-            <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-35,true)" default="false"/>
-        <setting type="lsep" label="30954" visible="eq(-36,true)"/>
-            <setting id="autoFindPlayonAmazon" type="bool" label="30955" subsetting="true" visible="eq(-37,true)" default="false"/>
-            <setting id="autoFindPlayonHulu" type="bool" label="30956" subsetting="true" visible="eq(-38,true)" default="false"/>
-            <setting id="autoFindPlayonNetflix" type="bool" label="30957" subsetting="true" visible="eq(-39,true)" default="false"/>
+            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-30,true) + eq(-27,true)" default="false"/>
+        <setting type="lsep" label="30954" visible="eq(-28,true)"/>
+            <setting id="autoFindPlayonAmazon" type="bool" label="30955" subsetting="true" visible="eq(-29,true)" default="false"/>
+            <setting id="autoFindPlayonHulu" type="bool" label="30956" subsetting="true" visible="eq(-30,true)" default="false"/>
+            <setting id="autoFindPlayonNetflix" type="bool" label="30957" subsetting="true" visible="eq(-31,true)" default="false"/>
+        <setting type="lsep" label="30110" visible="eq(-32,true)"/>
+            <setting id="autoFindCommunity_Source" type="enum" label="31110" subsetting="true"  enable="eq(-35,true)" visible="eq(-33,true)" values="Community|Donor" default="0" />
+            <setting id="autoFindCommunity_Plugins" type="bool" label="30111" subsetting="true" visible="eq(-34,true)" default="false"/>
+            <setting id="autoFindCommunity_Playon" type="bool" label="30116" subsetting="true" visible="eq(-35,true)" default="false"/>
+            <setting id="autoFindCommunity_InternetTV" type="bool" label="30117" subsetting="true" visible="eq(-39,true) + eq(-36,true)" default="false"/>
+            <setting id="autoFindCommunity_RSS" type="bool" label="30112" subsetting="true" visible="eq(-37,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-38,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-39,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-40,true)" default="false"/>
         <!-- AT Donor -->
-        <setting type="lsep" label="30090" visible="eq(-40,true)"/>  
-            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-43,true)" visible="eq(-41,true)" default="false"/>
-            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-44,true)" visible="eq(-42,true)" default="false"/>
+        <setting type="lsep" label="30090" visible="eq(-41,true)"/>  
+            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-44,true)" visible="eq(-42,true)" default="false"/>
+            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-45,true)" visible="eq(-43,true)" default="false"/>
       </category>
       
 <!--Community Network-->
     <category label="30700"> 
         <setting label="30701" type="lsep" default="" /> 
-        <setting id="CN_TV" label="30702" type="bool" default="false" />
-        <setting id="CN_Movies" label="30703" type="bool" default="false" />
+        <setting id="CN_TV" label="30702" type="bool" default="true" />
+        <setting id="CN_Movies" label="30703" type="bool" default="true" />
         <setting id="CN_Episodes" label="30704" type="bool" default="false" />
-        <setting id="CN_Sports" label="30705" type="bool" default="false" />
-        <setting id="CN_News" label="30707" type="bool" default="false" />
+        <setting id="CN_Sports" label="30705" type="bool" default="true" />
         <setting id="CN_Kids" label="30706" type="bool" default="false" />
-        <setting id="CN_Other" label="30718" type="bool" default="false" />
+        <setting id="CN_News" label="30707" type="bool" default="true" />
+        <setting id="CN_Music" label="30712" type="bool" default="false" />
+        <setting id="CN_Other" label="30713" type="bool" default="false" />
     </category> 
 
 <!--BCTs-->   
@@ -202,6 +207,7 @@
         <setting id="ATRestore" type="bool" label="30909" default="false"/>
       	<setting id="Warning2" type="bool" label="30069" subsetting="true" visible="eq(-1,true)" default="false"/>
         <setting label="30990" type="lsep"/>
+        <setting id="Auto_Version" type="enum" label="30971" values="Disabled|Master - Stable|Development - Latest" default="1"/>
         <setting id="enable_Debug" type="bool" label="30993" default="false"/>
         <setting id="Override_ok" type="bool" label="30991" default="false"/>
         <setting id="ClearBCT" type="bool" label="30995" default="false"/>

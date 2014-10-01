@@ -127,6 +127,17 @@ LOGO_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'logos')
 EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
 BUMPER_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'bumpers')) + '/' #Local bumper location
 IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
+XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/' #Post Channel logo IMG Processing location
+
+#XMLTV FILENAMES
+USTVnowXML = (os.path.join(XMLTV_CACHE_LOC, 'ustvnow.xml'))
+SSTVXML = (os.path.join(XMLTV_CACHE_LOC, 'smoothstreams.xml'))
+FTVXML = (os.path.join(XMLTV_CACHE_LOC, 'ftvguide.xml'))
+
+#BASEURL
+USERPASS = REAL_SETTINGS.getSetting('Donor_UP')
+BASEURL = 'http://ptvl.comeze.com/PTVL/'
+PTVLURL = 'http://'+USERPASS+'@ptvl.comeze.com/PTVL/'
 
 # Core Default Image Locations
 DEFAULT_MEDIA_LOC =  xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', 'media')) + '/'
@@ -220,18 +231,19 @@ NOTIFY = REAL_SETTINGS.getSetting('notify')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop")
 
-# Common Cache types, 22hr clock allows overlap.  
-daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22) #System Purge, Force Reset
-weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",22 * 7) #System Purge, Force Reset
-monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((22 * 7) * 4)) #System Purge
-parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((22 * 7) * 4)) #No Purge (API Queries)
-artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((22 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((22 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork2 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork2",((22 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork3 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork3",((22 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork4 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork4",((22 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork5 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork5",((22 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork6 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork6",((22 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+# Common Cache types
+quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6) #System Purge, Force Reset
+daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24) #System Purge, Force Reset
+weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7) #System Purge, Force Reset
+monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4)) #System Purge
+parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((24 * 7) * 4)) #No Purge (API Queries)
+artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+artwork2 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork2",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+artwork3 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork3",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+artwork4 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork4",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+artwork5 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork5",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+artwork6 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork6",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
 
 # HEX COLOR OPTIONS 4 (Overlay CHANBUG, EPG Genre & CHtype) 
 # http://www.w3schools.com/html/html_colornames.asp
@@ -361,10 +373,12 @@ ACTION_TELETEXT_BLUE = 218
 
 #UTC LiveTV plugin
 UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V', 'plugin.video.mystreamstv.beta']
+LOCALTIME_XMLTV = []
 
 #Dynamic Artwork plugin types
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv', 'plugin.video.F.T.V']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'plugin.video.F.T.V'] #Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']
+#Title format must be "Movie (Year)"
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'plugin.video.F.T.V', 'plugin.video.salts']
 
 # Plugin seek blacklist
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow', 'plugin.video.mystreamstv.beta']

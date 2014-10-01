@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
-import xbmc, xbmcgui, xbmcaddon, xbmcvfs
-import subprocess, os, sys, re
+import xbmc, xbmcgui, xbmcaddon, FileAccess
+import subprocess, os, sys, re, shutil
 import datetime, time, threading, _strptime
 import random, traceback
 import urllib, urllib2, json
@@ -34,6 +34,7 @@ from Migrate import Migrate
 from Artdownloader import *
 from upnp import *
 from PVRdownload import *
+from utils import *
 
 try:
     from PIL import Image
@@ -186,7 +187,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.InfTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
         self.Artdownloader = Artdownloader()
         self.VideoWindow = False
-        
+
         if REAL_SETTINGS.getSetting("UPNP1") == "true" or REAL_SETTINGS.getSetting("UPNP2") == "true" or REAL_SETTINGS.getSetting("UPNP3") == "true":
             self.UPNP = True
         else:
@@ -324,19 +325,22 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 return
 
         self.background = self.getControl(101)
+        self.background.setVisible(True)
         self.getControl(102).setVisible(False)
+
+        try:
+            self.getControl(120).setVisible(False)
+        except:
+            pass
+            
+        if REAL_SETTINGS.getSetting("SyncXMLTV_Enabled") == "true":
+            self.SyncXMLTV()
 
         try:
             self.getControl(101).setLabel('Loading...')
         except:
             pass
             
-        try:
-            self.getControl(120).setVisible(False)
-        except:
-            pass
-            
-        self.background.setVisible(True)
         updateDialog = xbmcgui.DialogProgress()
         updateDialog.create("PseudoTV Live", "Initializing")
         self.backupFiles(updateDialog)
@@ -1019,10 +1023,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         else:
             mpath = (os.path.split(mediapath)[0])
         
+        #PVR Globals
         self.PVRchtype = chtype
         self.PVRmediapath = mediapath
         self.PVRchname = chname
         self.PVRtitle = title
+        #
         
         LiveID = self.channelList.unpackLiveID(LiveID)
         type = LiveID[0]
@@ -1094,7 +1100,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         self.getControl(511).setImage(IMAGES_LOC + 'CP.png')                          
                 else:
                     self.getControl(511).setVisible(False)  
+                    self.getControl(511).setImage(IMAGES_LOC + 'NA.png') 
             except:
+                print 'setShowInfo.Label 511 not found'
                 pass     
                 
             #Unaired/aired == Playcount 0 = New
@@ -1105,8 +1113,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 elif playcount >= 1:
                     self.getControl(512).setImage(MEDIA_LOC + 'OLD.png')      
                 else:
-                    self.getControl(512).setVisible(False)      
+                    self.getControl(512).setVisible(False) 
+                    self.getControl(512).setImage(MEDIA_LOC + 'NA.png')     
             except:
+                print 'setShowInfo.Label 512 not found'
                 pass  
 
             try:
@@ -1127,46 +1137,50 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         else:
             #use xbmc.videoplayer art since not using dynamic art
             try:
-                self.getControl(508).setImage('NA.png')   
-            except:
-                pass   
-            try:
-                self.getControl(510).setImage('NA.png') 
-            except:
-                pass   
-            try:
-                self.getControl(511).setImage('NA.png') 
-            except:
-                pass   
-            try:
-                self.getControl(512).setImage('NA.png') 
-            except:
-                pass   
-            try:
                 self.getControl(513).setVisible(True)
             except:
                 pass  
-
+            try:
+                self.getControl(508).setVisible(False)
+            except:
+                pass  
+            try:
+                self.getControl(510).setVisible(False)
+            except:
+                pass  
+            try:
+                self.getControl(511).setVisible(False)
+            except:
+                pass  
+            try:
+                self.getControl(512).setVisible(False)
+            except:
+                pass  
+                
         self.log('setShowInfo return')
-        
+
         
     def setArtwork1(self, type, chtype, id, mpath, type1EXT):
         self.log('setArtwork1')
         try:
+            self.getControl(508).setVisible(True)
             self.getControl(508).setImage('NA.png')
             setImage1 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type1EXT)
             self.getControl(508).setImage(setImage1)
         except:
+            self.getControl(508).setVisible(False)
             pass  
     
     
     def setArtwork2(self, type, chtype, id, mpath, type2EXT):
         self.log('setArtwork2')
         try: 
+            self.getControl(510).setVisible(True)
             self.getControl(510).setImage('NA.png')
             setImage2 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type2EXT)
             self.getControl(510).setImage(setImage2)
         except:
+            self.getControl(510).setVisible(False)
             pass
     
     
@@ -1575,9 +1589,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             return
 
         # Cancel the timer if it is still running
-        if self.sleepTimer.isAlive():
-            self.sleepTimer.cancel()
-            self.sleepTimer = threading.Timer(self.sleepTimeValue, self.sleepAction)
+        try:
+            if self.sleepTimer.isAlive():
+                self.sleepTimer.cancel()
+                self.sleepTimer = threading.Timer(self.sleepTimeValue, self.sleepAction)
+        except:
+            pass
 
         if self.Player.stopped == False:
             self.sleepTimer.name = "SleepTimer"
@@ -1586,16 +1603,17 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
     def startNotificationTimer(self, timertime = NOTIFICATION_CHECK_TIME):
         self.log("startNotificationTimer")
+        try:
+            if self.notificationTimer.isAlive():
+                self.notificationTimer.cancel()
 
-        if self.notificationTimer.isAlive():
-            self.notificationTimer.cancel()
+            self.notificationTimer = threading.Timer(timertime, self.notificationAction)
 
-        self.notificationTimer = threading.Timer(timertime, self.notificationAction)
-
-        if self.Player.stopped == False:
-            self.notificationTimer.name = "NotificationTimer"
-            self.notificationTimer.start()
-
+            if self.Player.stopped == False:
+                self.notificationTimer.name = "NotificationTimer"
+                self.notificationTimer.start()
+        except:
+            pass
 
     # This is called when the sleep timer expires
     def sleepAction(self):
@@ -1795,7 +1813,25 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         except:
             self.log('Unwatch Failed')
             pass
-        
+    
+    
+    def SyncXMLTV(self):
+        print 'SyncXMLTV'
+        USxmltv = False
+        SSxmltv = False
+        FTVxmltv = False
+
+        if not xbmcvfs.exists(XMLTV_CACHE_LOC):
+            os.makedirs(XMLTV_CACHE_LOC)
+            
+        USxmltv = self.channelList.SyncUSTVnow()
+        SSxmltv = self.channelList.SyncSSTV()
+        FTVxmltv = self.channelList.SyncFTV()
+
+        if USxmltv or SSxmltv or FTVxmltv:
+            if NOTIFY == 'true':
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Updated", 4000, THUMB) )
+
 
     def end(self):
         self.log('end')     
@@ -1856,7 +1892,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 self.ArtServiceThread.join()
         except:
             pass
-            
+
         if self.Player.isPlaying():
             self.lastPlayTime = self.Player.getTime()
             self.lastPlaylistPosition = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition()

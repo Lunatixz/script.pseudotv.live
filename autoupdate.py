@@ -18,17 +18,13 @@
 
 
 import urllib,urllib2
-import xbmcplugin,xbmcgui,xbmc,xbmcaddon,xbmcvfs
-import re,os,sys,time,shutil
+import xbmcplugin, xbmcgui, xbmc, xbmcaddon, xbmcvfs
+import re, os, sys, time
 
-from addon.common.addon import Addon
-from resources.lib.Globals import *
-from resources.lib.FileAccess import *
 from resources.lib.utils import *
 
 __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
 __cwd__        = __settings__.getAddonInfo('path')
-
 
 def UPDATEFILES():
     ADDON = os.path.split(__cwd__)[1]
@@ -43,7 +39,7 @@ def UPDATEFILES():
     xbmc.log('script.pseudotv.live-autoupdate: URL = ' + url)
     
     try: 
-        os.remove(lib)
+        xbmcvfs.delete(lib)
         xbmc.log('script.pseudotv.live-autoupdate: deleted old package')
     except: 
         pass
@@ -59,5 +55,4 @@ def UPDATEFILES():
         pass
         
     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) )
-    xbmc.executebuiltin("UpdateLocalAddons")
     return

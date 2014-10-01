@@ -100,7 +100,7 @@ class Migrate:
             CChan = 0
             
             for CChan in range(999):
-                if os.path.exists(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'):
+                if xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'):
                     self.log("autoTune, adding Custom Video Playlist Channel")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -111,7 +111,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
                     channelNum += 1
-                elif os.path.exists(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp'):
+                elif xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp'):
                     self.log("autoTune, adding Custom Mixed Playlist Channel")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -122,7 +122,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
                     channelNum += 1
-                elif os.path.exists(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp'):
+                elif xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp'):
                     self.log("autoTune, adding Custom Music Playlist Channel")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -237,8 +237,8 @@ class Migrate:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "pvr://channels/tv/All TV channels/" + str(PVRnum) + ".pvr")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", CHSetName)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Unavailable")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
@@ -297,8 +297,8 @@ class Migrate:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", filename)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", CHSetName)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Unavailable")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
@@ -346,8 +346,8 @@ class Migrate:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", unquote(file))
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", CHSetName)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Unavailable")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
@@ -356,9 +356,8 @@ class Migrate:
                             channelNum += 1 
                 except:
                     pass
-                
-            
-            
+
+                    
         # LiveTV - USTVnow
         self.updateDialogProgress = 13
         if Globals.REAL_SETTINGS.getSetting("autoFindUSTVNOW") == "true":
@@ -373,63 +372,51 @@ class Migrate:
                     json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.ustvnow/live?mode=live"},"id":1}')
                     json_folder_detail = chanlist.sendJSON(json_query)
                     file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
-                    url = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-EMzNTRmpDUTZ0VXM'
-                    url_bak = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-ERlNKazAxWjBFSFE'
                     
-                    try: 
-                        f = urllib2.urlopen(url)
-                        xmltv = url
-                        self.log("ustvnow, INFO: URL Connected...")
-                    except urllib2.URLError as e:
-                        f = urllib2.urlopen(url_bak)
-                        xmltv = url_bak
-                        self.log("ustvnow, INFO: URL_BAK Connected...")
-                    except urllib2.URLError as e:
-                        return
-
-                    for USTVnum in file_detail:      
-                        file = re.search('"file" *: *"(.*?)"', USTVnum)
-                        label = re.search('"label" *: *"(.*?)"', USTVnum)
-                        
-                        if file and label:
-                            file = file.group(1)
-                            label = label.group(1)
-                            CHname = str(label.split(' -')[0])
-                            inSet = False
-                                    
-                            CHSetName, CHzapit = chanlist.findZap2itID(CHname, xmltv)
-                            if CHzapit != '0':
-                                inSet = True
-                                    
-                            if inSet == True:
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
-                                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file) #Raw RTMP Link
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.ustvnow/?name="+CHname+"&mode=play")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "ustvnow")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USTVnow')  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels",CHname)
-                                channelNum += 1
+                    if xbmcvfs.exists(USTVnowXML):
+                        for USTVnum in file_detail:      
+                            file = re.search('"file" *: *"(.*?)"', USTVnum)
+                            label = re.search('"label" *: *"(.*?)"', USTVnum)
                             
-                            else:
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
-                                # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file) #Raw RTMP Link
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.ustvnow/?name="+CHname+"&mode=play")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", CHname + ' USTVnow')
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Unavailable")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USTVnow')  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels",CHname)
-                                channelNum += 1
+                            if file and label:
+                                file = file.group(1)
+                                label = label.group(1)
+                                CHname = str(label.split(' -')[0])
+                                inSet = False
+                                        
+                                CHSetName, CHzapit = chanlist.findZap2itID(CHname, USTVnowXML)
+                                if CHzapit != '0':
+                                    inSet = True
+                                        
+                                if inSet == True:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
+                                    # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file) #Raw RTMP Link
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.ustvnow/?name="+CHname+"&mode=play")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "ustvnow")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USTVnow')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels",CHname)
+                                    channelNum += 1
+                                
+                                else:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                                    # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file) #Raw RTMP Link
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.ustvnow/?name="+CHname+"&mode=play")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USTVnow')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels",CHname)
+                                    channelNum += 1
                 except:
                     pass
         
@@ -442,68 +429,58 @@ class Migrate:
             SSTV = chanlist.plugin_ok('plugin.video.mystreamstv.beta')
             
             if SSTV == True:
-                json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.mystreamstv.beta/?path=/root/channels"},"id":1}')
-                json_folder_detail = chanlist.sendJSON(json_query)
-                file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
-                url = 'http://smoothstreams.tv/schedule/feed.xml'
-                url_bak = 'http://smoothstreams.tv/schedule/feed.xml'
-                # url_bak = 'http://smoothstreams.tv/schedule/feed.json'
-                
-                try: 
-                    f = urllib2.urlopen(url)
-                    xmltv = url
-                    self.log("sstv, INFO: URL Connected...")
-                except urllib2.URLError as e:
-                    f = urllib2.urlopen(url_bak)
-                    xmltv = url_bak
-                    self.log("sstv, INFO: URL_BAK Connected...")
-                except urllib2.URLError as e:
-                    return
-                
-                for SSTVnum in file_detail:      
-                    file = re.search('"file" *: *"(.*?)"', SSTVnum)
-                    label = re.search('"label" *: *"(.*?)"', SSTVnum)
-                    
-                    if file and label:
-                        file = file.group(1)
-                        label = label.group(1)
-                        CHzapit = int(label.split(' - ')[0].replace('#',''))
-                        CHname = label.split(' - ')[1]
-                        CHnum = "%02d" % (CHzapit)
-                        print CHzapit, CHname, CHnum
-                        inSet = False
+                try:
+                    json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.mystreamstv.beta/?path=/root/channels"},"id":1}')
+                    json_folder_detail = chanlist.sendJSON(json_query)
+                    file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+                    SSTVXML = (xbmc.translatePath(os.path.join(XMLTV_CACHE_LOC, 'smoothstreams.xml')))
                         
-                        if CHzapit and CHzapit != 0:
-                            inSet = True
+                    if xbmcvfs.exists(SSTVXML):
+                        for SSTVnum in file_detail:      
+                            file = re.search('"file" *: *"(.*?)"', SSTVnum)
+                            label = re.search('"label" *: *"(.*?)"', SSTVnum)
                             
-                        if inSet == True:
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(CHzapit))
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.mystreamstv.beta/?path=/root/channels/&action=play_channel&chan="+CHnum)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "smoothstreams")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", CHname)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' SStream')  
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels",CHname)
-                            channelNum += 1
-                            
-                        else:
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
-                            # Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file) #Raw RTMP Link
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.mystreamstv.beta/?path=/root/channels/&action=play_channel&chan="+CHnum)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", CHname + ' SStream')
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Unavailable")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' SStream')  
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels",CHname)
-                            channelNum += 1
+                            if file and label:
+                                file = file.group(1)
+                                label = label.group(1)
+                                CHzapit = int(label.split(' - ')[0].replace('#',''))
+                                CHname = label.split(' - ')[1]
+                                CHnum = "%02d" % (CHzapit)
+                                print CHzapit, CHname, CHnum
+                                inSet = False
+                                
+                                if CHzapit and CHzapit != 0:
+                                    inSet = True
+                                    
+                                if inSet == True:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(CHzapit))
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.mystreamstv.beta/?path=/root/channels/&action=play_channel&chan="+CHnum)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "smoothstreams")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", CHname)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' SStream')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels",CHname)
+                                    channelNum += 1
+                                    
+                                else:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.mystreamstv.beta/?path=/root/channels/&action=play_channel&chan="+CHnum)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' SStream')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels",CHname)
+                                    channelNum += 1
+                except:
+                    pass
            
         #TV - Networks/Genres
         self.updateDialogProgress = 20
@@ -642,7 +619,7 @@ class Migrate:
                     path = xbmc.translatePath("special://profile/addon_data/plugin.video.my_music_tv/cache/plist")
                     fle = os.path.join(path,"Channel_" + str(i) + ".xml.plist")
                     
-                    if os.path.exists(xbmc.translatePath(fle)):
+                    if xbmcvfs.exists(xbmc.translatePath(fle)):
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "13")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "2")
@@ -816,131 +793,134 @@ class Migrate:
                 channelNum = channelNum + 2
                 self.logDebug('channelNum = ' + str(channelNum))
         
+        #Recommend lists#
+        if int(REAL_SETTINGS.getSetting('autoFindCommunity_Source')) == 1: 
+            Community = False
+        else:
+            Community = True
         
-        #Community lists#
+        genre_filter = []
         
+        if Globals.REAL_SETTINGS.getSetting("CN_TV") == "true":
+            genre_filter.append('TV') 
+        if Globals.REAL_SETTINGS.getSetting("CN_Movies") == "true":
+            genre_filter.append('Movies') 
+        if Globals.REAL_SETTINGS.getSetting("CN_Episodes") == "true":
+            genre_filter.append('Episodes') 
+        if Globals.REAL_SETTINGS.getSetting("CN_Sports") == "true":
+            genre_filter.append('Sports') 
+        if Globals.REAL_SETTINGS.getSetting("CN_News") == "true":
+            genre_filter.append('News') 
+        if Globals.REAL_SETTINGS.getSetting("CN_Kids") == "true":
+            genre_filter.append('Kids') 
+        if Globals.REAL_SETTINGS.getSetting("CN_Music") == "true":
+            genre_filter.append('Music') 
+        if Globals.REAL_SETTINGS.getSetting("CN_Other") == "true":
+            genre_filter.append('Other') 
+        
+        genre_filter = ([x.lower() for x in genre_filter if x != ''])
+        print 'genre_filter', genre_filter
+            
         #Plugin
         self.updateDialogProgress = 70
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Plugins") == "true":
-            self.log("autoTune, adding Community Plugins")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community Plugins","")
-            url = 'https://pseudotv-live-community.googlecode.com/svn/addons.xml'
+            self.log("autoTune, adding Recommend Plugins")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Plugins","")
             
-            try: 
-                f = urllib2.urlopen(url)
-                data = f.readlines()
-                f.close()
-                data = data[2:] #remove first two unwanted lines
-            except urllib2.URLError as e:
-                return
-            
-            try:
-                for i in range(len(data)):
-                    line = str(data[i]).replace("\n","").replace('""',"")
-                    line = line.split("|")
-                    chtype = line[0]
-                    setting_1 = line[1]
-                    setting_2 = line[2]
-                    setting_3 = line[3]
-                    setting_4 = line[4]
-                    channel_name = line[5]
-                    
-                    Pluginvalid = chanlist.plugin_ok(setting_1)
-                    
-                    if Pluginvalid == True:
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community Plugins",channel_name)
-                        channelNum += 1
-            except:
-                pass
-                      
+            if Community:
+                url = 'https://pseudotv-live-community.googlecode.com/svn/addons.xml'
+            else:
+                url = BASEURL + 'addons.ini'
+                
+            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum)
+           
         #Playon
         self.updateDialogProgress = 71
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Playon") == "true":
-            self.log("autoTune, adding Community Playon")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community Playon","")
-            url = 'https://pseudotv-live-community.googlecode.com/svn/playon.xml'
+            self.log("autoTune, adding Recommend Playon")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Playon","")
+            
+            if Community:
+                url = 'https://pseudotv-live-community.googlecode.com/svn/playon.xml'
+            else:
+                url = BASEURL + 'playon.ini'
+            
+            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum)
+            
+        #InternetTV
+        self.updateDialogProgress = 72
+        if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_InternetTV") == "true":
+            self.log("autoTune, adding Recommend InternetTV")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend InternetTV","")
+           
+            if Community:
+                url = 'https://pseudotv-live-community.googlecode.com/svn/internettv.xml'
+            else:
+                url = BASEURL + 'internettv.ini'
+            
+            channelNum = self.RecTune(url, 'InternetTV', genre_filter, channelNum, limit, True)
+        
+        # RSS
+        self.updateDialogProgress = 73
+        if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_RSS") == "true":
+            self.log("autoTune, adding Recommend RSS")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend RSS","")
+            url = 'https://pseudotv-live-community.googlecode.com/svn/rss.xml'
+            fileNum = 0
             
             try: 
-                f = urllib2.urlopen(url)
+                f = Open_URL(url)
                 data = f.readlines()
                 f.close()
                 data = data[2:] #remove first two unwanted lines
-            except urllib2.URLError as e:
-                return
-            
-            try:
-                for i in range(len(data)):
-                    line = str(data[i]).replace("\n","").replace('""',"")
-                    line = line.split("|")
-                    chtype = line[0]
-                    setting_1 = line[1]
-                    setting_2 = line[2]
-                    setting_3 = line[3]
-                    setting_4 = line[4]
-                    channel_name = line[5]
-
-                    if PlayonPath != False:
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                        channelNum += 1
-                        
-                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community Playon",channel_name)
+                random.shuffle(data)#shuffle channel table
             except:
-                pass
-
-        #Youtube Network
-        self.updateDialogProgress = 72
-        if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Networks") == "true":
-            self.log("autoTune, adding Community Networks")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community Networks","")    
+                return
+                
+            for i in range(limit):
+                try:
+                    line = str(data[i]).replace("\n","").replace('""',"")
+                    line = line.split(",")
+                    setting_1 = line[0]
+                    channel_name = line[1]
             
-            genre_filter = []
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "11")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Randomly Recommend RSS",channel_name)
+                    channelNum += 1
+                    fileNum += 1
+                    
+                    if fileNum >= limit:
+                        break
+                except:
+                    pass
+            
+            
+        #Youtube Network
+        self.updateDialogProgress = 74
+        if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Networks") == "true":
+            self.log("autoTune, adding Recommend Networks")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Networks","")    
+
             Chan = []
             ChanLst = []
             Channel_List = 'https://pseudotv-live-community.googlecode.com/svn/youtube_channels_networks.xml'
             Playlist_List = 'https://pseudotv-live-community.googlecode.com/svn/youtube_playlists_networks.xml'
             
-            if Globals.REAL_SETTINGS.getSetting("CN_TV") == "true":
-                genre_filter.append('TV') 
-            if Globals.REAL_SETTINGS.getSetting("CN_Movies") == "true":
-                genre_filter.append('Movies') 
-            if Globals.REAL_SETTINGS.getSetting("CN_Episodes") == "true":
-                genre_filter.append('Episodes') 
-            if Globals.REAL_SETTINGS.getSetting("CN_Sports") == "true":
-                genre_filter.append('Sports') 
-            if Globals.REAL_SETTINGS.getSetting("CN_News") == "true":
-                genre_filter.append('News') 
-            if Globals.REAL_SETTINGS.getSetting("CN_Kids") == "true":
-                genre_filter.append('Kids') 
-            if Globals.REAL_SETTINGS.getSetting("CN_Other") == "true":
-                genre_filter.append('Other') 
-            
             try:
-                f = urllib2.urlopen(Channel_List)
+                f = Open_URL(Channel_List)
                 linesLST = f.readlines()
                 linesLST = linesLST[2:]#remove first two lines
                 f.close
-            except urllib2.URLError as e:
+            except:
                 return
             
             try:
@@ -977,17 +957,17 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", ChanNam)  
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community Networks",ChanNam)  
+                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Networks",ChanNam)  
                     channelNum += 1 
             except:
                 pass
             
             try:
-                f = urllib2.urlopen(Playlist_List)
+                f = Open_URL(Playlist_List)
                 linesLST = f.readlines()
                 linesLST = linesLST[2:]#remove first two lines
                 f.close
-            except urllib2.URLError as e:
+            except:
                 return
             
             try:
@@ -1032,115 +1012,21 @@ class Migrate:
             except:
                 pass
                 
-                
-        #InternetTV
-        self.updateDialogProgress = 72
-        if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_InternetTV") == "true":
-            self.log("autoTune, adding Community InternetTV")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community InternetTV","")
-            url = 'https://pseudotv-live-community.googlecode.com/svn/internettv.xml'
-            fileNum = 0
-            ITVnum = 0
-            duplicate = []
-            
-            try: 
-                f = urllib2.urlopen(url)
-                data = f.readlines()
-                f.close()
-                data = data[2:] #remove first two unwanted lines    
-                random.shuffle(data)#shuffle channel table
-            except urllib2.URLError as e:
-                return
-                
-            try:
-                for i in range(len(data)):
-                    line = str(data[i]).replace("\n","").replace('""',"")
-                    line = line.split("|")
-                    chtype = line[0]
-                    setting_1 = line[1]
-                    setting_2 = line[2]
-                    setting_3 = line[3]
-                    setting_4 = line[4]
-                    channel_name = line[5]
-                    CHname = channel_name.replace(' HD','').replace('HD','')
-
-                    urlValid = chanlist.Valid_ok(setting_2)
-                    
-                    if urlValid == True and CHname.lower() not in duplicate:
-                        duplicate.append(CHname.lower())
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                        channelNum += 1
-                        
-                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Community InternetTV",channel_name)
-                        fileNum += 1
-                        
-                    if fileNum >= limit:
-                        break
-            except:
-                pass
-                
-
-        # RSS
-        self.updateDialogProgress = 75
-        if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_RSS") == "true":
-            self.log("autoTune, adding Community RSS")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Community RSS","")
-            url = 'https://pseudotv-live-community.googlecode.com/svn/rss.xml'
-            
-            try: 
-                f = urllib2.urlopen(url)
-                data = f.readlines()
-                f.close()
-                data = data[2:] #remove first two unwanted lines
-                random.shuffle(data)#shuffle channel table
-            except urllib2.URLError as e:
-                return
-                
-            for i in range(limit):
-                try:
-                    line = str(data[i]).replace("\n","").replace('""',"")
-                    line = line.split(",")
-                    setting_1 = line[0]
-                    channel_name = line[1]
-            
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "11")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Community RSS",channel_name)
-                    channelNum += 1
-                except:
-                    pass
-            
+        
         #Youtube Channels
         self.updateDialogProgress = 75    
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Channels") == "true":
-            self.log("autoTune, adding Community Youtube Channels")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Community Youtube Channels","")
+            self.log("autoTune, adding Recommend Youtube Channels")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Channels","")
             url = 'https://pseudotv-live-community.googlecode.com/svn/youtube_channels.xml'
             
             try: 
-                f = urllib2.urlopen(url)
+                f = Open_URL(url)
                 data = f.readlines()
                 f.close()
                 data = data[2:] #remove first two unwanted lines
                 random.shuffle(data)#shuffle channel table
-            except urllib2.URLError as e:
+            except:
                 return
                 
             for i in range(limit):
@@ -1161,25 +1047,25 @@ class Migrate:
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Community Youtube Channels",channel_name)
+                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Channels",channel_name)
                         channelNum += 1
                 except:
                     pass
             
         #Youtube Playlists
-        self.updateDialogProgress = 78
+        self.updateDialogProgress = 76
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Playlists") == "true":
-            self.log("autoTune, adding Community Youtube Playlists")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Community Youtube Playlists","")
+            self.log("autoTune, adding Recommend Youtube Playlists")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Playlists","")
             url = 'https://pseudotv-live-community.googlecode.com/svn/youtube_playlists.xml'
             
             try: 
-                f = urllib2.urlopen(url)
+                f = Open_URL(url)
                 data = f.readlines()
                 f.close()
                 data = data[2:] #remove first two unwanted lines
                 random.shuffle(data)#shuffle channel table
-            except urllib2.URLError as e:
+            except:
                 return
                 
             for i in range(limit):
@@ -1200,13 +1086,12 @@ class Migrate:
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Community Youtube Playlists",channel_name)
+                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Playlists",channel_name)
                         channelNum += 1
                 except:
                     pass
 
-                    
-        #InternetTV - Strms
+        #InternetTV - Samples
         self.updateDialogProgress = 80
         if Globals.REAL_SETTINGS.getSetting("autoFindInternetSamples") == "true":
             self.log("autoTune, adding InternetTV Strms")
@@ -1234,7 +1119,6 @@ class Migrate:
             
             channelNum = channelNum + 2
             self.logDebug('channelNum = ' + str(channelNum))  
-        
         
         # Extras - Bringthepopcorn
         self.updateDialogProgress = 83
@@ -1301,72 +1185,59 @@ class Migrate:
         if Globals.REAL_SETTINGS.getSetting("autoFindFilmonFavourites") == "true":
             self.log("autoTune, adding F.T.V Favourites")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites","")
-            
             addonini = 'https://dl.dropboxusercontent.com/s/s6c4kqhvel3f721/addon.ini'
-            url = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-ETE0xYVUtc2ZCLVU'
-            url_bak = 'https://docs.google.com/uc?export=download&id=0BxfXty1Ovu-EeXZGRlRJcFVSWEE'
-            FTV = chanlist.plugin_ok('plugin.video.F.T.V')
             FTVnum = 0
+            FTV = chanlist.plugin_ok('plugin.video.F.T.V')
             
             if FTV == True:
-                    
                 try:
                     json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.F.T.V/?url=url&mode=415&name=Favourite+Channels"},"id":1}')
                     json_folder_detail = chanlist.sendJSON(json_query)
                     file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
-                    
-                    try: 
-                        f = urllib2.urlopen(url)
-                        xmltv = url
-                        self.log("ftvguide, INFO: URL Connected...")
-                    except urllib2.URLError as e:
-                        f = urllib2.urlopen(url_bak)
-                        xmltv = url_bak
-                        self.log("ftvguide, INFO: URL_BAK Connected...")
-                    except urllib2.URLError as e:
-                        return
-
-                    for FTVnum in file_detail:   
-                        file = re.search('"file" *: *"(.*?)"', FTVnum)
-                        label = re.search('"label" *: *"(.*?)"', FTVnum)
+                    FTVXML = (xbmc.translatePath(os.path.join(XMLTV_CACHE_LOC, 'ftvguide.xml')))
                         
-                        if file and label:
-                            file = file.group(1)
-                            label = label.group(1)
-                            CHname = ['W'+label[0:8], label[0:8]]
-                            inSet = False
-                                    
-                            CHSetName, CHzapit = chanlist.findZap2itID(CHname, xmltv)
-                            if CHzapit != '0':
-                                inSet = True
-                                            
-                            if inSet == True:
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "ftvguide")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                channelNum += 1
+                    if xbmcvfs.exists(FTVXML):
+                        for FTVnum in file_detail:   
+                            file = re.search('"file" *: *"(.*?)"', FTVnum)
+                            label = re.search('"label" *: *"(.*?)"', FTVnum)
                             
-                            else:
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", label + ' F.T.V')
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Unavailable")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                channelNum += 1
+                            if file and label:
+                                file = file.group(1)
+                                label = label.group(1)
+                                CHname = ['W'+label[0:8], label[0:8]]
+                                inSet = False
+                                        
+                                CHSetName, CHzapit = chanlist.findZap2itID(CHname, FTVXML)
+                                if CHzapit != '0':
+                                    inSet = True
+                                                
+                                if inSet == True:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "ftvguide")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                    channelNum += 1
                                 
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites",label)
+                                else:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                    channelNum += 1
+                                    
+                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites",label)
                 except:
                     pass 
                                 
@@ -1403,7 +1274,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon My TV")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon MyTV")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
@@ -1417,7 +1288,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon My Movies")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon MyMovies")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
@@ -1435,7 +1306,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu My Subs")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu MySubs")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
@@ -1622,3 +1493,62 @@ class Migrate:
                         break
 
         return currentchan
+
+        
+    def RecTune(self, url, STRMtype, genre_filter, channelNum, limit=200, RAND=False):
+        print 'RecTune'
+        chanlist = ChannelList.ChannelList()
+        duplicate = []
+        fileNum = 0
+        
+        # try: 
+        data = Open_URL_UP(url, USERPASS)
+        data = data[2:] #remove first two unwanted lines
+        data = ([x for x in data if x != '']) #remove empty lines      
+        if RAND:
+            random.shuffle(data)
+
+        for i in range(len(data)):
+            line = str(data[i]).replace("\n","").replace('""',"")
+            line = line.split("|")
+            print line
+            genre = line[0]
+            chtype = line[1]
+            setting_1 = line[2]
+            setting_2 = line[3]
+            setting_3 = line[4]
+            setting_4 = line[5]
+            channel_name = line[6]
+            CHname = channel_name.replace(' HD','').replace('HD','')
+            
+            if STRMtype == 'Plugin':
+                Pluginvalid = chanlist.plugin_ok(setting_1)
+            elif STRMtype == 'Playon':
+                Pluginvalid = chanlist.playon_player()
+            elif STRMtype == 'InternetTV':
+                Pluginvalid = chanlist.Valid_ok(setting_2)
+                
+            if Pluginvalid != False:
+                if genre.lower() in genre_filter:
+                    if CHname.lower() not in duplicate:
+                        duplicate.append(CHname.lower())
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend " + STRMtype,channel_name)
+                        channelNum += 1
+                        fileNum += 1
+            
+            if fileNum >= limit:
+                break
+        # except:
+            # pass
+            
+        return channelNum

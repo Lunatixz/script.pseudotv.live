@@ -25,7 +25,7 @@ import random, traceback
 import urllib, urllib2
 import fanarttv
 import socket
-socket.setdefaulttimeout(5)
+socket.setdefaulttimeout(30)
 
 from ChannelList import *
 from Globals import *
@@ -92,6 +92,33 @@ class Artdownloader:
                 
         return fletype
   
+  
+    def FindBug(self, type, chtype, chname, mediapath):
+        print 'FindBug'
+        #check logocache folder
+        #if not check logo folder
+        #if not check chtype:
+        #youtube - static
+        #plugin - icon.png
+        #playon - static
+        #livetv - parse icon scr
+        #if enabled google img search n save 2 logocache
+        #convert to transparent
+        #save to logocache
+        #else default
+        #return image path
+     
+     
+    def FindLogo(self, type, chtype, chname, mediapath):
+        print 'FindBug'
+        #check logo folder
+        #if not check chtype:
+        #youtube - static
+        #plugin - icon.png
+        #playon - static
+        #livetv - parse icon scr
+        #if enabled google img search n save 2 logo folder
+        #else default
      
     def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
         if Cache_Enabled:

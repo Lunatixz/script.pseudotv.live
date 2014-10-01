@@ -1,10 +1,11 @@
 import os, re, sys, time, zipfile, threading
-import urllib, urllib2
-import xbmc, xbmcgui, xbmcplugin
+import urllib, urllib2, base64
+import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 
 # from functools import wraps
 from addon.common.addon import Addon       
-from resources.lib.Globals import *  
+from Globals import *  
+from FileAccess import FileLock, FileAccess
 from Queue import Queue
 
 # Commoncache plugin import
@@ -13,6 +14,7 @@ try:
 except Exception,e:
     import storageserverdummy as StorageServer
     
+    
 #Downloader
 def download(url, dest, dp = None):
     if not dp:
@@ -20,7 +22,10 @@ def download(url, dest, dp = None):
         dp.create("PseudoTV Live","Downloading & Installing Files", ' ', ' ')
     dp.update(0)
     start_time=time.time()
-    urllib.urlretrieve(url, dest, lambda nb, bs, fs: _pbhook(nb, bs, fs, dp, start_time))
+    try:
+        urllib.urlretrieve(url, dest, lambda nb, bs, fs: _pbhook(nb, bs, fs, dp, start_time))
+    except:
+        pass
      
      
 def _pbhook(numblocks, blocksize, filesize, dp, start_time):
@@ -61,8 +66,43 @@ def Open_URL(url):
     try:
         f = urllib2.urlopen(url)
         return f
+    except urllib2.URLError as e:
+        pass
+
+
+def Open_URL_UP(url, userpass):
+    # try:
+    userpass = userpass.split(':')
+    username = userpass[0]
+    password = userpass[1]
+    request = urllib2.Request(url)
+    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+    request.add_header("Authorization", "Basic %s" % base64string)
+    result = urllib2.urlopen(request)
+    return result.readlines()
+    # except:
+        # pass
+        
+        
+def Download_URL(_in, _out): 
+    Finished = False    
+    
+    if xbmcvfs.exists(_out):
+        try:
+            os.remove(_out)
+        except:
+            pass
+    try:
+        resource = urllib.urlopen(_in)
+        output = FileAccess.open(_out, 'w')
+        output.write(resource.read())
+        Finished = True    
+        output.close()
     except:
         pass
+        
+    return Finished
+        
         
 #Extract
 def all(_in, _out, dp=None):
