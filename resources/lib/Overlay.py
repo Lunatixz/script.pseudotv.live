@@ -40,7 +40,7 @@ try:
     from PIL import Image
     from PIL import ImageEnhance
 except:
-    REAL_SETTINGS.setSetting("COLOR_CHANBUG","true")
+    REAL_SETTINGS.setSetting("UNAlter_ChanBug","true")
     pass
    
     
@@ -223,7 +223,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if FileAccess.exists(org):
             if FileAccess.exists(bak):
                 try:
-                    os.remove(bak)
+                    xbmcvfs.delete(bak)
                 except:
                     pass
             FileAccess.copy(org, bak)
@@ -237,7 +237,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if FileAccess.exists(bak):
             if FileAccess.exists(org):
                 try:
-                    os.remove(org)
+                    xbmcvfs.delete(org)
                 except:
                     pass
             FileAccess.copy(bak, org)
@@ -396,8 +396,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             if settingsFile_flesize != 0:
                 self.Backup(settingsFile, nsettingsFile)
         
-        REAL_SETTINGS.setSetting('Normal_Shutdown', "false")
-        
         if self.readConfig() == False:
             return
         
@@ -486,11 +484,13 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.channelThread.name = "ChannelThread"
             self.channelThread.start()
         else:
-            self.ArtServiceThread = threading.Timer(float(self.InfTimer), self.Artdownloader.ArtService)
-            self.ArtServiceThread.name = "ArtServiceThread"
-            self.ArtServiceThread.start()
+            if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
+                self.ArtServiceThread = threading.Timer(float(self.InfTimer), self.Artdownloader.ArtService)
+                self.ArtServiceThread.name = "ArtServiceThread"
+                self.ArtServiceThread.start()
 
         self.actionSemaphore.release()
+        REAL_SETTINGS.setSetting('Normal_Shutdown', "false")
         self.log('onInit return')
     
     
@@ -1028,7 +1028,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.PVRmediapath = mediapath
         self.PVRchname = chname
         self.PVRtitle = title
-        #
         
         LiveID = self.channelList.unpackLiveID(LiveID)
         type = LiveID[0]
@@ -1036,28 +1035,28 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         Managed = LiveID[3]
         playcount = int(LiveID[4])
 
-        # Unwatch Local Media if applicable    
-        if REAL_SETTINGS.getSetting("Disable_Watched") == "true" and self.Player.stopped:
-            if chtype <= 6 and id != '0':
-                if type == 'tvshow':
-                    media_type = 'episode'
-                    try:
-                        EPtitle = EpisodeTitle.split(' -')[0]
-                        season = EPtitle.split('x')[0]
-                        episode = EPtitle.split('x')[1]
-                    except Exception,e:
-                        EPtitle = EpisodeTitle.split(' -')[0]
-                        season = (EPtitle.split('E')[0]).replace('S','')
-                        episode = EPtitle.split('E')[1]
-                    except Exception,e:
-                        season = 0
-                        episode = 0
-                        pass
-                else:
-                    media_type = 'movie'
-                    season = ''
-                    episode = ''
-                    self.Unwatch(media_type, title, id, season, episode, '', playcount)
+        # # Unwatch Local Media if applicable    
+        # if REAL_SETTINGS.getSetting("Disable_Watched") == "true" and self.Player.stopped:
+            # if chtype <= 6 and id != '0':
+                # if type == 'tvshow':
+                    # media_type = 'episode'
+                    # try:
+                        # EPtitle = EpisodeTitle.split(' -')[0]
+                        # season = EPtitle.split('x')[0]
+                        # episode = EPtitle.split('x')[1]
+                    # except Exception,e:
+                        # EPtitle = EpisodeTitle.split(' -')[0]
+                        # season = (EPtitle.split('E')[0]).replace('S','')
+                        # episode = EPtitle.split('E')[1]
+                    # except Exception,e:
+                        # season = 0
+                        # episode = 0
+                        # pass
+                # else:
+                    # media_type = 'movie'
+                    # season = ''
+                    # episode = ''
+                    # self.Unwatch(media_type, title, id, season, episode, '', playcount)
                     
         SEtitle = self.channels[self.currentChannel - 1].getItemEpisodeTitle(position)
 
@@ -1083,12 +1082,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         
         if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":  
             self.log('Dynamic artwork enabled')
-            
-            #hide xbmc.videoplayer art since using dynamic art
-            try:
-                self.getControl(513).setVisible(False)
-            except:
-                pass  
                 
             #Sickbeard/Couchpotato == Managed
             try:
@@ -1122,7 +1115,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             try:
                 type1 = str(self.getControl(507).getLabel())
                 type1EXT = self.Artdownloader.EXTtype(type1)
-                self.setArtwork1(type, chtype, id, mpath, type1EXT)
+                self.setArtwork1(type, chtype, chname, id, mpath, type1EXT)
             except:
                 print 'setShowInfo.Label 507 not found'
                 pass
@@ -1130,54 +1123,39 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             try:
                 type2 = str(self.getControl(509).getLabel())
                 type2EXT = self.Artdownloader.EXTtype(type2)
-                self.setArtwork2(type, chtype, id, mpath, type2EXT)
+                self.setArtwork2(type, chtype, chname, id, mpath, type2EXT)
             except:
                 print 'setShowInfo.Label 509 not found'
                 pass
         else:
-            #use xbmc.videoplayer art since not using dynamic art
             try:
-                self.getControl(513).setVisible(True)
+                self.getControl(508).setImage(THUMB)
             except:
                 pass  
             try:
-                self.getControl(508).setVisible(False)
-            except:
-                pass  
-            try:
-                self.getControl(510).setVisible(False)
-            except:
-                pass  
-            try:
-                self.getControl(511).setVisible(False)
-            except:
-                pass  
-            try:
-                self.getControl(512).setVisible(False)
+                self.getControl(510).setImage(THUMB)
             except:
                 pass  
                 
         self.log('setShowInfo return')
 
-        
-    def setArtwork1(self, type, chtype, id, mpath, type1EXT):
+    def setArtwork1(self, type, chtype, chname, id, mpath, type1EXT):
         self.log('setArtwork1')
         try:
             self.getControl(508).setVisible(True)
             self.getControl(508).setImage('NA.png')
-            setImage1 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type1EXT)
+            setImage1 = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, type1EXT)
             self.getControl(508).setImage(setImage1)
         except:
             self.getControl(508).setVisible(False)
             pass  
     
-    
-    def setArtwork2(self, type, chtype, id, mpath, type2EXT):
+    def setArtwork2(self, type, chtype, chname, id, mpath, type2EXT):
         self.log('setArtwork2')
         try: 
             self.getControl(510).setVisible(True)
             self.getControl(510).setImage('NA.png')
-            setImage2 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type2EXT)
+            setImage2 = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, type2EXT)
             self.getControl(510).setImage(setImage2)
         except:
             self.getControl(510).setVisible(False)
@@ -1232,27 +1210,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         try:
             if self.showChannelBug == True:
                 if chtype != 8:
-                    if REAL_SETTINGS.getSetting('COLOR_CHANBUG') == 'false':
-                    
-                        if not FileAccess.exists(LOGO_CACHE_LOC):
-                            FileAccess.makedirs(LOGO_CACHE_LOC)
-                            
-                        if FileAccess.exists(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png'):
-                            self.getControl(103).setImage(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
-                        
-                        else:
-                            if FileAccess.exists(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png'):
-                                original = Image.open(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')                  
-                                converted_img = original.convert('LA')
-                                converted_img.save(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
-                                self.getControl(103).setImage(LOGO_CACHE_LOC + (self.channels[self.currentChannel - 1].name) + '.png')
-                            else:
-                                self.getControl(103).setImage(IMAGES_LOC + 'Default.png')
-                    else:
-                        if FileAccess.exists(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png'):
-                            self.getControl(103).setImage(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
-                        else:
-                            self.getControl(103).setImage(IMAGES_LOC + 'Default.png')
+                    setImage = self.Artdownloader.FindBug(self.PVRchtype, self.PVRchname, self.PVRmediapath)
+                    self.getControl(103).setImage(setImage)     
             else:
                 self.getControl(103).setImage('NA.png')
         except:
@@ -1690,6 +1649,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     
                     self.log('notification.init')     
                     mediapath = (self.channels[self.currentChannel - 1].getItemFilename(nextshow))
+                    chname = (self.channels[self.currentChannel - 1].name(nextshow))
                     THUMB = (IMAGES_LOC + 'icon.png')
                     ChannelLogo = (self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
                     
@@ -1722,7 +1682,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     except:
                         ShowEpisode = (self.channels[self.currentChannel - 1].getItemEpisodeTitle(nextshow).replace(',', ''))
                         pass
-
+                    
+                    #ArtType for Classic Popup
                     ArtType = {}
                     ArtType['0'] = 'poster'
                     ArtType['1'] = 'fanart' 
@@ -1730,19 +1691,21 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     ArtType['3'] = 'logo'       
                     ArtType['4'] = 'clearart'              
                     ArtType = ArtType[REAL_SETTINGS.getSetting('ComingUpArtwork')] #notification art type for classic
-                        
+                    
+                    #ArtType for Overlay Popup
                     try:
                         ArtType = str(self.getControl(121).getLabel()) #notification art type for new overlay
                         self.getControl(123).setLabel(title)
                         self.getControl(124).setLabel(ShowTitle)
                         self.getControl(125).setLabel(ShowEpisode)
                     except:
+                        #No Overlay Popup code in skin, default to Cassic Popup
                         ClassicPOPUP = True
                         pass
 
                     typeEXT = self.Artdownloader.EXTtype(ArtType)
                     self.log('notification.type.ext = ' + str(typeEXT))  
-                    THUMB = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, typeEXT)
+                    THUMB = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, typeEXT)
                     self.log("notification.plugin.thumb = " + THUMB)   
                     
                     if self.showingInfo == False and self.notificationShowedNotif == False:
@@ -1820,17 +1783,23 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         USxmltv = False
         SSxmltv = False
         FTVxmltv = False
+    
+        if REAL_SETTINGS.getSetting("SyncXMLTV_Running") == "false":
+            REAL_SETTINGS.setSetting('SyncXMLTV_Running', "true")
 
-        if not xbmcvfs.exists(XMLTV_CACHE_LOC):
-            os.makedirs(XMLTV_CACHE_LOC)
+            if not FileAccess.exists(XMLTV_CACHE_LOC):
+                FileAccess.makedirs(XMLTV_CACHE_LOC)
+                
+            USxmltv = self.channelList.SyncUSTVnow()
+            SSxmltv = self.channelList.SyncSSTV()
+            FTVxmltv = self.channelList.SyncFTV()
+            REAL_SETTINGS.setSetting('SyncXMLTV_Startup', "true")
+            REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
             
-        USxmltv = self.channelList.SyncUSTVnow()
-        SSxmltv = self.channelList.SyncSSTV()
-        FTVxmltv = self.channelList.SyncFTV()
-
-        if USxmltv or SSxmltv or FTVxmltv:
-            if NOTIFY == 'true':
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Updated", 4000, THUMB) )
+            if USxmltv or SSxmltv or FTVxmltv:
+                if NOTIFY == 'true':
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Updated", 4000, THUMB) )
+            
 
 
     def end(self):
@@ -1999,8 +1968,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
                                 tottime += self.channels[i].showTimeOffset
                                 ADDON_SETTINGS.setSetting('Channel_' + str(i + 1) + '_time', str(int(tottime)))
-                               
-                                
+     
                 self.storeFiles()
                 
         REAL_SETTINGS.setSetting('Normal_Shutdown', "true")

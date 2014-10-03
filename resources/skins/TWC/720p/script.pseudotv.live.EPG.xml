@@ -862,26 +862,6 @@
         <control type="group">            
             <posx>-15</posx>
             <posy>530</posy>
-            <!--Movie.landscape Now Playing-->        
-            <control type="image" id="513">
-                <description>landscape</description>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-                <width>300</width>
-                <height>125</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-                <texture fallback="landscape.png">$INFO[Player.Art(landscape)]</texture>
-            </control>
-            <!--TV.landscape Now Playing-->
-            <control type="image" id="514">
-                <description>landscape</description>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-                <width>300</width>
-                <height>125</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-                <texture>$INFO[Player.Art(tvshow.landscape)]</texture>
-            </control>
             <control type="button" id="507">
                 <description>Dynamic art</description>
                 <label>landscape</label>

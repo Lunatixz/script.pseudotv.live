@@ -51,27 +51,7 @@
         <!--NowPlaying.Window-->
         <control type="group">            
             <posx>960</posx>
-            <posy>570</posy>
-            <!--Movie.landscape Now Playing-->
-            <control type="image" id="513">
-                <description>landscape</description>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-                <width>285</width>
-                <height>125</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-                <texture fallback="landscape.png">$INFO[Player.Art(landscape)]</texture>
-            <!--TV.landscape Now Playing-->
-            <control type="image">
-                <description>landscape</description>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-                <width>285</width>
-                <height>125</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-                <texture>$INFO[Player.Art(tvshow.landscape)]</texture>
-            </control>        
-            </control>    
+            <posy>570</posy>   
             <control type="button" id="507">
                 <description>Dynamic art</description>
                 <label>landscape</label>

@@ -70,6 +70,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.PVRmediapath = ''
         self.PVRchname = ''
         self.PVRtitle = ''
+        self.Artdownloader = Artdownloader()  
 
         for i in range(self.rowCount):
             self.channelButtons[i] = []
@@ -241,7 +242,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
 
             try:        
                 if REAL_SETTINGS.getSetting("EPGTextEnable") == "0":
-                    self.getControl(321 + i).setImage(self.channelLogos + self.MyOverlayWindow.channels[curchannel - 1].name + '.png')
+                    # self.getControl(321 + i).setImage(self.channelLogos + self.MyOverlayWindow.channels[curchannel - 1].name + '.png')
+                    chname = (self.MyOverlayWindow.channels[curchannel - 1].name)
+                    setImage = self.Artdownloader.FindLogo(chname)
+                    self.getControl(321 + i).setImage(setImage)
                 else:
                     self.getControl(321 + i).setImage('')
             except:
@@ -953,7 +957,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         starttime = self.shownTime + (left / (basew / 5400.0))
         chnoffset = self.focusRow - 2
         newchan = self.centerChannel
-        self.Artdownloader = Artdownloader()  
         
         while chnoffset != 0:
             if chnoffset > 0:
@@ -998,7 +1001,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.PVRmediapath = mediapath
         self.PVRchname = chname
         self.PVRtitle = title
-        #
         
         LiveID = chanlist.unpackLiveID(LiveID)
         type = LiveID[0]
@@ -1051,13 +1053,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         
         if REAL_SETTINGS.getSetting("DynamicArt_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":  
             self.log('Dynamic artwork enabled')
-            
-            #hide xbmc.videoplayer art since using dynamic art
-            try:
-                self.getControl(513).setVisible(False)
-            except:
-                pass  
-                
+                            
             #Sickbeard/Couchpotato == Managed
             try:
                 if Managed == 'True':
@@ -1090,7 +1086,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:
                 type1 = str(self.getControl(507).getLabel())
                 type1EXT = self.Artdownloader.EXTtype(type1)
-                self.setArtwork1(type, chtype, id, mpath, type1EXT)
+                self.setArtwork1(type, chtype, chname, id, mpath, type1EXT)
             except:
                 print 'setShowInfo.Label 507 not found'
                 pass
@@ -1098,54 +1094,40 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:
                 type2 = str(self.getControl(509).getLabel())
                 type2EXT = self.Artdownloader.EXTtype(type2)
-                self.setArtwork2(type, chtype, id, mpath, type2EXT)
+                self.setArtwork2(type, chtype, chname, id, mpath, type2EXT)
             except:
                 print 'setShowInfo.Label 509 not found'
                 pass
         else:
-            #use xbmc.videoplayer art since not using dynamic art
             try:
-                self.getControl(513).setVisible(True)
+                self.getControl(508).setImage(THUMB)
             except:
                 pass  
             try:
-                self.getControl(508).setVisible(False)
+                self.getControl(510).setImage(THUMB)
             except:
                 pass  
-            try:
-                self.getControl(510).setVisible(False)
-            except:
-                pass  
-            try:
-                self.getControl(511).setVisible(False)
-            except:
-                pass  
-            try:
-                self.getControl(512).setVisible(False)
-            except:
-                pass  
-                
+
         self.log('setShowInfo return')
 
-        
-    def setArtwork1(self, type, chtype, id, mpath, type1EXT):
+    def setArtwork1(self, type, chtype, chname, id, mpath, type1EXT):
         self.log('setArtwork1')
         try:
             self.getControl(508).setVisible(True)
             self.getControl(508).setImage('NA.png')
-            setImage1 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type1EXT)
+            setImage1 = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, type1EXT)
             self.getControl(508).setImage(setImage1)
         except:
             self.getControl(508).setVisible(False)
             pass  
     
     
-    def setArtwork2(self, type, chtype, id, mpath, type2EXT):
+    def setArtwork2(self, type, chtype, chname, id, mpath, type2EXT):
         self.log('setArtwork2')
         try: 
             self.getControl(510).setVisible(True)
             self.getControl(510).setImage('NA.png')
-            setImage2 = self.Artdownloader.FindArtwork_NEW(type, chtype, id, mpath, type2EXT)
+            setImage2 = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, type2EXT)
             self.getControl(510).setImage(setImage2)
         except:
             self.getControl(510).setVisible(False)

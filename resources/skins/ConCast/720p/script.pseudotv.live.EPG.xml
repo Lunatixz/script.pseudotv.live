@@ -52,28 +52,6 @@
         <!-- ################################################################## -->
 
         <!--NowPlaying.Window-->>
-        <control type="group" id="513">       
-            <posx>753</posx>
-            <posy>0</posy>   
-            <control type="image">
-                <description>landscape</description>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-                <width>528</width>
-                <height>291</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-                <texture fallback="landscape.png">$INFO[Player.Art(landscape)]</texture>
-            </control>
-            <control type="image">
-                <description>landscape</description>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-                <width>528</width>
-                <height>291</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-                <texture>$INFO[Player.Art(tvshow.landscape)]</texture>
-            </control>
-        </control>
         <control type="group">  
             <posx>753</posx>
             <posy>0</posy>   

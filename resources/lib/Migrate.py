@@ -89,7 +89,7 @@ class Migrate:
         PlayonPath = chanlist.playon_player()
         
         limit = MEDIA_LIMIT[int(Globals.REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-        if limit == 0 or limit < 25 or limit >= 100:
+        if limit == 0 or limit < 25 or limit >= 200:
             limit = 25
 
         # Custom Playlists
@@ -832,7 +832,7 @@ class Migrate:
             else:
                 url = BASEURL + 'addons.ini'
                 
-            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum)
+            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum, 200, True)
            
         #Playon
         self.updateDialogProgress = 71
@@ -845,7 +845,7 @@ class Migrate:
             else:
                 url = BASEURL + 'playon.ini'
             
-            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum)
+            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum, 200, True)
             
         #InternetTV
         self.updateDialogProgress = 72
@@ -1501,54 +1501,54 @@ class Migrate:
         duplicate = []
         fileNum = 0
         
-        # try: 
-        data = Open_URL_UP(url, USERPASS)
-        data = data[2:] #remove first two unwanted lines
-        data = ([x for x in data if x != '']) #remove empty lines      
-        if RAND:
-            random.shuffle(data)
+        try: 
+            data = Open_URL_UP(url, USERPASS)
+            data = data[2:] #remove first two unwanted lines
+            data = ([x for x in data if x != '']) #remove empty lines      
+            if RAND:
+                random.shuffle(data)
 
-        for i in range(len(data)):
-            line = str(data[i]).replace("\n","").replace('""',"")
-            line = line.split("|")
-            print line
-            genre = line[0]
-            chtype = line[1]
-            setting_1 = line[2]
-            setting_2 = line[3]
-            setting_3 = line[4]
-            setting_4 = line[5]
-            channel_name = line[6]
-            CHname = channel_name.replace(' HD','').replace('HD','')
-            
-            if STRMtype == 'Plugin':
-                Pluginvalid = chanlist.plugin_ok(setting_1)
-            elif STRMtype == 'Playon':
-                Pluginvalid = chanlist.playon_player()
-            elif STRMtype == 'InternetTV':
-                Pluginvalid = chanlist.Valid_ok(setting_2)
+            for i in range(len(data)):
+                line = str(data[i]).replace("\n","").replace('""',"")
+                line = line.split("|")
+                print line
+                genre = line[0]
+                chtype = line[1]
+                setting_1 = line[2]
+                setting_2 = line[3]
+                setting_3 = line[4]
+                setting_4 = line[5]
+                channel_name = line[6]
+                CHname = channel_name.replace(' HD','').replace('HD','')
                 
-            if Pluginvalid != False:
-                if genre.lower() in genre_filter:
-                    if CHname.lower() not in duplicate:
-                        duplicate.append(CHname.lower())
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
-                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend " + STRMtype,channel_name)
-                        channelNum += 1
-                        fileNum += 1
-            
-            if fileNum >= limit:
-                break
-        # except:
-            # pass
+                if STRMtype == 'Plugin':
+                    Pluginvalid = chanlist.plugin_ok(setting_1)
+                elif STRMtype == 'Playon':
+                    Pluginvalid = chanlist.playon_player()
+                elif STRMtype == 'InternetTV':
+                    Pluginvalid = chanlist.Valid_ok(setting_2)
+                    
+                if Pluginvalid != False:
+                    if genre.lower() in genre_filter:
+                        if CHname.lower() not in duplicate:
+                            duplicate.append(CHname.lower())
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend " + STRMtype,channel_name)
+                            channelNum += 1
+                            fileNum += 1
+                
+                if fileNum >= limit:
+                    break
+        except:
+            pass
             
         return channelNum

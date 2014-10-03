@@ -1,4 +1,8 @@
-[*] Artwork Service Enabled w/ Dynamic artwork. Added Disable during Playback.
+[*] Changed LiveTV parsing limit to 12.
+[*] Misc. Tweaks and Bug fixes.
+[*] Removed old artwork fallbacks and skin labels.
+[*] Artwork Service Enabled w/ Dynamic artwork. Added Disable during Playback option.
+[*] [COLOR=blue]^ v.0.5.2 ^[/COLOR] 
 [*] Improved accuracy of Direct Plugin/Playon Parsing.
 [*] NEW! Smoothstreams.tv EPG tweaks *EPGSync issues
 [*] "Recommend List" Genre types, Limit Autotuning for Plugin, Playon, Youtube Network by Genre.

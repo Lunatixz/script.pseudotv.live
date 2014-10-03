@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, re
+import os, sys, re, shutil
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from resources.lib.Globals import *
@@ -105,7 +105,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             if REAL_SETTINGS.getSetting("ClearBCT") == "true":
             
                 try:
-                    xbmcfvs.rmdir(BCT_LOC)
+                    shutil.rmtree(BCT_LOC)
                     xbmc.log('script.pseudotv.live-default: BCT Folder Purged!')
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "BCT Cache Cleared", 4000, THUMB) )
                 except Exception,e:
@@ -118,19 +118,19 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             if REAL_SETTINGS.getSetting("ClearLiveArt") == "true":
             
                 try: # Logo Cache
-                    xbmcfvs.rmdir(LOGO_CACHE_LOC)
+                    shutil.rmtree(LOGO_CACHE_LOC)
                 except:
                     pass
                     
                 try: # Dynamic Artwork Cache
-                    xbmcfvs.rmdir(ART_LOC)
+                    shutil.rmtree(ART_LOC)
+                    REAL_SETTINGS.setSetting('ClearLiveArtCache', "true")
                 except:
                     pass
                                 
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Folders Cleared", 4000, THUMB) )
                 xbmc.log('script.pseudotv.live-default: Art Folders Purged!')
                 REAL_SETTINGS.setSetting('ClearLiveArt', "false")
-                REAL_SETTINGS.setSetting('ClearLiveArtCache', "true")
                 
             # Clear System Caches    
             if REAL_SETTINGS.getSetting("ClearCache") == "true":

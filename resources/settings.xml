@@ -37,7 +37,7 @@
         <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
         <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-2,true)" default="2"/>
         <setting id="ArtService_Enabled_Run" type="bool" label="34446" subsetting="true" visible="eq(-3,true)" default="false"/>
-        <setting id="DynamicArt_Enabled" type="bool" label="34047" subsetting="true" visible="false" default="false"/>
+        <setting id="FindLogos_Enabled" type="bool" label="34547" enable="false" subsetting="true" visible="eq(-4,true)" default="false"/>
         <setting id="ShowSeEp" type="bool" label="30301" default="false"/>
         <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>
         <!-- EPG -->
@@ -54,7 +54,7 @@
             <setting id="InfoOnChange" type="bool" label="30221" default="true"/>
             <setting id="InfoTimer" subsetting="true" visible="eq(-1,true)" type="enum" label="30222" values="3|5|10|15|20|25" default="1"/>
             <setting id="ShowChannelBug" type="bool" label="30224" default="true"/>
-            <setting id="COLOR_CHANBUG" subsetting="true" visible="eq(-1,true)" type="bool" label="30228" default="false"/>
+            <setting id="UNAlter_ChanBug" subsetting="true" visible="eq(-1,true)" type="bool" label="30228" default="true"/>
             <setting id="EnableComingUp" type="enum" label="30226" values="Disabled|Overlay|Classic" default="1"/>
             <setting id="ComingUpArtwork" subsetting="true" visible="eq(-1,2)" type="enum" label="30227" values="Poster|Fanart|Landscape|Logo|Clearart" default="1" />
    </category>
