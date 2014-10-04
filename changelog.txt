@@ -1,3 +1,6 @@
+[*] XMLTV service tweaks. 
+[*] Fixed Donor icon download, and Donor Source list updated!
+[*] Removed the need to add extra (Bold and Color) strings to Direct Plugin Chtypes.
 [*] Changed LiveTV parsing limit to 12.
 [*] Misc. Tweaks and Bug fixes.
 [*] Removed old artwork fallbacks and skin labels.

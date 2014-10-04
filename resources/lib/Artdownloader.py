@@ -270,6 +270,7 @@ class Artdownloader:
         smpath = os.path.dirname(mediapath)
         ArtCache = os.path.join(ART_LOC, fle)
         ChannelLogo = os.path.join(LOGO_LOC,chname + '.png')  
+        MediaImage = os.path.join(MEDIA_LOC, (arttype + '.png'))
         mediapathSeason, filename = os.path.split(mediapath)
         mediapathSeries = os.path.dirname(mediapathSeason)
         
@@ -371,7 +372,9 @@ class Artdownloader:
         #Default image
         if not setImage:    
             print ('Find Channel Logo Artwork')
-            if FileAccess.exists(ChannelLogo):
+            if FileAccess.exists(MediaImage):
+                setImage = MediaImage
+            elif FileAccess.exists(ChannelLogo):
                 setImage = ChannelLogo
             else:
                 setImage = THUMB

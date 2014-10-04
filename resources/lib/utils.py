@@ -15,8 +15,7 @@ try:
     import StorageServer
 except Exception,e:
     import storageserverdummy as StorageServer
-    
-    
+
 #Downloader
 def download(url, dest, dp = None):
     if not dp:
@@ -71,6 +70,31 @@ def Open_URL(url):
     except urllib2.URLError as e:
         pass
 
+        
+def Open_URL_CACHE(url):
+    print ("Open_URL_CACHE Cache")
+    if Cache_Enabled:
+        try:
+            result = quarterly.cacheFunction(Open_URL_CACHE_NEW, url)
+        except:
+            result = Open_URL_CACHE_NEW(url)
+            pass
+    else:
+        result = Open_URL_CACHE_NEW(url)
+    
+    if not result:
+        result = 'Empty'
+    return result   
+    
+    
+def Open_URL_CACHE_NEW(url):  
+    print ("Open_URL_CACHE_NEW")      
+    try:
+        f = urllib2.urlopen(url)
+        return f
+    except urllib2.URLError as e:
+        pass
+
 
 def Open_URL_UP(url, userpass):
     try:
@@ -80,7 +104,7 @@ def Open_URL_UP(url, userpass):
         request = urllib2.Request(url)
         base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
         request.add_header("Authorization", "Basic %s" % base64string)
-        result = urllib2.urlopen(request)
+        result = Open_URL_CACHE(request)
         return result.readlines()
     except:
         pass

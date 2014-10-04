@@ -42,24 +42,25 @@ def ServiceTimer():
                 ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]
                 Update = True
                 now  = datetime.datetime.today()
+                
                 try:
-                    ArtService_LastRun = REAL_SETTINGS.getSetting('ArtService_LastRun')
+                    ArtService_LastRun = REAL_SETTINGS.getSetting('ArtService_NextRun')
                     ArtService_LastRun = ArtService_LastRun.split('.')[0]
                     ArtService_LastRun = datetime.datetime.strptime(ArtService_LastRun, '%Y-%m-%d %H:%M:%S')
-                    ArtService_NextRun = (ArtService_LastRun + datetime.timedelta(seconds=ArtService_Timer))
                 except:
-                    ArtService_NextRun = now
-                    REAL_SETTINGS.setSetting("ArtService_LastRun",str(ArtService_NextRun))
+                    ArtService_LastRun = now
                     pass
 
-                if now >= ArtService_NextRun: 
+                if now >= ArtService_LastRun: 
                     if REAL_SETTINGS.getSetting('ArtService_Enabled_Run') == 'false':
                         if xbmc.Player().isPlaying():
                             Update = False 
 
                     if Update == True:
+                        ArtService_NextRun = (ArtService_LastRun + datetime.timedelta(seconds=ArtService_Timer))
+                        REAL_SETTINGS.setSetting("ArtService_NextRun",str(ArtService_NextRun))
                         Artdown.ArtService()
-                
+                        
             xbmc.sleep(4000)            
         
 

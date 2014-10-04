@@ -1519,7 +1519,7 @@ class Migrate:
                 setting_3 = line[4]
                 setting_4 = line[5]
                 channel_name = line[6]
-                CHname = channel_name.replace(' HD','').replace('HD','')
+                CHname = channel_name
                 
                 if STRMtype == 'Plugin':
                     Pluginvalid = chanlist.plugin_ok(setting_1)
@@ -1527,6 +1527,7 @@ class Migrate:
                     Pluginvalid = chanlist.playon_player()
                 elif STRMtype == 'InternetTV':
                     Pluginvalid = chanlist.Valid_ok(setting_2)
+                    CHname = channel_name.replace(' HD','').replace('HD','')
                     
                 if Pluginvalid != False:
                     if genre.lower() in genre_filter:

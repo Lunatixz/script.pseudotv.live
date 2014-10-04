@@ -120,7 +120,6 @@ class ChannelList:
         self.findMaxChannels()
 
         if self.forceReset:
-            daily.delete("%")
             REAL_SETTINGS.setSetting("INTRO_PLAYED","false")
             REAL_SETTINGS.setSetting("ClearLiveArtCache","true")
             REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
@@ -4458,7 +4457,8 @@ class ChannelList:
                     filetype = filetypes.group(1)
                     file = files.group(1)
                     label = labels.group(1)
-
+                    label = self.CleanLabels(label)
+                    
                     if label.lower() not in excludeLST:
                         print 'PluginWalk, ' + ascii(label) + ' not in excludeLST'
 
@@ -4676,8 +4676,9 @@ class ChannelList:
                                         else:
                                             swtitle = swtitle.replace(' . ',' - ')
 
-                                        showtitle = (showtitles.group(1)).replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','').replace('[B]','').replace('[/B]','')
-
+                                        showtitle = (showtitles.group(1))
+                                        showtitle = self.CleanLabels(showtitle)
+                                        
                                         if PlugCHK in DYNAMIC_PLUGIN_TV:
                                             print 'DYNAMIC_PLUGIN_TV'
 
@@ -4696,17 +4697,19 @@ class ChannelList:
 
                                             GenreLiveID = [genre, type, imdbnumber, dbid, Managed, 1, rating]
                                             genre, LiveID = self.packGenreLiveID(GenreLiveID)
-
+                                        
+                                        swtitle = self.CleanLabels(swtitle)
+                                        theplot = self.CleanLabels(theplot)
                                         tmpstr += showtitle + "//" + swtitle + "//" + theplot + "//" + genre + "////" + LiveID
                                         istvshow = True
 
                                     else:
 
                                         if labels:
-                                            label = (labels.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','').replace('[B]','').replace('[/B]','')
-
+                                            label = (labels.group(1))
+                                            
                                         if titles:
-                                            title = (titles.group(1)).replace(' [HD]','').replace('(Sub) ','').replace('(Dub) ','').replace('[B]','').replace('[/B]','')
+                                            title = (titles.group(1))
 
                                         tmpstr += (label).replace('\\','') + "//"
 
@@ -4752,7 +4755,8 @@ class ChannelList:
 
                                                 GenreLiveID = [genre, type, imdbnumber, dbid, Managed, 1, rating]
                                                 genre, LiveID = self.packGenreLiveID(GenreLiveID)
-
+                                            
+                                            theplot = self.CleanLabels(theplot)
                                             tmpstr += "//" + theplot + "//" + genre + "////" + (LiveID)
 
                                         else: #Music
@@ -4769,6 +4773,9 @@ class ChannelList:
                                             else:
                                                 artistTitle = ''
                                                 
+                                            albumTitle = self.CleanLabels(albumTitle)
+                                            artistTitle = self.CleanLabels(artistTitle)
+                                            
                                             tmpstr += albumTitle + "//" + artistTitle + "//" + 'Music' + "////" + LiveID
 
                                     file = file.replace('plugin://plugin.video.youtube/?action=play_video&videoid=', youtube_plugin)
@@ -4814,7 +4821,7 @@ class ChannelList:
         DetailLST_CHK = []
         self.dircount = 0
         self.filecount = 0
-        
+
         try:
             Directs = (setting1.split('/')) # split folders
             Directs = ([x for x in Directs if x != '']) # remove empty elements
@@ -4872,6 +4879,7 @@ class ChannelList:
                     Detail = (DetailLST[i]).split(',')
                     filetype = Detail[0]
                     title = Detail[1]
+                    title = self.CleanLabels(title)
                     genre = Detail[2]
                     dur = Detail[3]
                     description = Detail[4]
@@ -4879,7 +4887,8 @@ class ChannelList:
                     
                     if title.lower() not in excludeLST and title != '':
                         if filetype == 'directory':
-                            if Directs[0].lower() == title.lower():
+                            CurDirect = self.CleanLabels(Directs[0])
+                            if CurDirect.lower() == title.lower():
                                 print 'directory match'
                                 Directs.pop(0) #remove old directory, search next element
                                 plugin = file
@@ -5124,26 +5133,25 @@ class ChannelList:
         print 'SyncUSTVnow'    
         now  = datetime.datetime.today()
         USTVnow = self.plugin_ok('plugin.video.ustvnow')
+        
         if USTVnow == True:
             try:
                 SyncUSTVnow_LastRun = REAL_SETTINGS.getSetting('SyncUSTVnow_NextRun')
                 SyncUSTVnow_LastRun = SyncUSTVnow_LastRun.split('.')[0]
                 SyncUSTVnow_LastRun = datetime.datetime.strptime(SyncUSTVnow_LastRun, '%Y-%m-%d %H:%M:%S')
-                SyncUSTVnow_NextRun = (SyncUSTVnow_LastRun + datetime.timedelta(hours=48))
             except:
-                SyncUSTVnow_NextRun = now
-                REAL_SETTINGS.setSetting("SyncUSTVnow_NextRun",str(SyncUSTVnow_NextRun))
+                SyncUSTVnow_LastRun = now
                 pass
             
             #Force Download
             if force == True:
-                SyncUSTVnow_NextRun = now
+                SyncUSTVnow_LastRun = now
             
             #Force Download - If missing
             if not FileAccess.exists(USTVnowXML):
-                SyncUSTVnow_NextRun = now
+                SyncUSTVnow_LastRun = now
                 
-            if now >= SyncUSTVnow_NextRun: 
+            if now >= SyncUSTVnow_LastRun: 
                 url = 'http://users17.jabry.com/PTVL1/db/xmltv/ustvnow.xml'
                 url_bak = 'http://ptvl.comeze.com/XMLTV/ustvnow.xml'
                          
@@ -5164,8 +5172,9 @@ class ChannelList:
                 except urllib2.URLError as e:
                     pass
                     
-                download(USxmltv, USTVnowXML)  
+                SyncUSTVnow_NextRun = (SyncUSTVnow_LastRun + datetime.timedelta(hours=48))
                 REAL_SETTINGS.setSetting("SyncUSTVnow_NextRun",str(SyncUSTVnow_NextRun))
+                download(USxmltv, USTVnowXML)  
                 return True
             
 
@@ -5178,21 +5187,19 @@ class ChannelList:
                 SyncSSTV_LastRun = REAL_SETTINGS.getSetting('SyncSSTV_NextRun')
                 SyncSSTV_LastRun = SyncSSTV_LastRun.split('.')[0]
                 SyncSSTV_LastRun = datetime.datetime.strptime(SyncSSTV_LastRun, '%Y-%m-%d %H:%M:%S')
-                SyncSSTV_NextRun = (SyncSSTV_LastRun + datetime.timedelta(hours=24))
             except:
-                SyncSSTV_NextRun = now
-                REAL_SETTINGS.setSetting("SyncSSTV_NextRun",str(SyncSSTV_NextRun))
+                SyncSSTV_LastRun = now
                 pass
             
             #Force Download
             if force == True:
-                SyncSSTV_NextRun = now
+                SyncSSTV_LastRun = now
             
             #Force Download - If missing
             if not FileAccess.exists(SSTVXML):
-                SyncSSTV_NextRun = now
+                SyncSSTV_LastRun = now
                 
-            if now >= SyncSSTV_NextRun: 
+            if now >= SyncSSTV_LastRun: 
                 url = 'http://smoothstreams.tv/schedule/feed.xml'
                 url_bak = 'http://smoothstreams.tv/schedule/feed.xml'
                 # url_bak = 'http://smoothstreams.tv/schedule/feed.json'
@@ -5214,8 +5221,9 @@ class ChannelList:
                 except urllib2.URLError as e:
                     pass
                         
-                download(SSxmltv, SSTVXML)
+                SyncSSTV_NextRun = (SyncSSTV_LastRun + datetime.timedelta(hours=24))
                 REAL_SETTINGS.setSetting("SyncSSTV_NextRun",str(SyncSSTV_NextRun))
+                download(SSxmltv, SSTVXML)
                 return True
         
         
@@ -5228,21 +5236,19 @@ class ChannelList:
                 SyncFTV_LastRun = REAL_SETTINGS.getSetting('SyncFTV_NextRun')
                 SyncFTV_LastRun = SyncFTV_LastRun.split('.')[0]
                 SyncFTV_LastRun = datetime.datetime.strptime(SyncFTV_LastRun, '%Y-%m-%d %H:%M:%S')
-                SyncFTV_NextRun = (SyncFTV_LastRun + datetime.timedelta(hours=48))
             except:
-                SyncFTV_NextRun = now
-                REAL_SETTINGS.setSetting("SyncFTV_NextRun",str(SyncFTV_NextRun))
+                SyncFTV_LastRun = now
                 pass
             
             #Force Download
             if force == True:
-                SyncFTV_NextRun = now
+                SyncFTV_LastRun = now
             
             #Force Download - If missing
             if not FileAccess.exists(FTVXML):
-                SyncFTV_NextRun = now
+                SyncFTV_LastRun = now
                 
-            if now >= SyncFTV_NextRun: 
+            if now >= SyncFTV_LastRun: 
                 url = 'http://users17.jabry.com/PTVL1/db/xmltv/ftvguide.xml'
                 url_bak = 'http://ptvl.comeze.com/XMLTV/ftvguide.xml'
                          
@@ -5262,6 +5268,13 @@ class ChannelList:
                 except urllib2.URLError as e:
                     pass
             
-                download(FTVxmltv, FTVXML)
+                SyncFTV_NextRun = (SyncFTV_LastRun + datetime.timedelta(hours=48))
                 REAL_SETTINGS.setSetting("SyncFTV_NextRun",str(SyncFTV_NextRun))
+                download(FTVxmltv, FTVXML)
                 return True
+                
+    def CleanLabels(self, label):
+        print 'CleanLabels'
+        label = label.replace('[B]','').replace('[/B]','').replace('[/COLOR]','').replace('[COLOR=blue]','').replace('[COLOR=red]','').replace('[COLOR=green]','').replace('[COLOR=yellow]','').replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','').replace(' [cc]','')
+        return label
+    
