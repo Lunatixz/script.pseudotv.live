@@ -723,6 +723,8 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             chtype = 0
             pass
         
+        self.log('setChannel Chtype = ' + str(chtype))
+        
         if self.channels[self.currentChannel - 1].isPaused == False:
             # adjust the show and time offsets to properly position inside the playlist
             #for Live TV get the first item in playlist convert to epoch time  add duration until we get to the current item
@@ -1649,7 +1651,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     
                     self.log('notification.init')     
                     mediapath = (self.channels[self.currentChannel - 1].getItemFilename(nextshow))
-                    chname = (self.channels[self.currentChannel - 1].name(nextshow))
+                    chname = (self.channels[self.currentChannel - 1].name)
                     THUMB = (IMAGES_LOC + 'icon.png')
                     ChannelLogo = (self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png')
                     
@@ -1684,24 +1686,26 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         pass
                     
                     #ArtType for Classic Popup
-                    ArtType = {}
-                    ArtType['0'] = 'poster'
-                    ArtType['1'] = 'fanart' 
-                    ArtType['2'] = 'landscape'        
-                    ArtType['3'] = 'logo'       
-                    ArtType['4'] = 'clearart'              
-                    ArtType = ArtType[REAL_SETTINGS.getSetting('ComingUpArtwork')] #notification art type for classic
+                    if REAL_SETTINGS.getSetting("EnableComingUp") == "2":
+                        ArtType = {}
+                        ArtType['0'] = 'poster'
+                        ArtType['1'] = 'fanart' 
+                        ArtType['2'] = 'landscape'        
+                        ArtType['3'] = 'logo'       
+                        ArtType['4'] = 'clearart'              
+                        ArtType = ArtType[REAL_SETTINGS.getSetting('ComingUpArtwork')] #notification art type for classic
                     
                     #ArtType for Overlay Popup
-                    try:
-                        ArtType = str(self.getControl(121).getLabel()) #notification art type for new overlay
-                        self.getControl(123).setLabel(title)
-                        self.getControl(124).setLabel(ShowTitle)
-                        self.getControl(125).setLabel(ShowEpisode)
-                    except:
-                        #No Overlay Popup code in skin, default to Cassic Popup
-                        ClassicPOPUP = True
-                        pass
+                    elif REAL_SETTINGS.getSetting("EnableComingUp") == "1":
+                        try:
+                            ArtType = str(self.getControl(121).getLabel()) #notification art type for new overlay
+                            self.getControl(123).setLabel(title)
+                            self.getControl(124).setLabel(ShowTitle)
+                            self.getControl(125).setLabel(ShowEpisode)
+                        except:
+                            #No Overlay Popup code in skin, default to Cassic Popup
+                            ClassicPOPUP = True
+                            pass
 
                     typeEXT = self.Artdownloader.EXTtype(ArtType)
                     self.log('notification.type.ext = ' + str(typeEXT))  
@@ -1710,6 +1714,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     
                     if self.showingInfo == False and self.notificationShowedNotif == False:
                         if REAL_SETTINGS.getSetting("EnableComingUp") == "2" or ClassicPOPUP == True:
+                        
                             xbmc.executebuiltin('XBMC.Notification(%s, %s, %s, %s)' % (title, self.channels[self.currentChannel - 1].getItemTitle(nextshow).replace(',', ''), str(NOTIFICATION_DISPLAY_TIME * 2000), THUMB))
                         else:
                             self.getControl(122).setImage(THUMB)
@@ -1786,7 +1791,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
     
         if REAL_SETTINGS.getSetting("SyncXMLTV_Running") == "false":
             REAL_SETTINGS.setSetting('SyncXMLTV_Running', "true")
-
+            
             if not FileAccess.exists(XMLTV_CACHE_LOC):
                 FileAccess.makedirs(XMLTV_CACHE_LOC)
                 
@@ -1798,7 +1803,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             
             if USxmltv or SSxmltv or FTVxmltv:
                 if NOTIFY == 'true':
-                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Updated", 4000, THUMB) )
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Update Complete", 1000, THUMB) )
             
 
 

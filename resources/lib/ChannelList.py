@@ -82,8 +82,10 @@ class ChannelList:
         self.showGenreList = []
         self.movieGenreList = []
         self.musicGenreList = []
+        self.addonFileDetails = []
         self.showList = []
         self.channels = []
+        self.ResetChanLST = list(REAL_SETTINGS.getSetting('ResetChanLST'))
         self.videoParser = VideoParser()
         self.httpJSON = True
         self.sleepTime = 0
@@ -397,19 +399,12 @@ class ChannelList:
         try:
             needsreset = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_changed') == 'True'
             
-            # force rebuild
-            if chtype == 8 and REAL_SETTINGS.setSetting("ForceChannelReset_LiveTV") == "true":
-                self.log("Force LiveTV rebuild")
-                needsreset = True
-                makenewlist = True
-                REAL_SETTINGS.setSetting("ForceChannelReset_LiveTV","false")
-                
-            if SETTOP == 'false':
-                if chtype == 16:
-                    self.log("Force Playon rebuild")
-                    needsreset = True
-                    makenewlist = True
-            
+            # # force rebuild
+            # if channel in self.ResetChanLST:
+                # self.log("Force rebuild")
+                # needsreset = True
+                # makenewlist = True
+
             if needsreset:
                 self.channels[channel - 1].isSetup = False
         except Exception,e:
@@ -499,7 +494,9 @@ class ChannelList:
                         ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_time', '0')
 
                         if needsreset:
-                            ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'False')
+                            if channel not in self.ResetChanLST:
+                                ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'False')
+                            REAL_SETTINGS.setSetting('ResetChanLST', '')
                             self.channels[channel - 1].isSetup = True
                     
         self.runActions(RULES_ACTION_BEFORE_CLEAR, channel, self.channels[channel - 1])
@@ -673,37 +670,36 @@ class ChannelList:
                 #If you're using a HDHomeRun Dual and want Tuner 1 assign false. *Thanks Blazin912*
                 self.log("Building LiveTV using tuner0")
                 setting2 = re.sub(r'\d/tuner\d',"0/tuner0",setting2)
-            else:
+            elif setting2[0:9] == 'hdhomerun' and REAL_SETTINGS.getSetting('HdhomerunMaster') == "false":
                 self.log("Building LiveTV using tuner1")
                 setting2 = re.sub(r'\d/tuner\d',"1/tuner1",setting2)
             
-            # Validate XMLTV Data #
-            if setting3 != '':
-                xmltvValid = self.xmltv_ok(setting1, setting3)
-            else:
-                return
-            
-            if xmltvValid == True:
-                # Validate Feed #
-                fileListCHK = self.Valid_ok(setting2)
-                if fileListCHK == True:
+            # Validate Feed #
+            fileListCHK = self.Valid_ok(setting2)
+            if fileListCHK == True:
+
+                # Validate XMLTV Data #
+                if setting3 != '':
+                    xmltvValid = self.xmltv_ok(setting1, setting3)
+                
+                if xmltvValid == True:
+
                     if setting3 == 'smoothstreams':
                         # Fill Gap Between Listings #
                         PrefileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel) 
                         fileList = self.fillLiveTVFileList(PrefileList, setting4, channel)                    
                     else:
-                        REAL_SETTINGS.setSetting("ForceChannelReset_LiveTV","false")
                         fileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel)
-                        
                         # Fill Empty Listings #
                         if len(fileList) == 0:
-                            REAL_SETTINGS.setSetting("SyncFTV_NextRun","")
-                            REAL_SETTINGS.setSetting("SyncUSTVnow_NextRun","")
-                            REAL_SETTINGS.setSetting("ForceChannelReset_LiveTV","true")
-                            fileList = self.fillLiveTVFileList(fileList, setting2, channel)    
+                            fileList = self.fillLiveTVFileList(fileList, setting2, channel)   
+                            ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'True')
                 else:
-                    self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'fileListCHK invalid: ' + str(setting2))
-                    return 
+                    fileList = self.fillLiveTVFileList(fileList, setting2, channel)   
+                    ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'True')
+            else:
+                self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'fileListCHK invalid: ' + str(setting2))
+                return
         
         # InternetTV  
         elif chtype == 9:
@@ -1092,11 +1088,8 @@ class ChannelList:
     def createCinemaExperiencePlaylist(self):
         flename = xbmc.makeLegalFilename(MADE_CHAN_LOC + 'CinemaExperience.xsp')
         twoyearsold = date.today().year - 2
-        limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-        
-        if limit == 0:
-            limit = 25
-        
+        limit = 25
+            
         try:
             fle = FileAccess.open(flename, "w")
         except Exception,e:
@@ -1958,6 +1951,8 @@ class ChannelList:
                 n +=1
         else:
             print 'Empty LiveTV FileList, adding tmpstr'
+            self.ResetChanLST.insert(0, channel)
+            REAL_SETTINGS.setSetting('ResetChanLST', str(self.ResetChanLST))
             tmpstr = str(5400) + ',' + 'Listing Unavailable' + "//" + 'LiveTV' + "//" + 'TV Listing Unavailable, Check your xmltv file' + "//" + 'Unknown' + "//" + str(now) + "//" + 'tvshow|0|0|False|1|NA|' + '\n' + CHname
             newList.append(tmpstr)
             
@@ -1991,26 +1986,27 @@ class ChannelList:
         subtitle = ''   
         rating = 'NR'
         
-        limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-        if limit == 0 or limit < 50 or limit >= 250:
-            limit = 12
-            
-        self.log("buildLiveTVFileList, Using Global Parse-limit " + str(limit))
-        f = FileAccess.open(self.xmlTvFile, "rb")
-        
-        if setting3.startswith('http'):
-            f = Open_URL(self.xmlTvFile)
-        elif setting3 == 'ustvnow' or setting3 == 'ftvguide' or setting3 == 'smoothstreams':
-            GMToffset = True
-        elif setting3 != '':  
-            GMToffset = False
+        if LOWPOWER:
+            limit = 0
         else:
-            return
+            limit = 48
         
-        if self.background == False:
-            self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding LiveTV", 'parsing ' + str(setting3.lower()))
-
         try:
+            self.log("buildLiveTVFileList, Using Global Parse-limit " + str(limit))
+            
+            if setting3.startswith('http'):
+                f = Open_URL(self.xmlTvFile)
+            else:
+                f = FileAccess.open(self.xmlTvFile, "rb")
+                
+            if setting3 == 'ustvnow' or setting3 == 'ftvguide' or setting3 == 'smoothstreams':
+                GMToffset = True
+            else:
+                GMToffset = False
+            
+            if self.background == False:
+                self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding LiveTV", 'parsing ' + str(setting3.lower()))
+
             context = ET.iterparse(f, events=("start", "end")) 
             context = iter(context)
             
@@ -2381,8 +2377,10 @@ class ChannelList:
         
             if setting3 == '':
                 limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-                if limit == 0 or limit < 50 or limit >= 250:
-                    limit = 50
+                if limit == 0 or limit > 200:
+                    limit = 200
+                elif limit < 25:
+                    limit = 25
                 self.log("createYoutubeFilelist, Using Global Parse-limit " + str(limit))
             else:
                 limit = int(setting3)
@@ -2521,7 +2519,7 @@ class ChannelList:
                             summary = (summary[:350])
 
                         #remove // because interferes with playlist split.
-                        summary = summary.replace('//', ' ')
+                        summary = self.CleanLabels(summary)
                             
                         try:
                             runtime = feed.entries[i].yt_duration['seconds']
@@ -2637,8 +2635,10 @@ class ChannelList:
         
         if setting3 == '':
             limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-            if limit == 0 or limit < 50 or limit >= 250:
-                limit = 50
+            if limit == 0 or limit > 200:
+                limit = 200
+            elif limit < 25:
+                limit = 25
             self.log("createRSSFileList, Using Global Parse-limit " + str(limit))
         else:
             limit = int(setting3)
@@ -2856,8 +2856,10 @@ class ChannelList:
         
         if setting3 == '':
             limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-            if limit == 0 or limit < 50 or limit >= 250:
-                limit = 50
+            if limit == 0 or limit > 200:
+                limit = 200
+            elif limit < 25:
+                limit = 25
             self.log("LastFM, Using Global Parse-limit " + str(limit))
         else:
             limit = int(setting3)
@@ -2953,8 +2955,10 @@ class ChannelList:
         
         if setting3 == '':
             limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-            if limit == 0 or limit < 50 or limit >= 250:
-                limit = 50
+            if limit == 0 or limit > 200:
+                limit = 200
+            elif limit < 25:
+                limit = 25
             self.log("myMusicTV, Using Global Parse-limit " + str(limit))
         else:
             limit = int(setting3)
@@ -3012,6 +3016,10 @@ class ChannelList:
                     if self.background == False:
                         self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding My MusicTV, " + setting2, "added " + str(showcount) + " entries")
         
+            else:
+                self.log("myMusicTV, No MyMusic plist cache found = " + str(fle))
+                
+        
         except Exception,e:  
             pass
             
@@ -3026,24 +3034,25 @@ class ChannelList:
         lines = ''
         self.log("setting3 = " + str(setting3))
         
+        #XMLTV CHECK TEMP DISABLED#
         if setting3 == 'ustvnow':
             self.log("xmltv_ok, testing " + str(setting3))
-            if FileAccess.exists(USTVnowXML):
-                self.xmlTvFile = USTVnowXML
-                self.xmltvValid = True
-                self.log("INFO: XMLTV File Found...")
+            # if FileAccess.exists(USTVnowXML):
+            self.xmlTvFile = USTVnowXML
+            self.xmltvValid = True
+            self.log("INFO: XMLTV File Found...")
         elif setting3 == 'smoothstreams':
             self.log("xmltv_ok, testing " + str(setting3))
-            if FileAccess.exists(SSTVXML):
-                self.xmlTvFile = SSTVXML
-                self.xmltvValid = True
-                self.log("INFO: XMLTV File Found...")
+            # if FileAccess.exists(SSTVXML):
+            self.xmlTvFile = SSTVXML
+            self.xmltvValid = True
+            self.log("INFO: XMLTV File Found...")
         elif setting3 == 'ftvguide':
             self.log("xmltv_ok, testing " + str(setting3))
-            if FileAccess.exists(FTVXML):
-                self.xmlTvFile = FTVXML
-                self.xmltvValid = True
-                self.log("INFO: XMLTV File Found...")
+            # if FileAccess.exists(FTVXML):
+            self.xmlTvFile = FTVXML
+            self.xmltvValid = True
+            self.log("INFO: XMLTV File Found...")
         elif setting3[0:4] == 'http':
             try: 
                 urllib2.urlopen(setting3)
@@ -3054,9 +3063,9 @@ class ChannelList:
                 pass
         elif setting3 != '':
             self.xmlTvFile = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'), str(setting3) +'.xml'))
-            if FileAccess.exists(self.xmlTvFile):
-                self.log("INFO: XMLTV File Found...")
-                self.xmltvValid = True          
+            # if FileAccess.exists(self.xmlTvFile):
+            self.log("INFO: XMLTV File Found...")
+            self.xmltvValid = True          
 
         self.log("xmltvValid = " + str(self.xmltvValid))
         return self.xmltvValid
@@ -3237,33 +3246,50 @@ class ChannelList:
             self.log("plugin id = " + addon)
         else:
             addon = plugin
+            
+        print 'addon', addon        
+        
+        if self.addonFileDetails:
+            file_detail = self.addonFileDetails
+        
+        else:
+            json_query = ('{"jsonrpc": "2.0", "method": "Addons.GetAddons", "params": {}, "id": 1}')
+            json_folder_detail = self.sendJSON(json_query)
+            file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+            self.addonFileDetails = file_detail
+                   
         try:
-            addon_ok = xbmcaddon.Addon(id=addon)
-            if addon_ok:
-               self.PluginFound = True
-        except:
-            self.PluginFound = False 
-        
-        self.log("PluginFound = " + str(self.PluginFound))
-        
-        if self.PluginFound == True:
-        
-            if REAL_SETTINGS.getSetting("plugin_ok_level") == "0":#Low Check
-                self.Pluginvalid = True     
-                return self.Pluginvalid
+            for f in (file_detail):
+                addonids = re.search('"addonid" *: *"(.*?)",', f)
+                if addonids:
+                    addonid = addonids.group(1)
+                    if addonid.lower() == addon.lower():
+                        print addonid
+                        self.PluginFound = True
+                        break
+                        
+            if self.PluginFound == True:
                 
-            elif REAL_SETTINGS.getSetting("plugin_ok_level") == "1":#High Check todo
-                try:
-                    json_query = uni('{"jsonrpc": "2.0", "method": "Files.GetDirectory","params":{"directory":"%s"}, "id": 1}' % (self.escapeDirJSON(stream)))
+                if REAL_SETTINGS.getSetting("plugin_ok_level") == "0":#Low Check
+                    self.Pluginvalid = True
+                
+                elif REAL_SETTINGS.getSetting("plugin_ok_level") == "1":#High Check
+                    json_query = ('{"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": {"directory":"%s"}, "id": 1}' % plugin)
                     json_folder_detail = self.sendJSON(json_query)
-                    file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
-                    self.Pluginvalid = True        
-                except Exception,e:
-                    self.Pluginvalid = False
-
-        self.log("Pluginvalid = " + str(self.Pluginvalid))
+                    addon_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+                    
+                    ## TODO ## Search for exact file, true if found.
+                    for f in (addon_detail):
+                        file = re.search('"file" *: *"(.*?)"', f)
+                        
+                    if file != None and len(file.group(1)) > 0:
+                        self.Pluginvalid = True     
+        except:
+            pass
+            
+        print ("PluginFound = " + str(self.PluginFound))
         return self.Pluginvalid
-                
+                                
                 
     def youtube_duration(self, YTID):
         self.log("youtube_duration")
@@ -3978,7 +4004,7 @@ class ChannelList:
  
         if Donor_Downloaded == True:    
             try:
-                if setting1 == 'popcorn':
+                if setting1.lower() == 'popcorn':
                     showList = []
                     
                     if self.background == False:
@@ -3987,7 +4013,7 @@ class ChannelList:
                     showList = Bringpopcorn(setting2, setting3, setting4, channel)
                     return showList
                     
-                elif setting1 == 'cinema':
+                elif setting1.lower() == 'cinema':
                     showList = []
                     
                     flename = self.createCinemaExperiencePlaylist()        
@@ -4618,7 +4644,7 @@ class ChannelList:
                                         theplot = (theplot[:350])
 
                                     #remove // because interferes with playlist split.
-                                    theplot = theplot.replace('//', ' ')
+                                    theplot = self.CleanLabels(theplot)
 
                                     # This is a TV show
                                     if (episodes != None and episodes.group(1) != '-1') and showtitles != None and len(showtitles.group(1)) > 0:
@@ -4707,11 +4733,13 @@ class ChannelList:
 
                                         if labels:
                                             label = (labels.group(1))
+                                            label = self.CleanLabels(label)
                                             
                                         if titles:
                                             title = (titles.group(1))
+                                            title = self.CleanLabels(title)
 
-                                        tmpstr += (label).replace('\\','') + "//"
+                                        tmpstr += label + "//"
 
                                         album = re.search('"album" *: *"(.*?)"', f)
 
@@ -4720,7 +4748,9 @@ class ChannelList:
                                             taglines = re.search('"tagline" *: *"(.*?)"', f)
 
                                             if taglines != None and len(taglines.group(1)) > 0:
-                                                tmpstr += (taglines.group(1)).replace('\\','')
+                                                tagline = (taglines.group(1))
+                                                tagline = self.CleanLabels(tagline)
+                                                tmpstr += tagline
                                             else:
                                                 tmpstr += 'PluginTV'
 
@@ -4848,8 +4878,10 @@ class ChannelList:
             
         if setting3 == '':
             limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-            if limit == 0 or limit < 50 or limit >= 250:
-                limit = 50
+            if limit == 0 or limit > 200:
+                limit = 200
+            elif limit < 25:
+                limit = 25
             self.log("BuildPluginFileList, Using Global Parse-limit " + str(limit))
         else:
             limit = int(setting3)
@@ -4938,8 +4970,10 @@ class ChannelList:
                 
             if setting3 == '':
                 limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
-                if limit == 0 or limit < 50 or limit >= 250:
-                    limit = 50
+                if limit == 0 or limit > 200:
+                    limit = 200
+                elif limit < 25:
+                    limit = 25
                 self.log("BuildPlayonFileList, Using Global Parse-limit " + str(limit))
             else:
                 limit = int(setting3)
@@ -5145,6 +5179,7 @@ class ChannelList:
             
             #Force Download
             if force == True:
+                print 'SyncUSTVnow, Force Run'    
                 SyncUSTVnow_LastRun = now
             
             #Force Download - If missing
@@ -5152,8 +5187,13 @@ class ChannelList:
                 SyncUSTVnow_LastRun = now
                 
             if now >= SyncUSTVnow_LastRun: 
-                url = 'http://users17.jabry.com/PTVL1/db/xmltv/ustvnow.xml'
-                url_bak = 'http://ptvl.comeze.com/XMLTV/ustvnow.xml'
+
+                if NOTIFY == 'true':
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","USTVnow XMLTV Updating", 1000, THUMB) )
+                    
+                print 'SyncUSTVnow, Updating XMLTV'    
+                url = 'http://copy.com/D4juDEUQw9eBj2q3/ustvnow.xml'
+                url_bak = 'http://users17.jabry.com/PTVL1/db/xmltv/ustvnow.xml'
                          
                 if FileAccess.exists(USTVnowXML):
                     try:
@@ -5174,7 +5214,7 @@ class ChannelList:
                     
                 SyncUSTVnow_NextRun = (SyncUSTVnow_LastRun + datetime.timedelta(hours=48))
                 REAL_SETTINGS.setSetting("SyncUSTVnow_NextRun",str(SyncUSTVnow_NextRun))
-                download(USxmltv, USTVnowXML)  
+                download(USxmltv, USTVnowXML)
                 return True
             
 
@@ -5200,6 +5240,10 @@ class ChannelList:
                 SyncSSTV_LastRun = now
                 
             if now >= SyncSSTV_LastRun: 
+
+                if NOTIFY == 'true':
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","SmoothStream XMLTV Updating", 1000, THUMB) )
+                    
                 url = 'http://smoothstreams.tv/schedule/feed.xml'
                 url_bak = 'http://smoothstreams.tv/schedule/feed.xml'
                 # url_bak = 'http://smoothstreams.tv/schedule/feed.json'
@@ -5249,8 +5293,12 @@ class ChannelList:
                 SyncFTV_LastRun = now
                 
             if now >= SyncFTV_LastRun: 
-                url = 'http://users17.jabry.com/PTVL1/db/xmltv/ftvguide.xml'
-                url_bak = 'http://ptvl.comeze.com/XMLTV/ftvguide.xml'
+
+                if NOTIFY == 'true':
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","F.T.V XMLTV Updating", 1000, THUMB) )
+                    
+                url = 'http://copy.com/hxg9bYKzVTlOPzi4/ftvguide.xml'
+                url_bak = 'http://users17.jabry.com/PTVL1/db/xmltv/ftvguide.xml'
                          
                 if FileAccess.exists(FTVXML):
                     try:
@@ -5275,6 +5323,7 @@ class ChannelList:
                 
     def CleanLabels(self, label):
         print 'CleanLabels'
-        label = label.replace('[B]','').replace('[/B]','').replace('[/COLOR]','').replace('[COLOR=blue]','').replace('[COLOR=red]','').replace('[COLOR=green]','').replace('[COLOR=yellow]','').replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','').replace(' [cc]','')
+        #add regex wildcard to catch all colors todo
+        label = label.replace('[B]','').replace('[/B]','').replace('[/COLOR]','').replace('[COLOR=blue]','').replace('[COLOR=cyan]','').replace('[COLOR=red]','').replace('[COLOR=green]','').replace('[COLOR=yellow]','').replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','').replace(' [cc]','').replace('\\',' ')
         return label
     

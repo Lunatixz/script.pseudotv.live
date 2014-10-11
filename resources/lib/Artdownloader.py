@@ -166,7 +166,7 @@ class Artdownloader:
         print 'FindBug return', setImage
         return setImage
         
-
+        
     def FindLogo(self, chname):
         print 'FindLogo'
         found = False
@@ -189,7 +189,6 @@ class Artdownloader:
                 name = file.split('|')[0]
                 link = file.split('|')[1]
 
-                # try:
                 chname = name.split('_')
                 if len(chname) > 1:
                     chname1 = (chname[0])
@@ -297,27 +296,27 @@ class Artdownloader:
                     setImage = artSeason_fallback
                 else:
                     ###########################
-                    print ('Find Json Artwork')
-                    setImage = self.LocalArtwork(mediapath, type, arttype)
+                    # print ('Find Json Artwork')
+                    # setImage = self.LocalArtwork(mediapath, type, arttype)
                     
-                    if not setImage:
-                        print ('Find Json Artwork - Fallback')
-                        arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
-                        setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
+                    # if not setImage:
+                        # print ('Find Json Artwork - Fallback')
+                        # arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
+                        # setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
                         
-                        if not setImage:   
-                            if id != '0' and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
-                                print ('Find Artwork Cache')
-                                if FileAccess.exists(ArtCache):
-                                    setImage = ArtCache
-                                else:
-                                    ###########################
-                                    print ('Find Download Artwork')
-                                    setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
+                    if not setImage:   
+                        if id != '0' and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                            print ('Find Artwork Cache')
+                            if FileAccess.exists(ArtCache):
+                                setImage = ArtCache
+                            else:
+                                ###########################
+                                print ('Find Download Artwork')
+                                setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
 
-                                    if not setImage:
-                                        print ('Find Download Artwork - Fallback')
-                                        setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
+                                if not setImage:
+                                    print ('Find Download Artwork - Fallback')
+                                    setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
 
         else:
             print ('FindArtwork, Chtype > 7')
@@ -603,7 +602,7 @@ class Artdownloader:
             # self.logoParser = lsHTMLParser()
             # self.logoParser.retrieve_icons_avail()   
             
-            if REAL_SETTINGS.getSetting('ArtService_notify') == "true":
+            if NOTIFY == 'true':
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Spooler Started", 4000, THUMB) )
             
             # Clear Artwork Cache Folders
@@ -620,7 +619,7 @@ class Artdownloader:
                 xbmc.log('script.pseudotv.live-service: ArtCache Purged!')
                 REAL_SETTINGS.setSetting('ClearLiveArtCache', "false")
      
-                if REAL_SETTINGS.getSetting('ArtService_notify') == "true":
+                if NOTIFY == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Cache Cleared", 4000, THUMB) )
                 
             try:
@@ -659,6 +658,6 @@ class Artdownloader:
             REAL_SETTINGS.setSetting("ArtService_Startup","true")
             REAL_SETTINGS.setSetting("ArtService_LastRun",str(stop))
             
-            if REAL_SETTINGS.getSetting('ArtService_notify') == "true":
+            if NOTIFY == 'true':
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSSG, 2000, THUMB) )
     

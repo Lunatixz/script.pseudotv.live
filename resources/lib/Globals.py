@@ -63,7 +63,7 @@ ADDON_ID = 'script.pseudotv.live'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_ID = REAL_SETTINGS.getAddonInfo('id')
 ADDON_NAME = REAL_SETTINGS.getAddonInfo('name')
-ADDON_PATH = REAL_SETTINGS.getAddonInfo('path')
+ADDON_PATH = (REAL_SETTINGS.getAddonInfo('path').decode('utf-8'))
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 xbmc.log(ADDON_ID +' '+ ADDON_NAME +' '+ ADDON_PATH +' '+ ADDON_VERSION)
 
@@ -230,6 +230,12 @@ Donor_Downloaded = False
 NOTIFY = REAL_SETTINGS.getSetting('notify')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop")
+OS_SET = int(REAL_SETTINGS.getSetting("os"))
+
+if (OS_SET <= 5 or OS_SET == 10 or OS_SET == 12) and REAL_SETTINGS.getSetting("OS_SET_OVERRIDE") != "true":
+    LOWPOWER = True
+else:
+    LOWPOWER = False
 
 # Common Cache types
 quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6) #System Purge, Force Reset

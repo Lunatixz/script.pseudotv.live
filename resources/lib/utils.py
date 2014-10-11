@@ -27,6 +27,14 @@ def download(url, dest, dp = None):
         urllib.urlretrieve(url, dest, lambda nb, bs, fs: _pbhook(nb, bs, fs, dp, start_time))
     except:
         pass
+        
+        
+def download_silent(url, dest):
+    print 'download_silent'
+    try:
+        urllib.urlretrieve(url, dest)
+    except:
+        pass
      
      
 def _pbhook(numblocks, blocksize, filesize, dp, start_time):

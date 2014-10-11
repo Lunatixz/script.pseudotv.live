@@ -33,35 +33,35 @@ def ServiceTimer():
     REAL_SETTINGS.setSetting("ArtService_Running","false")
     REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
     
-    while not xbmc.abortRequested:
+    # while not xbmc.abortRequested:
 
-            if REAL_SETTINGS.getSetting("SyncXMLTV_Enabled") == "true" and REAL_SETTINGS.getSetting("SyncXMLTV_Startup") == "true":
-                SyncXMLTV()
+            # if REAL_SETTINGS.getSetting("SyncXMLTV_Enabled") == "true" and REAL_SETTINGS.getSetting("SyncXMLTV_Startup") == "true":
+                # SyncXMLTV()
                 
-            if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Startup") == "true":
-                ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]
-                Update = True
-                now  = datetime.datetime.today()
+            # if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Startup") == "true":
+                # ArtService_Timer = REFRESH_INT[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]
+                # Update = True
+                # now  = datetime.datetime.today()
                 
-                try:
-                    ArtService_LastRun = REAL_SETTINGS.getSetting('ArtService_NextRun')
-                    ArtService_LastRun = ArtService_LastRun.split('.')[0]
-                    ArtService_LastRun = datetime.datetime.strptime(ArtService_LastRun, '%Y-%m-%d %H:%M:%S')
-                except:
-                    ArtService_LastRun = now
-                    pass
+                # try:
+                    # ArtService_LastRun = REAL_SETTINGS.getSetting('ArtService_NextRun')
+                    # ArtService_LastRun = ArtService_LastRun.split('.')[0]
+                    # ArtService_LastRun = datetime.datetime.strptime(ArtService_LastRun, '%Y-%m-%d %H:%M:%S')
+                # except:
+                    # ArtService_LastRun = now
+                    # pass
 
-                if now >= ArtService_LastRun: 
-                    if REAL_SETTINGS.getSetting('ArtService_Enabled_Run') == 'false':
-                        if xbmc.Player().isPlaying():
-                            Update = False 
+                # if now >= ArtService_LastRun: 
+                    # if REAL_SETTINGS.getSetting('Enabled_RunOnPlayback') == 'false':
+                        # if xbmc.Player().isPlaying():
+                            # Update = False 
 
-                    if Update == True:
-                        ArtService_NextRun = (ArtService_LastRun + datetime.timedelta(seconds=ArtService_Timer))
-                        REAL_SETTINGS.setSetting("ArtService_NextRun",str(ArtService_NextRun))
-                        Artdown.ArtService()
+                    # if Update == True:
+                        # ArtService_NextRun = (ArtService_LastRun + datetime.timedelta(seconds=ArtService_Timer))
+                        # REAL_SETTINGS.setSetting("ArtService_NextRun",str(ArtService_NextRun))
+                        # Artdown.ArtService()
                         
-            xbmc.sleep(4000)            
+            # xbmc.sleep(4000)            
         
 
 def ForceArtService():
@@ -142,7 +142,7 @@ def SyncXMLTV():
     
     if REAL_SETTINGS.getSetting("SyncXMLTV_Running") == "false":
         REAL_SETTINGS.setSetting('SyncXMLTV_Running', "true")
-        
+            
         if not xbmcvfs.exists(XMLTV_CACHE_LOC):
             xbmcvfs.mkdirs(XMLTV_CACHE_LOC)
             
@@ -153,7 +153,7 @@ def SyncXMLTV():
         
         if USxmltv or SSxmltv or FTVxmltv:
             if NOTIFY == 'true':
-                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Updated", 4000, THUMB) )
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","XMLTV Update Complete", 1000, THUMB) )
     
     
 def autostart():
@@ -172,3 +172,4 @@ ServiceTimer()
 
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
     autostart()
+    
