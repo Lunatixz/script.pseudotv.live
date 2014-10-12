@@ -29,8 +29,8 @@ Artdown = Artdownloader()
 def ServiceTimer():
     print 'ServiceTimer'
     REAL_SETTINGS.setSetting("ArtService_Startup","false")
-    REAL_SETTINGS.setSetting('SyncXMLTV_Startup', "false")
     REAL_SETTINGS.setSetting("ArtService_Running","false")
+    REAL_SETTINGS.setSetting('SyncXMLTV_Startup', "false")
     REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
     
     # while not xbmc.abortRequested:

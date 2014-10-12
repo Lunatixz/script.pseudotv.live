@@ -1686,7 +1686,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         pass
                     
                     #ArtType for Classic Popup
-                    if REAL_SETTINGS.getSetting("EnableComingUp") == "2":
+                    if REAL_SETTINGS.getSetting("EnableComingUp") == "3":
                         ArtType = {}
                         ArtType['0'] = 'poster'
                         ArtType['1'] = 'fanart' 
@@ -1695,8 +1695,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         ArtType['4'] = 'clearart'              
                         ArtType = ArtType[REAL_SETTINGS.getSetting('ComingUpArtwork')] #notification art type for classic
                     
-                    #ArtType for Overlay Popup
-                    elif REAL_SETTINGS.getSetting("EnableComingUp") == "1":
+                    #ArtType for Popup
+                    elif REAL_SETTINGS.getSetting("EnableComingUp") == "2":
+                        self.log('notification, Classic')  
                         try:
                             ArtType = str(self.getControl(121).getLabel()) #notification art type for new overlay
                             self.getControl(123).setLabel(title)
@@ -1706,23 +1707,30 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                             #No Overlay Popup code in skin, default to Cassic Popup
                             ClassicPOPUP = True
                             pass
-
-                    typeEXT = self.Artdownloader.EXTtype(ArtType)
-                    self.log('notification.type.ext = ' + str(typeEXT))  
-                    THUMB = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, typeEXT)
-                    self.log("notification.plugin.thumb = " + THUMB)   
                     
-                    if self.showingInfo == False and self.notificationShowedNotif == False:
-                        if REAL_SETTINGS.getSetting("EnableComingUp") == "2" or ClassicPOPUP == True:
+                    if REAL_SETTINGS.getSetting("EnableComingUp") != "1":
+                        self.log('notification, Popup')  
+                        typeEXT = self.Artdownloader.EXTtype(ArtType)
+                        self.log('notification.type.ext = ' + str(typeEXT))  
+                        THUMB = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, typeEXT)
+                        self.log("notification.plugin.thumb = " + THUMB)   
                         
-                            xbmc.executebuiltin('XBMC.Notification(%s, %s, %s, %s)' % (title, self.channels[self.currentChannel - 1].getItemTitle(nextshow).replace(',', ''), str(NOTIFICATION_DISPLAY_TIME * 2000), THUMB))
-                        else:
-                            self.getControl(122).setImage(THUMB)
-                            self.showPOP(self.InfTimer + 2.5)
-
-                    self.log("notification.THUMB = " + (THUMB))
-                    self.notificationShowedNotif = True
-                    
+                        if self.showingInfo == False and self.notificationShowedNotif == False:
+                            if REAL_SETTINGS.getSetting("EnableComingUp") == "3" or ClassicPOPUP == True:
+                            
+                                xbmc.executebuiltin('XBMC.Notification(%s, %s, %s, %s)' % (title, self.channels[self.currentChannel - 1].getItemTitle(nextshow).replace(',', ''), str(NOTIFICATION_DISPLAY_TIME * 2000), THUMB))
+                            else:
+                                self.getControl(122).setImage(THUMB)
+                                self.showPOP(self.InfTimer + 2.5)
+                        
+                        self.log("notification.THUMB = " + (THUMB))
+                        self.notificationShowedNotif = True
+                        
+                    else:
+                        self.log('notification, Overlay')  
+                        self.infoOffset += 1
+                        self.showInfo(self.InfTimer)
+      
         self.startNotificationTimer()
 
 

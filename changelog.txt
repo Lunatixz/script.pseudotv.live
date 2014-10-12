@@ -1,10 +1,13 @@
+[*] Tweaked XMLTV parsing for performance. 
+[*] Added new "Coming Up Next" type, "Overlay" was renamed to "Popup", "Overlay" now triggers standard Overlay panel.
+[*] [COLOR=blue]^ v.0.5.3 ^[/COLOR] 
 [*] Temporary disabled Art/XMLTV services. They still run at start-up.
 [*] NEW! Optimized "LowPower" configurations based on OS Selection, Override under "Misc" settings.
 [*] Improved plugin detection, Fixed Internet Trailers BCT's
 [*] Global media limits and XMLTV service tweaks. 
 [*] Fixed Donor icon download, and Donor Source list updated!
 [*] Removed the need to add extra (Bold and Color) strings to Direct Plugin Chtypes.
-[*] Changed LiveTV parsing limit to 12.
+[*] Changed LiveTV parsing limit to 48.
 [*] Misc. Tweaks and Bug fixes.
 [*] Removed old artwork fallbacks and skin labels.
 [*] Artwork Service Enabled w/ Dynamic artwork. Added Disable during Playback option.

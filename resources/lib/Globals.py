@@ -377,9 +377,8 @@ ACTION_TELETEXT_BLUE = 218
 #// 5xx is reserved for additional gesture actions
 #define ACTION_GESTURE_END            599
 
-#UTC LiveTV plugin
-UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V', 'plugin.video.mystreamstv.beta']
-LOCALTIME_XMLTV = []
+#UTC XMLTV
+UTC_XMLTV = ['ustvnow', 'ftvguide', 'smoothstreams']
 
 #Dynamic Artwork plugin types
 DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']

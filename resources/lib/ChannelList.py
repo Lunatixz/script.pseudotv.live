@@ -105,7 +105,6 @@ class ChannelList:
         self.sbAPI = SickBeard(REAL_SETTINGS.getSetting('sickbeard.baseurl'),REAL_SETTINGS.getSetting('sickbeard.apikey'))
         self.cpAPI = CouchPotato(REAL_SETTINGS.getSetting('couchpotato.baseurl'),REAL_SETTINGS.getSetting('couchpotato.apikey'))
             
-            
     def readConfig(self):
         self.channelResetSetting = int(REAL_SETTINGS.getSetting("ChannelResetSetting"))
         self.log('Channel Reset Setting is ' + str(self.channelResetSetting))
@@ -399,11 +398,17 @@ class ChannelList:
         try:
             needsreset = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_changed') == 'True'
             
-            # # force rebuild
-            # if channel in self.ResetChanLST:
-                # self.log("Force rebuild")
-                # needsreset = True
-                # makenewlist = True
+            # force rebuild
+            if chtype == 8:
+                self.log("Force LiveTV rebuild")
+                needsreset = True
+                makenewlist = True
+                
+            # if SETTOP == 'false':
+                # if chtype == 16:
+                    # self.log("Force Playon rebuild")
+                    # needsreset = True
+                    # makenewlist = True
 
             if needsreset:
                 self.channels[channel - 1].isSetup = False
@@ -1974,7 +1979,6 @@ class ChannelList:
     
     def buildLiveTVFileList(self, setting1, setting2, setting3, setting4, channel):
         self.log("buildLiveTVFileList")
-        # GMToffset = False
         Managed = False
         sbManaged = False
         cpManaged = False
@@ -1985,11 +1989,7 @@ class ChannelList:
         description = ''
         subtitle = ''   
         rating = 'NR'
-        
-        if LOWPOWER:
-            limit = 0
-        else:
-            limit = 48
+        limit = 48
         
         try:
             self.log("buildLiveTVFileList, Using Global Parse-limit " + str(limit))
@@ -1999,19 +1999,22 @@ class ChannelList:
             else:
                 f = FileAccess.open(self.xmlTvFile, "rb")
                 
-            if setting3 == 'ustvnow' or setting3 == 'ftvguide' or setting3 == 'smoothstreams':
-                GMToffset = True
+            if setting3.lower() in UTC_XMLTV:
+                GMToffset = True                  
+                #our difference from GMT in hours, minus 4 hours for the initial offset of the tv guide data                
+                offset = ((time.timezone / 3600) - 5 ) * -1        
             else:
                 GMToffset = False
+                offset = 0
+                
+            self.log("buildLiveTVFileList, GMToffset = " + str(GMToffset))
             
             if self.background == False:
                 self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding LiveTV", 'parsing ' + str(setting3.lower()))
 
             context = ET.iterparse(f, events=("start", "end")) 
             context = iter(context)
-            
-            event, root = context.next()
-            inSet = False
+            event, root = context.next() 
             
             for event, elem in context:
                 if self.threadPause() == False:
@@ -2022,8 +2025,8 @@ class ChannelList:
                     if elem.tag == "programme":
                         channel = elem.get("channel")
                         url = unquote(setting2)
+                        
                         if setting1 == channel:
-                            inSet = True
                             title = elem.findtext('title')
                             
                             try:
@@ -2118,13 +2121,11 @@ class ChannelList:
                                 ignoreParse = False
                                 
                             now = datetime.datetime.now()
-                            #offset = 0# Our difference from GMT in hours, minus 4 hours for the initial offset of the tv guide data
-                            offset = ((time.timezone / 3600) - 5 ) * -1
                             stopDate = self.parseXMLTVDate(elem.get('stop'), offset)
                             startDate = self.parseXMLTVDate(elem.get('start'), offset)
                             
-                            if (((now > startDate and now <= stopDate) or (now < startDate))):
-                                if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and ignoreParse == False: 
+                            if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and ignoreParse == False: 
+                                if (((now > startDate and now <= stopDate) or (now < startDate))):
                                     #Enable Enhanced Parsing
                                     
                                     if movie == False:
@@ -2249,12 +2250,10 @@ class ChannelList:
                                 #Read the "new" boolean for this program
                                 if elem.find("new") != None:
                                     playcount = 0
-                                    # title = (title + '*NEW*') #todo move to epg.replace title with (new)
                                 else:
                                     playcount = 1                        
                             
-                                GenreLiveID = [category,type,id,0,Managed,playcount,rating]
-                                
+                                GenreLiveID = [category,type,id,0,Managed,playcount,rating] 
                                 genre, LiveID = self.packGenreLiveID(GenreLiveID)
                                 
                             description = description.replace("\n", "").replace("\r", "")
@@ -2282,10 +2281,8 @@ class ChannelList:
                             if now > startDate and now <= stopDate:
                                 try:
                                     dur = ((stopDate - startDate).seconds)
-                                    #dur = ((stopDate - startDate).seconds) - ((now - startDate).seconds)
                                 except Exception,e:
                                     dur = 3600  #60 minute default
-                                    self.log("buildLiveTVFileList, CHANNEL: " + str(self.settingChannel) + " - Error calculating show duration (defaulted to 60 min)")
                                     raise
                                     
                             #use the full duration for an upcoming show
@@ -2294,7 +2291,6 @@ class ChannelList:
                                     dur = (stopDate - startDate).seconds
                                 except Exception,e:
                                     dur = 3600  #60 minute default
-                                    self.log("buildLiveTVFileList, CHANNEL: " + str(self.settingChannel) + " - Error calculating show duration (default to 60 min)")
                                     raise
                                 
                             if not movie: #TV
@@ -2323,9 +2319,6 @@ class ChannelList:
             self.log("buildLiveTVFileList, CHANNEL: " + str(e))
             pass
                 
-        if showcount == 0:
-            self.log("buildLiveTVFileList, CHANNEL: " + str(self.settingChannel) + " 0 SHOWS FOUND")
-
         return showList
 
     
@@ -4520,6 +4513,7 @@ class ChannelList:
 
                             if self.filecount < limit:
 
+
                                 #Remove PlayMedia to keep link from launching
                                 try:
                                     file = ((file.split('PlayMedia%28%22'))[1]).replace('%22%29','')
@@ -4834,6 +4828,7 @@ class ChannelList:
                 if self.channels[channel - 1].mode & MODE_ORDERAIRDATE > 0:
                     seasoneplist.sort(key=lambda seep: seep[1])
                     seasoneplist.sort(key=lambda seep: seep[0])
+
 
                     for seepitem in seasoneplist:
                         fileList.append(seepitem[2])
@@ -5193,7 +5188,7 @@ class ChannelList:
                     
                 print 'SyncUSTVnow, Updating XMLTV'    
                 url = 'http://copy.com/D4juDEUQw9eBj2q3/ustvnow.xml'
-                url_bak = 'http://users17.jabry.com/PTVL1/db/xmltv/ustvnow.xml'
+                url_bak = ''
                          
                 if FileAccess.exists(USTVnowXML):
                     try:
@@ -5327,3 +5322,26 @@ class ChannelList:
         label = label.replace('[B]','').replace('[/B]','').replace('[/COLOR]','').replace('[COLOR=blue]','').replace('[COLOR=cyan]','').replace('[COLOR=red]','').replace('[COLOR=green]','').replace('[COLOR=yellow]','').replace(' [HD]', '').replace('(Sub) ','').replace('(Dub) ','').replace(' [cc]','').replace('\\',' ')
         return label
     
+    
+    def GUISetSwitch(self):
+        print 'GUISetSwitch'
+        # fle = xbmc.translatePath("special://profile/guisettings.xml")
+
+        # try:
+            # xml = FileAccess.open(fle, "r")
+            # dom = parse(xml)
+        # except Exception,e:
+            # return
+
+        # # try:
+        # plname = dom.getElementsByTagName('autoplaynextitem')
+        # NextEnabled = (plname[0].childNodes[0].nodeValue.lower() == 'true')
+        # REAL_SETTINGS.setSetting("AutoPlayNext",str(NextEnabled))
+        
+        # if REAL_SETTINGS.getSetting('AutoPlayNext') == "true":
+            # plname[0].childNodes[0].nodeValue.lower() = 'true'
+        # else:
+            # plname[0].childNodes[0].nodeValue.lower() = 'false'
+            
+        # xml.close()
+            

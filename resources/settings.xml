@@ -24,16 +24,17 @@
         <setting id="CurrentChannel" type="text" label="30304" subsetting="true" visible="eq(-1,1)" default="1"/>
         <setting id="Disable_Watched" type="bool" label="30311" default="false"/>
         <setting id="EnhancedGuideData" type="bool" label="30405" default="false" />
+        <!-- <setting id="AutoPlayNext" type="bool" label="30408" default="false" /> -->
         <setting id="HideClips" type="bool" label="30215" default="true"/>
-        <setting id="ClipLength" type="enum" subsetting="true" label="30216" visible="eq(-1,true)" values="15|30|60|90|120|180|240|300|360|420|460" default="5"/>
-    	<setting id="MEDIA_LIMIT" label="30310" type="enum" values="10|25|50|100|250|500|1000|Unlimited" default="0"/>
+        <setting id="ClipLength" type="enum" subsetting="true" label="30216" visible="eq(-1,true)" values="15|30|60|90|120|180|240|300|360|420|460" default="7"/>
+    	<setting id="MEDIA_LIMIT" label="30310" type="enum" values="10|25|50|100|250|500|1000|Unlimited" default="1"/>
         <setting id="reserveChannels" type="bool" label="30372" default="false"/>
     </category>
     
 <!--Visual-->
     <category label="30200">
         <setting id="SkinSelector" type="enum"  label="30202" values="Classic|Custom|Default|PTVL|(WIP) ConCast|(N/A) Time Whorner" default="3"/>
-        <setting id="ArtService_Enabled" label="30201" type="bool" default="false" /> 
+        <setting id="ArtService_Enabled" label="30201" type="bool" default="true" /> 
         <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-1,true)" default="2"/>
         <setting id="Enabled_RunOnPlayback" type="bool" label="34446" subsetting="true" visible="eq(-2,true)" default="false"/>
         <setting id="FindLogos_Enabled" type="bool" label="34547" enable="false" subsetting="true" visible="eq(-4,true)" default="false"/>
@@ -54,7 +55,7 @@
             <setting id="InfoTimer" subsetting="true" visible="eq(-1,true)" type="enum" label="30222" values="3|5|10|15|20|25" default="1"/>
             <setting id="ShowChannelBug" type="bool" label="30224" default="true"/>
             <setting id="UNAlter_ChanBug" subsetting="true" visible="eq(-1,true)" type="bool" label="30228" default="false"/>
-            <setting id="EnableComingUp" type="enum" label="30226" values="Disabled|Overlay|Classic" default="1"/>
+            <setting id="EnableComingUp" type="enum" label="30226" values="Disabled|Overlay|PopUp|Classic" default="2"/>
             <setting id="ComingUpArtwork" subsetting="true" visible="eq(-1,2)" type="enum" label="30227" values="Poster|Fanart|Landscape|Logo|Clearart" default="1" />
    </category>
    
@@ -137,12 +138,12 @@
         <setting label="30701" type="lsep" default="" /> 
         <setting id="CN_TV" label="30702" type="bool" default="true" />
         <setting id="CN_Movies" label="30703" type="bool" default="true" />
-        <setting id="CN_Episodes" label="30704" type="bool" default="false" />
+        <setting id="CN_Episodes" label="30704" type="bool" default="true" />
         <setting id="CN_Sports" label="30705" type="bool" default="true" />
         <setting id="CN_Kids" label="30706" type="bool" default="false" />
         <setting id="CN_News" label="30707" type="bool" default="true" />
-        <setting id="CN_Music" label="30712" type="bool" default="false" />
-        <setting id="CN_Other" label="30713" type="bool" default="false" />
+        <setting id="CN_Music" label="30712" type="bool" default="true" />
+        <setting id="CN_Other" label="30713" type="bool" default="true" />
     </category> 
 
 <!--BCTs-->   
