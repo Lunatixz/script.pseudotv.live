@@ -297,11 +297,12 @@ class Artdownloader:
                 else:
                     ###########################
                     # print ('Find Json Artwork')
+                    arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
+                    
                     # setImage = self.LocalArtwork(mediapath, type, arttype)
                     
                     # if not setImage:
                         # print ('Find Json Artwork - Fallback')
-                        # arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
                         # setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
                         
                     if not setImage:   
