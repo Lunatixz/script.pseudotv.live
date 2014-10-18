@@ -117,8 +117,10 @@ class Settings:
         flewrite = Globals.uni("<settings>\n")
 
         for i in range(len(self.currentSettings)):
-            flewrite += Globals.uni('    <setting id="') + Globals.uni(self.currentSettings[i][0]) + Globals.uni('" value="') + Globals.uni(self.currentSettings[i][1]) + Globals.uni('" />\n')
-
+            try:
+                flewrite += Globals.uni('    <setting id="') + Globals.uni(self.currentSettings[i][0]) + Globals.uni('" value="') + Globals.uni(self.currentSettings[i][1]) + Globals.uni('" />\n')
+            except:
+                pass
         flewrite += Globals.uni('</settings>\n')
         fle.write(flewrite)
         fle.close()

@@ -21,7 +21,7 @@ import subprocess, os, sys, re
 import time, datetime, threading, _strptime
 import httplib, urllib, urllib2, feedparser, socket, json
 import base64, shutil, random, errno
-import Globals, tvdb_api, xmltv
+import Globals, tvdb_api, tmdb_api, xmltv
 
 from urllib import unquote
 from urllib import urlopen
@@ -85,10 +85,10 @@ class ChannelList:
         self.addonFileDetails = []
         self.showList = []
         self.channels = []
-        self.ResetChanLST = list(REAL_SETTINGS.getSetting('ResetChanLST'))
         self.videoParser = VideoParser()
         self.httpJSON = True
         self.sleepTime = 0
+        self.ResetChanLST = list(REAL_SETTINGS.getSetting('ResetChanLST'))
         self.discoveredWebServer = False
         self.threadPaused = False
         self.runningActionChannel = 0
@@ -104,6 +104,14 @@ class ChannelList:
         self.tmdbAPI = TMDB(TMDB_API_KEY)  
         self.sbAPI = SickBeard(REAL_SETTINGS.getSetting('sickbeard.baseurl'),REAL_SETTINGS.getSetting('sickbeard.apikey'))
         self.cpAPI = CouchPotato(REAL_SETTINGS.getSetting('couchpotato.baseurl'),REAL_SETTINGS.getSetting('couchpotato.apikey'))
+        
+        try:
+            self.Youtube_api = YoutubeAPI(YOUTUBE_API_KEY)
+        except:
+            self.Youtube_api = False
+            print 'Youtube API KEY Unavailable'
+            pass
+            
             
     def readConfig(self):
         self.channelResetSetting = int(REAL_SETTINGS.getSetting("ChannelResetSetting"))
@@ -135,6 +143,7 @@ class ChannelList:
             self.lastExitTime = int(ADDON_SETTINGS.getSetting("LastExitTime"))
         except Exception,e:
             self.lastExitTime = int(time.time())
+            pass
             
             
     def setupList(self):
@@ -399,16 +408,14 @@ class ChannelList:
             needsreset = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_changed') == 'True'
             
             # force rebuild
-            if chtype == 8:
-                self.log("Force LiveTV rebuild")
-                needsreset = True
-                makenewlist = True
-                
-            # if SETTOP == 'false':
-                # if chtype == 16:
-                    # self.log("Force Playon rebuild")
-                    # needsreset = True
-                    # makenewlist = True
+            if SETTOP == False:
+                if chtype == 8:
+                    self.log("Force LiveTV rebuild")
+                    needsreset = True
+
+                if chtype == 16:
+                    self.log("Force Playon rebuild")
+                    needsreset = True
 
             if needsreset:
                 self.channels[channel - 1].isSetup = False
@@ -643,6 +650,7 @@ class ChannelList:
     # Based on a smart playlist, create a normal playlist that can actually be used by us
     def makeChannelList(self, channel, chtype, setting1, setting2, setting3, setting4, append = False):
         self.log('makeChannelList, CHANNEL: ' + str(channel))
+        limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
         israndom = False
         reverseOrder = False
         fileListCHK = False
@@ -822,20 +830,20 @@ class ChannelList:
                     
                 if self.incBCTs == True:
                     self.log("makeChannelList, adding Trailers to movies...")
-                    PrefileList = self.buildFileList(fle, channel)
+                    PrefileList = self.buildFileList(fle, channel, limit, '')
                     fileList = self.insertBCTfiles(channel, PrefileList, 'movies')
                 else:
-                    fileList = self.buildFileList(fle, channel)  
+                    fileList = self.buildFileList(fle, channel, limit, 0)
             
             elif self.getSmartPlaylistType(dom) == 'episodes':
                 if self.incBCTs == True:
                     self.log("makeChannelList, adding BCT's to episodes...")
-                    PrefileList = self.buildFileList(fle, channel)
+                    PrefileList = self.buildFileList(fle, channel, limit, 0)
                     fileList = self.insertBCTfiles(channel, PrefileList, 'episodes')
                 else:
-                    fileList = self.buildFileList(fle, channel)
+                    fileList = self.buildFileList(fle, channel, limit, 0)
             else:
-                fileList = self.buildFileList(fle, channel)
+                fileList = self.buildFileList(fle, channel, limit, 0)
 
             try:
                 order = dom.getElementsByTagName('order')
@@ -1635,10 +1643,25 @@ class ChannelList:
             pass
 
         return GenreLiveID
-    
+        
+        
+    def buildFileList(self, dir_name, channel, limit, sort):
+        xbmc.log("buildFileList Cache")
+        if Cache_Enabled == True and SETTOP == False:
+            try:
+                result = localTV.cacheFunction(self.buildFileList_NEW, dir_name, channel, limit, sort)
+            except:
+                result = self.buildFileList_NEW(dir_name, channel, limit, sort)
+                pass
+        else:
+            result = self.buildFileList_NEW(dir_name, channel, limit, sort)
+        if not result:
+            result = []
+        return result  
+        
 
-    def buildFileList(self, dir_name, channel): ##fix music channel todo
-        self.log("buildFileList")
+    def buildFileList_NEW(self, dir_name, channel, limit, sort): ##fix music channel todo
+        self.log("buildFileList_NEW")
         FleType = 'video'
         fileList = []
         seasoneplist = []
@@ -1978,18 +2001,36 @@ class ChannelList:
     
     
     def buildLiveTVFileList(self, setting1, setting2, setting3, setting4, channel):
-        self.log("buildLiveTVFileList")
-        Managed = False
-        sbManaged = False
-        cpManaged = False
+        xbmc.log("buildLiveTVFileList Cache")
+        if Cache_Enabled == True and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':  
+            try:
+                result = liveTV.cacheFunction(self.buildLiveTVFileList_NEW, setting1, setting2, setting3, setting4, channel)
+            except:
+                result = self.buildLiveTVFileList_NEW(setting1, setting2, setting3, setting4, channel)
+                pass
+        else:
+            result = self.buildLiveTVFileList_NEW(setting1, setting2, setting3, setting4, channel)
+        if not result:
+            result = []
+        return result  
+        
+    
+    def buildLiveTVFileList_NEW(self, setting1, setting2, setting3, setting4, channel):
+        self.log("buildLiveTVFileList_NEW")
         showList = []
         showcount = 0 
-        genre = 'Unknown'
-        title = ''
-        description = ''
-        subtitle = ''   
-        rating = 'NR'
+        playcount = 1
         limit = 48
+        id = 0
+        rating = 'NR'
+        Managed = False
+        episodeName = ''
+        episodeDesc = ''
+        episodeGenre = ''
+        seasonNumber = 0
+        episodeNumber = 0
+        tvdbid = 0
+        genre = 'Unknown'
         
         try:
             self.log("buildLiveTVFileList, Using Global Parse-limit " + str(limit))
@@ -2056,7 +2097,6 @@ class ChannelList:
 
                             ##################################
                             #Parse the category of the program
-                            istvshow = True
                             movie = False
                             category = 'Unknown'
                             categories = ''
@@ -2065,9 +2105,8 @@ class ChannelList:
                             for cat in categoryList:
                                 categories += ', ' + cat.text
                                 if cat.text == 'Movie':
-                                    category = cat.text
                                     movie = True
-                                    istvshow = False
+                                    category = cat.text
                                 elif cat.text == 'Sports':
                                     category = cat.text
                                 elif cat.text == 'Children':
@@ -2092,78 +2131,59 @@ class ChannelList:
                                 type = 'tvshow'
                                 
                             #TVDB/TMDB Parsing    
-                            dd_progid = ''
-                            tvdbid = 0
-                            imdbid = 0
-                            dbid = 0
-                            id = 0
-                            seasonNumber = 0
-                            episodeNumber = 0
-                            episodeDesc = ''
-                            episodeName = ''
-                            episodeGenre = ''
-                            movieTitle = ''
-                            movieYear = ''
-                            plot = ''
-                            tagline = ''
-                            genres = '' 
-                            LiveID = ''
-                            Managed = False
-                            sbManaged = False
-                            cpManaged = False
-                            ignore = False
-                            rating = 'NR'
-                            
                             #filter unwanted ids by title
                             if title == ('Paid Programming') or subtitle == ('Paid Programming') or description == ('Paid Programming'):
                                 ignoreParse = True
                             else:
                                 ignoreParse = False
-                                
+
                             now = datetime.datetime.now()
                             stopDate = self.parseXMLTVDate(elem.get('stop'), offset)
                             startDate = self.parseXMLTVDate(elem.get('start'), offset)
                             
+                            #Enable Enhanced Parsing
                             if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and ignoreParse == False: 
                                 if (((now > startDate and now <= stopDate) or (now < startDate))):
-                                    #Enable Enhanced Parsing
-                                    
-                                    if movie == False:
-                                        type = 'tvshow'
-                                        
-                                        #Decipher the TVDB ID by using the Zap2it ID in dd_progid
-                                        episodeNumList = elem.findall("episode-num")
-                                        
-                                        for epNum in episodeNumList:
-                                            if epNum.attrib["system"] == 'dd_progid':
-                                                dd_progid = epNum.text
-                                                
-                                        #The Zap2it ID is the first part of the string delimited by the dot
-                                        #  Ex: <episode-num system="dd_progid">MV00044257.0000</episode-num>
-                                        
-                                        dd_progid = dd_progid.split('.',1)[0]
-                                        tvdbid = self.getTVDBIDbyZap2it(dd_progid)
-                                            
+                                    if type == 'tvshow':
+                                                                            
                                         try:
                                             year = (title.split(' ('))[1].replace(')','')
                                             title = (title.split(' ('))[0]
                                         except:
                                             year = ''
                                             pass
-                                            
+                                
+                                        if year:
+                                            titleYR = title + ' (' + str(year) + ')'
+                                        else:
+                                            titleYR = title 
+                                
+                                        #Decipher the TVDB ID by using the Zap2it ID in dd_progid
+                                        episodeNumList = elem.findall("episode-num")
+                                        
+                                        for epNum in episodeNumList:
+                                            if epNum.attrib["system"] == 'dd_progid':
+                                                dd_progid = epNum.text
+                                        
+                                        #The Zap2it ID is the first part of the string delimited by the dot
+                                        #  Ex: <episode-num system="dd_progid">MV00044257.0000</episode-num>
+                                        
+                                        dd_progid = dd_progid.split('.',1)[0]
+                                        tvdbid = self.getTVDBIDbyZap2it(dd_progid)
+
                                         if tvdbid == 0: 
                                             tvdbid = self.getTVDBID(title, year)
                                                       
                                         #Find Episode info by subtitle (ie Episode Name). 
                                         if subtitle != 'LiveTV':
-                                            episodeName, seasonNumber, episodeNumber = self.getTVINFObySubtitle(title, subtitle)                                       
-                                        
+                                            episodeName, seasonNumber, episodeNumber = self.getTVINFObySubtitle(titleYR, subtitle)                                       
                                         else:
                                             #Find Episode info by air date.
                                             if tvdbid != 0:
                                                 #Date element holds the original air date of the program
                                                 airdateStr = elem.findtext('date')
                                                 if airdateStr != None:
+                                                    print 'buildLiveTVFileList, tvdbid by airdate'
                                                     try:
                                                         #Change date format into the byAirDate lookup format (YYYY-MM-DD)
                                                         t = time.strptime(airdateStr, '%Y%m%d')
@@ -2188,7 +2208,7 @@ class ChannelList:
 
                                         # Find Episode info by SeasonNum x EpisodeNum
                                         if (seasonNumber != 0 and episodeNumber != 0):
-                                            episodeName, episodeDesc, episodeGenre = self.getTVINFObySE(title, seasonNumber, episodeNumber)
+                                            episodeName, episodeDesc, episodeGenre = self.getTVINFObySE(titleYR, seasonNumber, episodeNumber)
                                         
                                         if episodeName:
                                             subtitle = episodeName
@@ -2198,9 +2218,8 @@ class ChannelList:
 
                                         if episodeGenre and category == 'Unknown':
                                             category = episodeGenre
-                                    else:
-                                        type = 'movie'
-                                        
+                                    
+                                    else:#Movie
                                         try:
                                             year = (title.split(' ('))[1].replace(')','')
                                             title = (title.split(' ('))[0]
@@ -2214,13 +2233,13 @@ class ChannelList:
                                         if imdbid == 0: 
                                             imdbid = self.getIMDBIDmovie(title, year)
                                             
-                                        if plot != '' or plot != None:
+                                        if plot:
                                             description = plot 
                                             
-                                        if tagline != '' or tagline != None:
+                                        if tagline:
                                             subtitle = tagline
                                             
-                                        if genre != '' or genre != None or genre != 'Unknown':
+                                        if genre and genre != 'Unknown':
                                             category = genre
 
                                     if type == 'tvshow':
@@ -2241,21 +2260,21 @@ class ChannelList:
                                             if genre:
                                                 category = genre
 
-                                if seasonNumber > 0:
-                                    seasonNumber = '%02d' % int(seasonNumber)
-                                
-                                if episodeName > 0:
-                                    episodeNumber = '%02d' % int(episodeNumber)
-                                 
+                                    if seasonNumber > 0:
+                                        seasonNumber = '%02d' % int(seasonNumber)
+                                    
+                                    if episodeName > 0:
+                                        episodeNumber = '%02d' % int(episodeNumber)
+                                     
                                 #Read the "new" boolean for this program
                                 if elem.find("new") != None:
                                     playcount = 0
                                 else:
                                     playcount = 1                        
                             
-                                GenreLiveID = [category,type,id,0,Managed,playcount,rating] 
-                                genre, LiveID = self.packGenreLiveID(GenreLiveID)
-                                
+                            GenreLiveID = [category,type,id,0,Managed,playcount,rating] 
+                            genre, LiveID = self.packGenreLiveID(GenreLiveID)
+                                    
                             description = description.replace("\n", "").replace("\r", "")
                             subtitle = subtitle.replace("\n", "").replace("\r", "")
                             
@@ -2293,7 +2312,7 @@ class ChannelList:
                                     dur = 3600  #60 minute default
                                     raise
                                 
-                            if not movie: #TV
+                            if type == 'tvshow':
                                 episodetitle = (('0' if seasonNumber < 10 else '') + str(seasonNumber) + 'x' + ('0' if episodeNumber < 10 else '') + str(episodeNumber) + ' - '+ (subtitle)).replace('  ',' ')
 
                                 if str(episodetitle[0:5]) == '00x00':
@@ -2316,7 +2335,7 @@ class ChannelList:
                 
                 root.clear()
         except Exception,e:
-            self.log("buildLiveTVFileList, CHANNEL: " + str(e))
+            self.log("buildLiveTVFileList, Error: " + str(e))
             pass
                 
         return showList
@@ -2366,6 +2385,9 @@ class ChannelList:
         LiveID = 'tvshow|0|0|False|1|NR|'
         youtube_plugin = self.youtube_player()
         
+        if not self.Youtube_api:
+            print 'Youtube API Unavailable'
+            
         if youtube_plugin != False:
         
             if setting3 == '':
@@ -2816,10 +2838,25 @@ class ChannelList:
                 showList = self.myMusicTV(setting1, setting2, setting3, setting4, channel)
                 
         return showList
-
+    
     
     def lastFM(self, setting1, setting2, setting3, setting4, channel):
-        self.log("lastFM")
+        xbmc.log("lastFM Cache")
+        if Cache_Enabled == True:  
+            try:
+                result = lastfm.cacheFunction(self.lastFM_NEW, setting1, setting2, setting3, setting4, channel)
+            except:
+                result = self.lastFM_NEW(setting1, setting2, setting3, setting4, channel)
+                pass
+        else:
+            result = self.lastFM_NEW(setting1, setting2, setting3, setting4, channel)
+        if not result:
+            result = []
+        return result  
+    
+    
+    def lastFM_NEW(self, setting1, setting2, setting3, setting4, channel):
+        self.log("lastFM_NEW")
         # Sample xml output:
         # <clip>
             # <artist url="http://www.last.fm/music/Tears+for+Fears">Tears for Fears</artist>
@@ -2860,79 +2897,63 @@ class ChannelList:
         
         if self.background == False:
             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Last.FM", "User " + setting2)
-        
-        LastFMCachePath = xbmc.translatePath(os.path.join(FLST_LOC, 'lastfm')) + '/'  
-        LastFMCache = 'LastFM_Cache_'+str(setting2)+'.xml'
-        CacheExpired = self.Cache_ok(LastFMCachePath, LastFMCache) 
 
-        if CacheExpired == False:
-            LastFMList = self.readCache(LastFMCachePath, LastFMCache)
-            for i in range(len(LastFMList)):
-                try:
-                    tmpstr = str(LastFMList[i]) + '\n' + str(LastFMList[i+1])
-                    LastFMList.pop(i+1)
-                    showList.append(tmpstr)
-                except:
-                    pass
+        for n in range(limit):
+
+            if self.threadPause() == False:
+                del fileList[:]
+                break
             
-        elif CacheExpired == True: 
-            for n in range(limit):
+            try:
+                file = Open_URL(api)
+                self.log('file' + str(file))
+                data = file.read()
+                self.log('data' + str(data))
+                file.close()
+                dom = parseString(data)
 
-                if self.threadPause() == False:
-                    del fileList[:]
-                    break
+                xmlartist = dom.getElementsByTagName('artist')[0].toxml()
+                artist = xmlartist.replace('<artist>','').replace('</artist>','')
+                artist = artist.rsplit('>', -1)
+                artist = artist[1]
+                # artist = str(artist)
+                artist = self.uncleanString(artist)
+
+                xmltrack = dom.getElementsByTagName('track')[0].toxml()
+                track = xmltrack.replace('<track url>','').replace('</track>','')
+                track = track.rsplit('>', -1)
+                track = track[1]
+                # track = str(track)
+                track = self.uncleanString(track)
+
+                xmlurl = dom.getElementsByTagName('url')[0].toxml()
+                url = xmlurl.replace('<url>','').replace('</url>','')  
+                url = url.replace("https://", "").replace("http://", "").replace("www.youtube.com/watch?v=", "").replace("&feature=youtube_gdata_player", "").replace("&amp;feature=youtube_gdata_player", "")
+
+                xmlduration = dom.getElementsByTagName('duration')[0].toxml()
+                duration = xmlduration.replace('<duration>','').replace('</duration>','')
+
+                xmlthumbnail = dom.getElementsByTagName('thumbnail')[0].toxml()
+                thumburl = xmlthumbnail.replace('<thumbnail>','').replace('</thumbnail>','')
+
+                xmlrating = dom.getElementsByTagName('rating')[0].toxml()
+                rating = xmlrating.replace('<rating>','').replace('</rating>','')
+                rating = rating.rsplit('>', -1)
+                rating = rating[1]
+                rating = rating[0:4]
+                eptitle = uni(artist + ' - ' + track)
+                epdesc = uni('Rated ' + rating + '/5.00')
                 
-                try:
-                    file = Open_URL(api)
-                    self.log('file' + str(file))
-                    data = file.read()
-                    self.log('data' + str(data))
-                    file.close()
-                    dom = parseString(data)
-
-                    xmlartist = dom.getElementsByTagName('artist')[0].toxml()
-                    artist = xmlartist.replace('<artist>','').replace('</artist>','')
-                    artist = artist.rsplit('>', -1)
-                    artist = artist[1]
-                    # artist = str(artist)
-                    artist = self.uncleanString(artist)
-
-                    xmltrack = dom.getElementsByTagName('track')[0].toxml()
-                    track = xmltrack.replace('<track url>','').replace('</track>','')
-                    track = track.rsplit('>', -1)
-                    track = track[1]
-                    # track = str(track)
-                    track = self.uncleanString(track)
-
-                    xmlurl = dom.getElementsByTagName('url')[0].toxml()
-                    url = xmlurl.replace('<url>','').replace('</url>','')  
-                    url = url.replace("https://", "").replace("http://", "").replace("www.youtube.com/watch?v=", "").replace("&feature=youtube_gdata_player", "").replace("&amp;feature=youtube_gdata_player", "")
-
-                    xmlduration = dom.getElementsByTagName('duration')[0].toxml()
-                    duration = xmlduration.replace('<duration>','').replace('</duration>','')
-
-                    xmlthumbnail = dom.getElementsByTagName('thumbnail')[0].toxml()
-                    thumburl = xmlthumbnail.replace('<thumbnail>','').replace('</thumbnail>','')
-
-                    xmlrating = dom.getElementsByTagName('rating')[0].toxml()
-                    rating = xmlrating.replace('<rating>','').replace('</rating>','')
-                    rating = rating.rsplit('>', -1)
-                    rating = rating[1]
-                    rating = rating[0:4]
-                    eptitle = uni(artist + ' - ' + track)
-                    epdesc = uni('Rated ' + rating + '/5.00')
-                    
-                    tmpstr = str(duration) + ',' + eptitle + "//" + "Last.FM" + "//" + epdesc + "//" + 'Music' + "////" + LiveID + '\n' + youtube_plugin + url
-                    tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
-                    showList.append(tmpstr)
-                    showcount += 1    
-                              
-                    if self.background == False:
-                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Last.FM, User " + setting2, "added " + str(showcount) + " entries")
-                    
-                except Exception,e:
-                    pass   
-            self.writeCache(showList, LastFMCachePath, LastFMCache)   
+                tmpstr = str(duration) + ',' + eptitle + "//" + "Last.FM" + "//" + epdesc + "//" + 'Music' + "////" + LiveID + '\n' + youtube_plugin + url
+                tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
+                showList.append(tmpstr)
+                showcount += 1    
+                          
+                if self.background == False:
+                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Last.FM, User " + setting2, "added " + str(showcount) + " entries")
+                
+            except Exception,e:
+                pass    
                 
         return showList
 
@@ -3363,7 +3384,8 @@ class ChannelList:
         #Bumpers
         if (REAL_SETTINGS.getSetting('bumpers') != "0" and type != 'movies'): # Bumpers not disabled,and is custom or network playlist.
             BumperLST = self.GetBumperList(channel, fileList)#build full Bumper list
-            random.shuffle(BumperLST)
+            if BumperLST and len(BumperLST) > 0:
+                random.shuffle(BumperLST)
             BumperNum = len(BumperLST)#number of Bumpers items in full list
             self.logDebug("insertBCTfiles, Bumpers.numbumpers = " + str(numbumpers))
         
@@ -3374,14 +3396,16 @@ class ChannelList:
         #Commercial
         if REAL_SETTINGS.getSetting('commercials') != '0' and type != 'movies': # commercials not disabled, and not a movie
             CommercialLST = self.GetCommercialList(channel, fileList)#build full Commercial list
-            random.shuffle(CommercialLST)
+            if CommercialLST and len(CommercialLST) > 0:
+                random.shuffle(CommercialLST)
             CommercialNum = len(CommercialLST)#number of Commercial items in full list
             self.logDebug("insertBCTfiles, Commercials.numcommercials = " + str(numcommercials))
         
         #Trailers
         if REAL_SETTINGS.getSetting('trailers') != '0': # trailers not disabled, and not a movie
             TrailerLST = self.GetTrailerList(channel, fileList)
-            random.shuffle(TrailerLST)
+            if TrailerLST and len(TrailerLST) > 0:
+                random.shuffle(TrailerLST)
             TrailerNum = len(TrailerLST)#number of trailer items in full list
             self.logDebug("insertBCTfiles, trailers.numTrailers = " + str(numTrailers))    
 
@@ -3551,7 +3575,10 @@ class ChannelList:
                         self.writeCache(BumperLST, BumperCachePath, BumperInternetCache)
                 except:
                     pass
-                    
+                 
+        if not self.Youtube_api:
+            print 'Youtube API Unavailable'
+            
         return BumperLST     
 
         
@@ -3585,6 +3612,7 @@ class ChannelList:
     
     def GetCommercialList (self, channel, fileList):
         self.log("GetCommercialList")
+        Youtube_api = []
         CommercialCachePath = xbmc.translatePath(os.path.join(BCT_LOC, 'commercials')) + '/'   
         chtype = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type')
         
@@ -3655,24 +3683,6 @@ class ChannelList:
                         LocalCommercialLST.append(LocalCommercial)
                 CommercialLST.extend(LocalCommercialLST)                
                 self.writeCache(LocalCommercialLST, CommercialCachePath, CommercialLocalCache)
-        
-        #Internet (advertolog.com, ispot.tv)
-        if REAL_SETTINGS.getSetting('commercials') == '3' and Donor_Downloaded == True:
-            CommercialInternetCache = 'Commercial_Internet_Cache.xml'
-            CacheExpired = self.Cache_ok(CommercialCachePath, CommercialInternetCache) 
-
-            if CacheExpired == False:
-                InternetCommercialLST = self.readCache(CommercialCachePath, CommercialInternetCache)
-                CommercialLST.extend(InternetCommercialLST)  
-            elif CacheExpired == True:
-                try:  
-                    if self.background == False:
-                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Commercials", "parsing Internet Commercials")
-                    InternetCommercialLST = InternetCommercial(CommercialCachePath)
-                    CommercialLST.extend(InternetCommercialLST)  
-                    self.writeCache(InternetCommercialLST, CommercialCachePath, CommercialInternetCache)
-                except Exception,e:
-                    pass
 
         #Youtube
         if REAL_SETTINGS.getSetting('commercials') == '2':
@@ -3703,12 +3713,35 @@ class ChannelList:
                         YoutubeCommercialLST.append(YoutubeCommercial)
                 CommercialLST.extend(YoutubeCommercialLST)
                 self.writeCache(YoutubeCommercialLST, CommercialCachePath, CommercialYoutubeCache)
+
+        if not self.Youtube_api:
+            print 'Youtube API Unavailable'
+            return Youtube_api
+     
+        #Internet (advertolog.com, ispot.tv)
+        if REAL_SETTINGS.getSetting('commercials') == '3' and Donor_Downloaded == True:
+            CommercialInternetCache = 'Commercial_Internet_Cache.xml'
+            CacheExpired = self.Cache_ok(CommercialCachePath, CommercialInternetCache) 
+
+            if CacheExpired == False:
+                InternetCommercialLST = self.readCache(CommercialCachePath, CommercialInternetCache)
+                CommercialLST.extend(InternetCommercialLST)  
+            elif CacheExpired == True:
+                try:  
+                    if self.background == False:
+                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Commercials", "parsing Internet Commercials")
+                    InternetCommercialLST = InternetCommercial(CommercialCachePath)
+                    CommercialLST.extend(InternetCommercialLST)  
+                    self.writeCache(InternetCommercialLST, CommercialCachePath, CommercialInternetCache)
+                except Exception,e:
+                    pass
             
         return CommercialLST 
         
     
     def GetTrailerList (self, channel, fileList):
         self.log("GetTrailerList")
+        Youtube_api = []
         TrailerCachePath = xbmc.translatePath(os.path.join(BCT_LOC, 'trailers')) + '/'  
         chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
         
@@ -3830,23 +3863,6 @@ class ChannelList:
                                     JsonTrailerLST.append(JsonTrailer)
                         TrailerLST.extend(JsonTrailerLST)     
                         self.writeCache(TrailerLST, TrailerCachePath, TrailerInternetCache)
-                    
-        #Internet
-        if REAL_SETTINGS.getSetting('trailers') == '4' and Donor_Downloaded == True:
-            TrailerInternetCache = 'Trailer_Internet_Cache.xml'
-            CacheExpired = self.Cache_ok(TrailerCachePath, TrailerInternetCache) 
-
-            if CacheExpired == False:
-                TrailerLST = self.readCache(TrailerCachePath, TrailerInternetCache)
-                
-            elif CacheExpired == True:  
-                try:   
-                    if self.background == False:
-                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Internet Trailers")
-                    TrailerLST = InternetTrailer(TrailerCachePath)
-                    self.writeCache(TrailerLST, TrailerCachePath, TrailerInternetCache)
-                except Exception,e:
-                    pass
 
         #Youtube
         if REAL_SETTINGS.getSetting('trailers') == '3':
@@ -3868,6 +3884,28 @@ class ChannelList:
                     YoutubeTrailer = (str(duration) + ',' + trailer)
                     YoutubeTrailerLST.append(YoutubeTrailer)
             TrailerLST.extend(YoutubeTrailerLST)
+        
+        if not self.Youtube_api:
+            print 'Youtube API Unavailable'
+            return Youtube_api
+            
+        #Internet
+        if REAL_SETTINGS.getSetting('trailers') == '4' and Donor_Downloaded == True:
+            TrailerInternetCache = 'Trailer_Internet_Cache.xml'
+            CacheExpired = self.Cache_ok(TrailerCachePath, TrailerInternetCache) 
+
+            if CacheExpired == False:
+                TrailerLST = self.readCache(TrailerCachePath, TrailerInternetCache)
+                
+            elif CacheExpired == True:  
+                try:   
+                    if self.background == False:
+                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(channel), "adding Trailers", "parsing Internet Trailers")
+                    TrailerLST = InternetTrailer(TrailerCachePath)
+                    self.writeCache(TrailerLST, TrailerCachePath, TrailerInternetCache)
+                except Exception,e:
+                    pass
+
         return TrailerLST
 
         
@@ -3994,7 +4032,12 @@ class ChannelList:
     
     def extras(self, setting1, setting2, setting3, setting4, channel):
         self.log("extras")
- 
+        Youtube_api = []
+        
+        if not self.Youtube_api:
+            print 'Youtube API Unavailable'
+            return Youtube_api
+            
         if Donor_Downloaded == True:    
             try:
                 if setting1.lower() == 'popcorn':
@@ -4014,7 +4057,6 @@ class ChannelList:
                         flename == (xbmc.translatePath(setting2))
                                         
                     PrefileList = self.buildFileList(flename, channel) 
-                    print 'PrefileList', PrefileList
                     if self.background == False:
                         self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras", "populating PseudoCinema Experience")
                     
@@ -4060,7 +4102,7 @@ class ChannelList:
 
         return cpManaged
 
-
+    
     def getGenre(self, type, title, year):
         self.log("getGenre")
         genre = 'Unknown'
@@ -4077,10 +4119,13 @@ class ChannelList:
                 genre = str(genre.split(' / ')[0])
             except Exception as e:
                 pass
+            if not genre or genre == 'Empty' or genre == 'None':
+                genre = 'Unknown'
         except Exception,e:
+            genre = 'Unknown'
             pass
 
-        if not genre or genre == 'Unknown':
+        if genre == 'Unknown':
 
             if type == 'tvshow':
                 try:
@@ -4090,7 +4135,10 @@ class ChannelList:
                         genre = str((genre.split('|'))[1])
                     except:
                         pass
+                    if not genre or genre == 'Empty' or genre == 'None':
+                        genre = 'Unknown'
                 except Exception,e:
+                    genre = 'Unknown'
                     pass
             else:
                 self.log("tmdb")
@@ -4098,19 +4146,21 @@ class ChannelList:
                 try:
                     genre = str(movieInfo['genres'][0])
                     genre = str(genre.split("u'")[3]).replace("'}",'')
+                    if not genre or genre == 'Empty' or genre == 'None':
+                        genre = 'Unknown'
                 except Exception,e:
+                    genre = 'Unknown'
                     pass
 
-        if not genre or genre == 'None' or genre == 'Empty':
-            genre = 'Unknown'
-            
-        return genre.replace('NA','Unknown')
+        genre = genre.replace('NA','Unknown')
+        return genre
         
     
     def cleanRating(self, rating):
         self.log("cleanRating")
         rating = rating.replace('Rated ','').replace('US:','').replace('UK:','').replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('NA','NR').replace('Approved','NR')
         return rating
+        # rating = rating.replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('Approved','NR')
     
 
     def getRating(self, type, title, year, imdbid):
@@ -4118,71 +4168,81 @@ class ChannelList:
         rating = 'NR'
 
         try:
-            self.log("metahander")     
+            self.log("getRating, metahander")     
             self.metaget = metahandlers.MetaData(preparezip=False)
             rating = self.metaget.get_meta(type, title)['mpaa']
+            
+            if not rating or rating == 'Empty' or rating == 'None':
+                rating = 'NR'
+        
         except Exception,e:
             pass
-            
-        rating = rating.replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('Approved','NR')
-        if not rating or rating == 'NR':
         
+        if rating == 'NR':
             if type == 'tvshow':
                 try:
-                    self.log("tvdb_api")
+                    self.log("getRating, tvdb_api")
                     rating = str(self.t[title]['contentrating'])
                     try:
                         rating = rating.replace('|','')
                     except:
-                        pass
+                        pass 
+                    if not rating or rating == 'Empty' or rating == 'None':
+                        rating = 'NR'
                 except Exception,e:
+                    rating = 'NR'
                     pass
             else:
-                if imdbid or imdbid != 0:
+                if imdbid and imdbid != 0:
                     try:
-                        self.log("tmdb")
-                        rating = str(self.tmdbAPI.getMPAA(imdbid))
+                        self.log("getRating, tmdb")
+                        rating = str(self.tmdbAPI.getMPAA(imdbid)) 
+                        if not rating or rating == 'Empty' or rating == 'None':
+                            rating = 'NR'
                     except Exception,e:
+                        rating = 'NR'
                         pass
 
-        rating = rating.replace('Unrated','NR').replace('NotRated','NR').replace('N/A','NR').replace('Approved','NR')
-        if not rating or rating == 'None' or rating == 'Empty':
-            rating = 'NR'
-            
-        return (self.cleanRating(rating)).replace('M','R')
+        rating = (self.cleanRating(rating))
+        print rating
+        return rating
 
-
+        
     def getTVDBID(self, title, year):
         print 'getTVDBID'
         tvdbid = 0
-        imdbid = 0
- 
+        if year:
+            title = title + ' (' + str(year) + ')'
+            
         try:
-            self.log("metahander")
+            self.log("getTVDBID, metahander")
             self.metaget = metahandlers.MetaData(preparezip=False)
             tvdbid = self.metaget.get_meta('tvshow', title)['tvdb_id']
+            if not tvdbid or tvdbid == 'Empty':
+                tvdbid = 0
         except Exception,e:
+            tvdbid = 0
             pass
 
-        if not tvdbid or tvdbid == 0:
+        if tvdbid == 0:
             try:
-                self.log("tvdb_api")
+                self.log("getTVDBID, tvdb_api")
                 tvdbid = int(self.t[title]['id'])
             except Exception,e:
+                tvdbid = 0
                 pass
 
-        if not tvdbid or tvdbid == 0:
+        if tvdbid == 0:
             try:
+                self.log("getTVDBID, getTVDBIDbyIMDB")
                 imdbid = self.getIMDBIDtv(title)
-                if imdbid or imdbid != 0:
+                if imdbid:
                     tvdbid = int(self.getTVDBIDbyIMDB(imdbid))
-                if not tvdbid:
+                if not tvdbid or tvdbid == 'Empty':
                     tvdbid = 0
             except Exception,e:
+                tvdbid = 0
                 pass
-
-        if not tvdbid or tvdbid == 'None' or tvdbid == 'Empty':
-            tvdbid = 0
 
         return tvdbid
 
@@ -4227,7 +4287,7 @@ class ChannelList:
             
         return tvdbid
 
-
+        
     def getIMDBIDmovie(self, showtitle, year):
         print 'getIMDBIDmovie'
         imdbid = 0
@@ -4235,22 +4295,24 @@ class ChannelList:
             self.log("metahander")
             self.metaget = metahandlers.MetaData(preparezip=False)
             imdbid = (self.metaget.get_meta('movie', showtitle)['imdb_id'])
+            if not imdbid or imdbid == 'Empty':
+                imdbid = 0
         except Exception,e:
+            imdbid = 0
             pass
 
-        if not imdbid or imdbid == 0:
+        if imdbid == 0:
             try:
                 self.log("tmdb")
                 movieInfo = (self.tmdbAPI.getMovie(showtitle, year))
                 imdbid = (movieInfo['imdb_id'])
-                if not imdbid:
+                if not imdbid or imdbid == 'Empty':
                     imdbid = 0
             except Exception,e:
+                imdbid = 0
                 pass
                 
-        if not imdbid or imdbid == 'None' or imdbid == 'Empty':
-            imdbid = 0
-            
+        print imdbid
         return imdbid
         
     
@@ -4260,23 +4322,17 @@ class ChannelList:
         
         try:
             tvdbid = self.tvdbAPI.getIdByZap2it(dd_progid)
-            if not tvdbid:
+            if not tvdbid or tvdbid == 'Empty':
                 tvdbid = 0
         except Exception,e:
             pass
-        
-        if not tvdbid or tvdbid == 'None' or tvdbid == 'Empty':
-            tvdbid = 0
-            
+
+        print tvdbid
         return tvdbid
         
         
     def getTVINFObySubtitle(self, title, subtitle):
         print 'getTVINFObySubtitle'
-        episode = ''
-        episodeName = ''
-        seasonNumber = 0
-        episodeNumber = 0
         
         try:
             episode = self.t[title].search(subtitle, key = 'episodename')
@@ -4286,18 +4342,23 @@ class ChannelList:
             seasonNumber = int(episode[0].split('Episode ')[1])
             episodeNumber = int(episode[1].split(' -')[0])
             episodeName = str(episode[1]).split('- ')[1].replace('>','')
+            if not episodeName or episodeName == 'Empty':
+                episodeName = ''
+            if not seasonNumber or seasonNumber == 'Empty':
+                seasonNumber = 0    
+            if not episodeNumber or episodeNumber == 'Empty':
+                episodeNumber = 0
         except Exception,e:
+            episodeName = ''
+            seasonNumber = 0
+            episodeNumber = 0
             pass
-
+            
         return episodeName, seasonNumber, episodeNumber
 
         
     def getTVINFObySE(self, title, seasonNumber, episodeNumber):
         print 'getTVINFObySE'
-        episode = ''
-        episodeName = ''
-        episodeDesc = ''
-        episodeGenre = 'Unknown'
         
         try:
             episode = self.t[title][seasonNumber][episodeNumber]
@@ -4311,21 +4372,18 @@ class ChannelList:
             except:
                 pass
         except Exception,e:
+            episode = ''
+            episodeName = ''
+            episodeDesc = ''
+            episodeGenre = 'Unknown'
             pass
         
-        if episodeName != '' or episodeName != None:
-            if not episodeDesc:
-                episodeDesc = episodeName
-
         return episodeName, episodeDesc, episodeGenre
         
         
     def getMovieINFObyTitle(self, title, year):
         print 'getMovieINFObyTitle'
         imdbid = 0
-        plot = ''
-        tagline = ''
-        genre = 'Unknown'
         
         try:
             movieInfo = self.tmdbAPI.getMovie((title), year)
@@ -4333,21 +4391,25 @@ class ChannelList:
             try:
                 plot = str(movieInfo['overview'])
             except:
+                plot = ''
                 pass
             try:
                 tagline = str(movieInfo['tagline'])
             except:
+                tagline = ''
                 pass
             try:
                 genre = str(movieInfo['genres'][0])
                 genre = str((genre.split("u'")[3])).replace("'}",'')
             except:
+                genre = 'Unknown'
                 pass
                 
             if not imdbid or imdbid == 'None' or imdbid == 'Empty':
                 imdbid = 0
                 
         except Exception,e:
+            imdbid = 0
             pass
 
         return imdbid, plot, tagline, genre
@@ -4837,9 +4899,24 @@ class ChannelList:
 
         self.log("PluginWalk return")
         return fileList
-
-
+    
+    
     def BuildPluginFileList(self, setting1, setting2, setting3, setting4, channel):
+        xbmc.log("BuildPluginFileList Cache")
+        if Cache_Enabled == True and SETTOP == False:  
+            try:
+                result = pluginTV.cacheFunction(self.BuildPluginFileList_NEW, setting1, setting2, setting3, setting4, channel)
+            except:
+                result = self.BuildPluginFileList_NEW(setting1, setting2, setting3, setting4, channel)
+                pass
+        else:
+            result = self.BuildPluginFileList_NEW(setting1, setting2, setting3, setting4, channel)
+        if not result:
+            result = []
+        return result  
+        
+
+    def BuildPluginFileList_NEW(self, setting1, setting2, setting3, setting4, channel):
         print "BuildPluginFileList"
         showList = []
         DetailLST = []
@@ -4928,9 +5005,24 @@ class ChannelList:
             showList = self.PluginWalk(plugin, excludeLST, limit, channel, 'PluginTV', 'video')
                 
         return showList    
-        
-        
+           
+    
     def BuildPlayonFileList(self, setting1, setting2, setting3, setting4, channel):
+        xbmc.log("BuildPlayonFileList Cache")
+        if Cache_Enabled == True and SETTOP == False:
+            try:
+                result = playonTV.cacheFunction(self.BuildPlayonFileList_NEW, setting1, setting2, setting3, setting4, channel)
+            except:
+                result = self.BuildPlayonFileList_NEW(setting1, setting2, setting3, setting4, channel)
+                pass
+        else:
+            result = self.BuildPlayonFileList_NEW(setting1, setting2, setting3, setting4, channel)
+        if not result:
+            result = []
+        return result  
+        
+ 
+    def BuildPlayonFileList_NEW(self, setting1, setting2, setting3, setting4, channel):
         print ("BuildPlayonFileList")
         showList = []
         DetailLST = []
@@ -5158,33 +5250,34 @@ class ChannelList:
         return CHname, CHid
         
         
-    def SyncUSTVnow(self, force=False):
+    def SyncUSTVnow(self, silent=False, force=False):
         print 'SyncUSTVnow'    
         now  = datetime.datetime.today()
         USTVnow = self.plugin_ok('plugin.video.ustvnow')
         
         if USTVnow == True:
+            
             try:
-                SyncUSTVnow_LastRun = REAL_SETTINGS.getSetting('SyncUSTVnow_NextRun')
-                SyncUSTVnow_LastRun = SyncUSTVnow_LastRun.split('.')[0]
-                SyncUSTVnow_LastRun = datetime.datetime.strptime(SyncUSTVnow_LastRun, '%Y-%m-%d %H:%M:%S')
+                SyncUSTVnow_NextRun = REAL_SETTINGS.getSetting('SyncUSTVnow_NextRun')
+                SyncUSTVnow_NextRun = SyncUSTVnow_NextRun.split('.')[0]
+                SyncUSTVnow_NextRun = datetime.datetime.strptime(SyncUSTVnow_NextRun, '%Y-%m-%d %H:%M:%S')
             except:
-                SyncUSTVnow_LastRun = now
+                SyncUSTVnow_NextRun = now
                 pass
             
             #Force Download
             if force == True:
                 print 'SyncUSTVnow, Force Run'    
-                SyncUSTVnow_LastRun = now
+                SyncUSTVnow_NextRun = now
             
             #Force Download - If missing
             if not FileAccess.exists(USTVnowXML):
-                SyncUSTVnow_LastRun = now
+                SyncUSTVnow_NextRun = now
                 
-            if now >= SyncUSTVnow_LastRun: 
+            if now >= SyncUSTVnow_NextRun: 
 
                 if NOTIFY == 'true':
-                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","USTVnow XMLTV Updating", 1000, THUMB) )
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","USTVnow XMLTV Updating", 4000, THUMB) )
                     
                 print 'SyncUSTVnow, Updating XMLTV'    
                 url = 'http://copy.com/D4juDEUQw9eBj2q3/ustvnow.xml'
@@ -5207,37 +5300,41 @@ class ChannelList:
                 except urllib2.URLError as e:
                     pass
                     
-                SyncUSTVnow_NextRun = (SyncUSTVnow_LastRun + datetime.timedelta(hours=48))
+                SyncUSTVnow_NextRun = (SyncUSTVnow_NextRun + datetime.timedelta(hours=48))
                 REAL_SETTINGS.setSetting("SyncUSTVnow_NextRun",str(SyncUSTVnow_NextRun))
-                download(USxmltv, USTVnowXML)
+                if silent:
+                    download_silent(USxmltv, USTVnowXML)
+                else:
+                    download(USxmltv, USTVnowXML)
                 return True
             
 
-    def SyncSSTV(self, force=False):
+    def SyncSSTV(self, silent=False, force=False):
         print 'SyncSSTV' 
         now  = datetime.datetime.today()
         SSTV = self.plugin_ok('plugin.video.mystreamstv.beta')
         if SSTV == True:
+            
             try:
-                SyncSSTV_LastRun = REAL_SETTINGS.getSetting('SyncSSTV_NextRun')
-                SyncSSTV_LastRun = SyncSSTV_LastRun.split('.')[0]
-                SyncSSTV_LastRun = datetime.datetime.strptime(SyncSSTV_LastRun, '%Y-%m-%d %H:%M:%S')
+                SyncSSTV_NextRun = REAL_SETTINGS.getSetting('SyncSSTV_NextRun')
+                SyncSSTV_NextRun = SyncSSTV_NextRun.split('.')[0]
+                SyncSSTV_NextRun = datetime.datetime.strptime(SyncSSTV_NextRun, '%Y-%m-%d %H:%M:%S')
             except:
-                SyncSSTV_LastRun = now
+                SyncSSTV_NextRun = now
                 pass
             
             #Force Download
             if force == True:
-                SyncSSTV_LastRun = now
+                SyncSSTV_NextRun = now
             
             #Force Download - If missing
             if not FileAccess.exists(SSTVXML):
-                SyncSSTV_LastRun = now
+                SyncSSTV_NextRun = now
                 
-            if now >= SyncSSTV_LastRun: 
+            if now >= SyncSSTV_NextRun: 
 
                 if NOTIFY == 'true':
-                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","SmoothStream XMLTV Updating", 1000, THUMB) )
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","SmoothStream XMLTV Updating", 4000, THUMB) )
                     
                 url = 'http://smoothstreams.tv/schedule/feed.xml'
                 url_bak = 'http://smoothstreams.tv/schedule/feed.xml'
@@ -5260,37 +5357,41 @@ class ChannelList:
                 except urllib2.URLError as e:
                     pass
                         
-                SyncSSTV_NextRun = (SyncSSTV_LastRun + datetime.timedelta(hours=24))
+                SyncSSTV_NextRun = (SyncSSTV_NextRun + datetime.timedelta(hours=24))
                 REAL_SETTINGS.setSetting("SyncSSTV_NextRun",str(SyncSSTV_NextRun))
-                download(SSxmltv, SSTVXML)
+                if silent:
+                    download_silent(SSxmltv, SSTVXML)
+                else:
+                    download(SSxmltv, SSTVXML)
                 return True
         
         
-    def SyncFTV(self, force=False):
+    def SyncFTV(self, silent=False, force=False):
         print 'SyncFTV'  
         now  = datetime.datetime.today()
         FTV = self.plugin_ok('plugin.video.F.T.V') 
         if FTV == True:
+            
             try:
-                SyncFTV_LastRun = REAL_SETTINGS.getSetting('SyncFTV_NextRun')
-                SyncFTV_LastRun = SyncFTV_LastRun.split('.')[0]
-                SyncFTV_LastRun = datetime.datetime.strptime(SyncFTV_LastRun, '%Y-%m-%d %H:%M:%S')
+                SyncFTV_NextRun = REAL_SETTINGS.getSetting('SyncFTV_NextRun')
+                SyncFTV_NextRun = SyncFTV_NextRun.split('.')[0]
+                SyncFTV_NextRun = datetime.datetime.strptime(SyncFTV_NextRun, '%Y-%m-%d %H:%M:%S')
             except:
-                SyncFTV_LastRun = now
+                SyncFTV_NextRun = now
                 pass
             
             #Force Download
             if force == True:
-                SyncFTV_LastRun = now
+                SyncFTV_NextRun = now
             
             #Force Download - If missing
             if not FileAccess.exists(FTVXML):
-                SyncFTV_LastRun = now
+                SyncFTV_NextRun = now
                 
-            if now >= SyncFTV_LastRun: 
+            if now >= SyncFTV_NextRun: 
 
                 if NOTIFY == 'true':
-                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","F.T.V XMLTV Updating", 1000, THUMB) )
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","F.T.V XMLTV Updating", 4000, THUMB) )
                     
                 url = 'http://copy.com/hxg9bYKzVTlOPzi4/ftvguide.xml'
                 url_bak = 'http://users17.jabry.com/PTVL1/db/xmltv/ftvguide.xml'
@@ -5311,11 +5412,15 @@ class ChannelList:
                 except urllib2.URLError as e:
                     pass
             
-                SyncFTV_NextRun = (SyncFTV_LastRun + datetime.timedelta(hours=48))
+                SyncFTV_NextRun = (SyncFTV_NextRun + datetime.timedelta(hours=48))
                 REAL_SETTINGS.setSetting("SyncFTV_NextRun",str(SyncFTV_NextRun))
-                download(FTVxmltv, FTVXML)
+                if silent:
+                    download_silent(FTVxmltv, FTVXML)
+                else:
+                    download(FTVxmltv, FTVXML)
                 return True
                 
+
     def CleanLabels(self, label):
         print 'CleanLabels'
         #add regex wildcard to catch all colors todo

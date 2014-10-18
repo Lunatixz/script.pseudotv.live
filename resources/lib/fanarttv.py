@@ -74,7 +74,7 @@ def get_data(url, data_type ='json'):
     xbmc.log('script.pseudotv.live-fanarttv: get_data')
     #log('API: %s'% url)
     if CACHE_ON:
-        result = parsers.cacheFunction(get_data_new, url, data_type)
+        result = parserFANTV.cacheFunction(get_data_new, url, data_type)
     else:
         result = get_data_new(url, data_type)
     if not result:

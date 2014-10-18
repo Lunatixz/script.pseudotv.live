@@ -28,7 +28,7 @@
     <string id="34446">Run During Playback?</string>
     <string id="30202">Select Skin</string> 
     <string id="30225">Channel Logo Folder</string>  
-    <string id="34547">Find Missing Logos?</string>  
+    <string id="34547">Find Missing Logos</string>  
     <string id="30210">EPG Options:</string> 
         <string id="30211">Clock Mode</string>
         <string id="30212">EPG Color by</string>
@@ -48,8 +48,10 @@
         <string id="30229">Use Classic Coming Up Next box</string>
         <string id="30227">Coming Up Artwork Type</string>
 <string id="30300">Tweaks</string>
+    <string id="30401">Operating System</string>  
+    <string id="32055">Preferred Language</string>  
     <string id="30301">Use (S01E01), Instead of (01x01)</string>
-	<string id="30405">Find Missing Guide Data</string>
+	<string id="30405">Find Missing GuideData (Art/Info)</string>
     <string id="30408">Play the next video automatically</string>
     <string id="30302">Channel Change Delay (seconds)</string>
     <string id="30303">Choose Startup Channel</string> 
@@ -62,8 +64,6 @@
     <string id="30310">Media Limit Per Channel</string>
     <string id="30372">Reserve Channels 501-999 for Autotune</string>
 <string id="30400">PVR</string>  
-    <string id="30401">Operating System</string>  
-    <string id="32055">Preferred Language</string>  
 	<string id="30397">Enable XMLTV Service</string>
     <string id="30398">Show Notification</string>
     <string id="30399">Run Service Every (hours)</string>

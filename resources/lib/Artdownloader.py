@@ -339,8 +339,9 @@ class Artdownloader:
                         arttype_fallback = arttypeEXT.replace('landscape','fanart')
                         setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
             
-            else:        
-                if mediapath.startswith('plugin://') and id == '0':
+
+            if not setImage:      
+                if mediapath.startswith('plugin://'):
                     ###########################
                     print ('Find Plugin Artwork')
                     try:
@@ -348,7 +349,6 @@ class Artdownloader:
                         plugin = os.path.split(mediapath)
                         addon = os.path.split(plugin[0])[1]
                         YTid = plugin[1]
-                        
                         icon = 'special://home/addons/'+YTid+ '/icon.png'
                         fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
                         youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
@@ -460,8 +460,8 @@ class Artdownloader:
                     output.close()
                     return TVFilePath
                 except Exception,e:
-                    print ('FanTVDownload Failed!')    
-                    pass
+                    print ('FanTVDownload Failed!') 
+                    return ''   
 
         elif type == 'movie':
             FanMovieDownload = False
@@ -505,7 +505,7 @@ class Artdownloader:
                     return MovieFilePath
                 except Exception,e:
                     print ('FanMovieDownload Failed!')
-                    pass                
+                    return ''     
 
                     
     def EXTtype(self, arttype): 
@@ -593,7 +593,6 @@ class Artdownloader:
         print 'ArtService'         
         if REAL_SETTINGS.getSetting("ArtService_Running") == "false":
             REAL_SETTINGS.setSetting('ArtService_Running', "true")
-            REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
             
             type1EXT = ''
             type2EXT = ''
@@ -608,7 +607,6 @@ class Artdownloader:
             
             # Clear Artwork Cache Folders
             if REAL_SETTINGS.getSetting("ClearLiveArtCache") == "true":
-            
                 artwork.delete("%") 
                 artwork1.delete("%")
                 artwork2.delete("%")
@@ -617,7 +615,8 @@ class Artdownloader:
                 artwork5.delete("%")
                 artwork6.delete("%")
                 time.sleep(5)
-                xbmc.log('script.pseudotv.live-service: ArtCache Purged!')
+                
+                xbmc.log('script.pseudotv.live-ArtService: ArtCache Purged!')
                 REAL_SETTINGS.setSetting('ClearLiveArtCache', "false")
      
                 if NOTIFY == 'true':
@@ -655,8 +654,6 @@ class Artdownloader:
             print str(MSSG)
             
             REAL_SETTINGS.setSetting("ArtService_Running","false")
-            REAL_SETTINGS.setSetting("DynamicArt_Enabled","true")
-            REAL_SETTINGS.setSetting("ArtService_Startup","true")
             REAL_SETTINGS.setSetting("ArtService_LastRun",str(stop))
             
             if NOTIFY == 'true':

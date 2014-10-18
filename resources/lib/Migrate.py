@@ -892,6 +892,12 @@ class Migrate:
                 try:
                     line = str(data[i]).replace("\n","").replace('""',"")
                     line = line.split(",")
+                    
+                    #If List Formatting is bad return
+                    if len(line) != 2:
+                        print "!!!!COMMUNITY LIST RSS FORMATING ERROR!!!!"
+                        pass
+                        
                     setting_1 = line[0]
                     channel_name = line[1]
             
@@ -938,11 +944,18 @@ class Migrate:
                 for i in range(len(linesLST)):#parse list for info
                     line = str(linesLST[i])
                     line = line.split('|')
+                                        
+                    #If List Formatting is bad return
+                    if len(line) != 4:
+                        print "!!!!COMMUNITY LIST Youtube Network FORMATING ERROR!!!!"
+                        pass
+                        
                     genre = line[0]
                     chanNum = line[1]
                     YoutubeID = line[2]
                     chanNam = line[3].replace('\n','')
-                    if genre in genre_filter:#filter wanted genres
+                    
+                    if genre.lower() in genre_filter:#filter wanted genres
                         Chan.append(chanNum +'|'+ genre +'|'+ chanNam)
 
                 Chan.sort()#sort, remove dupes
@@ -988,12 +1001,18 @@ class Migrate:
                 for i in range(len(linesLST)):#parse list for info
                     line = str(linesLST[i])
                     line = line.split('|')
+                    
+                    #If List Formatting is bad return
+                    if len(line) != 4:
+                        print "!!!!COMMUNITY LIST Youtube Network Playlist FORMATING ERROR!!!!"
+                        pass
+                        
                     genre = line[0]
                     chanNum = line[1]
                     YoutubeID = line[2]
                     chanNam = line[3].replace('\n','')
                     chanNam = chanNam.split('_')[0]
-                    if genre in genre_filter:#filter wanted genres
+                    if genre.lower() in genre_filter:#filter wanted genres
                         Chan.append(chanNum +'|'+ genre +'|'+ chanNam)
 
                 Chan.sort()#sort, remove dups
@@ -1045,6 +1064,12 @@ class Migrate:
                 try:
                     line = str(data[i]).replace("\n","").replace('""',"")
                     line = line.split(",")
+                    
+                    #If List Formatting is bad return
+                    if len(line) != 2:
+                        print "!!!!COMMUNITY LIST Youtube FORMATING ERROR!!!!"
+                        pass
+                    
                     setting_1 = line[0]
                     channel_name = line[1]
                                         
@@ -1085,6 +1110,12 @@ class Migrate:
                 try:
                     line = str(data[i]).replace("\n","").replace('""',"")
                     line = line.split(",")
+                                   
+                    #If List Formatting is bad return
+                    if len(line) != 2:
+                        print "!!!!COMMUNITY LIST Youtube Playlists FORMATING ERROR!!!!"
+                        pass
+                        
                     setting_1 = line[0]
                     channel_name = line[1]
                                         
@@ -1527,6 +1558,12 @@ class Migrate:
                 line = str(data[i]).replace("\n","").replace('""',"")
                 line = line.split("|")
                 print line
+                                                    
+                #If List Formatting is bad return
+                if len(line) != 7:
+                    print "!!!!COMMUNITY LIST RECTune FORMATING ERROR!!!!"
+                    pass
+                    
                 genre = line[0]
                 chtype = line[1]
                 setting_1 = line[2]

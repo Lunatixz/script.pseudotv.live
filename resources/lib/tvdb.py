@@ -64,7 +64,7 @@ class TVDB(object):
     def getIdByZap2it(self, zap2it_id):
         xbmc.log("getIdByZap2it Cache")
         if CACHE_ON:
-            result = parsers.cacheFunction(self.getIdByZap2it_NEW, zap2it_id)
+            result = parserTVDB.cacheFunction(self.getIdByZap2it_NEW, zap2it_id)
         else:
             result = self.getIdByZap2it_NEW(zap2it_id)
         if not result:
@@ -87,7 +87,7 @@ class TVDB(object):
     def getIdByIMDB(self, imdb_id):
         xbmc.log("getIdByIMDB Cache")
         if CACHE_ON:
-            result = parsers.cacheFunction(self.getIdByIMDB_NEW, imdb_id)
+            result = parserTVDB.cacheFunction(self.getIdByIMDB_NEW, imdb_id)
         else:
             result = self.getIdByIMDB_NEW(imdb_id)
         if not result:
@@ -111,7 +111,7 @@ class TVDB(object):
     def getEpisodeByAirdate(self, tvdbid, airdate):
         xbmc.log("getEpisodeByAirdate Cache")
         if CACHE_ON:
-            result = parsers.cacheFunction(self.getEpisodeByAirdate_NEW, tvdbid, airdate)
+            result = parserTVDB.cacheFunction(self.getEpisodeByAirdate_NEW, tvdbid, airdate)
         else:
             result = self.getEpisodeByAirdate_NEW(tvdbid, airdate)
         if not result:
@@ -129,7 +129,7 @@ class TVDB(object):
     def getEpisodeByID(self, tvdbid):
         xbmc.log("getIdByIMDB Cache")
         if CACHE_ON:
-            result = parsers.cacheFunction(self.getEpisodeByID_NEW, tvdbid)
+            result = parserTVDB.cacheFunction(self.getEpisodeByID_NEW, tvdbid)
         else:
             result = self.getEpisodeByID_NEW(tvdbid)
         if not result:
@@ -148,7 +148,7 @@ class TVDB(object):
         xbmc.log("getIdByShowName Cache")
         if CACHE_ON:
             try:
-                result = parsers.cacheFunction(self.getIdByShowName_NEW, showName)
+                result = parserTVDB.cacheFunction(self.getIdByShowName_NEW, showName)
             except:
                 result = self.getIdByShowName_NEW(showName)
                 pass
@@ -175,7 +175,7 @@ class TVDB(object):
     def getBannerByID(self, tvdbid, type):
         xbmc.log("getIdByZap2it Cache")
         if CACHE_ON:
-            result = parsers.cacheFunction(self.getBannerByID_NEW, tvdbid, type)
+            result = parserTVDB.cacheFunction(self.getBannerByID_NEW, tvdbid, type)
         else:
             result = self.getBannerByID_NEW(tvdbid, type)
         if not result:
@@ -213,7 +213,7 @@ class TVDB(object):
         xbmc.log("getIMDBbyShowName Cache")
         if CACHE_ON:
             try:
-                result = parsers.cacheFunction(self.getIMDBbyShowName_NEW, showName)
+                result = parserTVDB.cacheFunction(self.getIMDBbyShowName_NEW, showName)
             except:
                 result = self.getIMDBbyShowName_NEW(showName)
                 pass
@@ -323,7 +323,7 @@ class TVDB(object):
         log('Downloader: get_data - Cache')
         if CACHE_ON:
             try:
-                result = parsers.cacheFunction(self.get_data_new, url, data_type)
+                result = parserTVDB.cacheFunction(self.get_data_new, url, data_type)
             except:
                 result = self.get_data_new(url, data_type)
                 pass

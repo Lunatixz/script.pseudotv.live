@@ -1,5 +1,10 @@
-[*] Tweaked XMLTV parsing for performance. 
-[*] Added new "Coming Up Next" type, "Overlay" was renamed to "Popup", "Overlay" now triggers standard Overlay panel.
+[*] EventGhost JSON broadcasts (Starting,Stopping)
+[*] LiveTV, LocalTV, PluginTV, PlayonTV and LastFM FileList Caching, 
+    Purged every 24hrs, 12hrs, 24hrs, 4hrs, 48hrs. Caching is disabled in Settop Box Mode.
+[*] Overall performance enhancements.
+[*] [COLOR=blue]^ v.0.5.4 ^[/COLOR] 
+[*] LiveTV XMLTV parsing performance tweaks. 
+[*] Added new "Coming Up Next" type. "Overlay" was renamed to "Popup", "Overlay" now triggers standard Overlay panel.
 [*] [COLOR=blue]^ v.0.5.3 ^[/COLOR] 
 [*] Temporary disabled Art/XMLTV services. They still run at start-up.
 [*] NEW! Optimized "LowPower" configurations based on OS Selection, Override under "Misc" settings.

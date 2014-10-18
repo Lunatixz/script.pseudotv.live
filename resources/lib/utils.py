@@ -83,7 +83,7 @@ def Open_URL_CACHE(url):
     print ("Open_URL_CACHE Cache")
     if Cache_Enabled:
         try:
-            result = quarterly.cacheFunction(Open_URL_CACHE_NEW, url)
+            result = daily.cacheFunction(Open_URL_CACHE_NEW, url)
         except:
             result = Open_URL_CACHE_NEW(url)
             pass
