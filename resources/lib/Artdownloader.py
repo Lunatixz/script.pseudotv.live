@@ -22,7 +22,7 @@ import time, datetime, random
 import datetime
 import sys, re
 import random, traceback
-import urllib, urllib2
+import urllib, urllib2, urlparse
 import fanarttv
 import socket
 socket.setdefaulttimeout(30)
@@ -35,22 +35,23 @@ from tvdb import *
 from tmdb import *
 from urllib import unquote, quote
 from metahandler import metahandlers
+from utils import *
 
 # Commoncache plugin import
 try:
     import StorageServer
 except Exception,e:
     import storageserverdummy as StorageServer
+    
+try:
+    from PIL import Image
+    from PIL import ImageEnhance
+except:
+    pass
+    
 
 class Artdownloader:
 
-    global ArtService_Running
-    ArtService_Running = False
-    
-    global ArtService_Msg
-    ArtService_Msg = REAL_SETTINGS.getSetting('ArtService_notify')
-    
-    
     def log(self, msg, level = xbmc.LOGDEBUG):
         log('Artdownloader: ' + msg, level)
 
@@ -93,76 +94,188 @@ class Artdownloader:
         return fletype
   
   
-    def FindBug(self, type, chtype, chname, mediapath):
-        print 'FindBug'
-        #check logocache folder
-        #if not check logo folder
-        #if not check chtype:
-        #youtube - static
-        #plugin - icon.png
-        #playon - static
-        #livetv - parse icon scr
-        #if enabled google img search n save 2 logocache
-        #convert to transparent
-        #save to logocache
-        #else default
-        #return image path
+    def ConvertBug(self, org, mod):
+        print 'ConvertBug' 
+        org =  xbmc.translatePath(org)
+        original = Image.open(org)                  
+        converted_img = original.convert('LA')
+        converted_img.save(mod)
+        return mod
+  
+  
+    def FindBug(self, chtype, chname, mediapath):
+        print 'FindBug' 
+        print chtype, chname, mediapath
+        setImage = ''
+        BugName = (chname + '.png')
+        BugCache = os.path.join(LOGO_CACHE_LOC,BugName)
+        BugFolder = os.path.join(LOGO_LOC,BugName)
+        BugDefault = os.path.join(IMAGES_LOC,'Default.png')
+        BugDefault_YT = os.path.join(IMAGES_LOC,'Youtube.png')
+
+        if REAL_SETTINGS.getSetting('UNAlter_ChanBug') == 'false':
+                    
+            if not FileAccess.exists(LOGO_CACHE_LOC):
+                FileAccess.makedirs(LOGO_CACHE_LOC)
+        
+            if FileAccess.exists(BugCache):
+                print ('Find Local Cache Bug')
+                setImage = BugCache
+                
+            elif FileAccess.exists(BugFolder):
+                print ('Find Local Logo Bug')
+                BugCache = self.ConvertBug(BugFolder, BugCache)
+                setImage = BugCache
+                
+            # elif mediapath.startswith('plugin://'):
+                # ###########################
+                # print ('Find Plugin Bug')
+                # try:
+                    # plugin = (os.path.split(mediapath)[0]).replace('plugin://','')
+                    # icon = 'special://home/addons/'+plugin+ '/icon.png'
+                    # fanart = 'special://home/addons/'+plugin+ '/fanart.jpg'
+                    # youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
+                    
+                    # if plugin in youtube:
+                        # ###########################
+                        # print ('Find Plugin Bug - Youtube')
+                        # setImage = BugDefault_YT
+
+                    # else:
+                        # ###########################
+                        # print ('Find Plugin Bug - Icon')
+                        # print icon
+                        # print BugCache
+                        # if FileAccess.exists(xbmc.translatePath(icon)):
+                            # print 'aa'
+                            # BugCache = self.ConvertBug(icon, BugCache)
+                            # setImage = BugCache
+                # except:
+                    # print 'Find Plugin Bug, Error'
+                    # setImage = BugDefault
+                    # pass     
+
+            else:
+                setImage = BugDefault
+        else:
+            if FileAccess.exists(BugFolder):
+                setImage = BugFolder
+            else:
+                setImage = BugDefault
+
+        print 'FindBug return', setImage
+        return setImage
+        
+        
+    def FindLogo(self, chname):
+        print 'FindLogo'
+        found = False
+        setImage = ''
+        LogoName = (chname + '.png')
+        LogoFolder = os.path.join(LOGO_LOC,LogoName)
+        self.logoParser = lsHTMLParser()
+        
+        if FileAccess.exists(LogoFolder):
+            print ('Find Local Folder Logo')
+            setImage = LogoFolder
+        elif REAL_SETTINGS.getSetting('FindLogos_Enabled') == 'true':
+            file_detail = str(self.logoParser.retrieve_icons_avail())
+            file_detail = file_detail.replace("{'",'').replace("'}",'').replace("': '","|")
+            file_detail = file_detail.split("', '")
+            orgName = chname
+
+            for f in range(len(file_detail)):
+                file = (file_detail[f]).replace('HD','')
+                name = file.split('|')[0]
+                link = file.split('|')[1]
+
+                chname = name.split('_')
+                if len(chname) > 1:
+                    chname1 = (chname[0])
+                    chname2 = (chname[0] + ' ' + chname[1])
+                else:
+                    chname1 = (chname[0])
+                    chname2 = (chname[0])
+
+                orgName = orgName.replace(' hd','').replace(' tv','').replace('-tv','')
+                orgNameLST = [orgName.lower() +' tv',orgName.lower() +' hd']
+
+                print chname, chname1, chname2, orgName, orgNameLST
+
+                if chname2.lower() == orgName.lower():
+                    print chname2
+                    print link
+                    found = True
+                    break
+                elif chname1.lower() == orgName.lower():
+                    print chname1
+                    print link
+                    found = True
+                    break
+                elif chname1.lower() in orgNameLST:
+                    print chname1
+                    print link
+                    found = True
+                    break
+
+            if found == True:
+                print 'match'
+                resource = urllib.urlopen(link)
+                output = FileAccess.open(LogoFolder, 'w')
+                output.write(resource.read())
+                output.close()
+                setImage = LogoFolder
+
+        # if not setImage:
+            # setImage = THUMB
+        print setImage
+        return setImage
      
-     
-    def FindLogo(self, type, chtype, chname, mediapath):
-        print 'FindBug'
-        #check logo folder
-        #if not check chtype:
-        #youtube - static
-        #plugin - icon.png
-        #playon - static
-        #livetv - parse icon scr
-        #if enabled google img search n save 2 logo folder
-        #else default
-     
-    def FindArtwork(self, type, chtype, id, mediapath, arttypeEXT):
+
+    def FindArtwork(self, type, chtype, chname, id, mediapath, arttypeEXT):
         if Cache_Enabled:
             print ("FindArtwork Cache")
             try: #stagger artwork cache by chtype
                 # chtype = int(chtype)
                 if chtype <= 3:
-                    result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                    result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, mediapath, arttypeEXT)
                 elif chtype > 3 and chtype <= 6:
-                    result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                    result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, mediapath, arttypeEXT)
                 elif chtype > 6 and chtype <= 9:
-                    result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                    result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, mediapath, arttypeEXT)
                 elif chtype > 9 and chtype <= 12:
-                    result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                    result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, mediapath, arttypeEXT)
                 elif chtype > 9 and chtype <= 15:
-                    result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                    result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, mediapath, arttypeEXT)
                 else:
-                    result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, id, mediapath, arttypeEXT)
+                    result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, mediapath, arttypeEXT)
             except:
                 print ("FindArtwork Cache Failed Forwarding to FindArtwork_NEW")
-                result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
+                result = self.FindArtwork_NEW(type, chtype, chname, id, mediapath, arttypeEXT)
                 pass
         else:
             print ("FindArtwork Cache Disabled")
-            result = self.FindArtwork_NEW(type, chtype, id, mediapath, arttypeEXT)
+            result = self.FindArtwork_NEW(type, chtype, chname, id, mediapath, arttypeEXT)
         if not result:
             result = 0
         return result
          
 
-    def FindArtwork_NEW(self, type, chtype, id, mediapath, arttypeEXT):
-        print ('FindArtwork_NEW')
+    def FindArtwork_NEW(self, type, chtype, chname, id, mediapath, arttypeEXT):
+        print ('FindArtwork_NEW')       
         setImage = ''
         arttype = arttypeEXT.split(".")[0]
-        fle = str(id) + '-' + arttypeEXT
+        fle = id + '-' + arttypeEXT
         smpath = os.path.dirname(mediapath)
         ArtCache = os.path.join(ART_LOC, fle)
+        ChannelLogo = os.path.join(LOGO_LOC,chname + '.png')  
         MediaImage = os.path.join(MEDIA_LOC, (arttype + '.png'))
-        DefaultImage = os.path.join(DEFAULT_MEDIA_LOC, (arttype + '.png'))
         mediapathSeason, filename = os.path.split(mediapath)
         mediapathSeries = os.path.dirname(mediapathSeason)
         
         if chtype <= 7:
             print ('FindArtwork, Chtype <= 7')
+            ###############################
             print ('Find Infolder Artwork')                        
             artSeries = xbmc.translatePath(os.path.join(smpath, arttypeEXT))
             artSeason = xbmc.translatePath(os.path.join(mediapath, arttypeEXT))
@@ -181,39 +294,42 @@ class Artdownloader:
                     setImage = artSeries_fallback
                 elif FileAccess.exists(artSeason_fallback):
                     setImage = artSeason_fallback
-                else:   
-                    print ('Find Json Artwork')
-                    setImage = self.LocalArtwork(mediapath, type, arttype)
+                else:
+                    ###########################
+                    # print ('Find Json Artwork')
+                    arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
                     
-                    if not setImage:
-                        print ('Find Json Artwork - Fallback')
-                        arttype_fallback = arttype.replace('landscape','fanart')#add more fallback replacements
-                        setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
+                    # setImage = self.LocalArtwork(mediapath, type, arttype)
+                    
+                    # if not setImage:
+                        # print ('Find Json Artwork - Fallback')
+                        # setImage = self.LocalArtwork(mediapath, type, arttype_fallback)
                         
-                        if not setImage:   
-                            if id != '0' and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
-                                print ('Find Artwork Cache')
-                                if FileAccess.exists(ArtCache):
-                                    setImage = ArtCache
-                                else:
-                                    print ('Find Download Artwork')
-                                    setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
+                    if not setImage:   
+                        if id != '0' and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                            print ('Find Artwork Cache')
+                            if FileAccess.exists(ArtCache):
+                                setImage = ArtCache
+                            else:
+                                ###########################
+                                print ('Find Download Artwork')
+                                setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
 
-                                    if not setImage:
-                                        print ('Find Download Artwork - Fallback')
-                                        setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
-        
-        # elif chtype == 11:
-            
+                                if not setImage:
+                                    print ('Find Download Artwork - Fallback')
+                                    setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
+
         else:
             print ('FindArtwork, Chtype > 7')
             if id != '0' and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':  
                 #PseudoTV Artwork Cache
+                ###########################
                 print ('Find Artwork Cache')
                 if FileAccess.exists(ArtCache):
                     setImage = ArtCache
                 else:
                     #Download Artwork
+                    ###########################
                     print ('Find Artwork Download')
                     setImage = self.DownloadArt(type, id, fle, arttypeEXT, ART_LOC)
 
@@ -222,46 +338,48 @@ class Artdownloader:
                         #Download Artwork - Fallback
                         arttype_fallback = arttypeEXT.replace('landscape','fanart')
                         setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
-                    
-            elif mediapath.startswith('plugin://') and id == '0':
-                print ('Find Plugin Artwork')
-                try:
-                    addon = ''
-                    plugin = os.path.split(mediapath)
-                    addon = os.path.split(plugin[0])[1]
-                    YTid = plugin[1]
-                    
-                    icon = 'special://home/addons/'+YTid+ '/icon.png'
-                    fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
-                    youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
-                    
-                    if addon in youtube:
-                        print ('Find Plugin Artwork - Youtube')
-                        setImage = "http://img.youtube.com/vi/"+YTid+"/0.jpg"
+            
 
-                    else:
-                        print ('Find Plugin Artwork - Other')
-                        if FileAccess.exists(xbmc.translatePath(icon)):
-                            setImage = icon
-                except:
-                    pass     
-        
-            # elif mediapath.startswith('upnp://') and id == '0':
-                 # {"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["thumbnail"]},"id":4}
-        
-        
-        
+            if not setImage:      
+                if mediapath.startswith('plugin://'):
+                    ###########################
+                    print ('Find Plugin Artwork')
+                    try:
+                        addon = ''
+                        plugin = os.path.split(mediapath)
+                        addon = os.path.split(plugin[0])[1]
+                        YTid = plugin[1]
+                        icon = 'special://home/addons/'+YTid+ '/icon.png'
+                        fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
+                        youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
+                        
+                        if addon in youtube:
+                            ###########################
+                            print ('Find Plugin Artwork - Youtube')
+                            setImage = "http://img.youtube.com/vi/"+YTid+"/0.jpg"
+
+                        else:
+                            ###########################
+                            print ('Find Plugin Artwork - Other')
+                            if FileAccess.exists(xbmc.translatePath(icon)):
+                                setImage = icon
+                    except:
+                        pass     
+            
+                # elif mediapath.startswith('upnp://') and id == '0':
+                     # {"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["thumbnail"]},"id":4}
+
         #Default image
         if not setImage:    
-            print ('Find Default Artwork')
-            #Default fallbacks
+            print ('Find Channel Logo Artwork')
             if FileAccess.exists(MediaImage):
-                #Skin media
                 setImage = MediaImage
-            elif FileAccess.exists(DefaultImage):
-                #Default Skin media
-                setImage = DefaultImage
-                       
+            elif FileAccess.exists(ChannelLogo):
+                setImage = ChannelLogo
+            else:
+                setImage = THUMB
+        
+        print 'setImage', setImage
         return setImage
         
                 
@@ -298,22 +416,14 @@ class Artdownloader:
         print ('DownloadArt')
         tvdbAPI = TVDB(TVDB_API_KEY)
         tmdbAPI = TMDB(TMDB_API_KEY)     
-
+        
         if not FileAccess.exists(ART_LOC):
-            os.makedirs(ART_LOC)
+            FileAccess.makedirs(ART_LOC)
 
-        ArtType = typeEXT.split('.')[0]
-        MediaImage = os.path.join(MEDIA_LOC, (ArtType + '.png'))
-        DefaultImage = os.path.join(DEFAULT_MEDIA_LOC, (ArtType + '.png'))
+        ArtType = typeEXT.split('.')[0]        
+        setImage = ''
         
-        if FileAccess.exists(MediaImage):
-            setImage = MediaImage
-        elif FileAccess.exists(DefaultImage):
-            setImage = DefaultImage
-        else:
-            setImage = ''
-        
-        if type == 'tvshow':
+        if type.lower() == 'tvshow':
             FanTVDownload = False
             TVFilePath = os.path.join(ART_LOC, fle) 
             tvdb_Types = ['banner', 'fanart', 'folder', 'poster']
@@ -350,8 +460,8 @@ class Artdownloader:
                     output.close()
                     return TVFilePath
                 except Exception,e:
-                    print ('FanTVDownload Failed!')    
-                    pass
+                    print ('FanTVDownload Failed!') 
+                    return ''   
 
         elif type == 'movie':
             FanMovieDownload = False
@@ -395,7 +505,7 @@ class Artdownloader:
                     return MovieFilePath
                 except Exception,e:
                     print ('FanMovieDownload Failed!')
-                    pass                
+                    return ''     
 
                     
     def EXTtype(self, arttype): 
@@ -409,98 +519,7 @@ class Artdownloader:
             arttypeEXT = (arttype + '.png')
         print ('EXTtype = ' + str(arttypeEXT))
         return arttypeEXT
-        
-        
-    def ArtSpool(self, chtype, channel):
-        print 'ArtSpool'
-        print str(chtype), ' ', str(channel)
-        type1EXT = ''
-        type2EXT = ''
-        exclude = ['#EXTM3U', '#EXTINF']
-        lineLST = []
-        newLST = []
-        ArtLST = []
-        id = -1
-        type = ''
-        mpath = ''
-        fle = xbmc.translatePath(os.path.join(LOCK_LOC, ("channel_" + str(channel) + '.m3u')))
-        
-        global ArtService_Running
-        if not ArtService_Running:
-            ArtService_Running = True
-            
-            if chtype >= 0:
-                try:
-                    if FileAccess.exists(fle):
-                        f = FileAccess.open(fle, 'r')
-                        lineLST = f.readlines()
-                        lineLST.pop(0) #Remove unwanted first line '#EXTM3U'
-                        for n in range(len(lineLST)):
-                            line = lineLST[n]
-                            
-                            if line[0:7] == '#EXTINF':
-                            
-                                try:
-                                    TV_liveid = (line.split('tvshow|')[1])
-                                    TV_liveid =  'tvshow|' + TV_liveid
-                                    type = (TV_liveid.split('|'))[0]
-                                    id = (TV_liveid.split('|'))[1]
-                                except Exception,e:
-                                    MO_liveid = line.split('movie|')[1]
-                                    MO_liveid = 'movie|' + MO_liveid
-                                    type = MO_liveid.split('|')[0]
-                                    id = MO_liveid.split('|')[1]
-                                except:
-                                    pass
-                            
-                            elif line[0:7] not in exclude:
-                                if id != -1:
-                                    if line[0:5] == 'stack':
-                                        line = (line.split(' , ')[0]).replace('stack://','').replace('rar://','')
-                                    mpath = (os.path.split(line)[0])
-
-                                    if type and mpath:
-                                        newLST = [type, chtype, id, mpath]
-                                        print newLST
-                                        ArtLST.append(newLST)
-                except:
-                    pass
-                            
-            random.shuffle(ArtLST)
-            print ArtLST
-            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Spooling Channel " +  str(channel), 4000, THUMB) )
-            
-            if len(ArtLST) > 0:
-                try:
-                    type1EXT = REAL_SETTINGS.getSetting('type1EXT')
-                except:
-                    type1EXT = ''
-                    pass
-                
-                try:
-                    type2EXT = REAL_SETTINGS.getSetting('type2EXT')
-                except:
-                    type2EXT = ''
-                    pass
-
-                for i in range(len(ArtLST)):
-                    setImage1 = ''
-                    setImage2 = ''
-                    lineLST = ArtLST[i]
-                    type = lineLST[0]
-                    chtype = lineLST[1]
-                    id = lineLST[2]
-                    mpath = lineLST[3]
-                    
-                    if type1EXT != '':
-                        setImage1 = self.FindArtwork(type, chtype, id, mpath, type1EXT)
-                    
-                    if type2EXT != '':
-                        setImage2 = self.FindArtwork(type, chtype, id, mpath, type2EXT)
-                        
-                    print "ArtSpool Finished Channel " + str(channel)   
-                    ArtService_Running = False             
-                
+      
  
     def PreArtService(self):
         print 'PreArtService'
@@ -561,7 +580,6 @@ class Artdownloader:
                                         
                                     if type and mpath:
                                         newLST = [type, chtype, id, mpath]
-                                        print newLST
                                         ArtLST.append(newLST)
                 except:
                     pass
@@ -571,26 +589,24 @@ class Artdownloader:
         return ArtLST
 
     
-    def ArtService(self, Art_Msg=ArtService_Msg):
-        print 'ArtService'
-        REAL_SETTINGS.setSetting("DynamicArt_Enabled","false")
-        type1EXT = ''
-        type2EXT = ''
-        
-        global ArtService_Running
-        if not ArtService_Running:
+    def ArtService(self):
+        print 'ArtService'         
+        if REAL_SETTINGS.getSetting("ArtService_Running") == "false":
+            REAL_SETTINGS.setSetting('ArtService_Running', "true")
+            
+            type1EXT = ''
+            type2EXT = ''
             start = datetime.datetime.today()
             print 'ArtService_Start = ' + str(start)
-            
-            ArtService_Running = True
             ArtLst = self.PreArtService()
+            # self.logoParser = lsHTMLParser()
+            # self.logoParser.retrieve_icons_avail()   
             
-            if (Art_Msg == 'true'):
+            if NOTIFY == 'true':
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Spooler Started", 4000, THUMB) )
             
             # Clear Artwork Cache Folders
             if REAL_SETTINGS.getSetting("ClearLiveArtCache") == "true":
-            
                 artwork.delete("%") 
                 artwork1.delete("%")
                 artwork2.delete("%")
@@ -599,10 +615,11 @@ class Artdownloader:
                 artwork5.delete("%")
                 artwork6.delete("%")
                 time.sleep(5)
-                xbmc.log('script.pseudotv.live-service: ArtCache Purged!')
+                
+                xbmc.log('script.pseudotv.live-ArtService: ArtCache Purged!')
                 REAL_SETTINGS.setSetting('ClearLiveArtCache', "false")
      
-                if (Art_Msg == 'true'):
+                if NOTIFY == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Cache Cleared", 4000, THUMB) )
                 
             try:
@@ -623,22 +640,22 @@ class Artdownloader:
                 chtype = lineLST[1]
                 id = lineLST[2]
                 mpath = lineLST[3]
+                chname = ''
                 
                 if type1EXT != '':
-                    setImage1 = self.FindArtwork(type, chtype, id, mpath, type1EXT)
+                    setImage1 = self.FindArtwork(type, chtype, chname, id, mpath, type1EXT)
                 
                 if type2EXT != '':
-                    setImage2 = self.FindArtwork(type, chtype, id, mpath, type2EXT)
+                    setImage2 = self.FindArtwork(type, chtype, chname, id, mpath, type2EXT)
             
             stop = datetime.datetime.today()
             finished = stop - start
             MSSG = ("Artwork Spooled in %d seconds" %finished.seconds)
             print str(MSSG)
             
-            REAL_SETTINGS.setSetting("DynamicArt_Enabled","true")
+            REAL_SETTINGS.setSetting("ArtService_Running","false")
             REAL_SETTINGS.setSetting("ArtService_LastRun",str(stop))
-            ArtService_Running = False
             
-            if (Art_Msg == 'true'):
+            if NOTIFY == 'true':
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSSG, 2000, THUMB) )
-        
+    

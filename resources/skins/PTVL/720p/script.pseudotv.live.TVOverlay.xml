@@ -60,25 +60,6 @@
                 <height>720</height>
                 <texture>pstvlBackground2.png</texture>
             </control>       
-            <control type="group" id="513">  
-            <!-- landscape Window --> 
-                <posx>-15</posx>
-                <posy>530</posy>
-                <control type="image">
-                    <texture fallback="landscape.png">$INFO[Player.Art(landscape)]</texture>
-                    <width>300</width>
-                    <height>125</height>
-                    <align>center</align>
-                    <aspectratio>keep</aspectratio>
-                </control>
-                <control type="image">
-                    <texture>$INFO[Player.Art(tvshow.landscape)]</texture>
-                    <width>300</width>
-                    <height>125</height>
-                    <align>center</align>
-                    <aspectratio>keep</aspectratio>
-                </control>
-            </control>
             <control type="group">
             <!-- landscape Window --> 
                 <posx>-15</posx>
@@ -109,8 +90,8 @@
                 <description>Unaired NEW Icon</description>         
                 <posx>20</posx>
                 <posy>528</posy>  
-                <width>100</width>
-                <height>100</height>
+                <width>50</width>
+                <height>50</height>
                 <aspectratio>keep</aspectratio>
                 <visible></visible>
             </control>

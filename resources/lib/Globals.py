@@ -63,7 +63,7 @@ ADDON_ID = 'script.pseudotv.live'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
 ADDON_ID = REAL_SETTINGS.getAddonInfo('id')
 ADDON_NAME = REAL_SETTINGS.getAddonInfo('name')
-ADDON_PATH = REAL_SETTINGS.getAddonInfo('path')
+ADDON_PATH = (REAL_SETTINGS.getAddonInfo('path').decode('utf-8'))
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 xbmc.log(ADDON_ID +' '+ ADDON_NAME +' '+ ADDON_PATH +' '+ ADDON_VERSION)
 
@@ -71,9 +71,11 @@ xbmc.log(ADDON_ID +' '+ ADDON_NAME +' '+ ADDON_PATH +' '+ ADDON_VERSION)
 TVDB_API_KEY = '078845CE15BC08A7'
 TMDB_API_KEY = '9c47d05a3f5f3a00104f6586412306af'
 FANARTTV_API_KEY = '7bc4161cc4add99b14e51eddcdd5b985'
+YOUTUBE_API_KEY = "MTQ1MTU3cHJvdGVjdERPTk9SS0VZMTAxNzIwMTQxNTAw"
 
 # Timers
 AUTOSTART_TIMER = [0,5,10,15,20]#in seconds
+ART_TIMER = [6,12,24,48,72]
 SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
 MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]#Media Per/Channel, 0 = Unlimited
@@ -229,21 +231,39 @@ GlobalFileLock = FileLock()
 Donor_Downloaded = False
 NOTIFY = REAL_SETTINGS.getSetting('notify')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
-SETTOP = REAL_SETTINGS.getSetting("EnableSettop")
+SETTOP = REAL_SETTINGS.getSetting("EnableSettop") == "true"
+OS_SET = int(REAL_SETTINGS.getSetting("os"))
 
-# Common Cache types
-quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6) #System Purge, Force Reset
-daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24) #System Purge, Force Reset
-weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7) #System Purge, Force Reset
-monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4)) #System Purge
-parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((24 * 7) * 4)) #No Purge (API Queries)
-artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork2 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork2",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork3 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork3",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork4 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork4",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork5 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork5",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
-artwork6 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork6",((24 * 7) * 4)) #Artwork Purge, Force Reset (Art Paths)
+if (OS_SET <= 5 or OS_SET == 10 or OS_SET == 12) and REAL_SETTINGS.getSetting("OS_SET_OVERRIDE") != "true":
+    LOWPOWER = True
+else:
+    LOWPOWER = False
+
+# Common Cache types, Stacked and sorted for read performance... Todo convert to local db, mysql?
+#General
+quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge
+daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge
+weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge
+monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge
+#FileLists
+liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge
+localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",12)                     #System Purge
+pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",24)                   #System Purge
+playonTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",4)                    #System Purge
+lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",48)                       #System Purge
+#Parsers
+parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((24 * 7) * 4))         #No Purge (API Queries)
+parserFANTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserFANTV",((24 * 7) * 4)) #No Purge (FANART Queries)
+parserTVDB = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserTVDB",((24 * 7) * 4))   #No Purge (TVDB Queries)
+parserTMDB = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserTMDB",((24 * 7) * 4))   #No Purge (TMDB Queries)
+#Artwork
+artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((24 * 7) * 4))         #Artwork Purge, ForceReset
+artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((24 * 7) * 4))       #Artwork Purge, ForceReset
+artwork2 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork2",((24 * 7) * 4))       #Artwork Purge, ForceReset
+artwork3 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork3",((24 * 7) * 4))       #Artwork Purge, ForceReset
+artwork4 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork4",((24 * 7) * 4))       #Artwork Purge, ForceReset
+artwork5 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork5",((24 * 7) * 4))       #Artwork Purge, ForceReset
+artwork6 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork6",((24 * 7) * 4))       #Artwork Purge, ForceReset
 
 # HEX COLOR OPTIONS 4 (Overlay CHANBUG, EPG Genre & CHtype) 
 # http://www.w3schools.com/html/html_colornames.asp
@@ -371,20 +391,18 @@ ACTION_TELETEXT_BLUE = 218
 #// 5xx is reserved for additional gesture actions
 #define ACTION_GESTURE_END            599
 
-#UTC LiveTV plugin
-UTC_PLUGIN = ['plugin.video.ustvnow', 'plugin.video.F.T.V', 'plugin.video.mystreamstv.beta']
-LOCALTIME_XMLTV = []
+#UTC XMLTV - XMLTV that uses UTC w/ Offset timing (not local time).
+UTC_XMLTV = ['ustvnow', 'ftvguide', 'smoothstreams']
 
-#Dynamic Artwork plugin types
-DYNAMIC_PLUGIN_TV = ['plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']
-#Title format must be "Movie (Year)"
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'plugin.video.F.T.V', 'plugin.video.salts']
+#Dynamic Artwork plugins - #Title format must be "Title (Year)" or "Title" or "Title - Episode"
+DYNAMIC_PLUGIN_TV = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.iwannawatch', 'plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'plugin.video.F.T.V', 'plugin.video.salts']
 
-# Plugin seek blacklist
+# Plugin seek blacklist - Plugins that are known to use rtmp source which lockup xbmc during seek
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow', 'plugin.video.mystreamstv.beta']
 
-# Bypass EPG (paused/stacked) by channel name
+# Bypass EPG (paused/stacked) by channel name - Removed "(Stacked)" from EPG
 BYPASS_EPG = ['PseudoCinema']
 
-# Bypass Overlay Coming up next by channel name
+# Bypass Overlay Coming up next by channel name - keep "ComingUp Next" from displaying
 BYPASS_OVERLAY = ['PseudoCinema']

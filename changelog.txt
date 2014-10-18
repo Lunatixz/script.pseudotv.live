@@ -1,4 +1,22 @@
-[*] Artwork Service Enabled w/ Dynamic artwork. Added Disable during Playback.
+[*] EventGhost JSON broadcasts (Starting,Stopping)
+[*] LiveTV, LocalTV, PluginTV, PlayonTV and LastFM FileList Caching, 
+    Purged every 24hrs, 12hrs, 24hrs, 4hrs, 48hrs. Caching is disabled in Settop Box Mode.
+[*] Overall performance enhancements.
+[*] [COLOR=blue]^ v.0.5.4 ^[/COLOR] 
+[*] LiveTV XMLTV parsing performance tweaks. 
+[*] Added new "Coming Up Next" type. "Overlay" was renamed to "Popup", "Overlay" now triggers standard Overlay panel.
+[*] [COLOR=blue]^ v.0.5.3 ^[/COLOR] 
+[*] Temporary disabled Art/XMLTV services. They still run at start-up.
+[*] NEW! Optimized "LowPower" configurations based on OS Selection, Override under "Misc" settings.
+[*] Improved plugin detection, Fixed Internet Trailers BCT's
+[*] Global media limits and XMLTV service tweaks. 
+[*] Fixed Donor icon download, and Donor Source list updated!
+[*] Removed the need to add extra (Bold and Color) strings to Direct Plugin Chtypes.
+[*] Changed LiveTV parsing limit to 48.
+[*] Misc. Tweaks and Bug fixes.
+[*] Removed old artwork fallbacks and skin labels.
+[*] Artwork Service Enabled w/ Dynamic artwork. Added Disable during Playback option.
+[*] [COLOR=blue]^ v.0.5.2 ^[/COLOR] 
 [*] Improved accuracy of Direct Plugin/Playon Parsing.
 [*] NEW! Smoothstreams.tv EPG tweaks *EPGSync issues
 [*] "Recommend List" Genre types, Limit Autotuning for Plugin, Playon, Youtube Network by Genre.

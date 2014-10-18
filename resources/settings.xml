@@ -6,7 +6,7 @@
             <setting type="action" label="30002" action="RunScript($CWD/config.py)"/>
             <setting label="30003" type="lsep"/>
                 <setting id="Auto_Start" type="bool" label="30044" default="false"/>
-                <setting id="timer_amount" type="enum" values="0|5|10|15|20" label="30045" subsetting="true" visible="eq(-2,true)" default="1"/>
+                <setting id="timer_amount" type="enum" values="0|5|10|15|20" label="30045" subsetting="true" visible="eq(-1,true)" default="1"/>
                 <setting id="AutoOff" type="enum" label="30004" values="Disable|30|60|90|120|150|180|210|240" default="0"/>
                 <setting id="ForceChannelReset" type="bool" label="30005" default="false" />
                 <setting id="ChannelResetSetting" type="enum" label="30006" values="Automatic|Daily|Weekly|Monthly|Never|Every Time" default="0"/>
@@ -19,25 +19,27 @@
     
 <!--Tweaks-->
     <category label="30300">
+        <setting id="os" type="enum" values="Android Arm|Android x86|ATV1 Linux|ATV1 Stock|ATV2|IOS|Linux 32bit|Linux 64bit|Mac 32bit|Mac 64bit|Rasberry Pi|Windows|TLBB" label="30401" default="11" />
+        <setting id="limit_preferred_language" type="select" label="32055" values="Chinese|Dutch|English|Finnish|French|German|Hungarian|Italian|Japanese|Polish|Portuguese|Russian|Spanish|Swedish" default="English"/>
         <setting id="ChannelDelay" type="enum" label="30302" default="0" values="None|0.25|0.5|0.75|1.0|1.25|1.5|1.75|2.0"/>
         <setting id="SUPchannel" type="enum"  label="30303" values="Last Channel|Preferred Channel" default="0"/>
         <setting id="CurrentChannel" type="text" label="30304" subsetting="true" visible="eq(-1,1)" default="1"/>
         <setting id="Disable_Watched" type="bool" label="30311" default="false"/>
         <setting id="EnhancedGuideData" type="bool" label="30405" default="false" />
+        <!-- <setting id="AutoPlayNext" type="bool" label="30408" default="false" /> -->
         <setting id="HideClips" type="bool" label="30215" default="true"/>
-        <setting id="ClipLength" type="enum" subsetting="true" label="30216" visible="eq(-1,true)" values="15|30|60|90|120|180|240|300|360|420|460" default="5"/>
-    	<setting id="MEDIA_LIMIT" label="30310" type="enum" values="10|25|50|100|250|500|1000|Unlimited" default="0"/>
+        <setting id="ClipLength" type="enum" subsetting="true" label="30216" visible="eq(-1,true)" values="15|30|60|90|120|180|240|300|360|420|460" default="7"/>
+    	<setting id="MEDIA_LIMIT" label="30310" type="enum" values="10|25|50|100|250|500|1000|Unlimited" default="1"/>
         <setting id="reserveChannels" type="bool" label="30372" default="false"/>
     </category>
     
 <!--Visual-->
     <category label="30200">
         <setting id="SkinSelector" type="enum"  label="30202" values="Classic|Custom|Default|PTVL|(WIP) ConCast|(N/A) Time Whorner" default="3"/>
-        <setting id="ArtService_Enabled" label="30201" type="bool" default="false" /> 
-        <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
-        <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-2,true)" default="2"/>
-        <setting id="ArtService_Enabled_Run" type="bool" label="34446" subsetting="true" visible="eq(-3,true)" default="false"/>
-        <setting id="DynamicArt_Enabled" type="bool" label="34047" subsetting="true" visible="false" default="false"/>
+        <setting id="ArtService_Enabled" label="30201" type="bool" default="true" /> 
+        <setting id="ArtService_timer_amount" type="enum" values="6|12|24|48|72" label="34045" subsetting="true" visible="eq(-1,true)" default="2"/>
+        <setting id="Enabled_RunOnPlayback" type="bool" label="34446" subsetting="true" visible="eq(-2,true)" default="false"/>
+        <setting id="FindLogos_Enabled" type="bool" label="34547" enable="false" subsetting="true" visible="eq(-4,true)" default="false"/>
         <setting id="ShowSeEp" type="bool" label="30301" default="false"/>
         <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>
         <!-- EPG -->
@@ -54,18 +56,15 @@
             <setting id="InfoOnChange" type="bool" label="30221" default="true"/>
             <setting id="InfoTimer" subsetting="true" visible="eq(-1,true)" type="enum" label="30222" values="3|5|10|15|20|25" default="1"/>
             <setting id="ShowChannelBug" type="bool" label="30224" default="true"/>
-            <setting id="COLOR_CHANBUG" subsetting="true" visible="eq(-1,true)" type="bool" label="30228" default="false"/>
-            <setting id="EnableComingUp" type="enum" label="30226" values="Disabled|Overlay|Classic" default="1"/>
-            <setting id="ComingUpArtwork" subsetting="true" visible="eq(-1,2)" type="enum" label="30227" values="Poster|Fanart|Landscape|Logo|Clearart" default="1" />
+            <setting id="UNAlter_ChanBug" subsetting="true" visible="eq(-1,true)" type="bool" label="30228" default="false"/>
+            <setting id="EnableComingUp" type="enum" label="30226" values="Disabled|Overlay|PopUp|Classic" default="2"/>
+            <setting id="ComingUpArtwork" subsetting="true" visible="eq(-1,3)" type="enum" label="30227" values="Poster|Fanart|Landscape|Logo|Clearart" default="1" />
    </category>
    
 <!--PVR-->
    <category label="30400">
-        <setting id="os" type="enum" values="Android Arm|Android x86|ATV1 Linux|ATV1 Stock|ATV2|IOS|Linux 32bit|Linux 64bit|Mac 32bit|Mac 64bit|Rasberry Pi|Windows|TLBB" label="30401" default="11" />
-        <setting id="limit_preferred_language" type="select" label="32055" values="Chinese|Dutch|English|Finnish|French|German|Hungarian|Italian|Japanese|Polish|Portuguese|Russian|Spanish|Swedish" default="English"/>
         <setting id="SyncXMLTV_Enabled" label="30397" type="bool" default="true"/>
-        <setting id="ArtService_notify" type="bool" label="34046" subsetting="true" visible="eq(-1,true)" default="true"/>
-        <setting id="ArtService_Enabled_Run" type="bool" label="34446" subsetting="true" visible="eq(-2,true)" default="false"/>
+        <setting id="Enabled_RunOnPlayback" type="bool" label="34446" subsetting="true" visible="eq(-1,true)" default="false"/>
         <setting id="xmltvLOC" type="folder" source="auto" label="30404" default="" />
         <setting id="PVR_Enabled" label="30801" type="bool" default="false"/>
         <setting id="PVR_Folder" subsetting="true" label="30802" visible="eq(-1,true)" type="folder" source="auto" default="" />        
@@ -131,6 +130,7 @@
         <setting type="lsep" label="30090" visible="eq(-41,true)"/>  
             <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-44,true)" visible="eq(-42,true)" default="false"/>
             <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-45,true)" visible="eq(-43,true)" default="false"/>
+            <setting id="autoFindCinema_Theme" type="enum" label="30908" subsetting="true"  enable="eq(-46,true)" visible="eq(-44,true) + eq(-1,true)" values="Default|IMAX" default="1" />
       </category>
       
 <!--Community Network-->
@@ -138,12 +138,12 @@
         <setting label="30701" type="lsep" default="" /> 
         <setting id="CN_TV" label="30702" type="bool" default="true" />
         <setting id="CN_Movies" label="30703" type="bool" default="true" />
-        <setting id="CN_Episodes" label="30704" type="bool" default="false" />
+        <setting id="CN_Episodes" label="30704" type="bool" default="true" />
         <setting id="CN_Sports" label="30705" type="bool" default="true" />
         <setting id="CN_Kids" label="30706" type="bool" default="false" />
         <setting id="CN_News" label="30707" type="bool" default="true" />
-        <setting id="CN_Music" label="30712" type="bool" default="false" />
-        <setting id="CN_Other" label="30713" type="bool" default="false" />
+        <setting id="CN_Music" label="30712" type="bool" default="true" />
+        <setting id="CN_Other" label="30713" type="bool" default="true" />
     </category> 
 
 <!--BCTs-->   
@@ -210,6 +210,7 @@
         <setting id="Auto_Version" type="enum" label="30971" values="Disabled|Master - Stable|Development - Latest" default="1"/>
         <setting id="enable_Debug" type="bool" label="30993" default="false"/>
         <setting id="Override_ok" type="bool" label="30991" default="false"/>
+        <setting id="OS_SET_OVERRIDE" type="bool" label="30981" default="false"/>
         <setting id="ClearBCT" type="bool" label="30995" default="false"/>
         <setting id="ClearLiveArt" type="bool" label="30996" default="false"/>
         <setting id="ClearCache" type="bool" label="30988" default="false"/>

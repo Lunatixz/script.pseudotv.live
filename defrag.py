@@ -121,7 +121,7 @@ OpnFil.close()
 WrtFil.close()
 
 # try:
-os.remove(settingsFile)
+xbmcvfs.delete(settingsFile)
 FileAccess.rename(nsettingsFile, settingsFile)
 # except:
     # pass

@@ -35,10 +35,12 @@ __language__   = __settings__.getLocalizedString
 
 import resources.lib.Overlay as Overlay
 
-try:#If found, Load PTVL Skin
-    MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.live.TVOverlay.xml", __cwd__, Skin_Select)
-except:#Else, Load PTV Skin
+REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
+
+if int(__settings__.getSetting('SkinSelector')) == 0:
     MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.TVOverlay.xml", __cwd__, Skin_Select)
+else:
+    MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.live.TVOverlay.xml", __cwd__, Skin_Select)
     
 # for curthread in threading.enumerate():
     # try:

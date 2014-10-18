@@ -1,20 +1,21 @@
 import os, re, sys, time, zipfile, threading
 import urllib, urllib2, base64
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
+import urlparse, time
 
 # from functools import wraps
 from addon.common.addon import Addon       
 from Globals import *  
 from FileAccess import FileLock, FileAccess
 from Queue import Queue
+from HTMLParser import HTMLParser
 
 # Commoncache plugin import
 try:
     import StorageServer
 except Exception,e:
     import storageserverdummy as StorageServer
-    
-    
+
 #Downloader
 def download(url, dest, dp = None):
     if not dp:
@@ -24,6 +25,14 @@ def download(url, dest, dp = None):
     start_time=time.time()
     try:
         urllib.urlretrieve(url, dest, lambda nb, bs, fs: _pbhook(nb, bs, fs, dp, start_time))
+    except:
+        pass
+        
+        
+def download_silent(url, dest):
+    print 'download_silent'
+    try:
+        urllib.urlretrieve(url, dest)
     except:
         pass
      
@@ -69,19 +78,44 @@ def Open_URL(url):
     except urllib2.URLError as e:
         pass
 
+        
+def Open_URL_CACHE(url):
+    print ("Open_URL_CACHE Cache")
+    if Cache_Enabled:
+        try:
+            result = daily.cacheFunction(Open_URL_CACHE_NEW, url)
+        except:
+            result = Open_URL_CACHE_NEW(url)
+            pass
+    else:
+        result = Open_URL_CACHE_NEW(url)
+    
+    if not result:
+        result = 'Empty'
+    return result   
+    
+    
+def Open_URL_CACHE_NEW(url):  
+    print ("Open_URL_CACHE_NEW")      
+    try:
+        f = urllib2.urlopen(url)
+        return f
+    except urllib2.URLError as e:
+        pass
+
 
 def Open_URL_UP(url, userpass):
-    # try:
-    userpass = userpass.split(':')
-    username = userpass[0]
-    password = userpass[1]
-    request = urllib2.Request(url)
-    base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-    request.add_header("Authorization", "Basic %s" % base64string)
-    result = urllib2.urlopen(request)
-    return result.readlines()
-    # except:
-        # pass
+    try:
+        userpass = userpass.split(':')
+        username = userpass[0]
+        password = userpass[1]
+        request = urllib2.Request(url)
+        base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+        request.add_header("Authorization", "Basic %s" % base64string)
+        result = Open_URL_CACHE(request)
+        return result.readlines()
+    except:
+        pass
         
         
 def Download_URL(_in, _out): 
@@ -168,3 +202,50 @@ class TextBox:
         f = open(faq_path)
         text = f.read()
         self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
+
+        
+#logo parser
+class lsHTMLParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.icon_rel_url_list=[]
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "img":
+            for pair in attrs:
+                if pair[0]=="src" and pair[1].find("/logo/")!=-1:
+                    self.icon_rel_url_list.append(pair[1])
+                    
+    def retrieve_icons_avail(self, region='us'):
+        if Cache_Enabled:
+            print ("retrieve_icons_avail Cache")
+            try:
+                result = parsers.cacheFunction(self.retrieve_icons_avail_NEW, region)
+            except:
+                print ("retrieve_icons_avail Cache Failed Forwarding to retrieve_icons_avail_NEW")
+                result = self.retrieve_icons_avail_NEW(region)
+                pass
+        else:
+            print ("retrieve_icons_avail Cache Disabled")
+            result = self.retrieve_icons_avail_NEW(region)
+        if not result:
+            result = 0
+        return result
+         
+            
+    def retrieve_icons_avail_NEW(self, region='us'):
+        print 'retrieve_icons_avail'
+        lyngsat_sub_page="http://www.lyngsat-logo.com/tvcountry/%s_%d.html"
+        results={}
+        URL = 'http://www.lyngsat-logo.com/tvcountry/%s.html' % region
+        opener = urllib.FancyURLopener({})
+        f = opener.open(URL)
+        page_contents=f.read()
+        f.close()
+        parser=lsHTMLParser()
+        parser.feed(page_contents)
+        for icon_rel_url in parser.icon_rel_url_list:
+                icon_abs_url=urlparse.urljoin(lyngsat_sub_page, icon_rel_url)
+                icon_name=os.path.splitext(os.path.basename(icon_abs_url))[0].upper()
+                results[icon_name]=icon_abs_url
+        return results   

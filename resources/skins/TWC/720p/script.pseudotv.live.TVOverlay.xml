@@ -40,18 +40,6 @@
                 <height>720</height>
                 <texture>pstvlBackground2.png</texture>
             </control>       
-            <control type="group" id="513">  
-                <posx>160</posx>
-                <posy>555</posy>
-                <visible></visible>       
-                <control type="image" id="506">
-                    <description>Show Channel Icon</description>
-                    <width>125</width>
-                    <height>125</height>
-                    <align>center</align>
-                    <aspectratio>keep</aspectratio>
-                </control> 
-            </control>  
             <control type="group">
                 <posx>160</posx>
                 <posy>555</posy>

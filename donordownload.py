@@ -123,10 +123,10 @@ def LogoDownloader():
     
     if dlg.yesno("PseudoTV Live", "Download Color Logos or No, Download Mono Logos", ""):
         LogoDEST = LogoPath + '/PTVL_Color.zip'
-        i = 1
+        i = 0
     else:
         LogoDEST = LogoPath + '/PTVL_Mono.zip'
-        i = 2
+        i = 1
 
     if not DEFAULT_LOGO_LOC:
         xbmcvfs.mkdirs(DEFAULT_LOGO_LOC)
@@ -144,7 +144,12 @@ def LogoDownloader():
         download(LogoURLPath, LogoDEST)
         all(LogoDEST, LogoPath)
         REAL_SETTINGS.setSetting("ChannelLogoFolder", DEFAULT_LOGO_LOC)
-        xbmcvfs.delete(LogoDEST)
+        
+        try:
+            xbmcvfs.delete(xbmc.translatePath(LinkPath))
+            xbmcvfs.delete(LogoDEST)
+        except:
+            pass
     except:
         pass
         
