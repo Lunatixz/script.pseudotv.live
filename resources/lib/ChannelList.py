@@ -755,7 +755,7 @@ class ChannelList:
         elif chtype == 14 and Donor_Downloaded == True:
             self.log("Extras, " + setting1 + "...")
             fileList = self.extras(setting1, setting2, setting3, setting4, channel)
-        
+            
         # Direct Plugin
         elif chtype == 15:
             # Validate Feed #
@@ -830,7 +830,7 @@ class ChannelList:
                     
                 if self.incBCTs == True:
                     self.log("makeChannelList, adding Trailers to movies...")
-                    PrefileList = self.buildFileList(fle, channel, limit, '')
+                    PrefileList = self.buildFileList(fle, channel, limit, 0)
                     fileList = self.insertBCTfiles(channel, PrefileList, 'movies')
                 else:
                     fileList = self.buildFileList(fle, channel, limit, 0)
@@ -1691,7 +1691,7 @@ class ChannelList:
 
             if match:
                 if(match.group(1).endswith("/") or match.group(1).endswith("\\")):
-                    fileList.extend(self.buildFileList(match.group(1), channel))
+                    fileList.extend(self.buildFileList(match.group(1), channel, limit, 0))
                 else:
                     f = self.runActions(RULES_ACTION_JSON, channel, f)
                     duration = re.search('"duration" *: *([0-9]*?),', f)
@@ -1919,8 +1919,9 @@ class ChannelList:
 
 
     def buildMixedFileList(self, dom1, channel):
-        fileList = []
         self.log('buildMixedFileList')
+        fileList = []
+        limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
 
         try:
             rules = dom1.getElementsByTagName('rule')
@@ -1937,9 +1938,9 @@ class ChannelList:
 
             if FileAccess.exists(xbmc.translatePath('special://profile/playlists/video/') + rulename):
                 FileAccess.copy(xbmc.translatePath('special://profile/playlists/video/') + rulename, MADE_CHAN_LOC + rulename)
-                fileList.extend(self.buildFileList(MADE_CHAN_LOC + rulename, channel))
+                fileList.extend(self.buildFileList(MADE_CHAN_LOC + rulename, channel, limit, 0))
             else:
-                fileList.extend(self.buildFileList(GEN_CHAN_LOC + rulename, channel))
+                fileList.extend(self.buildFileList(GEN_CHAN_LOC + rulename, channel, limit, 0))
 
         self.log("buildMixedFileList returning")
         
@@ -4032,39 +4033,35 @@ class ChannelList:
     
     def extras(self, setting1, setting2, setting3, setting4, channel):
         self.log("extras")
-        Youtube_api = []
-        
+        limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
+        showList = []
+
         if not self.Youtube_api:
             print 'Youtube API Unavailable'
-            return Youtube_api
-            
-        if Donor_Downloaded == True:    
-            try:
-                if setting1.lower() == 'popcorn':
-                    showList = []
-                    
-                    if self.background == False:
-                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras", "parsing BringThePopcorn")
-                    
-                    showList = Bringpopcorn(setting2, setting3, setting4, channel)
-                    return showList
-                    
-                elif setting1.lower() == 'cinema':
-                    showList = []
-                    
-                    flename = self.createCinemaExperiencePlaylist()        
-                    if setting2 != flename:
-                        flename == (xbmc.translatePath(setting2))
-                                        
-                    PrefileList = self.buildFileList(flename, channel) 
-                    if self.background == False:
-                        self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras", "populating PseudoCinema Experience")
-                    
-                    showList = BuildCinemaExperienceFileList(setting1, setting2, setting3, setting4, channel, PrefileList)
-                    return showList
-            except Exception,e:
-                pass
-    
+            return showList
+
+        if Donor_Downloaded == True:  
+            if setting1.lower() == 'popcorn':
+                
+                if self.background == False:
+                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras", "parsing BringThePopcorn")
+                
+                showList = Bringpopcorn(setting2, setting3, setting4, channel)
+                
+            elif setting1.lower() == 'cinema':
+                flename = self.createCinemaExperiencePlaylist()        
+                if setting2 != flename:
+                    flename == (xbmc.translatePath(setting2))             
+                
+                PrefileList = self.buildFileList(flename, channel, limit, 0)
+                
+                if self.background == False:
+                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras", "populating PseudoCinema Experience")
+                
+                showList = BuildCinemaExperienceFileList(setting1, setting2, setting3, setting4, channel, PrefileList)
+
+        return showList
+
     
     def copyanything(self, src, dst):
         try:
