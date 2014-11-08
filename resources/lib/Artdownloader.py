@@ -121,40 +121,11 @@ class Artdownloader:
             if FileAccess.exists(BugCache):
                 print ('Find Local Cache Bug')
                 setImage = BugCache
-                
+                               
             elif FileAccess.exists(BugFolder):
                 print ('Find Local Logo Bug')
                 BugCache = self.ConvertBug(BugFolder, BugCache)
                 setImage = BugCache
-                
-            # elif mediapath.startswith('plugin://'):
-                # ###########################
-                # print ('Find Plugin Bug')
-                # try:
-                    # plugin = (os.path.split(mediapath)[0]).replace('plugin://','')
-                    # icon = 'special://home/addons/'+plugin+ '/icon.png'
-                    # fanart = 'special://home/addons/'+plugin+ '/fanart.jpg'
-                    # youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
-                    
-                    # if plugin in youtube:
-                        # ###########################
-                        # print ('Find Plugin Bug - Youtube')
-                        # setImage = BugDefault_YT
-
-                    # else:
-                        # ###########################
-                        # print ('Find Plugin Bug - Icon')
-                        # print icon
-                        # print BugCache
-                        # if FileAccess.exists(xbmc.translatePath(icon)):
-                            # print 'aa'
-                            # BugCache = self.ConvertBug(icon, BugCache)
-                            # setImage = BugCache
-                # except:
-                    # print 'Find Plugin Bug, Error'
-                    # setImage = BugDefault
-                    # pass     
-
             else:
                 setImage = BugDefault
         else:
@@ -167,8 +138,9 @@ class Artdownloader:
         return setImage
         
         
-    def FindLogo(self, chname):
+    def FindLogo(self, chtype, chname, mediapath):
         print 'FindLogo'
+        print chtype, chname, mediapath
         found = False
         setImage = ''
         LogoName = (chname + '.png')
@@ -178,6 +150,7 @@ class Artdownloader:
         if FileAccess.exists(LogoFolder):
             print ('Find Local Folder Logo')
             setImage = LogoFolder
+        #if chtype 0, 9 check chname to fanart.tv for logo match.
         elif REAL_SETTINGS.getSetting('FindLogos_Enabled') == 'true':
             file_detail = str(self.logoParser.retrieve_icons_avail())
             file_detail = file_detail.replace("{'",'').replace("'}",'').replace("': '","|")
@@ -225,6 +198,8 @@ class Artdownloader:
                 output.write(resource.read())
                 output.close()
                 setImage = LogoFolder
+        else:
+            setImage = 'NA.png'
 
         # if not setImage:
             # setImage = THUMB

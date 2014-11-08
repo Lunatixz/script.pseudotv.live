@@ -1,4 +1,23 @@
-﻿import os, shutil, datetime, random
+﻿#   Copyright (C) 2013 Lunatixz
+#
+#
+# This file is part of PseudoTV Live.
+#
+# PseudoTV Live is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# PseudoTV Live is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
+
+
+import os, shutil, datetime, random
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
@@ -11,7 +30,7 @@ from resources.lib.EPGWindow import *
 try:
     import StorageServer
 except Exception,e:
-    import storageserverdummy as StorageServer
+    import resources.lib.storageserverdummy as StorageServer
     
 # Plugin Info
 ADDON_ID = 'script.pseudotv.live'
@@ -26,76 +45,7 @@ xbmc.log("script.pseudotv.live-service: Service Started...")
 chanlist = ChannelList()
 Artdown = Artdownloader()
 
-def ServiceTimer():
-    print 'ServiceTimer'    
-    while not xbmc.abortRequested:
 
-        if REAL_SETTINGS.getSetting("SyncXMLTV_Enabled") == "true" and REAL_SETTINGS.getSetting("SyncXMLTV_Running") == "false":
-            now  = datetime.datetime.today()
-            Update = True 
-            
-            try:
-                SyncXMLTV_NextRun = REAL_SETTINGS.getSetting('SyncXMLTV_NextRun')
-                SyncXMLTV_NextRun = SyncXMLTV_NextRun.split('.')[0]
-                SyncXMLTV_NextRun = datetime.datetime.strptime(SyncXMLTV_NextRun, '%Y-%m-%d %H:%M:%S')
-            except:
-                SyncXMLTV_NextRun = now
-                pass
-            
-            if now >= SyncXMLTV_NextRun: 
-                if REAL_SETTINGS.getSetting('Enabled_RunOnPlayback') == 'false':
-                    if xbmc.Player().isPlaying():
-                        Update = False 
-
-                if Update == True:
-                    SyncXMLTV_NextRun = (SyncXMLTV_NextRun + datetime.timedelta(hours=12))
-                    REAL_SETTINGS.setSetting("SyncXMLTV_NextRun",str(SyncXMLTV_NextRun))
-                    
-                    if REAL_SETTINGS.getSetting("SyncXMLTV_Running") == "false":
-                        REAL_SETTINGS.setSetting('SyncXMLTV_Running', "true")
-            
-                        if not FileAccess.exists(XMLTV_CACHE_LOC):
-                            FileAccess.makedirs(XMLTV_CACHE_LOC)
-                            
-                        USxmltv = chanlist.SyncUSTVnow(True, False)
-                        SSxmltv = chanlist.SyncSSTV(True, False)
-                        FTVxmltv = chanlist.SyncFTV(True, False)
-                        REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
-
-        # Not sure service is required, settop trigger instead of service?
-        
-        # if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true" and REAL_SETTINGS.getSetting("ArtService_Running") == "false":
-            # ArtService_Timer = ART_TIMER[int(REAL_SETTINGS.getSetting('ArtService_timer_amount'))]
-            # now  = datetime.datetime.today()
-            # Update = True 
-            
-            # try:
-                # ArtService_NextRun = REAL_SETTINGS.getSetting('ArtService_NextRun')
-                # ArtService_NextRun = ArtService_NextRun.split('.')[0]
-                # ArtService_NextRun = datetime.datetime.strptime(ArtService_NextRun, '%Y-%m-%d %H:%M:%S')
-            # except:
-                # ArtService_NextRun = now
-                # pass
-
-            # if now >= ArtService_NextRun: 
-                # if REAL_SETTINGS.getSetting('Enabled_RunOnPlayback') == 'false':
-                    # if xbmc.Player().isPlaying():
-                        # Update = False 
-
-                # if Update == True:
-                    # ArtService_NextRun = (ArtService_NextRun + datetime.timedelta(hours=ArtService_Timer))
-                    # REAL_SETTINGS.setSetting("ArtService_NextRun",str(ArtService_NextRun))
-                    # Artdown.ArtService()
-                    
-        xbmc.sleep(4000)            
-        
-
-def ForceArtService():
-    print 'ForceArtService'
-    Artdown = Artdownloader() 
-    Artdown.ArtService()
-
-    
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
     xbmc.log('script.pseudotv.live-service: HubSwap')
         
@@ -117,9 +67,7 @@ def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
                 try:
                     xbmcvfs.copy(icon + 'HUB', icon + '.png')
                 except:
-                    pass   
-                
-                
+                    pass      
         else:
             xbmc.log('script.pseudotv.live-service: HubSwap - Master')
             REAL_SETTINGS.setSetting("Hub","false")
@@ -142,16 +90,12 @@ def donorCHK():
     DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
     DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
     
-    if xbmcvfs.exists(DonorPath):
+    if xbmcvfs.exists(DonorPath) or xbmcvfs.exists(DL_DonorPath):  
         REAL_SETTINGS.setSetting("AT_Donor", "true")
         REAL_SETTINGS.setSetting("COM_Donor", "true")
         REAL_SETTINGS.setSetting("TRL_Donor", "true")
         REAL_SETTINGS.setSetting("CAT_Donor", "true")
-    elif xbmcvfs.exists(DL_DonorPath):  
-        REAL_SETTINGS.setSetting("AT_Donor", "true")
-        REAL_SETTINGS.setSetting("COM_Donor", "true")
-        REAL_SETTINGS.setSetting("TRL_Donor", "true")
-        REAL_SETTINGS.setSetting("CAT_Donor", "true")
+        REAL_SETTINGS.setSetting("autoFindCommunity_Source", "1")
     else:
         REAL_SETTINGS.setSetting("AT_Donor", "false")
         REAL_SETTINGS.setSetting("COM_Donor", "false")
@@ -175,9 +119,6 @@ REAL_SETTINGS.setSetting('ArtService_Running', "false")
  
 HubSwap()
 donorCHK()
-# ServiceTimer()
 
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
-    autostart()
-
-    
+    autostart()    

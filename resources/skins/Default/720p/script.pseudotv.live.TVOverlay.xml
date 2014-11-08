@@ -6,11 +6,6 @@
         <posy>0</posy>
     </coordinates>
     <controls>
-        <control type="button" id="100"><!--todo-->
-            <description>channelbug color</description>
-            <label>C0C0C0C0</label>
-            <visible>false</visible>
-        </control>
         <control type="image">
             <description>Background</description>
             <posx>0</posx>
@@ -51,7 +46,7 @@
                 <height>720</height>
                 <texture>pstvlInfoWindow.png</texture>
             </control>
-<!--line 1 -->
+            <!--line 1 -->
             <control type="grouplist">
                 <posx>155</posx>
                 <posy>500</posy>
@@ -103,16 +98,6 @@
                     <height>30</height>
                     <aspectratio>keep</aspectratio>
                 </control>
-    <!--chan bug?-->				
-                <control type="label">
-                    <description>Show Name Label</description>
-                    <width min="10" max="50">auto</width>
-                    <height>30</height>
-                    <label></label>
-                    <font>font_bold20</font>
-                    <align>left</align>
-                    <textcolor>FF00b4db</textcolor>
-                </control>
             </control>
             <!--Channel Name Text-->
             <control type="label" id="300">
@@ -126,46 +111,48 @@
                 <textcolor>FFFFFFFF</textcolor>
                 <visible>false</visible>
             </control>
-<!--line 2 logos-->      
-        <control type="group">  
-            <posx>155</posx>
-            <posy>540</posy>        
-            <control type="button" id="509">
-                <description>Dynamic art</description>
-                <label>logo</label>
-                <visible>false</visible>
+            <!--line 2 logos-->      
+            <control type="group">  
+                <posx>155</posx>
+                <posy>540</posy>        
+                <control type="button" id="509">
+                    <description>Dynamic art</description>
+                    <label>logo</label>
+                    <visible>false</visible>
+                </control>
+                <control type="image" id="510">
+                    <description>Dynamic art</description>
+                    <width>170</width>
+                    <height>75</height>
+                    <align>center</align>
+                    <aspectratio>keep</aspectratio>
+                </control>
             </control>
-            <control type="image" id="510">
-                <description>Dynamic art</description>
-                <width>170</width>
-                <height>75</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
+            <control type="group">  
+                <control type="button" id="507">
+                    <description>Dynamic art</description>
+                    <label>poster</label>
+                    <visible>false</visible>
+                </control>
+                <control type="image" id="508">
+                    <posx>1040</posx>
+                    <posy>420</posy>  
+                    <description>Dynamic art</description>
+                    <colordiffuse>FFFFFFFF</colordiffuse>
+                    <width max="200">auto</width>
+                    <height max="300">auto</height>
+                    <align>center</align>
+                    <aspectratio>keep</aspectratio>
+                </control>
+                <control type="image" id="512">
+                    <description>Unaired NEW Icon</description>    
+                    <posx>1037</posx>
+                    <posy>422</posy>         
+                    <width>100</width>
+                    <height>100</height>
+                    <aspectratio>keep</aspectratio>
+                </control>
             </control>
-        </control>
-        <control type="group">  
-            <posx>1040</posx>
-            <posy>420</posy>  
-            <control type="button" id="507">
-                <description>Dynamic art</description>
-                <label>poster</label>
-                <visible>false</visible>
-            </control>
-            <control type="image" id="508">
-                <description>Dynamic art</description>
-                <colordiffuse>FFFFFFFF</colordiffuse>
-                <width max="200">auto</width>
-                <height max="300">auto</height>
-                <align>center</align>
-                <aspectratio>keep</aspectratio>
-            </control>
-            <control type="image" id="512">
-                <description>Unaired NEW Icon</description>           
-                <width>100</width>
-                <height>100</height>
-                <aspectratio>keep</aspectratio>
-            </control>
-        </control>
         <control type="label" id="505">
             <description>Show Description</description>
             <posx>335</posx>

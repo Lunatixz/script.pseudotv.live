@@ -22,17 +22,19 @@ import xbmcplugin, xbmcgui, xbmc, xbmcaddon, xbmcvfs
 import re, os, sys, time
 
 from resources.lib.utils import *
-
-__settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
-__cwd__        = __settings__.getAddonInfo('path')
+from resources.lib.Globals import *
 
 def UPDATEFILES():
-    ADDON = os.path.split(__cwd__)[1]
     xbmc.log('script.pseudotv.live-autoupdate: UPDATEFILES')
-    xbmc.log('script.pseudotv.live-autoupdate: Version = ' + ADDON)
-    url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
-    name = 'script.pseudotv.live-master.zip'  
-    changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt'         
+    
+    if REAL_SETTINGS.getSetting("Auto_Version") == "1":
+        url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
+        changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt'    
+    elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
+        url='https://github.com/Lunatixz/script.pseudotv.live/archive/development.zip'
+        changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/changelog.txt'  
+      
+    name = 'script.pseudotv.live.zip'   
     path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
     addonpath = xbmc.translatePath(os.path.join('special://','home/addons'))
     lib = os.path.join(path,name)

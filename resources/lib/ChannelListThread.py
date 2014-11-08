@@ -38,6 +38,7 @@ class ChannelListThread(threading.Thread):
         self.fullUpdating = True
         self.Artdownloader = Artdownloader()
 
+        
     def log(self, msg, level = xbmc.LOGDEBUG):
         log('ChannelListThread: ' + msg, level)
 
@@ -205,7 +206,8 @@ class ChannelListThread(threading.Thread):
                 timeslept += 2
 
         self.log("All channels up to date.  Exiting thread.")
-
+        
+        
     def pause(self):
         self.paused = True
         self.chanlist.threadPaused = True

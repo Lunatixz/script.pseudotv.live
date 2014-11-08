@@ -1,5 +1,14 @@
-***XBMC Skin w/ matching PseudoTV Skin***
+PTVL Skin labels for skinners:
 
+EPG:
+99 - Focused Text color
+100 - Text color
+105 - Text font
+
+
+
+
+***XBMC Skin w/ matching PseudoTV Skin***
 Matching Skin Paths by order of detection:
 special:\\addon\script.pseudotv.live\resources\skins\original\(skin.name)
 special:\\skin\media\script.pseudotv.live\ #PseudoTV Live skin

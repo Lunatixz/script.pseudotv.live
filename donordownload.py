@@ -27,11 +27,6 @@ try:
     from Donor import *
 except:
     pass
-    
-#Globals
-DonorDownloaded = False
-LogoDownloaded = False
-BumperDownloaded = False
 
 #Donor
 DonorURLPath = (PTVLURL + 'Donor.py')
@@ -42,19 +37,21 @@ DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
 
 
 def autopatch():
+    REAL_SETTINGS.setSetting("AT_Donor", "false")
+    REAL_SETTINGS.setSetting("COM_Donor", "false")
+    REAL_SETTINGS.setSetting("TRL_Donor", "false")
+    REAL_SETTINGS.setSetting("CAT_Donor", "false")
     xbmc.log('script.pseudotv.live-donordownload: autopatch')
-    MSG = 'Donor Autoupdate Complete'
-    
+
     try:
-        xbmcvfs.delete(xbmc.translatePath(DL_DonorPath))
+        if xbmcvfs.exists(xbmc.translatePath(DL_DonorPath)):
+            xbmcvfs.delete(xbmc.translatePath(DL_DonorPath))
+            
+        if xbmcvfs.exists(xbmc.translatePath(DonorPath)):
+            xbmcvfs.delete(xbmc.translatePath(DonorPath))  
     except:
         pass
-        
-    try:
-        xbmcvfs.delete(xbmc.translatePath(DonorPath))  
-    except:
-        pass
-        
+
     try:
         urllib.urlretrieve(DonorURLPath, (xbmc.translatePath(DL_DonorPath)))
         xbmc.log('script.pseudotv.live-donordownload: autopatch, Downloading DL_DonorPath')   
@@ -64,17 +61,23 @@ def autopatch():
             REAL_SETTINGS.setSetting("COM_Donor", "true")
             REAL_SETTINGS.setSetting("TRL_Donor", "true")
             REAL_SETTINGS.setSetting("CAT_Donor", "true")
+            xbmc.executebuiltin("UpdateLocalAddons")
             xbmc.log('script.pseudotv.live-donordownload: autopatch, Settings.xml Patched')
-            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) ) 
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Donor Autoupdate Complete", 4000, THUMB) ) 
     except:
         pass
     
 
 def DonorDownloader():
     xbmc.log('script.pseudotv.live-donordownload: DonorDownloader')
+    REAL_SETTINGS.setSetting("AT_Donor", "false")
+    REAL_SETTINGS.setSetting("COM_Donor", "false")
+    REAL_SETTINGS.setSetting("TRL_Donor", "false")
+    REAL_SETTINGS.setSetting("CAT_Donor", "false")
     Install = False
     Verified = False
     InstallStatusMSG = 'Activate'  
+    
     if xbmcvfs.exists(DonorPath):
         InstallStatusMSG = 'Update'
         if dlg.yesno("PseudoTV Live", str(InstallStatusMSG) + " Donor Features?"):
@@ -98,6 +101,7 @@ def DonorDownloader():
                 REAL_SETTINGS.setSetting("COM_Donor", "true")
                 REAL_SETTINGS.setSetting("TRL_Donor", "true")
                 REAL_SETTINGS.setSetting("CAT_Donor", "true")
+                xbmc.executebuiltin("UpdateLocalAddons")
             
                 if REAL_SETTINGS.getSetting('AT_Donor') and REAL_SETTINGS.getSetting('COM_Donor') and REAL_SETTINGS.getSetting('TRL_Donor') and REAL_SETTINGS.getSetting('CAT_Donor'):
                     Verified = True

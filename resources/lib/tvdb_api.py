@@ -495,7 +495,7 @@ class Tvdb:
         self.config['url_artworkPrefix'] = u"%(base_url)s/banners/%%s" % self.config
 
     def _getTempDir(self):
-        return xbmc.translatePath(os.path.join('special://temp/',"tvdb_api"))
+        return xbmc.translatePath(os.path.join(SETTINGS_LOC,'cache','tvdb_api'))
 
     def _loadUrl(self, url, recache = False, language=None):
         global lastTimeout
