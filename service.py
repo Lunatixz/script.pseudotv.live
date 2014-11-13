@@ -46,6 +46,13 @@ chanlist = ChannelList()
 Artdown = Artdownloader()
 
 
+# def Service():
+    # while (not xbmc.abortRequested):
+        # HubSwap()
+        # donorCHK()
+        # xbmc.sleep(1000)
+
+        
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
     xbmc.log('script.pseudotv.live-service: HubSwap')
         
@@ -116,7 +123,6 @@ def autostart():
 
 REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
 REAL_SETTINGS.setSetting('ArtService_Running', "false")
- 
 HubSwap()
 donorCHK()
 

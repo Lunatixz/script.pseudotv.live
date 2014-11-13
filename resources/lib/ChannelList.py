@@ -40,8 +40,9 @@ from tmdb import *
 from urllib2 import urlopen
 from urllib2 import HTTPError, URLError
 from datetime import date
-from datetime import timedelta
 from utils import *
+from datetime import timedelta
+
 socket.setdefaulttimeout(30)
 
 # Commoncache plugin import
@@ -90,6 +91,7 @@ class ChannelList:
         self.cached_json_detailed_trailers = []  
         self.videoParser = VideoParser()
         self.httpJSON = True
+        self.autoplaynextitem = False
         self.sleepTime = 0
         self.discoveredWebServer = False
         self.threadPaused = False
@@ -97,22 +99,9 @@ class ChannelList:
         self.runningActionId = 0
         self.enteredChannelCount = 0
         self.background = True
-        self.Override_ok = REAL_SETTINGS.getSetting('Override_ok') == "true"
-        self.log('Stream Validation Override is ' + str(self.Override_ok))
-        self.youtube_ok = self.youtube_player()
-        self.log('Youtube Player is ' + str(self.youtube_ok))
-        self.playon_ok = self.playon_player()
-        self.log('Playon Player is ' + str(self.playon_ok))
         random.seed() 
 
-        try:
-            self.Youtube_api = YoutubeAPI(YOUTUBE_API_KEY)
-        except:
-            self.Youtube_api = False
-            print 'Youtube API KEY Unavailable'
-            pass
-            
-            
+        
     def readConfig(self):
         self.ResetChanLST = list(REAL_SETTINGS.getSetting('ResetChanLST'))
         self.log('Channel Reset List is ' + str(self.ResetChanLST))
@@ -133,12 +122,17 @@ class ChannelList:
         self.tmdbAPI = TMDB(TMDB_API_KEY)  
         self.sbAPI = SickBeard(REAL_SETTINGS.getSetting('sickbeard.baseurl'),REAL_SETTINGS.getSetting('sickbeard.apikey'))
         self.cpAPI = CouchPotato(REAL_SETTINGS.getSetting('couchpotato.baseurl'),REAL_SETTINGS.getSetting('couchpotato.apikey'))
+        self.youtube_ok = self.youtube_player()
+        self.log('Youtube Player is ' + str(self.youtube_ok))
+        self.playon_ok = self.playon_player()
+        self.log('Playon Player is ' + str(self.playon_ok))
         self.findMaxChannels()
         
         if self.forceReset:
             REAL_SETTINGS.setSetting("INTRO_PLAYED","false")
             REAL_SETTINGS.setSetting("ClearLiveArtCache","true")
             REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
+            REAL_SETTINGS.setSetting('StartupMessage', 'false')
             self.forceReset = False
 
         try:
@@ -279,7 +273,10 @@ class ChannelList:
             plname = dom.getElementsByTagName('webserver')
             self.httpJSON = (plname[0].childNodes[0].nodeValue.lower() == 'true')
             self.log('determineWebServer is ' + str(self.httpJSON))
-
+            autoplaynextitem = dom.getElementsByTagName('autoplaynextitem')
+            self.autoplaynextitem  = (autoplaynextitem[1].childNodes[0].nodeValue.lower() == 'true')
+            self.log('autoplaynextitem is ' + str(self.autoplaynextitem))
+            
             if self.httpJSON == True:
                 plname = dom.getElementsByTagName('webserverport')
                 self.webPort = int(plname[0].childNodes[0].nodeValue)
@@ -379,14 +376,15 @@ class ChannelList:
         try:
             needsreset = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_changed') == 'True'
             
-            # # force rebuild
-            # if chtype == 8:
-                # self.log("Force LiveTV rebuild")
-                # needsreset = True
-                
-            # if chtype == 16:
-                # self.log("Force Playon rebuild")
-                # needsreset = True
+            # force rebuild
+            if SETTOP == False:
+                if chtype == 8:
+                    self.log("Force LiveTV rebuild")
+                    needsreset = True
+                    
+                if chtype == 16:
+                    self.log("Force Playon rebuild")
+                    needsreset = True
 
             if needsreset:
                 self.channels[channel - 1].isSetup = False
@@ -668,16 +666,16 @@ class ChannelList:
                 
                 if xmltvValid == True:
 
-                    if setting3 == 'smoothstreams':
-                        # Fill Gap Between Listings #
-                        PrefileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel) 
-                        fileList = self.fillLiveTVFileList(PrefileList, setting4, channel)                    
-                    else:
-                        fileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel)
-                        # Fill Empty Listings #
-                        if len(fileList) == 0:
-                            fileList = self.fillLiveTVFileList(fileList, setting2, channel)   
-                            ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'True')
+                    # if setting3 == 'smoothstreams':
+                        # # Fill Gap Between Listings #
+                        # PrefileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel) 
+                        # fileList = self.fillLiveTVFileList(PrefileList, setting4, channel)                    
+                    # else:
+                    fileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel)
+                    # Fill Empty Listings #
+                    if len(fileList) == 0:
+                        fileList = self.fillLiveTVFileList(fileList, setting2, channel)   
+                        ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'True')
                 else:
                     fileList = self.fillLiveTVFileList(fileList, setting2, channel)   
                     ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'True')
@@ -1972,7 +1970,8 @@ class ChannelList:
                 
                 if (today.day == startDate.day and today.hour < startDate.hour) or (tomorrow.day < startDate.day):
                     print 'match'
-                    startDur = int((startDate - nowDate).total_seconds())
+                    startDur = int(self.__total_seconds__(startDate - nowDate))
+                    # startDur = int((startDate - nowDate).total_seconds())
                     tmpstr = str(startDur) + ',' + CHname + "//" + 'SmoothStreams - LiveTV' + "//" + CHname + "//" + 'Unknown' + "//" + str(now) + "//" + 'tvshow|0|0|False|1|NA|' + '\n' + file
                     newList.append(tmpstr)
 
@@ -1988,6 +1987,15 @@ class ChannelList:
             
         return newList
     
+    
+    def __total_seconds__(self, delta):
+        try:
+            return delta.total_seconds()
+        except AttributeError:
+            # *Thanks sphere, taken from plugin.video.ted.talks
+            # People still using Python <2.7 201303 :(
+            return float((delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6)) / 10 ** 6
+
     
     def parseXMLTVDate(self, dateString, offset):
         if dateString is not None:
@@ -2400,9 +2408,6 @@ class ChannelList:
         stop = 0
         LiveID = 'tvshow|0|0|False|1|NR|'
         
-        if not self.Youtube_api:
-            print 'Youtube API Unavailable'
-            
         if self.youtube_ok != False:
         
             if setting3 == '':
@@ -3085,7 +3090,9 @@ class ChannelList:
         
     def Valid_ok(self, setting2):
         self.log("Valid_ok")
-
+        self.Override_ok = REAL_SETTINGS.getSetting('Override_ok') == "true"
+        self.log('Stream Validation Override is ' + str(self.Override_ok))
+        
         #Override Check# 
         if self.Override_ok == True:
             self.log("Overriding Stream Validation")
@@ -3306,12 +3313,16 @@ class ChannelList:
                 
     def youtube_duration(self, YTID):
         self.log("youtube_duration")
-        url = 'https://gdata.youtube.com/feeds/api/videos/{0}?v=2'.format(YTID)
-        s = urlopen(url).read()
-        d = parseString(s)
-        e = d.getElementsByTagName('yt:duration')[0]
-        a = e.attributes['seconds']
-        v = int(a.value)
+        try:
+            url = 'https://gdata.youtube.com/feeds/api/videos/{0}?v=2'.format(YTID)
+            s = urlopen(url).read()
+            d = parseString(s)
+            e = d.getElementsByTagName('yt:duration')[0]
+            a = e.attributes['seconds']
+            v = int(a.value)
+        except:
+            v = 120
+            pass
         return v
         
         
@@ -3573,10 +3584,7 @@ class ChannelList:
                         self.writeCache(BumperLST, BumperCachePath, BumperInternetCache)
                 except:
                     pass
-                 
-        if not self.Youtube_api:
-            print 'Youtube API Unavailable'
-            
+
         return BumperLST     
 
         
@@ -3611,7 +3619,6 @@ class ChannelList:
     
     def GetCommercialList (self, channel, fileList):
         self.log("GetCommercialList")
-        Youtube_api = []
         CommercialCachePath = xbmc.translatePath(os.path.join(BCT_LOC, 'commercials')) + '/'   
         chtype = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type')
         
@@ -3713,10 +3720,6 @@ class ChannelList:
                 CommercialLST.extend(YoutubeCommercialLST)
                 self.writeCache(YoutubeCommercialLST, CommercialCachePath, CommercialYoutubeCache)
 
-        if not self.Youtube_api:
-            print 'Youtube API Unavailable'
-            return Youtube_api
-     
         #Internet (advertolog.com, ispot.tv)
         if REAL_SETTINGS.getSetting('commercials') == '3' and Donor_Downloaded == True:
             CommercialInternetCache = 'Commercial_Internet_Cache.xml'
@@ -3740,7 +3743,6 @@ class ChannelList:
     
     def GetTrailerList (self, channel, fileList):
         self.log("GetTrailerList")
-        Youtube_api = []
         TrailerCachePath = xbmc.translatePath(os.path.join(BCT_LOC, 'trailers')) + '/'  
         chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
         
@@ -3882,11 +3884,7 @@ class ChannelList:
                     YoutubeTrailer = (str(duration) + ',' + trailer)
                     YoutubeTrailerLST.append(YoutubeTrailer)
             TrailerLST.extend(YoutubeTrailerLST)
-        
-        if not self.Youtube_api:
-            print 'Youtube API Unavailable'
-            return Youtube_api
-            
+
         #Internet
         if REAL_SETTINGS.getSetting('trailers') == '4' and Donor_Downloaded == True:
             TrailerInternetCache = 'Trailer_Internet_Cache.xml'
@@ -4033,15 +4031,11 @@ class ChannelList:
         limit = MEDIA_LIMIT[int(REAL_SETTINGS.getSetting('MEDIA_LIMIT'))]
         showList = []
 
-        if not self.Youtube_api:
-            print 'Youtube API Unavailable'
-            return showList
-
         if Donor_Downloaded == True:  
             if setting1.lower() == 'popcorn':
                 
                 if self.background == False:
-                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras, parsing BringThePopcorn", "This could take a moment Please Wait...")
+                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras, parsing BringThePopcorn", "This could take a moment, Please Wait...")
                 
                 showList = Bringpopcorn(setting2, setting3, setting4, channel)
                 
@@ -4053,7 +4047,7 @@ class ChannelList:
                 PrefileList = self.buildFileList(flename, channel, limit, 0)
                 
                 if self.background == False:
-                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras, populating PseudoCinema Experience", "This could take a moment Please Wait...")
+                    self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Extras, populating PseudoCinema Experience", "This could take a moment, Please Wait...")
                 
                 showList = BuildCinemaExperienceFileList(setting1, setting2, setting3, setting4, channel, PrefileList)
 
@@ -5240,13 +5234,12 @@ class ChannelList:
                 break
             else:
                 CHid = '0'
-                
-        print 'return', CHid
+
         return CHname, CHid
         
         
     def SyncUSTVnow(self, silent=False, force=False):
-        print 'SyncUSTVnow'    
+        self.log('SyncUSTVnow')
         now  = datetime.datetime.today()
         USTVnow = self.plugin_ok('plugin.video.ustvnow')
         
@@ -5262,7 +5255,7 @@ class ChannelList:
             
             #Force Download
             if force == True:
-                print 'SyncUSTVnow, Force Run'    
+                self.log('SyncUSTVnow, Force Run')
                 SyncUSTVnow_NextRun = now
             
             #Force Download - If missing
@@ -5274,7 +5267,7 @@ class ChannelList:
                 if NOTIFY == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","USTVnow XMLTV Updating", 4000, THUMB) )
                     
-                print 'SyncUSTVnow, Updating XMLTV'    
+                self.log('SyncUSTVnow, Updating XMLTV')
                 url = 'http://copy.com/D4juDEUQw9eBj2q3/ustvnow.xml'
                 url_bak = ''
                          
@@ -5305,7 +5298,7 @@ class ChannelList:
             
 
     def SyncSSTV(self, silent=False, force=False):
-        print 'SyncSSTV' 
+        self.log('SyncSSTV')
         now  = datetime.datetime.today()
         SSTV = self.plugin_ok('plugin.video.mystreamstv.beta')
         if SSTV == True:
@@ -5331,8 +5324,8 @@ class ChannelList:
                 if NOTIFY == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","SmoothStream XMLTV Updating", 4000, THUMB) )
                     
-                url = 'http://smoothstreams.tv/schedule/feed.xml'
-                url_bak = 'http://smoothstreams.tv/schedule/feed.xml'
+                url = 'http://copy.com/g1Tjx7BvedETDg7f/SStream.xml'
+                # url_bak = 'http://smoothstreams.tv/schedule/feed.xml'
                 # url_bak = 'http://smoothstreams.tv/schedule/feed.json'
                          
                 if FileAccess.exists(SSTVXML):
@@ -5352,7 +5345,7 @@ class ChannelList:
                 except urllib2.URLError as e:
                     pass
                         
-                SyncSSTV_NextRun = (SyncSSTV_NextRun + datetime.timedelta(hours=24))
+                SyncSSTV_NextRun = (SyncSSTV_NextRun + datetime.timedelta(hours=48))
                 REAL_SETTINGS.setSetting("SyncSSTV_NextRun",str(SyncSSTV_NextRun))
                 if silent == True:
                     download_silent(SSxmltv, SSTVXML)
@@ -5362,7 +5355,7 @@ class ChannelList:
         
         
     def SyncFTV(self, silent=False, force=False):
-        print 'SyncFTV'  
+        self.log('SyncFTV')
         now  = datetime.datetime.today()
         FTV = self.plugin_ok('plugin.video.F.T.V') 
         if FTV == True:
@@ -5417,13 +5410,21 @@ class ChannelList:
              
  
     def IPTVtuning(self, url):
+        IPTVList = []
         IPTVList = IPTVtuning(url)
         return IPTVList
  
  
     def LSTVtuning(self, url):
+        LSTVList = []
         LSTVList = LSTVtuning(url)
         return LSTVList
+        
+        
+    def NaviXtuning(self, url):
+        NaviXlist = []
+        NaviXlist = NaviXtuning(url)
+        return NaviXlist
 
         
     def CleanLabels(self, label):
@@ -5433,7 +5434,7 @@ class ChannelList:
     
     
     def GUISetSwitch(self):
-        print 'GUISetSwitch'
+        self.log('GUISetSwitch')
         # fle = xbmc.translatePath("special://profile/guisettings.xml")
 
         # try:

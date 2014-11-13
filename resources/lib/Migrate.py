@@ -1503,6 +1503,44 @@ class Migrate:
                     channelNum = channelNum + 1
         
         
+        # Extras - Navi-X
+        self.updateDialogProgress = 83
+        if Globals.REAL_SETTINGS.getSetting("autoFindNavix_Source") != "0" and Donor_Downloaded == True:
+            self.log("autoTune, adding Navi-X Channels")
+            self.updateDialog.update(self.updateDialogProgress,"adding Navi-X Channels","This could take a few minutes","Please Wait...")
+            NaviXnum = 0
+                        
+            if Globals.REAL_SETTINGS.getSetting("autoFindNavix_Source") == "1":
+                NaviXurl = Globals.REAL_SETTINGS.getSetting('autoFindNavix_Path_Local')
+            else:
+                NaviXurl = Globals.REAL_SETTINGS.getSetting('autoFindNavix_Path_Online')
+            
+            NaviXlst = chanlist.NaviXtuning(NaviXurl)
+            NaviXname = NaviXurl.replace('//','/')
+            
+            for NaviXnum in range(len(NaviXlst)):
+                if channelNum == 999:
+                    break
+            
+                NaviX = NaviXlst[NaviXnum]
+                title = NaviX[0]
+                link = NaviX[1]
+                Pluginvalid = chanlist.Valid_ok(link)
+                
+                if Pluginvalid != False:
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", link)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", title)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Navi-X - " + NaviXname)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum = channelNum + 1
+                    
+                    
         Globals.ADDON_SETTINGS.writeSettings()
 
         #set max channels
@@ -1546,7 +1584,8 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindPopcorn","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCinema","false")
         Globals.REAL_SETTINGS.setSetting("autoFindIPTV_Source","0")    
-        Globals.REAL_SETTINGS.setSetting("autoFindLive_Source","0")        
+        Globals.REAL_SETTINGS.setSetting("autoFindLive_Source","0")    
+        Globals.REAL_SETTINGS.setSetting("autoFindNavix_Source","0")        
         Globals.REAL_SETTINGS.setSetting("ForceChannelReset","true")
         Globals.ADDON_SETTINGS.setSetting('LastExitTime', str(int(curtime)))
         self.updateDialog.close()

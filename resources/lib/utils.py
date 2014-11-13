@@ -3,8 +3,7 @@ import urllib, urllib2, base64
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 import urlparse, time
 
-# from functools import wraps
-from addon.common.addon import Addon       
+# from functools import wraps  
 from Globals import *  
 from FileAccess import FileLock, FileAccess
 from Queue import Queue

@@ -101,8 +101,8 @@ class Artdownloader:
         converted_img = original.convert('LA')
         converted_img.save(mod)
         return mod
-  
-  
+        
+        
     def FindBug(self, chtype, chname, mediapath):
         print 'FindBug' 
         print chtype, chname, mediapath
@@ -114,10 +114,7 @@ class Artdownloader:
         BugDefault_YT = os.path.join(IMAGES_LOC,'Youtube.png')
 
         if REAL_SETTINGS.getSetting('UNAlter_ChanBug') == 'false':
-                    
-            if not FileAccess.exists(LOGO_CACHE_LOC):
-                FileAccess.makedirs(LOGO_CACHE_LOC)
-        
+            
             if FileAccess.exists(BugCache):
                 print ('Find Local Cache Bug')
                 setImage = BugCache
@@ -136,7 +133,7 @@ class Artdownloader:
 
         print 'FindBug return', setImage
         return setImage
-        
+
         
     def FindLogo(self, chtype, chname, mediapath):
         print 'FindLogo'
@@ -151,64 +148,61 @@ class Artdownloader:
             print ('Find Local Folder Logo')
             setImage = LogoFolder
         #if chtype 0, 9 check chname to fanart.tv for logo match.
-        elif REAL_SETTINGS.getSetting('FindLogos_Enabled') == 'true':
-            file_detail = str(self.logoParser.retrieve_icons_avail())
-            file_detail = file_detail.replace("{'",'').replace("'}",'').replace("': '","|")
-            file_detail = file_detail.split("', '")
-            orgName = chname
+        # elif REAL_SETTINGS.getSetting('FindLogos_Enabled') == 'true':
+            # file_detail = str(self.logoParser.retrieve_icons_avail())
+            # file_detail = file_detail.replace("{'",'').replace("'}",'').replace("': '","|")
+            # file_detail = file_detail.split("', '")
+            # orgName = chname
 
-            for f in range(len(file_detail)):
-                file = (file_detail[f]).replace('HD','')
-                name = file.split('|')[0]
-                link = file.split('|')[1]
+            # for f in range(len(file_detail)):
+                # file = (file_detail[f]).replace('HD','')
+                # name = file.split('|')[0]
+                # link = file.split('|')[1]
 
-                chname = name.split('_')
-                if len(chname) > 1:
-                    chname1 = (chname[0])
-                    chname2 = (chname[0] + ' ' + chname[1])
-                else:
-                    chname1 = (chname[0])
-                    chname2 = (chname[0])
+                # chname = name.split('_')
+                # if len(chname) > 1:
+                    # chname1 = (chname[0])
+                    # chname2 = (chname[0] + ' ' + chname[1])
+                # else:
+                    # chname1 = (chname[0])
+                    # chname2 = (chname[0])
 
-                orgName = orgName.replace(' hd','').replace(' tv','').replace('-tv','')
-                orgNameLST = [orgName.lower() +' tv',orgName.lower() +' hd']
+                # orgName = orgName.replace(' hd','').replace(' tv','').replace('-tv','')
+                # orgNameLST = [orgName.lower() +' tv',orgName.lower() +' hd']
 
-                print chname, chname1, chname2, orgName, orgNameLST
+                # print chname, chname1, chname2, orgName, orgNameLST
 
-                if chname2.lower() == orgName.lower():
-                    print chname2
-                    print link
-                    found = True
-                    break
-                elif chname1.lower() == orgName.lower():
-                    print chname1
-                    print link
-                    found = True
-                    break
-                elif chname1.lower() in orgNameLST:
-                    print chname1
-                    print link
-                    found = True
-                    break
+                # if chname2.lower() == orgName.lower():
+                    # print chname2
+                    # print link
+                    # found = True
+                    # break
+                # elif chname1.lower() == orgName.lower():
+                    # print chname1
+                    # print link
+                    # found = True
+                    # break
+                # elif chname1.lower() in orgNameLST:
+                    # print chname1
+                    # print link
+                    # found = True
+                    # break
 
-            if found == True:
-                print 'match'
-                resource = urllib.urlopen(link)
-                output = FileAccess.open(LogoFolder, 'w')
-                output.write(resource.read())
-                output.close()
-                setImage = LogoFolder
+            # if found == True:
+                # print 'match'
+                # resource = urllib.urlopen(link)
+                # output = FileAccess.open(LogoFolder, 'w')
+                # output.write(resource.read())
+                # output.close()
+                # setImage = LogoFolder
         else:
             setImage = 'NA.png'
 
-        # if not setImage:
-            # setImage = THUMB
-        print setImage
         return setImage
      
 
     def FindArtwork(self, type, chtype, chname, id, mediapath, arttypeEXT):
-        if Cache_Enabled:
+        if Cache_Enabled == True:  
             print ("FindArtwork Cache")
             try: #stagger artwork cache by chtype
                 # chtype = int(chtype)
@@ -315,41 +309,40 @@ class Artdownloader:
                         setImage = self.DownloadArt(type, id, fle, arttype_fallback, ART_LOC)
             
 
-            if not setImage:      
-                if mediapath.startswith('plugin://'):
-                    ###########################
-                    print ('Find Plugin Artwork')
-                    try:
-                        addon = ''
-                        plugin = os.path.split(mediapath)
-                        addon = os.path.split(plugin[0])[1]
-                        YTid = plugin[1]
-                        icon = 'special://home/addons/'+YTid+ '/icon.png'
-                        fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
-                        youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
-                        
-                        if addon in youtube:
-                            ###########################
-                            print ('Find Plugin Artwork - Youtube')
-                            setImage = "http://img.youtube.com/vi/"+YTid+"/0.jpg"
+        #Plugin/Youtube image, add thumb json todo
+        if not setImage:      
+            if mediapath.startswith('plugin://'):
+                ###########################
+                print ('Find Plugin Artwork')
+                try:
+                    addon = ''
+                    plugin = os.path.split(mediapath)
+                    addon = os.path.split(plugin[0])[1]
+                    YTid = plugin[1]
+                    icon = 'special://home/addons/'+YTid+ '/icon.png'
+                    fanart = 'special://home/addons/'+YTid+ '/fanart.jpg'
+                    youtube = ['plugin.video.bromix.youtube', 'plugin.video.youtube']
+                    
+                    if addon in youtube:
+                        ###########################
+                        print ('Find Plugin Artwork - Youtube')
+                        setImage = "http://img.youtube.com/vi/"+YTid+"/0.jpg"
 
-                        else:
-                            ###########################
-                            print ('Find Plugin Artwork - Other')
-                            if FileAccess.exists(xbmc.translatePath(icon)):
-                                setImage = icon
-                    except:
-                        pass     
-            
-                # elif mediapath.startswith('upnp://') and id == '0':
-                     # {"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["thumbnail"]},"id":4}
+                    else:
+                        ###########################
+                        print ('Find Plugin Artwork - Other')
+                        if FileAccess.exists(xbmc.translatePath(icon)):
+                            setImage = icon  
+                except:
+                    pass   
+            # elif mediapath.startswith('upnp://') and id == '0':
+            # {"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"%s","properties":["thumbnail"]},"id":4}
 
+        
         #Default image
         if not setImage:    
             print ('Find Channel Logo Artwork')
-            if FileAccess.exists(MediaImage):
-                setImage = MediaImage
-            elif FileAccess.exists(ChannelLogo):
+            if FileAccess.exists(ChannelLogo):
                 setImage = ChannelLogo
             else:
                 setImage = THUMB

@@ -68,6 +68,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.showSeasonEpisode = REAL_SETTINGS.getSetting("ShowSeEp") == "true"
         self.PVRchtype = 0
         self.PTVChanNum = 0
+        self.PVRTimeOffset = 0
         self.PVRmediapath = ''
         self.PVRchname = ''
         self.PVRtitle = ''
@@ -256,7 +257,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     setImage = self.Artdownloader.FindLogo(chtype, chname, mediapath)
                     self.getControl(321 + i).setImage(setImage)
                 else:
-                    self.getControl(321 + i).setImage('')
+                    self.getControl(321 + i).setImage('NA.png')
             except:
                 pass
 
@@ -942,6 +943,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         title = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemTitle(plpos))
         timestamp = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemtimestamp(plpos))
         LiveID = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemLiveID(plpos))
+        # videotime = self.MyOverlayWindow.channels[newchan - 1].showTimeOffset
         
         if mediapath[0:5] == 'stack':
             smpath = (mediapath.split(' , ')[0]).replace('stack://','')
@@ -960,6 +962,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.PVRtitle = title
         self.PVRtimestamp = timestamp
         self.PTVChanNum = newchan
+        # self.PVRTimeOffset = videotime
         
         LiveID = chanlist.unpackLiveID(LiveID)
         type = LiveID[0]
@@ -1168,9 +1171,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     timedif -= self.MyOverlayWindow.channels[newchan - 1].getItemDuration(pos) - showoffset
                     pos = self.MyOverlayWindow.channels[newchan - 1].fixPlaylistIndex(pos + 1)
                     showoffset = 0
-
                 self.log('pos + plpos ' + str(pos) +', ' + str(plpos))
             
+
             if self.MyOverlayWindow.currentChannel == newchan:
                 if plpos == xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition():
                     self.log('selectShow return current show')
@@ -1185,9 +1188,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         pass
                     Notify_Time = time.strftime('%I:%M%p, %A', t)
                     
-                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for", str(self.PVRtitle) + ' on channel ' + str(self.PTVChanNum), 'at '+ str(Notify_Time) + ' ?'):
+                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(self.PVRtitle) + '[/B] on channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
                         self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum)
-                    
                     self.log('selectShow return current LiveTV channel')
                     return
             
@@ -1201,12 +1203,27 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         pass
                     Notify_Time = time.strftime('%I:%M%p, %A', t)
                     
-                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for", str(self.PVRtitle) + ' on channel ' + str(self.PTVChanNum), 'at '+ str(Notify_Time) + ' ?'):
+                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(self.PVRtitle) + '[/B] on channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
                         self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum)
 
                     self.log('selectShow return different LiveTV channel')
                     return
                 else:
+                    Notify_Time = self.PVRTimeOffset
+                    
+                    if REAL_SETTINGS.getSetting("SelectAction") == "1":
+                        self.log('selectShow, Different Channel SelectAction = 1')
+                        if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(self.PVRtitle) + '[/B] on channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
+                            self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum) 
+                            return
+                    elif REAL_SETTINGS.getSetting("SelectAction") == "2":
+                        self.log('selectShow, Different Channel SelectAction = 2')
+                        if dlg.yesno("PseudoTV Live", "Would you like to watch [B]", str(self.PVRtitle) + '[/B] Now or set a reminder for channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
+                            print 'Watch Now Selected'
+                        else:
+                            self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum)
+                            return
+                            
                     self.MyOverlayWindow.channels[newchan - 1].setShowPosition(plpos)
                     self.MyOverlayWindow.channels[newchan - 1].setShowTime(0)
                     self.MyOverlayWindow.channels[newchan - 1].setAccessTime(time.time())

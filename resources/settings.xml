@@ -27,6 +27,7 @@
         <setting id="Disable_Watched" type="bool" label="30311" default="false"/>
         <setting id="EnhancedGuideData" type="bool" label="30405" default="false" />
         <setting id="AutoJump" type="bool" label="30408" default="false" />
+        <setting id="SelectAction" type="enum" enable="false" values="Watch Now|Set Reminder|Always Ask" label="30409" default="0" />
         <setting id="HideClips" type="bool" label="30215" default="true"/>
         <setting id="ClipLength" type="enum" subsetting="true" label="30216" visible="eq(-1,true)" values="15|30|60|90|120|180|240|300|360|420|460" default="7"/>
     	<setting id="MEDIA_LIMIT" label="30310" type="enum" values="10|25|50|100|250|500|1000|Unlimited" default="1"/>
@@ -137,15 +138,16 @@
         <setting type="lsep" label="30090" visible="eq(-42,true)"/>  
             <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-45,true)" visible="eq(-43,true)" default="false"/>
             <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-46,true)" visible="eq(-44,true)" default="false"/>
-            <setting id="autoFindCinema_Theme" type="enum" label="30908" subsetting="true"  enable="eq(-47,true)" visible="eq(-45,true) + eq(-1,true)" values="Default|IMAX" default="1" />
+            <setting id="autoFindCinema_Theme" type="enum" label="30908" subsetting="true"  enable="eq(-47,true)" visible="eq(-45,true) + eq(-1,true)" values="Default|IMAX|Custom" default="1" />
             <setting id="autoFindIPTV_Source" type="enum" label="30965" subsetting="true"  enable="eq(-48,true) + eq(-49,true)" visible="eq(-46,true)" values=" |Local|Online" default="0" />
             <setting id="autoFindIPTV_Path_Local" type="file" source="auto" label="30966" subsetting="true" enable="eq(-1,1)" visible="eq(-47,true) + eq(-1,1)" default=""/>
             <setting id="autoFindIPTV_Path_Online" type="text" source="auto" label="30967" subsetting="true" enable="eq(-2,2)" visible="eq(-48,true) + eq(-2,2)" default=""/>
-            <!-- <setting id="autoFindIPTV_Path_XMLTV" type="text" source="auto" label="30968" subsetting="true" visible="eq(-49,true) + !eq(-3,0)" default=""/> -->
             <setting id="autoFindLive_Source" type="enum" label="30969" subsetting="true"  enable="eq(-51,true) + eq(-52,true)" visible="eq(-49,true)" values=" |Local|Online" default="0" />
             <setting id="autoFindLive_Path_Local" type="file" source="auto" label="30970" subsetting="true" enable="eq(-1,1)" visible="eq(-50,true) + eq(-1,1)" default=""/>
             <setting id="autoFindLive_Path_Online" type="text" source="auto" label="30971" subsetting="true" enable="eq(-2,2)" visible="eq(-51,true) + eq(-2,2)" default=""/>
-            <!-- <setting id="autoFindLive_Path_XMLTV" type="text" source="auto" label="30972" subsetting="true" visible="eq(-53,true) + !eq(-3,0)" default=""/> -->
+            <setting id="autoFindNavix_Source" type="enum" label="30972" subsetting="true"  enable="eq(-54,true) + eq(-53,true)" visible="eq(-52,true)" values=" |Local|Online" default="0" />
+            <setting id="autoFindNavix_Path_Local" type="file" source="auto" label="30973" subsetting="true" enable="eq(-1,1)" visible="eq(-53,true) + eq(-1,1)" default=""/>
+            <setting id="autoFindNavix_Path_Online" type="text" source="auto" label="30974" subsetting="true" enable="eq(-2,2)" visible="eq(-54,true) + eq(-2,2)" default=""/>
         </category>
 <!--BCTs-->   
     <category label="30499">
@@ -210,6 +212,7 @@
       	<setting id="Warning2" type="bool" label="30069" subsetting="true" visible="eq(-1,true)" default="false"/>
         <setting label="30990" type="lsep"/>
         <setting id="Auto_Version" type="enum" label="30952" values="Disabled|Master - Stable|Development - Latest" default="1"/>
+        <setting id="Playback_timeout" type="slider" label="30309" default="0" range="0,.5,30" option="float" />
         <setting id="enable_Debug" type="bool" label="30993" default="false"/>
         <setting id="Override_ok" type="bool" label="30991" default="true"/>
         <setting id="OS_SET_OVERRIDE" type="bool" label="30981" default="false"/>

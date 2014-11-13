@@ -1,3 +1,8 @@
+[*] Full XMLTV Listings for SmoothStream LiveTV EPG.
+[*] NEW! Playback timeout option. Found under "Misc", What does it do? PTVL tries to cancel playback after the configured 
+    time. Tweak timeout time to avoid "Failed Playback" prompt. 0 = Disabled.
+[*] PseudoCinema tweaks, New Eventghost broadcast events and custom video option (WIP).
+[*] [COLOR=blue]^ v.0.5.6 ^[/COLOR] 
 [*] Settop mode finalized. What is it? It allows PTVL to rebuild/update channel without having to restart.
     How is it used? Any channel you want updated, Setup a advanced channel rule to reset every x hours.
     Enable Settop mode under "General" settings, select the interval you want to check for updates.
@@ -13,7 +18,7 @@
     Please make sure to have "script.extendedinfo" & "script.tv.show.next.aired" installed.
 [*] Sleep timer w/ shutdown options, Mapped to "ACTION_ASPECT_RATIO".
 [*] VideoWindow Patcher now removes XBMC seek OSD.
-[*] NEW! IPTV M3U & Livestream XML Autotuning - Hub Edition and Donors only. 
+[*] NEW! IPTV M3U & Livestream XML and Navi-X PLX Autotuning w/Missing Logo Downloading - Hub Edition and Donors only. 
 [*] NEW! Recently added TV & Movie Autotuning, Channel includes media added to XBMC in the last 14days.
 [*] [COLOR=blue]^ v.0.5.5 ^[/COLOR] 
 [*] EventGhost JSON broadcasts (Starting,Stopping)
