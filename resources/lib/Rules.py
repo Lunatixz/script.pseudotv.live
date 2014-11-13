@@ -1315,11 +1315,9 @@ class PlayShowInOrder(BaseRule):
 
 class SetResetTime(BaseRule):
     def __init__(self):
-
         self.name = "Reset Every x Hours"
         self.optionLabels = ['Number of Hours']
         self.optionValues = ['24']
-        
         self.myId = 13
         self.actions = RULES_ACTION_START
 
@@ -1373,9 +1371,7 @@ class SetResetTime(BaseRule):
             if rightnow >= nextreset:
                 channeldata.isValid = False
                 ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_changed', 'True')
-
-                nextreset = rightnow + (60 * numhours)
-     
+                nextreset = rightnow + ((60 * 60 * numhours) - 120) #58min hour.
                 ADDON_SETTINGS.setSetting('Channel_' + str(curchan) + '_SetResetTime', str(nextreset))
 
         return channeldata

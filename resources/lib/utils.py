@@ -3,8 +3,7 @@ import urllib, urllib2, base64
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 import urlparse, time
 
-# from functools import wraps
-from addon.common.addon import Addon       
+# from functools import wraps  
 from Globals import *  
 from FileAccess import FileLock, FileAccess
 from Queue import Queue
@@ -112,7 +111,7 @@ def Open_URL_UP(url, userpass):
         request = urllib2.Request(url)
         base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
         request.add_header("Authorization", "Basic %s" % base64string)
-        result = Open_URL_CACHE(request)
+        result = Open_URL(request)
         return result.readlines()
     except:
         pass
@@ -202,7 +201,9 @@ class TextBox:
         f = open(faq_path)
         text = f.read()
         self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
-
+        
+        if dlg.yesno("PseudoTV Live", "Restart required after update, Exit XBMC?"):
+            xbmc.executebuiltin("Quit")
         
 #logo parser
 class lsHTMLParser(HTMLParser):

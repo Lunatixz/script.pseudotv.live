@@ -22,13 +22,14 @@ import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 from resources.lib.Globals import *
 from resources.lib.FileAccess import *
 from autoupdate import *
+from pseudotv import *
 from resources.lib.utils import *
 
 # Commoncache plugin import
 try:
     import StorageServer
 except Exception,e:
-    import storageserverdummy as StorageServer
+    import resources.lib.storageserverdummy as StorageServer
 
 # Script constants
 __scriptname__ = "PseudoTV Live"
@@ -47,7 +48,6 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
         if REAL_SETTINGS.getSetting("Auto_Version") != "0":
             # Compare git version with local version.
             xbmc.log('script.pseudotv.live-default: CheckVersion mode = ' + str(REAL_SETTINGS.getSetting("Auto_Version")))
-
             try:        
                 curver = xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
                 source = open(curver, mode = 'r')
@@ -61,7 +61,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                 try:
                     if REAL_SETTINGS.getSetting("Auto_Version") == "1":
                         link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/addon.xml')
-                    elif REAL_SETTINGS.getSetting("Auto_Version") == "":
+                    elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
                         link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/addon.xml')
                 except:
                     link='nill'
@@ -76,57 +76,29 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                         if confirm:
                             UPDATEFILES() 
                             UPDATED = True
-                        else:
-                            UPDATED = False
             except Exception:
                 pass
             
         #If Updated, Textbox, Videowindow/DonorDownload and quit...
-        if UPDATED:
-            REAL_SETTINGS.setSetting("AT_Donor", "false")
-            REAL_SETTINGS.setSetting("COM_Donor", "false")
-            REAL_SETTINGS.setSetting("TRL_Donor", "false")
-            REAL_SETTINGS.setSetting("CAT_Donor", "false")
+        if UPDATED == True:
+            REAL_SETTINGS.setSetting('ClearCache', 'true')
             REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
             xbmc.executebuiltin("RunScript("+__cwd__+"/videowindow.py,-autopatch)")
             xbmc.executebuiltin("RunScript("+__cwd__+"/donordownload.py,-autopatch)")
-            xbmc.executebuiltin("UpdateLocalAddons")
-            TextBox()
-            
-            if dlg.yesno("PseudoTV Live", "Restart required after update, Exit XBMC?"):
-                xbmc.executebuiltin("Quit")
+            TextBox()           
         else:
             #If not Updated, Launch PTVL
-
             #Enforce settings
-            if LOWPOWER:
+            if LOWPOWER == True:
                 #Set Configurations Optimized for Low Power OS's
                 REAL_SETTINGS.setSetting("EnhancedGuideData", "false")
-                REAL_SETTINGS.setSetting("MEDIA_LIMIT", "1")
                 REAL_SETTINGS.setSetting("ArtService_Enabled", "false")
                 REAL_SETTINGS.setSetting("ShowSeEp", "false")
                 REAL_SETTINGS.setSetting("EPGcolor_enabled", "0")
                 REAL_SETTINGS.setSetting("EPG.xInfo", "false")
                 REAL_SETTINGS.setSetting("UNAlter_ChanBug", "true")
-                # REAL_SETTINGS.setSetting("EnableComingUp", "2")
-                # REAL_SETTINGS.setSetting("SyncXMLTV_Enabled", "false")
-                # REAL_SETTINGS.setSetting("xmltvLOC", "")
                 REAL_SETTINGS.setSetting("sickbeard.enabled", "false")
-                REAL_SETTINGS.setSetting("couchpotato.enabled", "false")
-
-                # #Remove XMLTV Files to avoid parsing.
-                # try:
-                    # xbmcvfs.delete(USTVnowXML)
-                # except:
-                    # pass 
-                # try:
-                    # xbmcvfs.delete(SSTVXML)
-                # except:
-                    # pass  
-                # try:
-                    # xbmcvfs.delete(FTVXML)
-                # except:
-                    # pass       
+                REAL_SETTINGS.setSetting("couchpotato.enabled", "false")  
                 
                 if NOTIFY == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Optimized Configurations Applied", 1000, THUMB) )
@@ -135,16 +107,14 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             if REAL_SETTINGS.getSetting("ClearBCT") == "true":
                 try:
                     shutil.rmtree(BCT_LOC)
-                    xbmc.log('script.pseudotv.live-default: BCT Folder Purged!')
-                    
-                    if NOTIFY == 'true':
-                        xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "BCT Cache Cleared", 1000, THUMB) )
-                
+                    xbmc.log('script.pseudotv.live-default: BCT Folder Purged!')             
                 except Exception,e:
                     xbmc.log('script.pseudotv.live-default: BCT Folder Purge Failed! ' + str(e))  
                     pass
 
                 REAL_SETTINGS.setSetting('ClearBCT', "false")
+                if NOTIFY == 'true':
+                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", 'BCT Cache Cleared', 1000, THUMB) )
             
             # Clear Artwork Cache Folders
             if REAL_SETTINGS.getSetting("ClearLiveArt") == "true":
@@ -162,14 +132,13 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                     pass
                     
                 try: # tvdbapi Cache
-                    shutil.rmtree(xbmc.translatePath(os.path.join('special://temp','tvdb_api')))
+                    shutil.rmtree(xbmc.translatePath(os.path.join(SETTINGS_LOC,'cache','tvdb_api')))
                 except Exception,e:
                     xbmc.log('script.pseudotv.live-default: tvdbapi Cache Folder Purge Failed! ' + str(e))  
                     pass
 
                 REAL_SETTINGS.setSetting('ClearLiveArt', "false")
                 xbmc.log('script.pseudotv.live-default: Art Folders Purged!')
-                
                 if NOTIFY == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Artwork Folders Cleared", 1000, THUMB) )
                 
@@ -181,15 +150,17 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                 monthly.delete("%")
                 localTV.delete("%")
                 liveTV.delete("%")
+                YoutubeTV.delete("%")
+                RSSTV.delete("%")
                 pluginTV.delete("%")
                 playonTV.delete("%")
                 lastfm.delete("%")
+                
                 REAL_SETTINGS.setSetting('ClearCache', "false")
                 xbmc.log('script.pseudotv.live-default: System Cache Purged!')
-                
                 if NOTIFY == 'true':
                     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "System Cache Cleared", 1000, THUMB) )
 
-            xbmc.executebuiltin('RunScript("' + __cwd__ + '/pseudotv.py' + '")')
+            PseudoTV()
 else:
     xbmc.log('script.pseudotv.live - Already running, exiting', xbmc.LOGERROR)

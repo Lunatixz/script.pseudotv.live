@@ -33,29 +33,29 @@ __cwd__        = __settings__.getAddonInfo('path')
 __version__    = __settings__.getAddonInfo('version')
 __language__   = __settings__.getLocalizedString
 
-import resources.lib.Overlay as Overlay
+def PseudoTV():
+    import resources.lib.Overlay as Overlay
 
-REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
+    try:
+        MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.live.TVOverlay.xml", __cwd__, Skin_Select)
+    except:
+        MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.TVOverlay.xml", __cwd__, Skin_Select)
+        pass
+        
+    for curthread in threading.enumerate():
+        try:
+            log("Active Thread: " + str(curthread.name), xbmc.LOGERROR)
 
-if int(__settings__.getSetting('SkinSelector')) == 0:
-    MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.TVOverlay.xml", __cwd__, Skin_Select)
-else:
-    MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.live.TVOverlay.xml", __cwd__, Skin_Select)
-    
-# for curthread in threading.enumerate():
-    # try:
-        # log("Active Thread: " + str(curthread.name), xbmc.LOGERROR)
+            if curthread.name != "MainThread":
+                try:
+                    curthread.join()
+                except:
+                    pass
 
-        # if curthread.name != "MainThread":
-            # try:
-                # curthread.join()
-            # except:
-                # pass
-
-            # log("Joined " + curthread.name)
-    # except:
-        # pass
-          
-del MyOverlayWindow
-  
-xbmcgui.Window(10000).setProperty("PseudoTVRunning", "False")
+                log("Joined " + curthread.name)
+        except:
+            pass
+              
+    del MyOverlayWindow
+      
+    xbmcgui.Window(10000).setProperty("PseudoTVRunning", "False")

@@ -33,53 +33,42 @@ def replaceAll(file,searchExp,replaceExp):
 
 def videowindow():   
     xbmc.log('script.pseudotv.live-videowindow: videowindow')
-    __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
-    __cwd__        = __settings__.getAddonInfo('path')
-    __settings__.setSetting("videowindow","false")
-    SkinMasterPath = os.path.join(ADDON_PATH, 'resources', 'skins') + '/'
-    PseudoSkin = (os.path.join(SkinMasterPath, Skin_Select, '720p')) + '/'
-    PseudoSkinfle = ''
-
-    # Find PseudoTV Skin Path
-    try:
-        if xbmcvfs.exists(PseudoSkin):
-            PseudoSkinfle = xbmc.translatePath(os.path.join(SkinMasterPath, Skin_Select, '720p', 'script.pseudotv.live.EPG.xml'))
-        else:
-            PseudoSkinfle = xbmc.translatePath(os.path.join(SkinMasterPath, Skin_Select, '1080i', 'script.pseudotv.live.EPG.xml'))
-    except:
-        pass
-
+    REAL_SETTINGS.setSetting("videowindow","false")
+    PTVL_SKIN_SELECT_FLE = xbmc.translatePath(os.path.join(PTVL_SKIN_SELECT, 'script.pseudotv.live.EPG.xml'))
+    
     xbmc.log('script.pseudotv.live-VideoWindow: Patcher Started')
     xbmc.log('script.pseudotv.live-VideoWindow: ADDON_PATH = ' + ADDON_PATH)
-    xbmc.log('script.pseudotv.live-VideoWindow: PseudoSkinfle = ' + PseudoSkinfle)
-    xbmc.log('script.pseudotv.live-VideoWindow: SkinPath = ' + skinPath)
+    xbmc.log('script.pseudotv.live-VideoWindow: PTVL_SKIN_SELECT = ' + PTVL_SKIN_SELECT)
+    xbmc.log('script.pseudotv.live-VideoWindow: PTVL_SKIN_SELECT_FLE = ' + PTVL_SKIN_SELECT_FLE)
+    xbmc.log('script.pseudotv.live-VideoWindow: XBMC_SKIN_LOC = ' + XBMC_SKIN_LOC)
         
     a = '<!-- PATCH START -->'
     b = '<!-- PATCH START --> <!--'
     c = '<!-- PATCH END -->'
     d = '--> <!-- PATCH END -->'
-
-    Install = False
+    
+    v = ' '
+    w = '<visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+    y = '</defaultcontrol>'
+    z = '</defaultcontrol>\n    <visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+        
     Installed = False
-    Uninstall = False
-
-    Patch = False
     Patched = False
-    UnPatch = False
-
-    SeekPatch = False
-    SeekPatched = True
-
-    Error = False
     MSG = ''
 
-    Path = (os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', '720p'))
-    fle = 'custom_script.pseudotv.live_9506.xml'
-    fle1 = 'dialogseekbar.xml'
-    VWPath = (os.path.join(skinPath, fle))
-    DSPath = xbmc.translatePath(os.path.join(skinPath, fle1))
+    Path = (os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', '720p')) #Path to Default PTVL skin, location of mod file.
+    fle = 'custom_script.pseudotv.live_9506.xml' #mod file, copy to xbmc skin folder
+    VWPath = (os.path.join(XBMC_SKIN_LOC, fle))
     flePath = (os.path.join(Path, fle)) 
-
+    fle1 = 'dialogseekbar.xml' #xbmc skin file, needs patch
+    DSPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, fle1))
+    
+    Error = False
+    Uninstall = False
+    UnPatch = False
+    Patch = False
+    Install = False
+    
     # Delete Old VideoWindow Patch
     if xbmcvfs.exists(VWPath):
         if dlg.yesno("PseudoTV Live", "VideoWindow Patch Found!\nRemove Patch?"):
@@ -93,16 +82,26 @@ def videowindow():
                 pass
                 
             try:
-                f = open(PseudoSkinfle, "r")
-                linesLST = f.readlines()            
+                #unpatch videowindow
+                f = open(PTVL_SKIN_SELECT_FLE, "r")
+                linesLST = f.readlines()    
                 f.close()
-                
                 for i in range(len(set(linesLST))):
                     lines = linesLST[i]
                     if a in lines:
-                        replaceAll(PseudoSkinfle,a,b)
-                    if c in lines:
-                        replaceAll(PseudoSkinfle,c,d)
+                        replaceAll(PTVL_SKIN_SELECT_FLE,a,b)
+                    elif c in lines:
+                        replaceAll(PTVL_SKIN_SELECT_FLE,c,d)
+                        
+                #unpatch seek
+                f = open(DSPath, "r")
+                lineLST = f.readlines()            
+                f.close()
+                for i in range(len(set(lineLST))):
+                    line = lineLST[i]
+                    if w in line:
+                        replaceAll(DSPath,w,v)
+                        
                 UnPatch = True
                 xbmc.log('script.pseudotv.live-VideoWindow: UnPatch')
             except Exception,e:
@@ -133,101 +132,113 @@ def videowindow():
         
     if Patch:
         try:
-            f = open(PseudoSkinfle, "r")
-            linesLST = f.readlines()            
+            f = open(PTVL_SKIN_SELECT_FLE, "r")
+            linesLST = f.readlines()  
             f.close()
             
             for i in range(len(set(linesLST))):
                 lines = linesLST[i]
                 if b in lines:
-                    replaceAll(PseudoSkinfle,b,a)
-                if d in lines:
-                    replaceAll(PseudoSkinfle,d,c)            
+                    replaceAll(PTVL_SKIN_SELECT_FLE,b,a)
+                elif d in lines:
+                    replaceAll(PTVL_SKIN_SELECT_FLE,d,c)            
             xbmc.log('script.pseudotv.live-VideoWindow: script.pseudotv.live.EPG.xml Patched')
+            
+            try:
+                f = open(DSPath, "r")
+                lineLST = f.readlines()            
+                f.close()
+                
+                for i in range(len(set(lineLST))):
+                    line = lineLST[i]
+                    if y in line:
+                        replaceAll(DSPath,y,z)
+                        xbmc.log('script.pseudotv.live-VideoWindow: DialogSeekBar Patched')
+            except:
+                pass
+            
+            
             Patched = True
-            SeekPatch = True
         except Exception,e:
             xbmc.log('script.pseudotv.live-VideoWindow: script.pseudotv.live.EPG.xml Patch Failed' + str(e))
             Error = True
             pass
-        
-    # if SeekPatch:
-        # # try:
-        # y = '<visible>'
-        # z = ('<visible>!Window.IsActive(script.pseudotv.live.TVOverlay.xml) + ')
-        # replaceAll(DSPath,y,z)
-        # xbmc.log('script.pseudotv.live-VideoWindow: DialogSeekBar Patched')
-        # SeekPatched = True
-        # # except Exception,e:
-            # # xbmc.log('script.pseudotv.live-VideoWindow: DialogSeekBar Patched')
-            # # Error = True
-            # # pass
-            
-    if (Installed and Patched and SeekPatched) or (Patched and SeekPatched):
+
+    if (Installed and Patched) or Patched:
         MSG = "VideoWindow Patched!"
-        __settings__.setSetting("videowindow","true")
+        REAL_SETTINGS.setSetting("videowindow","true")
         xbmc.executebuiltin("ReloadSkin()")
     
     if Uninstall or UnPatch:
         MSG = "VideoWindow Patch Removed!"
-        __settings__.setSetting("videowindow","false")
+        REAL_SETTINGS.setSetting("videowindow","false")
         xbmc.executebuiltin("ReloadSkin()")
     
     if Error:
         MSG = "VideoWindow Patch Error!"
         
     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 1000, THUMB) )
-    __settings__.openSettings()
+    REAL_SETTINGS.openSettings()
     
     
 def autopatch():
     xbmc.log('script.pseudotv.live-videowindow: autopatch')
-    __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
-    __cwd__        = __settings__.getAddonInfo('path')
-    __settings__.setSetting("videowindow","false")
-    SkinMasterPath = os.path.join(ADDON_PATH, 'resources', 'skins') + '/'
-    PseudoSkin = (os.path.join(SkinMasterPath, Skin_Select, '720p')) + '/'
-    PseudoSkinfle = ''
-
-    # Find PseudoTV Skin Path
-    try:
-        if xbmcvfs.exists(PseudoSkin):
-            PseudoSkinfle = xbmc.translatePath(os.path.join(SkinMasterPath, Skin_Select, '720p', 'script.pseudotv.live.EPG.xml'))
-        else:
-            PseudoSkinfle = xbmc.translatePath(os.path.join(SkinMasterPath, Skin_Select, '1080i', 'script.pseudotv.live.EPG.xml'))
-    except:
-        pass
+    REAL_SETTINGS.setSetting("videowindow","false")
+    PTVL_SKIN_SELECT_FLE = xbmc.translatePath(os.path.join(PTVL_SKIN_SELECT, 'script.pseudotv.live.EPG.xml'))
 
     a = '<!-- PATCH START -->'
     b = '<!-- PATCH START --> <!--'
     c = '<!-- PATCH END -->'
     d = '--> <!-- PATCH END -->'
     
+    v = ' '
+    w = '    <visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+    y = '</defaultcontrol>'
+    z = '</defaultcontrol>\n    <visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+        
     MSG = ''
-
-    fle = 'custom_script.pseudotv.live_9506.xml'
-    VWPath = (os.path.join(skinPath, fle))
+    fle = 'custom_script.pseudotv.live_9506.xml' #mod file, copy to xbmc skin folder
+    VWPath = (os.path.join(XBMC_SKIN_LOC, fle))
+    flePath = (os.path.join(Path, fle)) 
+    
+    fle1 = 'dialogseekbar.xml' #xbmc skin file, needs patch
+    DSPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, fle1))
     
     if xbmcvfs.exists(VWPath):
         try:
-            f = open(PseudoSkinfle, "r")
+            #videowindow
+            f = open(PTVL_SKIN_SELECT_FLE, "r")
             linesLST = f.readlines()            
             f.close()
             
             for i in range(len(set(linesLST))):
                 lines = linesLST[i]
                 if b in lines:
-                    replaceAll(PseudoSkinfle,b,a)
-                if d in lines:
-                    replaceAll(PseudoSkinfle,d,c)            
+                    replaceAll(PTVL_SKIN_SELECT_FLE,b,a)
+                elif d in lines:
+                    replaceAll(PTVL_SKIN_SELECT_FLE,d,c)            
             xbmc.log('script.pseudotv.live-VideoWindow: autopatch script.pseudotv.live.EPG.xml Patched')
             MSG = "VideoWindow Patched"
+
+            #seek
+            f = open(DSPath, "r")
+            lineLST = f.readlines()            
+            f.close()
+            
+            for i in range(len(set(lineLST))):
+                line = lineLST[i]
+                
+                if y in line:
+                    replaceAll(DSPath,y,z)
+                    xbmc.log('script.pseudotv.live-VideoWindow: DialogSeekBar Patched')
+
+            REAL_SETTINGS.setSetting("videowindow","true")
         except Exception,e:
             xbmc.log('script.pseudotv.live-VideoWindow: autopatch script.pseudotv.live.EPG.xml Patch Failed' + str(e))
             MSG = "VideoWindow Patch Error!"
             pass
         xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) )
-   
+
     else:
         xbmc.log('script.pseudotv.live-videowindow: autopatch fle not found')
             

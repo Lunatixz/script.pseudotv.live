@@ -1,20 +1,20 @@
 #   Copyright (C) 2013 Lunatixz
 #
 #
-# This file is part of PseudoTV.
+# This file is part of PseudoTV Live.
 #
-# PseudoTV is free software: you can redistribute it and/or modify
+# PseudoTV Live is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# PseudoTV is distributed in the hope that it will be useful,
+# PseudoTV Live is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
+# along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import xbmcaddon, xbmc, xbmcgui, xbmcvfs
@@ -79,7 +79,7 @@ ART_TIMER = [6,12,24,48,72]
 SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
 MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]#Media Per/Channel, 0 = Unlimited
-REFRESH_INT = [3600,10800,21600,43200,86400,172800,216000]#in seconds (1,3,6,12,24,48,72hrs)
+REFRESH_INT = [14520,28920,43320,86520]#in seconds (4|8|12|24hrs) + 2min offset
 TIMEOUT = 15 * 1000
 TOTAL_FILL_CHANNELS = 20
 PREP_CHANNEL_TIME = 60 * 60 * 24 * 5
@@ -130,6 +130,7 @@ EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg
 BUMPER_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'bumpers')) + '/' #Local bumper location
 IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
 XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/' #Post Channel logo IMG Processing location
+PTVL_SKIN_LOC = os.path.join(ADDON_PATH, 'resources', 'skins') #Path to PTVL Skin folder
 
 #XMLTV FILENAMES
 USTVnowXML = (os.path.join(XMLTV_CACHE_LOC, 'ustvnow.xml'))
@@ -182,6 +183,7 @@ if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
         
     if not xbmcvfs.exists(MEDIA_LOC):
         MEDIA_LOC = DEFAULT_MEDIA_LOC 
+        
     if not xbmcvfs.exists(EPGGENRE_LOC):
         EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC         
 else:
@@ -196,15 +198,9 @@ else:
         Skin_Select = 'ConCast' 
     elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
         Skin_Select = 'TWC'     
-    else: # Default if Skin_Select value isn't found
-        Skin_Select = 'Default'
-                     
-    # Core Skin_Select Image Locations     
-    if xbmcvfs.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'):
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/' 
-    else:
-        MEDIA_LOC = DEFAULT_MEDIA_LOC
-            
+
+    MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+                
     if xbmcvfs.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'):
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
     else:  
@@ -212,10 +208,16 @@ else:
         
 # Find XBMC Skin path
 if xbmcvfs.exists(os.path.join('special://skin' ,'1080i')):
-    skinPath = (os.path.join('special://skin' ,'1080i'))
+    XBMC_SKIN_LOC = (os.path.join('special://skin' ,'1080i'))
 else:
-    skinPath = (os.path.join('special://skin' ,'720p'))
+    XBMC_SKIN_LOC = (os.path.join('special://skin' ,'720p'))
     
+# Find PTVL selected skin folder 720 or 1080i ?
+if xbmcvfs.exists(os.path.join(PTVL_SKIN_LOC, Skin_Select, '720p')):
+    PTVL_SKIN_SELECT = xbmc.translatePath(os.path.join(PTVL_SKIN_LOC, Skin_Select, '720p'))
+else:
+    PTVL_SKIN_SELECT = xbmc.translatePath(os.path.join(PTVL_SKIN_LOC, Skin_Select, '1080i'))
+
 # PseudoTV Cache Control
 if REAL_SETTINGS.getSetting("Cache_Enabled") == 'true': #
     Cache_Enabled = True
@@ -246,11 +248,13 @@ daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",2
 weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge
 monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge
 #FileLists
+localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",24)                     #System Purge
 liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge
-localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",12)                     #System Purge
+YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",24)                 #System Purge
+RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",24)                         #System Purge
 pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",24)                   #System Purge
 playonTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",4)                    #System Purge
-lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",48)                       #System Purge
+lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",24)                       #System Purge
 #Parsers
 parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((24 * 7) * 4))         #No Purge (API Queries)
 parserFANTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserFANTV",((24 * 7) * 4)) #No Purge (FANART Queries)

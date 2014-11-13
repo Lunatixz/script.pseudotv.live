@@ -17,11 +17,10 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import json
-import urllib2
-from BeautifulSoup import BeautifulSoup
+import json, urllib2
+import xbmcaddon, xbmc, xbmcgui, xbmcvfs
 
-# import libraries
+from BeautifulSoup import BeautifulSoup
 from urllib2 import HTTPError, URLError
 
 # Cache bool
@@ -49,26 +48,31 @@ class NetworkError(Exception):
 
 
 def get_latest(page=1):
+    xbmc.log("script.pseudotv.live-HDTrailers: get_latest")
     url = MAIN_URL + 'page/%d/' % int(page)
     return _get_movies(url)
 
 
 def get_most_watched():
+    xbmc.log("script.pseudotv.live-HDTrailers: get_most_watched")
     url = MAIN_URL + 'most-watched/'
     return _get_movies(url)
 
 
 def get_top_ten():
+    xbmc.log("script.pseudotv.live-HDTrailers: get_top_ten")
     url = MAIN_URL + 'top-movies/'
     return _get_movies(url)
 
 
 def get_opening_this_week():
+    xbmc.log("script.pseudotv.live-HDTrailers: get_opening_this_week")
     url = MAIN_URL + 'opening-this-week/'
     return _get_movies(url)
 
 
 def get_coming_soon():
+    xbmc.log("script.pseudotv.live-HDTrailers: get_coming_soon")
     url = MAIN_URL + 'coming-soon/'
     return _get_movies(url)
 
@@ -83,6 +87,7 @@ def get_initials():
 
 
 def get_videos(movie_id):
+    xbmc.log("script.pseudotv.live-HDTrailers: get_videos")
     url = MAIN_URL + 'movie/%s' % movie_id
     tree = __get_tree(url)
 
@@ -144,6 +149,7 @@ def get_yahoo_url(vid, res):
 
 
 def _get_movies(url):
+    xbmc.log("script.pseudotv.live-HDTrailers: _get_movies")
     tree = __get_tree(url)
     movies = [{
         'id': td.a['href'].split('/')[2],
@@ -199,6 +205,8 @@ def log(msg):
 
 
 def get_playable_url(source, raw_url):
+    xbmc.log("script.pseudotv.live-HDTrailers: get_playable_url")
+    print source, raw_url
 ##    print source
     if source == 'apple.com':
         raw_url = '%s' % raw_url

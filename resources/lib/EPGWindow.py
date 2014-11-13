@@ -67,9 +67,12 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.textureButtonNoFocus = MEDIA_LOC + BUTTON_NO_FOCUS
         self.showSeasonEpisode = REAL_SETTINGS.getSetting("ShowSeEp") == "true"
         self.PVRchtype = 0
+        self.PTVChanNum = 0
+        self.PVRTimeOffset = 0
         self.PVRmediapath = ''
         self.PVRchname = ''
         self.PVRtitle = ''
+        self.PVRtimestamp = ''
         self.Artdownloader = Artdownloader()  
 
         for i in range(self.rowCount):
@@ -243,11 +246,18 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:        
                 if REAL_SETTINGS.getSetting("EPGTextEnable") == "0":
                     # self.getControl(321 + i).setImage(self.channelLogos + self.MyOverlayWindow.channels[curchannel - 1].name + '.png')
+                    try:
+                        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))        
+                    except:
+                        chtype = 0
+                        pass
                     chname = (self.MyOverlayWindow.channels[curchannel - 1].name)
-                    setImage = self.Artdownloader.FindLogo(chname)
+                    plpos = self.determinePlaylistPosAtTime(starttime, (curchannel - 1))
+                    mediapath = ascii(self.MyOverlayWindow.channels[curchannel - 1].getItemFilename(plpos))
+                    setImage = self.Artdownloader.FindLogo(chtype, chname, mediapath)
                     self.getControl(321 + i).setImage(setImage)
                 else:
-                    self.getControl(321 + i).setImage('')
+                    self.getControl(321 + i).setImage('NA.png')
             except:
                 pass
 
@@ -518,13 +528,13 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                             if type == 'movie' and REAL_SETTINGS.getSetting('EPGcolor_MovieGenre') == "false":
                                 self.textureButtonNoFocus = self.EPGtype('Movie')
                             else:
-                                self.textureButtonNoFocus = self.EPGtype((mygenre))
+                                self.textureButtonNoFocus = self.EPGtype(mygenre)
                                 
                         elif REAL_SETTINGS.getSetting('EPGcolor_enabled') == '2':
                             self.textureButtonNoFocus = self.EPGtype(str(chtype))
                            
                         elif REAL_SETTINGS.getSetting('EPGcolor_enabled') == '3':
-                            self.textureButtonNoFocus = self.EPGtype(str(rating)) 
+                            self.textureButtonNoFocus = self.EPGtype(rating)
                             
                         else:   
                             self.textureButtonNoFocus = MEDIA_LOC + BUTTON_NO_FOCUS
@@ -931,7 +941,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         mediapath = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemFilename(plpos))
         chname = ascii(self.MyOverlayWindow.channels[newchan - 1].name)
         title = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemTitle(plpos))
+        timestamp = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemtimestamp(plpos))
         LiveID = ascii(self.MyOverlayWindow.channels[newchan - 1].getItemLiveID(plpos))
+        # videotime = self.MyOverlayWindow.channels[newchan - 1].showTimeOffset
         
         if mediapath[0:5] == 'stack':
             smpath = (mediapath.split(' , ')[0]).replace('stack://','')
@@ -948,6 +960,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.PVRmediapath = mediapath
         self.PVRchname = chname
         self.PVRtitle = title
+        self.PVRtimestamp = timestamp
+        self.PTVChanNum = newchan
+        # self.PVRTimeOffset = videotime
         
         LiveID = chanlist.unpackLiveID(LiveID)
         type = LiveID[0]
@@ -955,17 +970,17 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         Managed = LiveID[3]
         playcount = int(LiveID[4])
                 
-        #Check if VideoWindow Patch found, change label.
-        if self.MyOverlayWindow.VideoWindow == True:
-            try:
-                self.getControl(523).setLabel('NOW WATCHING:')
-            except:
-                pass
+        #Check if VideoWindow Patch found, Toggle Visible.
+        try:
+            if self.MyOverlayWindow.VideoWindow == True:
+                self.getControl(523).setVisible(True)
+            else:
+                self.getControl(523).setVisible(False)
+        except:
+            pass
                 
         #Change Label when Dynamic artwork enabled
         try:
-            self.getControl(522).setVisible(False)
-
             if self.infoOffset > 0:
                 self.getControl(515).setVisible(False)
             elif self.infoOffset < 0:
@@ -1122,12 +1137,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 return
            
             timedif = (time.time() - self.MyOverlayWindow.channels[newchan - 1].lastAccessTime)
-            
             pos = self.MyOverlayWindow.channels[newchan - 1].playlistPosition
-            
             showoffset = self.MyOverlayWindow.channels[newchan - 1].showTimeOffset
 
-            
             #code added for "LiveTV" types
             #Get the Start time of the show from "episodeitemtitle"
             #we just passed this from channellist.py ; just a fill in to get value
@@ -1159,23 +1171,59 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     timedif -= self.MyOverlayWindow.channels[newchan - 1].getItemDuration(pos) - showoffset
                     pos = self.MyOverlayWindow.channels[newchan - 1].fixPlaylistIndex(pos + 1)
                     showoffset = 0
-
                 self.log('pos + plpos ' + str(pos) +', ' + str(plpos))
             
+
             if self.MyOverlayWindow.currentChannel == newchan:
                 if plpos == xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition():
                     self.log('selectShow return current show')
                     return
 
                 if chtype == 8:
+                    tmpDate = self.PVRtimestamp
+                    try:#sloppy fix, for threading issue with strptime.
+                        t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
+                    except:
+                        t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
+                        pass
+                    Notify_Time = time.strftime('%I:%M%p, %A', t)
+                    
+                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(self.PVRtitle) + '[/B] on channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
+                        self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum)
                     self.log('selectShow return current LiveTV channel')
                     return
             
             if pos != plpos:
                 if chtype == 8:
+                    tmpDate = self.PVRtimestamp
+                    try:#sloppy fix, for threading issue with strptime.
+                        t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
+                    except:
+                        t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
+                        pass
+                    Notify_Time = time.strftime('%I:%M%p, %A', t)
+                    
+                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(self.PVRtitle) + '[/B] on channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
+                        self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum)
+
                     self.log('selectShow return different LiveTV channel')
                     return
                 else:
+                    Notify_Time = self.PVRTimeOffset
+                    
+                    if REAL_SETTINGS.getSetting("SelectAction") == "1":
+                        self.log('selectShow, Different Channel SelectAction = 1')
+                        if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(self.PVRtitle) + '[/B] on channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
+                            self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum) 
+                            return
+                    elif REAL_SETTINGS.getSetting("SelectAction") == "2":
+                        self.log('selectShow, Different Channel SelectAction = 2')
+                        if dlg.yesno("PseudoTV Live", "Would you like to watch [B]", str(self.PVRtitle) + '[/B] Now or set a reminder for channel [B]' + str(self.PTVChanNum), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
+                            print 'Watch Now Selected'
+                        else:
+                            self.setReminder(self.PVRtimestamp, Notify_Time, self.PVRtitle, self.PTVChanNum)
+                            return
+                            
                     self.MyOverlayWindow.channels[newchan - 1].setShowPosition(plpos)
                     self.MyOverlayWindow.channels[newchan - 1].setShowTime(0)
                     self.MyOverlayWindow.channels[newchan - 1].setAccessTime(time.time())
@@ -1273,3 +1321,25 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 return self.MyOverlayWindow.channels[channel - 1].fixPlaylistIndex(playlistpos)
         except:
             pass
+            
+    
+    def setReminder(self, tmpDate, cleanDate, title, channel):
+        self.log('setReminder')
+        jump = REAL_SETTINGS.getSetting("AutoJump") == "true"
+        
+        try:#sloppy fix, for threading issue with strptime.
+            t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
+        except:
+            t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
+            pass
+            
+        epochBeginDate = time.mktime(t)
+        now = time.time()
+        reminder_time = round(((epochBeginDate - now) / 60) - 1)
+        reminder_threadtime = round(((epochBeginDate - now) / 60) - 1) * 60
+        msg = title + ' starts in 1m'
+        
+        if jump == False:
+            xbmc.executebuiltin('XBMC.AlarmClock(PseudoTV Live, XBMC.Notification("PseudoTV Live",'+ msg +',4000,'+ THUMB +'),'+ str(reminder_time) + ',false)')
+        else:
+            self.MyOverlayWindow.SetAutoJump(reminder_threadtime, cleanDate, title, channel)

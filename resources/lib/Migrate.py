@@ -54,7 +54,7 @@ class Migrate:
         chanlist.background = True
         chanlist.forceReset = True
         chanlist.createlist = True
-        
+
         # If Autotune is enabled direct to autotuning
         if Globals.REAL_SETTINGS.getSetting("Autotune") == "true" and Globals.REAL_SETTINGS.getSetting("Warning1") == "true":
             self.log("autoTune, migrate")
@@ -100,21 +100,20 @@ class Migrate:
         self.updateDialogProgress = 1
         if Globals.REAL_SETTINGS.getSetting("autoFindCustom") == "true" :
             self.log("autoTune, adding Custom Channel")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Custom Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Custom Channels"," ")
             CChan = 0
             
             for CChan in range(999):
-                if xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'):
-                    self.log("autoTune, adding Custom Video Playlist Channel")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
+                if xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp'):
+                    self.log("autoTune, adding Custom Music Playlist Channel")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "12")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(xbmc.translatePath('special://profile/playlists/video/') + "Channel_" + str(CChan + 1) + '.xsp'))
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(xbmc.translatePath('special://profile/playlists/music/') + "Channel_" + str(CChan + 1) + '.xsp'))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'))))
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp'))))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
-                    channelNum += 1
+                    self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
                 elif xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp'):
                     self.log("autoTune, adding Custom Mixed Playlist Channel")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
@@ -125,18 +124,19 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp'))))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
-                    channelNum += 1
-                elif xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp'):
-                    self.log("autoTune, adding Custom Music Playlist Channel")
+                elif xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'):
+                    self.log("autoTune, adding Custom Video Playlist Channel")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(xbmc.translatePath('special://profile/playlists/music/') + "Channel_" + str(CChan + 1) + '.xsp'))
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(xbmc.translatePath('special://profile/playlists/video/') + "Channel_" + str(CChan + 1) + '.xsp'))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp'))))
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'))))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
-                    channelNum += 1
+                    self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
+                
+                channelNum += 1
+
   
         # Custom SuperFavs
         self.updateDialogProgress = 5
@@ -148,7 +148,7 @@ class Migrate:
             if SuperFav == True:
                 plugin_details = chanlist.PluginQuery('plugin://plugin.program.super.favourites')
                 filter =['create new super folder','explore favourites','explore  favourites','explore xbmc favourites','explore kodi favourites','isearch','search']
-                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Super Favourites","")
+                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Super Favourites"," ")
 
                 try:
                     Match = True
@@ -189,15 +189,17 @@ class Migrate:
                                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", SFname)
                                         Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Super Favourites",SFname)  
                                         channelNum += 1
                 except:
                     pass
                             
+        
         # LiveTV - PVR
         self.updateDialogProgress = 10
         if Globals.REAL_SETTINGS.getSetting("autoFindLivePVR") == "true":
             self.log("autoTune, adding Live PVR Channels")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding PVR Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding PVR Channels"," ")
 
             if Globals.REAL_SETTINGS.getSetting("xmltvLOC"):
                 xmltvLOC = xbmc.translatePath(Globals.REAL_SETTINGS.getSetting("xmltvLOC"))
@@ -231,13 +233,12 @@ class Migrate:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "pvr://channels/tv/All TV channels/" + str(PVRnum) + ".pvr")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "xmltv")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding PVR Channels",CHSetName)  
-                            channelNum += 1
-                        
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                        
                         else:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -249,8 +250,9 @@ class Migrate:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding PVR Channels",CHSetName)  
-                            channelNum += 1 
+                        
+                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding PVR Channels",CHSetName)  
+                        channelNum += 1 
                 except:
                     pass
                 
@@ -266,7 +268,7 @@ class Migrate:
             # LiveTV - HDHomeRun - STRM
             if Globals.REAL_SETTINGS.getSetting("autoFindLiveHD") == "1":
                 self.log("autoTune, adding Live HDHomeRun Strm Channels")
-                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun STRM Channels","")
+                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun STRM Channels"," ")
                 
                 try:                
                     LocalLST = str(xbmcvfs.listdir(self.HDstrmPath)[1]).replace("[","").replace("]","").replace("'","")
@@ -292,13 +294,12 @@ class Migrate:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", filename)
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "xmltv")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun STRM Channels",CHSetName)
-                                channelNum += 1
-                            
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                            
                             else:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -310,15 +311,17 @@ class Migrate:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun STRM Channels",CHSetName)
-                                channelNum += 1
+                                
+                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun STRM Channels",CHSetName)
+                            channelNum += 1
                 except:
                     pass
                     
+            
             # LiveTV - HDHomeRun - UPNP
             elif Globals.REAL_SETTINGS.getSetting("autoFindLiveHD") == "2":
                 self.log("autoTune, adding Live HDHomeRun UPNP Channels")
-                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun UPNP Channels","")
+                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun UPNP Channels"," ")
                 HDHome_details = chanlist.PluginInfo(self.HDstrmPath)
                 HDUPNPnum = 0
                 
@@ -343,13 +346,12 @@ class Migrate:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", unquote(file))
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "xmltv")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun UPNP Channels",CHSetName)  
-                            channelNum += 1
-                        
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                        
                         else:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -361,8 +363,9 @@ class Migrate:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHSetName + ' LiveTV')  
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun UPNP Channels",CHSetName)  
-                            channelNum += 1 
+                            
+                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding HDHomeRun UPNP Channels",CHSetName)  
+                        channelNum += 1 
                 except:
                     pass
 
@@ -371,7 +374,7 @@ class Migrate:
         self.updateDialogProgress = 13
         if Globals.REAL_SETTINGS.getSetting("autoFindUSTVNOW") == "true":
             self.log("autoTune, adding USTVnow Channels")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels"," ")
             USTVnum = 0
             USTVnow = chanlist.plugin_ok('plugin.video.ustvnow')
                 
@@ -406,13 +409,12 @@ class Migrate:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.ustvnow/?name="+CHname+"&mode=play")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "ustvnow")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USTVnow')  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels",CHname)
-                                channelNum += 1
-                            
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                           
                             else:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -425,16 +427,18 @@ class Migrate:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USTVnow')  
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels",CHname)
-                                channelNum += 1
+                                
+                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USTVnow Channels",CHname)
+                            channelNum += 1
                 except:
                     pass
+        
         
         # LiveTV - smoothstreams
         self.updateDialogProgress = 14
         if Globals.REAL_SETTINGS.getSetting("autoFindSmoothStreams") == "true":
             self.log("autoTune, adding SmoothStream Channels")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels"," ")
             SSTVnum = 0
             SSTV = chanlist.plugin_ok('plugin.video.mystreamstv.beta')
             
@@ -469,13 +473,12 @@ class Migrate:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.mystreamstv.beta/?path=/root/channels/&action=play_channel&chan="+CHnum)
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "smoothstreams")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", CHname)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' SStream')  
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels",CHname)
-                                channelNum += 1
-                                
                             else:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -487,25 +490,89 @@ class Migrate:
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' SStream')  
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels",CHname)
-                                channelNum += 1
+
+                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding SmoothStream Channels",CHname)
+                            channelNum += 1
                 except:
                     pass
            
+           
+        # Plugin - F.T.V Favourites
+        self.updateDialogProgress = 90
+        if Globals.REAL_SETTINGS.getSetting("autoFindFilmonFavourites") == "true":
+            self.log("autoTune, adding F.T.V Favourites")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites"," ")
+            addonini = 'https://dl.dropboxusercontent.com/s/s6c4kqhvel3f721/addon.ini'
+            FTVnum = 0
+            FTV = chanlist.plugin_ok('plugin.video.F.T.V')
+            
+            if FTV == True:
+                try:
+                    json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.F.T.V/?url=url&mode=415&name=Favourite+Channels"},"id":1}')
+                    json_folder_detail = chanlist.sendJSON(json_query)
+                    file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+                    FTVXML = (xbmc.translatePath(os.path.join(XMLTV_CACHE_LOC, 'ftvguide.xml')))
+                        
+                    if xbmcvfs.exists(FTVXML):
+                        for FTVnum in file_detail:   
+                            file = re.search('"file" *: *"(.*?)"', FTVnum)
+                            label = re.search('"label" *: *"(.*?)"', FTVnum)
+                            
+                            if file and label:
+                                file = file.group(1)
+                                label = label.group(1)
+                                CHname = ['W'+label[0:8], label[0:8]]
+                                inSet = False
+                                        
+                                CHSetName, CHzapit = chanlist.findZap2itID(CHname, FTVXML)
+                                if CHzapit != '0':
+                                    inSet = True
+                                                
+                                if inSet == True:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "ftvguide")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                                
+                                else:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                
+                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites",label)
+                                channelNum += 1                
+                except:
+                    pass    
+
+                    
         #TV - Networks/Genres
         self.updateDialogProgress = 20
         self.log("autoTune, autoFindNetworks " + str(Globals.REAL_SETTINGS.getSetting("autoFindNetworks")))
         self.log("autoTune, autoFindTVGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindTVGenres")))
         if (Globals.REAL_SETTINGS.getSetting("autoFindNetworks") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindTVGenres") == "true"):
             self.log("autoTune, Searching for TV Channels")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for TV Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for TV Channels"," ")
             chanlist.fillTVInfo()
 
         # need to add check for auto find network channels
-        self.updateDialogProgress = 23
+        self.updateDialogProgress = 21
         if Globals.REAL_SETTINGS.getSetting("autoFindNetworks") == "true":
             self.log("autoTune, adding TV Networks")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding TV Networks","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding TV Networks"," ")
 
             for i in range(len(chanlist.networkList)):
                 # channelNum = self.initialAddChannels(chanlist.networkList, 1, channelNum)
@@ -517,7 +584,7 @@ class Migrate:
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding TV Network",Globals.uni(chanlist.networkList[i]))
                 channelNum += 1
         
-        self.updateDialogProgress = 25
+        self.updateDialogProgress = 22
         if Globals.REAL_SETTINGS.getSetting("autoFindTVGenres") == "true":
             self.log("autoTune, adding TV Genres")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding TV Genres","")
@@ -533,17 +600,17 @@ class Migrate:
                     self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding TV Genres",Globals.uni(chanlist.showGenreList[i]) + " TV")
                     channelNum += 1
         
-        self.updateDialogProgress = 28
+        self.updateDialogProgress = 23
         self.log("autoTune, autoFindStudios " + str(Globals.REAL_SETTINGS.getSetting("autoFindStudios")))
         self.log("autoTune, autoFindMovieGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMovieGenres")))
         if (Globals.REAL_SETTINGS.getSetting("autoFindStudios") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindMovieGenres") == "true"):
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Movie Channels","")
             chanlist.fillMovieInfo()
 
-        self.updateDialogProgress = 30
+        self.updateDialogProgress = 24
         if Globals.REAL_SETTINGS.getSetting("autoFindStudios") == "true":
             self.log("autoTune, adding Movie Studios")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Movie Studios","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Movie Studios"," ")
 
             for i in range(len(chanlist.studioList)):
                 self.updateDialogProgress = self.updateDialogProgress + (10/len(chanlist.studioList))
@@ -555,10 +622,10 @@ class Migrate:
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Movie Studios",Globals.uni(chanlist.studioList[i]))
                 channelNum += 1
                 
-        self.updateDialogProgress = 33
+        self.updateDialogProgress = 25
         if Globals.REAL_SETTINGS.getSetting("autoFindMovieGenres") == "true":
             self.log("autoTune, adding Movie Genres")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Movie Genres","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Movie Genres"," ")
 
             # channelNum = self.initialAddChannels(chanlist.movieGenreList, 4, channelNum)
             for i in range(len(chanlist.movieGenreList)):
@@ -572,13 +639,13 @@ class Migrate:
                     self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Movie Genres","Found " + Globals.uni(chanlist.movieGenreList[i]) + " Movies")
                     channelNum += 1
                 
-        self.updateDialogProgress = 35
+        self.updateDialogProgress = 26
         self.log("autoTune, autoFindMixGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMixGenres")))
         if Globals.REAL_SETTINGS.getSetting("autoFindMixGenres") == "true":
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Mixed Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Mixed Channels"," ")
             chanlist.fillMixedGenreInfo()
         
-        self.updateDialogProgress = 38
+        self.updateDialogProgress = 27
         if Globals.REAL_SETTINGS.getSetting("autoFindMixGenres") == "true":
             self.log("autoTune, adding Mixed Genres")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Mixed Genres","")
@@ -592,18 +659,52 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Mixed Genres",Globals.uni(chanlist.mixedGenreList[i]) + " Mix")
                     channelNum += 1
-
+        
+        
+        #recent movie/tv
+        self.updateDialogProgress = 28  
+        if Globals.REAL_SETTINGS.getSetting("autoFindRecent") == "true":
+            self.log("autoTune, adding Recent TV/Movies")
+            
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recent TV"," ")
+            TVflename = chanlist.createRecentlyAddedTV()
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", TVflename)
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "3")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Recent TV")  
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "12")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_3_id", "13")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_3_opt_1", "4")  
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+            channelNum += 1
+            
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recent Movies"," ")
+            Movieflename = chanlist.createRecentlyAddedMovies()     
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", Movieflename)
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Recent Movies")  
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")  
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+            channelNum += 1
+            
         self.updateDialogProgress = 40
         self.log("autoTune, autoFindMusicGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicGenres")))
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicGenres") == "true":
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Music Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Music Channels"," ")
             chanlist.fillMusicInfo()
 
-        self.updateDialogProgress = 50
+        
         #Music Genre
+        self.updateDialogProgress = 50
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicGenres") == "true":
             self.log("autoTune, adding Music Genres")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Music Genres","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Music Genres"," ")
 
             for i in range(len(chanlist.musicGenreList)):
                 # add network presets
@@ -615,11 +716,12 @@ class Migrate:
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Music Genres",Globals.uni(chanlist.musicGenreList[i]) + " Music")
                 channelNum += 1
         
+        
         #Music Videos - My Music
         self.updateDialogProgress = 53
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosMusicTV") == "true":
             self.log("autoTune, adding My MusicTV Music Videos")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding My MusicTV Music Videos","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding My MusicTV Music Videos"," ")
                
             MusicTV = False
             MusicTV = chanlist.plugin_ok('plugin.video.my_music_tv')
@@ -645,11 +747,12 @@ class Migrate:
                         self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding My MusicTV Music Videos","Channel " + str(i))
                         channelNum += 1
  
+        
         #Music Videos - Last.fm user
         self.updateDialogProgress = 53
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosLastFM") == "true":
             self.log("autoTune, adding Last.FM Music Videos")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Last.FM Music Videos","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Last.FM Music Videos"," ")
                
             if Youtube != False:
                 user = Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosLastFMuser")
@@ -661,20 +764,23 @@ class Migrate:
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", user)
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "3")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Last.FM")  
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "18")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "No")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_3_id", "13")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_3_opt_1", "24")  
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Last.FM Music Videos","User " + user)
                 channelNum += 1
 
+        
         #Music Videos - Youtube
         self.updateDialogProgress = 55
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosYoutube") == "true":
             self.log("autoTune, adding Youtube Music Videos")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube Music Videos","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube Music Videos"," ")
 
             if Youtube != False:
 
@@ -684,32 +790,36 @@ class Migrate:
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "HungaryRChart")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "HRChart")  
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                channelNum += 1
                 # add BillbostdHot100 presets
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_type", "10")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_time", "0")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_1", "BillbostdHot100")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_2", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_3", str(limit))
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rulecount", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_id", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_opt_1", "BillbostdHot100")  
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_changed", "true")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "BillbostdHot100")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "BillbostdHot100")  
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                channelNum += 1
                 # add TheTesteeTop50Charts presets
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_type", "10")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_time", "0")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_1", "TheTesteeTop50Charts")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_2", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_3", str(limit))
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_rulecount", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_rule_1_id", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_rule_1_opt_1", "TheTesteeTop50Charts")  
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 2) + "_changed", "true")
-                       
-                channelNum = channelNum + 3
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "TheTesteeTop50Charts")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "TheTesteeTop50Charts")  
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                channelNum += 1
                 self.logDebug('channelNum = ' + str(channelNum))
             
             
@@ -717,7 +827,7 @@ class Migrate:
         self.updateDialogProgress = 58
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosVevoTV") == "true":
             self.log("autoTune, adding VevoTV Music Videos")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding VevoTV Music Videos","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding VevoTV Music Videos"," ")
             
             VevoTV = False
             VevoTV = chanlist.plugin_ok('plugin.video.vevo_tv')
@@ -735,18 +845,18 @@ class Migrate:
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "VevoTV - Hits")  
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_type", "9")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_time", "0")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_1", "5400")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_2", "plugin://plugin.video.vevo_tv/?url=TIVEVSTRUS01&mode=playOfficial")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_3", "VEVO TV (US: Flow)")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_4", "Sit back and enjoy a 24/7 stream of music videos on VEVO TV.")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rulecount", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_id", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_opt_1", "VevoTV - Flow")  
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_changed", "true")
-                       
-                channelNum = channelNum + 2
+                channelNum += 1
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "plugin://plugin.video.vevo_tv/?url=TIVEVSTRUS01&mode=playOfficial")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "VEVO TV (US: Flow)")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Sit back and enjoy a 24/7 stream of music videos on VEVO TV.")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "VevoTV - Flow")  
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                channelNum += 1
                 self.logDebug('channelNum = ' + str(channelNum))
             
             
@@ -754,7 +864,7 @@ class Migrate:
         self.updateDialogProgress = 60
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosLocal") != "":
             self.log("autoTune, adding Local Music Videos")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Local Music Videos","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Local Music Videos"," ")
             LocalVideo = str(Globals.REAL_SETTINGS.getSetting('autoFindMusicVideosLocal'))
             
             # add Local presets
@@ -764,9 +874,8 @@ class Migrate:
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Music Videos")  
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")        
-       
-            channelNum = channelNum + 1
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")         
+            channelNum += 1
             self.logDebug('channelNum = ' + str(channelNum))
         
         
@@ -788,21 +897,136 @@ class Migrate:
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Username + "Subscriptions")  
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")    
+                channelNum += 1
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", Username)
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "4")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Username + "Favourites")  
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_type", "10")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_time", "0")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_1", Username)
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_2", "4")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_3", str(limit))
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_4", "0")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rulecount", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_id", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_opt_1", Username + "Favourites")  
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_changed", "true")
-            
-                channelNum = channelNum + 2
+                channelNum += 1
                 self.logDebug('channelNum = ' + str(channelNum))
         
+        
+        # Playon
+        if Globals.REAL_SETTINGS.getSetting("autoFindPlayonAmazon") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindPlayonHulu") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindPlayonNetflix") == "true":
+            if PlayonPath != False:
+                self.updateDialogProgress = 95
+                self.log("Playon")
+                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon"," ")
+        
+                if Globals.REAL_SETTINGS.getSetting("autoFindPlayonAmazon") == "true":
+                    self.log("Playon - Amazon") 
+                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon","Amazon")
+
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Amazon Instant Video/Prime Watchlist/TV Shows')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon MyTV")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum += 1
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Amazon Instant Video/Prime Watchlist/Movies')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon MyMovies")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum += 1
+                    
+                if Globals.REAL_SETTINGS.getSetting("autoFindPlayonHulu") == "true":
+                    self.log("Playon - Hulu") 
+                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon","Hulu")
+                    
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Hulu/Your Subscriptions')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu MySubs")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum += 1
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Hulu/Popular/Popular Feature Films')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu Popular Movies")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum += 1
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Hulu/Recently Added/Recently Added Feature Films')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu Recent Movies")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum += 1
+                    
+                if Globals.REAL_SETTINGS.getSetting("autoFindPlayonNetflix") == "true":
+                    self.log("Playon - Netflix") 
+                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon","Netflix")
+                    
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Netflix/My List')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", 'Netflix My List')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum += 1       
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Netflix/Recently Added')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", 'Netflix Recently Added')
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum += 1       
+
+                    
         #Recommend lists#
         if int(REAL_SETTINGS.getSetting('autoFindCommunity_Source')) == 1: 
             Community = False
@@ -835,46 +1059,46 @@ class Migrate:
         self.updateDialogProgress = 70
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Plugins") == "true":
             self.log("autoTune, adding Recommend Plugins")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Plugins","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Plugins"," ")
             
             if Community:
                 url = 'https://pseudotv-live-community.googlecode.com/svn/addons.xml'
             else:
                 url = BASEURL + 'addons.ini'
                 
-            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum, limit, RAND)
+            channelNum = self.RecTune(url, genre_filter, channelNum, limit, RAND)
            
         #Playon
         self.updateDialogProgress = 71
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Playon") == "true":
             self.log("autoTune, adding Recommend Playon")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Playon","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Playon"," ")
             
             if Community:
                 url = 'https://pseudotv-live-community.googlecode.com/svn/playon.xml'
             else:
                 url = BASEURL + 'playon.ini'
             
-            channelNum = self.RecTune(url, 'Plugin', genre_filter, channelNum, limit, RAND)
+            channelNum = self.RecTune(url, genre_filter, channelNum, limit, RAND)
             
         #InternetTV
         self.updateDialogProgress = 72
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_InternetTV") == "true":
             self.log("autoTune, adding Recommend InternetTV")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend InternetTV","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend InternetTV"," ")
            
             if Community:
                 url = 'https://pseudotv-live-community.googlecode.com/svn/internettv.xml'
             else:
                 url = BASEURL + 'internettv.ini'
             
-            channelNum = self.RecTune(url, 'InternetTV', genre_filter, channelNum, limit, RAND)
+            channelNum = self.RecTune(url, genre_filter, channelNum, limit, RAND)
         
         # RSS
         self.updateDialogProgress = 73
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_RSS") == "true":
             self.log("autoTune, adding Recommend RSS")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend RSS","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend RSS"," ")
             url = 'https://pseudotv-live-community.googlecode.com/svn/rss.xml'
             fileNum = 0
             
@@ -883,52 +1107,52 @@ class Migrate:
                 data = f.readlines()
                 f.close()
                 data = data[2:] #remove first two unwanted lines
+                
                 if RAND == True:
                     random.shuffle(data)#shuffle
             except:
                 return
-                
-            for i in range(limit):
-                try:
+            
+            try:
+                for i in range(limit):
                     line = str(data[i]).replace("\n","").replace('""',"")
                     line = line.split(",")
                     
                     #If List Formatting is bad return
-                    if len(line) != 2:
+                    if len(line) == 2:
+                        setting_1 = line[0]
+                        channel_name = (line[1]).replace('\n','').replace('\r','')
+                
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "11")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)
+                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Randomly Recommend RSS",channel_name)
+                        channelNum += 1
+                        fileNum += 1
+                        
+                        if fileNum >= limit:
+                            break
+                    else:
+                        print line
                         print "!!!!COMMUNITY LIST RSS FORMATING ERROR!!!!"
                         pass
-                        
-                    setting_1 = line[0]
-                    channel_name = line[1]
-            
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "11")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Randomly Recommend RSS",channel_name)
-                    channelNum += 1
-                    fileNum += 1
-                    
-                    if fileNum >= limit:
-                        break
-                except:
-                    pass
+            except:
+                pass
             
             
         #Youtube Network
+        #todo switch format to multi youtube type
         self.updateDialogProgress = 74
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Networks") == "true":
-            self.log("autoTune, adding Recommend Networks")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Networks","")    
-
-            Chan = []
-            ChanLst = []
+            self.log("autoTune, adding Youtube Networks")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube Networks"," ")    
             Channel_List = 'https://pseudotv-live-community.googlecode.com/svn/youtube_channels_networks.xml'
             Playlist_List = 'https://pseudotv-live-community.googlecode.com/svn/youtube_playlists_networks.xml'
             
@@ -940,52 +1164,39 @@ class Migrate:
             except:
                 return
             
-            try:
-                for i in range(len(linesLST)):#parse list for info
-                    line = str(linesLST[i])
-                    line = line.split('|')
-                                        
-                    #If List Formatting is bad return
-                    if len(line) != 4:
-                        print "!!!!COMMUNITY LIST Youtube Network FORMATING ERROR!!!!"
-                        pass
-                        
-                    genre = line[0]
-                    chanNum = line[1]
-                    YoutubeID = line[2]
-                    chanNam = line[3].replace('\n','')
-                    
-                    if genre.lower() in genre_filter:#filter wanted genres
-                        Chan.append(chanNum +'|'+ genre +'|'+ chanNam)
-
-                Chan.sort()#sort, remove dupes
-                ChanLst = sorted(set(Chan),key=Chan.index)
-
-                for i in range(len(ChanLst)):
-                    Chan = ChanLst[i].split('|')
-                    ChanNum = Chan[0]
-                    ChanGenre = Chan[1]
-                    ChanNam = Chan[2]
-
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "17")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "Channel")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", ChanNum)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", ChanGenre)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", ChanNam)  
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend Networks",ChanNam)  
-                    channelNum += 1 
-            except:
-                pass
+            for i in range(len(linesLST)):
+                line = str(linesLST[i]).replace("\n","").replace('""',"")
+                line = line.split("|")
             
+                #If List Formatting is bad return
+                if len(line) == 7:  
+                    genre = line[0]
+                    chtype = line[1]
+                    setting_1 = (line[2]).replace(",","|")
+                    setting_2 = line[3]
+                    setting_3 = line[4]
+                    setting_4 = line[5]
+                    channel_name = line[6]
+                    CHname = channel_name
+                    
+                    if Youtube != False:
+                        if genre.lower() in genre_filter:
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "8")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube Networks",channel_name)
+                            channelNum += 1
+                else:   
+                    print line
+                    print "!!!!COMMUNITY LIST Youtube Network FORMATING ERROR!!!!"
+                            
             try:
                 f = Open_URL(Playlist_List)
                 linesLST = f.readlines()
@@ -994,60 +1205,45 @@ class Migrate:
             except:
                 return
             
-            try:
-                Chan = []
-                ChanLst = []
-                
-                for i in range(len(linesLST)):#parse list for info
-                    line = str(linesLST[i])
-                    line = line.split('|')
-                    
-                    #If List Formatting is bad return
-                    if len(line) != 4:
-                        print "!!!!COMMUNITY LIST Youtube Network Playlist FORMATING ERROR!!!!"
-                        pass
-                        
+            for i in range(len(linesLST)):
+                line = str(linesLST[i]).replace("\n","").replace('""',"")
+                line = line.split("|")
+            
+                #If List Formatting is bad return
+                if len(line) == 7:  
                     genre = line[0]
-                    chanNum = line[1]
-                    YoutubeID = line[2]
-                    chanNam = line[3].replace('\n','')
-                    chanNam = chanNam.split('_')[0]
-                    if genre.lower() in genre_filter:#filter wanted genres
-                        Chan.append(chanNum +'|'+ genre +'|'+ chanNam)
+                    chtype = line[1]
+                    setting_1 = (line[2]).replace(",","|")
+                    setting_2 = line[3]
+                    setting_3 = line[4]
+                    setting_4 = line[5]
+                    channel_name = line[6]
+                    CHname = channel_name
+                    
+                    if Youtube != False:
+                        if genre.lower() in genre_filter:
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "7")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube Networks",channel_name)
+                            channelNum += 1
+                else:   
+                    print line
+                    print "!!!!COMMUNITY LIST Youtube Network FORMATING ERROR!!!!"
 
-                Chan.sort()#sort, remove dups
-                ChanLst = sorted(set(Chan),key=Chan.index)
-
-                for i in range(len(ChanLst)):
-                    Chan = ChanLst[i].split('|')
-                    ChanNum = Chan[0]
-                    ChanGenre = Chan[1]
-                    ChanNam = Chan[2]
-
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "17")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "Playlist")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", ChanNum)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", ChanGenre)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", ChanNam)  
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1
-            except:
-                pass
-                
-        
+                    
         #Youtube Channels
         self.updateDialogProgress = 75    
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Channels") == "true":
             self.log("autoTune, adding Recommend Youtube Channels")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Channels","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Channels"," ")
             url = 'https://pseudotv-live-community.googlecode.com/svn/youtube_channels.xml'
             
             try: 
@@ -1093,7 +1289,7 @@ class Migrate:
         self.updateDialogProgress = 76
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Playlists") == "true":
             self.log("autoTune, adding Recommend Youtube Playlists")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Playlists","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Random Recommend Youtube Playlists"," ")
             url = 'https://pseudotv-live-community.googlecode.com/svn/youtube_playlists.xml'
             
             try: 
@@ -1139,7 +1335,7 @@ class Migrate:
         self.updateDialogProgress = 80
         if Globals.REAL_SETTINGS.getSetting("autoFindInternetSamples") == "true":
             self.log("autoTune, adding InternetTV Strms")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube & RSS Examples","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube & RSS Examples"," ")
 
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
@@ -1151,24 +1347,25 @@ class Migrate:
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "BBC World News")  
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_type", "11")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_time", "0")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_1", "http://revision3.com/hdnation/feed/Quicktime-High-Definition")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_2", "1")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_3", str(limit))
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rulecount", "1")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_id", "1")
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_rule_1_opt_1", "HD Nation")  
-            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum + 1) + "_changed", "true")
-            
-            channelNum = channelNum + 2
+            channelNum += 1
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "11")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "http://revision3.com/hdnation/feed/Quicktime-High-Definition")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "1")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(limit))
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "HD Nation")  
+            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+            channelNum += 1
             self.logDebug('channelNum = ' + str(channelNum))  
         
+        
         # Extras - Bringthepopcorn
-        self.updateDialogProgress = 83
+        self.updateDialogProgress = 81
         if Globals.REAL_SETTINGS.getSetting("autoFindPopcorn") == "true" and Donor_Downloaded == True:
             self.log("autoTune, adding Bring The Popcorn Movies")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Bring The Popcorn Movies","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Bring The Popcorn Movies"," ")
             
             if Youtube != False:
             
@@ -1198,10 +1395,12 @@ class Migrate:
                 channelNum = channelNum + 1
                 self.logDebug('channelNum = ' + str(channelNum))
            
+           
         # Extras - Cinema Experience 
-        if Globals.REAL_SETTINGS.getSetting("autoFindCinema") == "true" and Globals.REAL_SETTINGS.getSetting("CinemaPack") == "true" and Donor_Downloaded == True:
+        self.updateDialogProgress = 82
+        if Globals.REAL_SETTINGS.getSetting("autoFindCinema") == "true" and Donor_Downloaded == True:
             self.log("autoTune, adding Cinema Experience ")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Cinema Experience","")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Cinema Experience"," ")
             flename = chanlist.createCinemaExperiencePlaylist() #create playlist
             THEME_NAMES = ['Default','IMAX']
             THEME = THEME_NAMES[int(Globals.REAL_SETTINGS.getSetting('autoFindCinema_Theme'))]
@@ -1222,202 +1421,126 @@ class Migrate:
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_4_opt_1", "No")  
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_id", "15")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_opt_1", "No")    
-            
             channelNum = channelNum + 1
             self.logDebug('channelNum = ' + str(channelNum))
-
-        # Plugin - F.T.V Favourites
-        self.updateDialogProgress = 90
-        if Globals.REAL_SETTINGS.getSetting("autoFindFilmonFavourites") == "true":
-            self.log("autoTune, adding F.T.V Favourites")
-            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites","")
-            addonini = 'https://dl.dropboxusercontent.com/s/s6c4kqhvel3f721/addon.ini'
-            FTVnum = 0
-            FTV = chanlist.plugin_ok('plugin.video.F.T.V')
+  
+  
+        # Extras - IPTV
+        self.updateDialogProgress = 83
+        if Globals.REAL_SETTINGS.getSetting("autoFindIPTV_Source") != "0" and Donor_Downloaded == True:
+            self.log("autoTune, adding IPTV Channels")
+            self.updateDialog.update(self.updateDialogProgress,"adding IPTV Channels","This could take a few minutes","Please Wait...")
+            # IPTVurl = 'http://xty.me/vdubt25'
+            # IPTVxml = 'http://is.gd/vguide2'
+            IPTVnum = 0
             
-            if FTV == True:
-                try:
-                    json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.F.T.V/?url=url&mode=415&name=Favourite+Channels"},"id":1}')
-                    json_folder_detail = chanlist.sendJSON(json_query)
-                    file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
-                    FTVXML = (xbmc.translatePath(os.path.join(XMLTV_CACHE_LOC, 'ftvguide.xml')))
+            if Globals.REAL_SETTINGS.getSetting("autoFindIPTV_Source") == "1":
+                IPTVurl = Globals.REAL_SETTINGS.getSetting('autoFindIPTV_Path_Local')
+            else:
+                IPTVurl = Globals.REAL_SETTINGS.getSetting('autoFindIPTV_Path_Online')
+            
+            IPTVlst = chanlist.IPTVtuning(IPTVurl)
+            IPTVname = IPTVurl.replace('//','/')
+            
+            for IPTVnum in range(len(IPTVlst)):
+                if channelNum == 999:
+                    break
+            
+                IPTV = IPTVlst[IPTVnum]
+                title = IPTV[0]
+                link = IPTV[1]
+                Pluginvalid = chanlist.Valid_ok(link)
+                
+                if Pluginvalid != False:
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", link)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", title)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "IPTV - " + IPTVname)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum = channelNum + 1
+        
+        
+        # Extras - LiveStream
+        self.updateDialogProgress = 83
+        if Globals.REAL_SETTINGS.getSetting("autoFindLive_Source") != "0" and Donor_Downloaded == True:
+            self.log("autoTune, adding LiveStream Channels")
+            self.updateDialog.update(self.updateDialogProgress,"adding LiveStream Channels","This could take a few minutes","Please Wait...")
+            LSTVnum = 0
                         
-                    if xbmcvfs.exists(FTVXML):
-                        for FTVnum in file_detail:   
-                            file = re.search('"file" *: *"(.*?)"', FTVnum)
-                            label = re.search('"label" *: *"(.*?)"', FTVnum)
-                            
-                            if file and label:
-                                file = file.group(1)
-                                label = label.group(1)
-                                CHname = ['W'+label[0:8], label[0:8]]
-                                inSet = False
-                                        
-                                CHSetName, CHzapit = chanlist.findZap2itID(CHname, FTVXML)
-                                if CHzapit != '0':
-                                    inSet = True
-                                                
-                                if inSet == True:
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "ftvguide")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                    channelNum += 1
-                                
-                                else:
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", label + ' FTV')  
-                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                    channelNum += 1
-                                    
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites",label)
-                except:
-                    pass 
-                                
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "15")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'plugin://plugin.video.F.T.V/Favourite Movies')
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", '')
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", '25')
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", '1')
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", 'F.T.V Movies')  
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding F.T.V Favourites",'F.T.V Movies')
-                channelNum = channelNum + 1
-                self.logDebug('channelNum = ' + str(channelNum))
+            if Globals.REAL_SETTINGS.getSetting("autoFindLive_Source") == "1":
+                LSTVurl = Globals.REAL_SETTINGS.getSetting('autoFindLive_Path_Local')
+            else:
+                LSTVurl = Globals.REAL_SETTINGS.getSetting('autoFindLive_Path_Online')
+            
+            LSTVlst = chanlist.LSTVtuning(LSTVurl)
+            LSTVname = LSTVurl.replace('//','/')
+            
+            for LSTVnum in range(len(LSTVlst)):
+                if channelNum == 999:
+                    break
+            
+                LSTV = LSTVlst[LSTVnum]
+                title = LSTV[0]
+                link = LSTV[1]
+                Pluginvalid = chanlist.Valid_ok(link)
+                
+                if Pluginvalid != False:
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", link)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", title)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "LiveStream - " + LSTVname)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                    channelNum = channelNum + 1
         
-        # Playon
-        if Globals.REAL_SETTINGS.getSetting("autoFindPlayonAmazon") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindPlayonHulu") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindPlayonNetflix") == "true":
-            if PlayonPath != False:
-                self.updateDialogProgress = 95
-                self.log("Playon")
-                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon","")
         
-                if Globals.REAL_SETTINGS.getSetting("autoFindPlayonAmazon") == "true":
-                    self.log("Playon - Amazon") 
-                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon","Amazon")
-
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
+        # Extras - Navi-X
+        self.updateDialogProgress = 83
+        if Globals.REAL_SETTINGS.getSetting("autoFindNavix_Source") != "0" and Donor_Downloaded == True:
+            self.log("autoTune, adding Navi-X Channels")
+            self.updateDialog.update(self.updateDialogProgress,"adding Navi-X Channels","This could take a few minutes","Please Wait...")
+            NaviXnum = 0
+                        
+            if Globals.REAL_SETTINGS.getSetting("autoFindNavix_Source") == "1":
+                NaviXurl = Globals.REAL_SETTINGS.getSetting('autoFindNavix_Path_Local')
+            else:
+                NaviXurl = Globals.REAL_SETTINGS.getSetting('autoFindNavix_Path_Online')
+            
+            NaviXlst = chanlist.NaviXtuning(NaviXurl)
+            NaviXname = NaviXurl.replace('//','/')
+            
+            for NaviXnum in range(len(NaviXlst)):
+                if channelNum == 999:
+                    break
+            
+                NaviX = NaviXlst[NaviXnum]
+                title = NaviX[0]
+                link = NaviX[1]
+                Pluginvalid = chanlist.Valid_ok(link)
+                
+                if Pluginvalid != False:
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Amazon Instant Video/Prime Watchlist/TV Shows')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", link)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", title)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Navi-X - " + NaviXname)
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon MyTV")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
+                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1
+                    channelNum = channelNum + 1
                     
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Amazon Instant Video/Prime Watchlist/Movies')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Amazon MyMovies")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1
                     
-                if Globals.REAL_SETTINGS.getSetting("autoFindPlayonHulu") == "true":
-                    self.log("Playon - Hulu") 
-                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon","Hulu")
-                    
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Hulu/Your Subscriptions')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu MySubs")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1
-                    
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Hulu/Popular/Popular Feature Films')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu Popular Movies")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1
-                    
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Hulu/Recently Added/Recently Added Feature Films')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Hulu Recent Movies")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1
-                    
-                if Globals.REAL_SETTINGS.getSetting("autoFindPlayonNetflix") == "true":
-                    self.log("Playon - Netflix") 
-                    self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Playon","Netflix")
-                    
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Netflix/My List')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", 'Netflix My List')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1       
-                    
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "16")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", 'Netflix/Recently Added')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "25")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", 'Netflix Recently Added')
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum += 1       
-        
         Globals.ADDON_SETTINGS.writeSettings()
 
         #set max channels
@@ -1433,11 +1556,13 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting('autoFindLiveHD', "0")
         Globals.REAL_SETTINGS.setSetting('autoFindUSTVNOW', "false")  
         Globals.REAL_SETTINGS.setSetting('autoFindSmoothStreams', "false")  
+        Globals.REAL_SETTINGS.setSetting("autoFindFilmonFavourites","false")
         Globals.REAL_SETTINGS.setSetting("autoFindNetworks","false")
         Globals.REAL_SETTINGS.setSetting("autoFindStudios","false")
         Globals.REAL_SETTINGS.setSetting("autoFindTVGenres","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMovieGenres","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMixGenres","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindRecent","false")      
         Globals.REAL_SETTINGS.setSetting("autoFindMusicGenres","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosMusicTV","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosLastFM","false")
@@ -1445,6 +1570,9 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosVevoTV","false")
         Globals.REAL_SETTINGS.setSetting("autoFindMusicVideosLocal","")
         Globals.REAL_SETTINGS.setSetting("autoFindYoutube","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindPlayonAmazon","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindPlayonHulu","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindPlayonNetflix","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Plugins","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Playon","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Youtube_Networks","false")
@@ -1455,10 +1583,9 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindInternetStrms","false")
         Globals.REAL_SETTINGS.setSetting("autoFindPopcorn","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCinema","false")
-        Globals.REAL_SETTINGS.setSetting("autoFindFilmonFavourites","false")
-        Globals.REAL_SETTINGS.setSetting("autoFindPlayonAmazon","false")
-        Globals.REAL_SETTINGS.setSetting("autoFindPlayonHulu","false")
-        Globals.REAL_SETTINGS.setSetting("autoFindPlayonNetflix","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindIPTV_Source","0")    
+        Globals.REAL_SETTINGS.setSetting("autoFindLive_Source","0")    
+        Globals.REAL_SETTINGS.setSetting("autoFindNavix_Source","0")        
         Globals.REAL_SETTINGS.setSetting("ForceChannelReset","true")
         Globals.ADDON_SETTINGS.setSetting('LastExitTime', str(int(curtime)))
         self.updateDialog.close()
@@ -1541,64 +1668,78 @@ class Migrate:
         return currentchan
 
         
-    def RecTune(self, url, STRMtype, genre_filter, channelNum, limit=200, RAND=False):
-        print 'RecTune'
+    def RecTune(self, url, genre_filter, channelNum, limit=200, RAND=False):
+        self.log('RecTune, URL = ' + url + ', Limit = ' + str(limit) + ', Random = ' + str(RAND))
         chanlist = ChannelList.ChannelList()
         duplicate = []
         fileNum = 0
         
-        try: 
+        try:
             data = Open_URL_UP(url, USERPASS)
             data = data[2:] #remove first two unwanted lines
             data = ([x for x in data if x != '']) #remove empty lines      
+            
             if RAND == True:
                 random.shuffle(data)
 
             for i in range(len(data)):
                 line = str(data[i]).replace("\n","").replace('""',"")
                 line = line.split("|")
-                print line
-                                                    
-                #If List Formatting is bad return
-                if len(line) != 7:
-                    print "!!!!COMMUNITY LIST RECTune FORMATING ERROR!!!!"
-                    pass
-                    
-                genre = line[0]
-                chtype = line[1]
-                setting_1 = line[2]
-                setting_2 = line[3]
-                setting_3 = line[4]
-                setting_4 = line[5]
-                channel_name = line[6]
-                CHname = channel_name
                 
-                if STRMtype == 'Plugin':
-                    Pluginvalid = chanlist.plugin_ok(setting_1)
-                elif STRMtype == 'Playon':
-                    Pluginvalid = chanlist.playon_player()
-                elif STRMtype == 'InternetTV':
-                    Pluginvalid = chanlist.Valid_ok(setting_2)
-                    CHname = channel_name.replace(' HD','').replace('HD','')
+                #If List Formatting is bad return
+                if len(line) == 7:  
+                    genre = line[0]
+                    chtype = line[1]
+                    setting_1 = line[2]
+                    setting_2 = line[3]
+                    setting_3 = line[4]
+                    setting_4 = line[5]
+                    channel_name = line[6]
+                    CHname = channel_name
                     
-                if Pluginvalid != False:
                     if genre.lower() in genre_filter:
                         if CHname.lower() not in duplicate:
-                            duplicate.append(CHname.lower())
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name)  
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend " + STRMtype,channel_name)
-                            channelNum += 1
-                            fileNum += 1
-                
+                        
+                            if chtype == '15':
+                                STRMtype = 'PluginTV'
+                                Pluginvalid = chanlist.plugin_ok(setting_1)
+                            elif chtype == '16':
+                                STRMtype = 'PlayonTV'
+                                Pluginvalid = chanlist.playon_player()
+                            elif chtype == '9':
+                                STRMtype = 'InternetTV'
+                                Pluginvalid = chanlist.Valid_ok(setting_2)
+                                CHname = channel_name.replace(' HD','').replace('HD','')
+                                
+                            if Pluginvalid != False:
+                                duplicate.append(CHname.lower())
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", setting_2)
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", setting_3)
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", setting_4)
+                                
+                                if STRMtype == 'PlayonTV':
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                                else:
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                    
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name) 
+
+                                if STRMtype == 'PlayonTV':                                
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")  
+                                    
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend " + STRMtype,channel_name)
+                                channelNum += 1
+                                fileNum += 1
+                else:
+                    print line
+                    print "!!!!Recommended LIST FORMATING ERROR!!!!"
+        
                 if fileNum >= limit:
                     break
         except:

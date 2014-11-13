@@ -87,9 +87,10 @@ Controls
     --------------------
     Mute ('F8')
     Last Channel Recall ('ACTION_SHIFT')
-    Subtitles ('S'),('ACTION_SHOW_SUBTITLES')
+    Subtitles ('ACTION_SHOW_SUBTITLES'), ('ShowSubtitles')
+    Next Subtitle ('NextSubtitle')
     Show Codec ('ACTION_SHOW_CODEC')
-    Aspect Ratio ('ACTION_ASPECT_RATIO')
+    Sleep Timer ('ACTION_ASPECT_RATIO')
     Record ('ACTION_RECORD') -- To be used with future PVR features.
     
 ------------------

@@ -1,3 +1,26 @@
+[*] Full XMLTV Listings for SmoothStream LiveTV EPG.
+[*] NEW! Playback timeout option. Found under "Misc", What does it do? PTVL tries to cancel playback after the configured 
+    time. Tweak timeout time to avoid "Failed Playback" prompt. 0 = Disabled.
+[*] PseudoCinema tweaks, New Eventghost broadcast events and custom video option (WIP).
+[*] [COLOR=blue]^ v.0.5.6 ^[/COLOR] 
+[*] Settop mode finalized. What is it? It allows PTVL to rebuild/update channel without having to restart.
+    How is it used? Any channel you want updated, Setup a advanced channel rule to reset every x hours.
+    Enable Settop mode under "General" settings, select the interval you want to check for updates.
+[*] Initial Kodi Helix support, not 100% compatible.. Its still recommend you use Gotham.
+[*] NEW! LiveTV Show reminder w/ Optional Jump to channel on reminder.
+[*] ArtService and SyncXMLTV Service started by Settop mode.
+[*] Community Youtube Network Format Change, Also new Chtype "10" setting switch "7" = Multiple Youtube Playlists.
+[*] Tweaks and changes to dead link handling. "Misc/Override Stream Validation" Setting enabled by default.
+    If you prefer PTVL to filter dead links at the cost of channel building speed, disable above setting.
+[*] Misc. Tweaks and Bug fixes.
+[*] Added "Eminence" Classic skin *Thanks redhalo, Cleaned Default & Concast skins.
+[*] Visual enhancements made to "PTVL" skin.
+    Please make sure to have "script.extendedinfo" & "script.tv.show.next.aired" installed.
+[*] Sleep timer w/ shutdown options, Mapped to "ACTION_ASPECT_RATIO".
+[*] VideoWindow Patcher now removes XBMC seek OSD.
+[*] NEW! IPTV M3U & Livestream XML and Navi-X PLX Autotuning w/Missing Logo Downloading - Hub Edition and Donors only. 
+[*] NEW! Recently added TV & Movie Autotuning, Channel includes media added to XBMC in the last 14days.
+[*] [COLOR=blue]^ v.0.5.5 ^[/COLOR] 
 [*] EventGhost JSON broadcasts (Starting,Stopping)
 [*] LiveTV, LocalTV, PluginTV, PlayonTV and LastFM FileList Caching, 
     Purged every 24hrs, 12hrs, 24hrs, 4hrs, 48hrs. Caching is disabled in Settop Box Mode.
@@ -27,7 +50,7 @@
 [*] Improved LiveTV channel pairing, parsing and added local xmltv cache.
 [*] Misc. Tweaks and Bug patches.
 [*] [COLOR=blue]^ v.0.5.1 ^[/COLOR] 
-[*] Initial Smoothstreams.tv support via Hub-Edition Only! Thanks aaearon
+[*] Initial Smoothstreams.tv support via Hub-Edition Only! *Thanks aaearon
 [*] USTVnow XMLTV fix, InternetTV Autotune now Hub-Edition Only!
 [*] PseudoCinema rewrite (Removed Local CEPACK, Youtube sources only).
 [*] Super Favourites, Plugin Autotune and Seek fix.
