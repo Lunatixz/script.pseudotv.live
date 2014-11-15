@@ -247,24 +247,45 @@ class Migrate:
                             for n_items in range(len(items)):
                                 #print items[n_items]
                                 try:
-                                    strm_path = getItems(items[n_items],strm_folder,item_num)
+                                    strm_path,epg = getItems(items[n_items],strm_folder,item_num)
                                     print 'strm_path',strm_path
                                     if os.path.isfile(strm_path):
                                         (ppath,chname) = os.path.split(str(strm_path))
                                         print chname
                                         chname = chname.replace('.strm','').replace('_'+str(item_num),'').replace(' ','')
                                         chname = chname.lower()
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", strm_path) #channel not quoting
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", chname+'//'+name) #sourcename
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "LiveStreamPro")
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", chname )  
-                                        Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                        self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding LSpro items",chname)  
+                                        print chname
+                                        print epg
+                                        if epg:
+                                            epg = epg.split(':')
+                                            print epg
+                                            epgfilename = epg[0]
+                                            epgchid = epg[1]
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(epgchid))
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", strm_path)
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(epg[0]))
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", chname)
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", chname + ' LSpro')  
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                                        
+                                        
+                                        else:
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", strm_path) #channel not quoting
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", chname+'//'+name) #sourcename
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "LiveStreamPro")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", chname )  
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding LSpro items",chname)  
                                         channelNum += 1
                                 except Exception:
                                     print 'trying next link'
@@ -1842,6 +1863,15 @@ def getItems(item,strm_folder,item_num):
         name = ''
 
     try:
+        epg = item('pstvepg')[0].text #hindi:chname
+        print epg
+        if epg is None:
+            name = ''
+    except:
+        addon_log('Epg Error')
+        epg = ''
+
+    try:
         #url = []
         if len(item('link')) >0:
             print 'item link', item('link')
@@ -2000,6 +2030,6 @@ def getItems(item,strm_folder,item_num):
     with open(strm_path,'w') as f:
         f.write(strm_url)
     
-    return strm_path
+    return (strm_path,epg)
     #except:
     #        print 'Url is ignored'         
