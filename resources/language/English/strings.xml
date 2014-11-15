@@ -54,9 +54,7 @@
     <string id="30301">Use (S01E01), Instead of (01x01)</string>
 	<string id="30405">Find Missing GuideData (Art/Info)</string>
     <string id="30408">Jump to Channel on Reminder</string>
-    <string id="30409">Default Select Action</string>
     <string id="30302">Channel Change Delay (seconds)</string>
-    <string id="30309">Playback timeout (seconds)</string>
     <string id="30303">Choose Startup Channel</string> 
     <string id="30304">Enter Preferred Channel</string>
     <string id="30311">Disable Watch Flagging</string>
@@ -93,6 +91,7 @@
                 <string id="30074">Find USTVNOW</string>
                 <string id="30174">Find SmoothStream</string>
                 <string id="30953">Find F.T.V Channel Favourites</string>
+                <string id="30175">Find LivestremsPro Source</string>
                 <string id="30076">TV/Movie:</string>
                     <string id="30078">Find TV Networks</string>
                     <string id="30079">Find Movie Studios</string>
@@ -115,16 +114,14 @@
                             <string id="30092">BringThePopcorn Movie Channel</string>
                             <string id="30950">PseudoCinema Movie Channel</string>  
                             <string id="30908">Preferred Cinema Experience Theme</string>
-                            <string id="30965">Find IPTV Channels</string>
+                            <string id="30965">Find IPTV Channel</string>
                             <string id="30966">Select IPTV M3U File</string>
                             <string id="30967">Enter IPTV URL</string>
                             <string id="30968">Optional IPTV XMLTV Filename/URL</string>
-                            <string id="30969">Find Livestream Channels</string>
+                            <string id="30969">Find Livestream Channel</string>
                             <string id="30970">Select Livestream XML File</string>
                             <string id="30971">Enter Livestream URL</string>
-                            <string id="30972">Find Navi-X Channels</string>
-                            <string id="30973">Select Navi-X PLX File</string>
-                            <string id="30974">Enter Navi-X URL</string>
+                            <string id="30972">Optional Livestream XMLTV Filename/URL</string>
                         <string id="30954">Playon:</string>
                             <string id="30955">Find Amazon</string>
                             <string id="30956">Find Hulu</string>
