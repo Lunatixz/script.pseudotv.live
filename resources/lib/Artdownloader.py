@@ -627,3 +627,6 @@ class Artdownloader:
             if NOTIFY == 'true':
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSSG, 2000, THUMB) )
     
+
+
+        

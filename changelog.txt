@@ -1,3 +1,5 @@
+[*] Sidebar Menu, Activated while the InfoOverlay is displaying click Left. Click Right, Back or Close to exit.
+[*] [COLOR=blue]^ v.0.5.7 ^[/COLOR] 
 [*] Full XMLTV Listings for SmoothStream LiveTV EPG.
 [*] NEW! Playback timeout option. Found under "Misc", What does it do? PTVL tries to cancel playback after the configured 
     time. Tweak timeout time to avoid "Failed Playback" prompt. 0 = Disabled.

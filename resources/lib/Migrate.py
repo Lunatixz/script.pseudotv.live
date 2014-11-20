@@ -137,7 +137,6 @@ class Migrate:
                 
                 channelNum += 1
 
-  
         # Custom SuperFavs
         self.updateDialogProgress = 5
         if Globals.REAL_SETTINGS.getSetting("autoFindSuperFav") == "true" :
@@ -194,7 +193,6 @@ class Migrate:
                 except:
                     pass
                             
-        
         # LiveTV - PVR
         self.updateDialogProgress = 10
         if Globals.REAL_SETTINGS.getSetting("autoFindLivePVR") == "true":
@@ -210,7 +208,6 @@ class Migrate:
                     json_query = '{"jsonrpc":"2.0","method":"PVR.GetChannels","params":{"channelgroupid":2}, "id":1}'
                     json_folder_detail = chanlist.sendJSON(json_query)
                     file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
-
                     file_detail = str(file_detail)
                     CHnameLST = re.findall('"label" *: *(.*?),', file_detail)
                     CHidLST = re.findall('"channelid" *: *(.*?),', file_detail)
@@ -255,7 +252,6 @@ class Migrate:
                         channelNum += 1 
                 except:
                     pass
-                
         
         # LiveTV - HDHomeRun
         self.updateDialogProgress = 11
@@ -316,8 +312,7 @@ class Migrate:
                             channelNum += 1
                 except:
                     pass
-                    
-            
+
             # LiveTV - HDHomeRun - UPNP
             elif Globals.REAL_SETTINGS.getSetting("autoFindLiveHD") == "2":
                 self.log("autoTune, adding Live HDHomeRun UPNP Channels")
@@ -368,8 +363,7 @@ class Migrate:
                         channelNum += 1 
                 except:
                     pass
-
-                    
+             
         # LiveTV - USTVnow
         self.updateDialogProgress = 13
         if Globals.REAL_SETTINGS.getSetting("autoFindUSTVNOW") == "true":
@@ -1092,7 +1086,7 @@ class Migrate:
             else:
                 url = BASEURL + 'internettv.ini'
             
-            channelNum = self.RecTune(url, genre_filter, channelNum, limit, RAND)
+            channelNum = self.RecTune(url, genre_filter, channelNum, limit, True)
         
         # RSS
         self.updateDialogProgress = 73
@@ -1695,10 +1689,10 @@ class Migrate:
                     setting_3 = line[4]
                     setting_4 = line[5]
                     channel_name = line[6]
-                    CHname = channel_name
+                    CHname = ((channel_name.lower()).replace(' HD','').replace('HD','').replace(' hd','').replace('hd',''))
                     
                     if genre.lower() in genre_filter:
-                        if CHname.lower() not in duplicate:
+                        if CHname not in duplicate:
                         
                             if chtype == '15':
                                 STRMtype = 'PluginTV'
@@ -1708,11 +1702,14 @@ class Migrate:
                                 Pluginvalid = chanlist.playon_player()
                             elif chtype == '9':
                                 STRMtype = 'InternetTV'
-                                Pluginvalid = chanlist.Valid_ok(setting_2)
-                                CHname = channel_name.replace(' HD','').replace('HD','')
+                                if setting_2[0:6] == 'plugin':
+                                    #Call Plugin_ok directly to avoid Valid_ok Override.
+                                    Pluginvalid = chanlist.plugin_ok(setting_2)
+                                else:
+                                    Pluginvalid = chanlist.Valid_ok(setting_2)
                                 
                             if Pluginvalid != False:
-                                duplicate.append(CHname.lower())
+                                duplicate.append(CHname)
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", chtype)
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", setting_1)
@@ -1726,14 +1723,14 @@ class Migrate:
                                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
                                     
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name) 
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", channel_name.title()) 
 
                                 if STRMtype == 'PlayonTV':                                
                                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
                                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "4")  
                                     
                                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend " + STRMtype,channel_name)
+                                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Recommend " + STRMtype, channel_name.title())
                                 channelNum += 1
                                 fileNum += 1
                 else:

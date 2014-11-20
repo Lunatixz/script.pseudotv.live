@@ -117,6 +117,15 @@ def Open_URL_UP(url, userpass):
         pass
         
         
+def Open_URL_Request(url):
+    try:
+        req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"})
+        f = urllib2.urlopen(req)
+        return f
+    except:
+        pass
+        
+        
 def Download_URL(_in, _out): 
     Finished = False    
     

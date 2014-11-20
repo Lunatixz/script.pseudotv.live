@@ -93,7 +93,7 @@
                 <string id="30074">Find USTVNOW</string>
                 <string id="30174">Find SmoothStream</string>
                 <string id="30953">Find F.T.V Channel Favourites</string>
-                <string id="30076">TV/Movie:</string>
+                <string id="30076">LocalTV:</string>
                     <string id="30078">Find TV Networks</string>
                     <string id="30079">Find Movie Studios</string>
                     <string id="30080">Find TV Genres</string>
@@ -203,7 +203,7 @@
     <string id="39997">Include BCT Files</string>
     <string id="30994">Plugin Validation Level</string>
     <string id="30992">Disable Goggle Analytic's</string>
-    <string id="30998">Enable Settop Box Mode (Experimental)</string>
+    <string id="30998">Enable Settop Box Mode</string>
     <string id="31000">Refresh Interval (Hours)</string>
     <string id="30999">Optimize Configurations (Coming Soon)</string>
 </strings>
