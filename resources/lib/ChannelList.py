@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Jason Anderson, Lunatixz
+#   Copyright (C) 2013 Jason Anderson, Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -99,6 +99,7 @@ class ChannelList:
         self.runningActionId = 0
         self.enteredChannelCount = 0
         self.background = True
+        self.seasonal = False
         random.seed() 
 
         
@@ -704,6 +705,15 @@ class ChannelList:
         elif chtype == 10:
             if self.youtube_ok != False:
                 self.log("Building Youtube Channel " + setting1 + " using type " + setting2 + "...")
+                
+                if setting2 == '31':
+                    self.seasonal = True
+                    today = datetime.datetime.now()
+                    month = today.strftime('%B')
+                    if setting1.lower() != month.lower():
+                        seasonal.delete("%") 
+                        ADDON_SETTINGS.setSetting("Channel_" + str(channel) + "_1", month)
+                        
                 fileList = self.createYoutubeFilelist(setting1, setting2, setting3, setting4, channel)            
             else:
                 self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'self.youtube_ok invalid: ' + str(setting2))
@@ -2397,7 +2407,10 @@ class ChannelList:
         xbmc.log("createYoutubeFilelist Cache")
         if Cache_Enabled == True:
             try:
-                result = YoutubeTV.cacheFunction(self.createYoutubeFilelist_NEW, setting1, setting2, setting3, setting4, channel)
+                if self.seasonal:
+                    result = seasonal.cacheFunction(self.createYoutubeFilelist_NEW, setting1, setting2, setting3, setting4, channel)
+                else:
+                    result = YoutubeTV.cacheFunction(self.createYoutubeFilelist_NEW, setting1, setting2, setting3, setting4, channel)
             except:
                 result = self.createYoutubeFilelist_NEW(setting1, setting2, setting3, setting4, channel)
                 pass
@@ -2446,6 +2459,9 @@ class ChannelList:
             elif setting2 == '9': 
                 stop = 1 # If Setting2 = User playlist pagination disabled, else loop through pagination of 25 entries per page and stop at limit.
                 YTMSG = 'Raw gdata'
+            elif setting2 == '31':
+                YTMSG = 'Seasons Channel'
+                showList = self.BuildseasonalYoutubeChannel(setting1, setting2, setting3, setting4, channel)
 
             if self.background == False:
                 if REAL_SETTINGS.getSetting('commercials') == '2' or REAL_SETTINGS.getSetting('AsSeenOn') == 'true':
@@ -2606,6 +2622,46 @@ class ChannelList:
     
         return showList
 
+        
+    def BuildseasonalYoutubeChannel(self, setting1, setting2, setting3, setting4, channel):
+        self.log("BuildseasonalYoutubeChannel")
+        tmpstr = ''
+        showList = []
+        genre_filter = [setting1.lower()]
+        Playlist_List = 'https://pseudotv-live-community.googlecode.com/svn/youtube_playlists_networks.xml'
+        
+        try:
+            f = Open_URL(Playlist_List)
+            linesLST = f.readlines()
+            linesLST = linesLST[2:]#remove first two lines
+            f.close
+        except:
+            return
+            
+        for i in range(len(linesLST)):
+            line = str(linesLST[i]).replace("\n","").replace('""',"")
+            line = line.split("|")
+        
+            #If List Formatting is bad return
+            if len(line) == 7:  
+                genre = line[0]
+                chtype = line[1]
+                setting1 = (line[2]).replace(",","|")
+                setting2 = line[3]
+                setting3 = line[4]
+                setting4 = line[5]
+                channel_name = line[6]
+                CHname = channel_name
+
+                if genre.lower() in genre_filter:
+                    channelList = setting1.split('|')
+                    
+                    for n in range(len(channelList)):
+                        tmpstr = self.createYoutubeFilelist(channelList[n], '2', setting3, setting4, channel)
+                        showList.extend(tmpstr) 
+        
+        return showList    
+    
     
     def BuildMultiYoutubeChannelNetwork(self, setting1, setting2, setting3, setting4, channel):
         self.log("BuildMultiYoutubeChannelNetwork")
@@ -3259,9 +3315,9 @@ class ChannelList:
         self.log("urlValid = " + str(self.urlValid))
         return self.urlValid
         
-        
+
     def plugin_ok(self, plugin):
-        self.log("plugin_ok")
+        self.log("plugin_ok, plugin= " + plugin)
         self.PluginFound = False
         self.Pluginvalid = False
         
@@ -3272,9 +3328,7 @@ class ChannelList:
             self.log("plugin id = " + addon)
         else:
             addon = plugin
-            
-        print 'addon', addon        
-        
+
         if self.addonFileDetails:
             self.log("plugin_ok, Using Cached addonFileDetails")
             file_detail = self.addonFileDetails
@@ -5460,8 +5514,8 @@ class ChannelList:
             # plname[0].childNodes[0].nodeValue.lower() = 'false'
             
         # xml.close()
-        
-    
+       
+       
     def GrabLogo(self, url, title):
         print 'GrabLogo'
         if REAL_SETTINGS.getSetting('ChannelLogoFolder') != '':
@@ -5469,4 +5523,4 @@ class ChannelList:
             LogoFile = os.path.join(LogoPath, title[0:18] + '.png')
             
             if not FileAccess.exists(LogoFile):
-                Download_URL(logo, LogoFile)            
+                Download_URL(logo, LogoFile)

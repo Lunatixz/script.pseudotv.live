@@ -1,4 +1,4 @@
-#   Copyright (C) 2011 Lunatixz
+#   Copyright (C) 2011 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV.

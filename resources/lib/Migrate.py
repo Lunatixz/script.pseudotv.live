@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV.
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
-import subprocess, os, re, sys, time
+import subprocess, os, re, sys, time, datetime
 import xbmcaddon, xbmc, xbmcgui, xbmcvfs
 import Settings, Globals, ChannelList
 import urllib, urllib2, httplib, random
@@ -27,15 +27,6 @@ from FileAccess import FileLock, FileAccess
 from urllib import unquote
 from utils import *
 
-try:
-    from Donor import *
-    Donor_Downloaded = True
-    xbmc.log("script.pseudotv.live-Migrate: Donor Imported")
-except Exception,e:
-    Donor_Downloaded = False
-    xbmc.log("script.pseudotv.live-Migrate: Donor Import Failed, Disabling Donor Features" + str(e))
-    pass
-       
 class Migrate:
 
     def log(self, msg, level = xbmc.LOGDEBUG):
@@ -77,13 +68,12 @@ class Migrate:
         else:
             channelNum = 1
         
-        print 'channelNum', channelNum
+        self.log('autoTune, Starting channelNum = ' + str(channelNum))
         
         if channelNum == 999:
             return
         
         updateDialogProgress = 0
-                
         self.updateDialog = xbmcgui.DialogProgress()
         self.updateDialog.create("PseudoTV Live", "Auto Tune")
         Youtube = chanlist.youtube_player()
@@ -95,7 +85,7 @@ class Migrate:
             RAND = False
         elif limit < 25:
             limit = 25
-
+            
         # Custom Playlists
         self.updateDialogProgress = 1
         if Globals.REAL_SETTINGS.getSetting("autoFindCustom") == "true" :
@@ -134,7 +124,6 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'))))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
-                
                 channelNum += 1
 
         # Custom SuperFavs
@@ -1232,7 +1221,25 @@ class Migrate:
                     print line
                     print "!!!!COMMUNITY LIST Youtube Network FORMATING ERROR!!!!"
 
-                    
+        self.updateDialogProgress = 74
+        if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Seasonal") == "true":
+           if Youtube != False:
+                today = datetime.datetime.now()
+                month = today.strftime('%B')
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "10")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", month)
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "31")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Seasonal Channel")  
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube Networks","Seasonal Channel")
+                channelNum += 1 
+                
+                          
         #Youtube Channels
         self.updateDialogProgress = 75    
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Channels") == "true":
@@ -1570,6 +1577,7 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Plugins","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Playon","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Youtube_Networks","false")
+        Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Youtube_Seasonal","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_InternetTV","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_RSS","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCommunity_Youtube_Channels","false")
@@ -1679,8 +1687,7 @@ class Migrate:
             for i in range(len(data)):
                 line = str(data[i]).replace("\n","").replace('""',"")
                 line = line.split("|")
-                
-                #If List Formatting is bad return
+
                 if len(line) == 7:  
                     genre = line[0]
                     chtype = line[1]
@@ -1689,7 +1696,7 @@ class Migrate:
                     setting_3 = line[4]
                     setting_4 = line[5]
                     channel_name = line[6]
-                    CHname = ((channel_name.lower()).replace(' HD','').replace('HD','').replace(' hd','').replace('hd',''))
+                    CHname = ((channel_name.lower()).replace(' hd','').replace('hd',''))
                     
                     if genre.lower() in genre_filter:
                         if CHname not in duplicate:

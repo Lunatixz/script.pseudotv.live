@@ -8,6 +8,7 @@
         <string id="30045">Delay Service (seconds)</string>
         <string id="30004">Auto-off Timer (minutes)</string>
         <string id="30009">Auto-off Mode</string>
+        <string id="29999">Enable Idle ScreenSaver</string>
         <string id="30005">Force channel reset on next start</string>
         <string id="30006">Time between channel resets</string>
         <string id="30007">Default channel times at startup</string>
@@ -138,6 +139,7 @@
                             <string id="30115">Find Youtube Network Channels</string>
                             <string id="30113">Find Random Youtube Channels</string>
                             <string id="30114">Find Random Youtube Playlists</string>
+                            <string id="30817">Find Seasonal Youtube Playlists</string>
                                <!-- <string id="39005">Keep Pre-existing Channels During Autotuning (Experimental)</string> -->
                    
     <string id="30700">AutoTune filter</string>
@@ -205,5 +207,5 @@
     <string id="30992">Disable Goggle Analytic's</string>
     <string id="30998">Enable Settop Box Mode</string>
     <string id="31000">Refresh Interval (Hours)</string>
-    <string id="30999">Optimize Configurations (Coming Soon)</string>
+    <string id="30999">Optimize Configurations (Coming Soon)</string>    
 </strings>

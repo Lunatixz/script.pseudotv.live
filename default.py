@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -33,8 +33,8 @@ except Exception,e:
 
 # Script constants
 __scriptname__ = "PseudoTV Live"
-__author__     = "Lunatixz, Jason102 & Angrycamel"
-__url__        = "https://github.com/Lunatixz/script.pseudotv.live"
+__author__     = "Lunatixz, Jason102"
+__url__        = "https://github.com/Kevin S. Graer/script.pseudotv.live"
 __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
 __cwd__        = __settings__.getAddonInfo('path')
    
@@ -60,9 +60,9 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                     
                 try:
                     if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-                        link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/addon.xml')
+                        link=Request_URL('https://raw.githubusercontent.com/Kevin S. Graer/script.pseudotv.live/master/addon.xml')
                     elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
-                        link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/addon.xml')
+                        link=Request_URL('https://raw.githubusercontent.com/Kevin S. Graer/script.pseudotv.live/development/addon.xml')
                 except:
                     link='nill'
 
@@ -148,6 +148,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
                 daily.delete("%") 
                 weekly.delete("%")
                 monthly.delete("%")
+                seasonal.delete("%") 
                 localTV.delete("%")
                 liveTV.delete("%")
                 YoutubeTV.delete("%")

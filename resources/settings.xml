@@ -10,6 +10,7 @@
                 <setting id="AutoOff" type="enum" label="30004" values="Disable|30|60|90|120|150|180|210|240" default="0"/>
                 <setting id="AutoOff_Mode" type="enum" label="30009" values="Exit PTVL|Quit XBMC|Sleep|Shutdown" default="0"/>
                 <setting id="ForceChannelReset" type="bool" label="30005" default="false" />
+                <setting id="Idle_Screensaver" type="bool" label="29999" default="false" />
                 <setting id="ChannelResetSetting" type="enum" label="30006" values="Automatic|Daily|Weekly|Monthly|Never|Every Time" default="0"/>
                 <setting id="StartMode" type="enum" label="30007" values="Resume|Real Time|Random" default="1" />
                 <setting id="ThreadMode" type="enum" label="30008" values="On|Minimum Use|Off" default="1" />
@@ -134,20 +135,21 @@
             <setting id="autoFindCommunity_Youtube_Networks" type="bool" label="30115" subsetting="true" visible="eq(-39,true)" default="false"/>
             <setting id="autoFindCommunity_Youtube_Channels" type="bool" label="30113" subsetting="true" visible="eq(-40,true)" default="false"/>
             <setting id="autoFindCommunity_Youtube_Playlists" type="bool" label="30114" subsetting="true" visible="eq(-41,true)" default="false"/>
+            <setting id="autoFindCommunity_Youtube_Seasonal" type="bool" label="30817" subsetting="true" visible="eq(-42,true)" default="false"/>
         <!-- AT Donor -->
-        <setting type="lsep" label="30090" visible="eq(-42,true)"/>  
-            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-45,true)" visible="eq(-43,true)" default="false"/>
-            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-46,true)" visible="eq(-44,true)" default="false"/>
-            <setting id="autoFindCinema_Theme" type="enum" label="30908" subsetting="true"  enable="eq(-47,true)" visible="eq(-45,true) + eq(-1,true)" values="Default|IMAX|Custom" default="1" />
-            <setting id="autoFindIPTV_Source" type="enum" label="30965" subsetting="true"  enable="eq(-48,true) + eq(-49,true)" visible="eq(-46,true)" values=" |Local|Online" default="0" />
-            <setting id="autoFindIPTV_Path_Local" type="file" source="auto" label="30966" subsetting="true" enable="eq(-1,1)" visible="eq(-47,true) + eq(-1,1)" default=""/>
-            <setting id="autoFindIPTV_Path_Online" type="text" source="auto" label="30967" subsetting="true" enable="eq(-2,2)" visible="eq(-48,true) + eq(-2,2)" default=""/>
-            <setting id="autoFindLive_Source" type="enum" label="30969" subsetting="true"  enable="eq(-51,true) + eq(-52,true)" visible="eq(-49,true)" values=" |Local|Online" default="0" />
-            <setting id="autoFindLive_Path_Local" type="file" source="auto" label="30970" subsetting="true" enable="eq(-1,1)" visible="eq(-50,true) + eq(-1,1)" default=""/>
-            <setting id="autoFindLive_Path_Online" type="text" source="auto" label="30971" subsetting="true" enable="eq(-2,2)" visible="eq(-51,true) + eq(-2,2)" default=""/>
-            <setting id="autoFindNavix_Source" type="enum" label="30972" subsetting="true"  enable="eq(-54,true) + eq(-53,true)" visible="eq(-52,true)" values=" |Local|Online" default="0" />
-            <setting id="autoFindNavix_Path_Local" type="file" source="auto" label="30973" subsetting="true" enable="eq(-1,1)" visible="eq(-53,true) + eq(-1,1)" default=""/>
-            <setting id="autoFindNavix_Path_Online" type="text" source="auto" label="30974" subsetting="true" enable="eq(-2,2)" visible="eq(-54,true) + eq(-2,2)" default=""/>
+        <setting type="lsep" label="30090" visible="eq(-43,true)"/>  
+            <setting id="autoFindPopcorn" type="bool" label="30092" subsetting="true" enable="eq(-46,true)" visible="eq(-44,true)" default="false"/>
+            <setting id="autoFindCinema" type="bool" label="30950" subsetting="true" enable="eq(-47,true)" visible="eq(-45,true)" default="false"/>
+            <setting id="autoFindCinema_Theme" type="enum" label="30908" subsetting="true"  enable="eq(-48,true)" visible="eq(-46,true) + eq(-1,true)" values="Default|IMAX|Custom" default="1" />
+            <setting id="autoFindIPTV_Source" type="enum" label="30965" subsetting="true"  enable="eq(-49,true) + eq(-50,true)" visible="eq(-47,true)" values=" |Local|Online" default="0" />
+            <setting id="autoFindIPTV_Path_Local" type="file" source="auto" label="30966" subsetting="true" enable="eq(-1,1)" visible="eq(-48,true) + eq(-1,1)" default=""/>
+            <setting id="autoFindIPTV_Path_Online" type="text" source="auto" label="30967" subsetting="true" enable="eq(-2,2)" visible="eq(-49,true) + eq(-2,2)" default=""/>
+            <setting id="autoFindLive_Source" type="enum" label="30969" subsetting="true"  enable="eq(-52,true) + eq(-53,true)" visible="eq(-50,true)" values=" |Local|Online" default="0" />
+            <setting id="autoFindLive_Path_Local" type="file" source="auto" label="30970" subsetting="true" enable="eq(-1,1)" visible="eq(-51,true) + eq(-1,1)" default=""/>
+            <setting id="autoFindLive_Path_Online" type="text" source="auto" label="30971" subsetting="true" enable="eq(-2,2)" visible="eq(-52,true) + eq(-2,2)" default=""/>
+            <setting id="autoFindNavix_Source" type="enum" label="30972" subsetting="true"  enable="eq(-55,true) + eq(-54,true)" visible="eq(-53,true)" values=" |Local|Online" default="0" />
+            <setting id="autoFindNavix_Path_Local" type="file" source="auto" label="30973" subsetting="true" enable="eq(-1,1)" visible="eq(-54,true) + eq(-1,1)" default=""/>
+            <setting id="autoFindNavix_Path_Online" type="text" source="auto" label="30974" subsetting="true" enable="eq(-2,2)" visible="eq(-55,true) + eq(-2,2)" default=""/>
         </category>
 <!--BCTs-->   
     <category label="30499">

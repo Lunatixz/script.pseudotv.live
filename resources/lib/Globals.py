@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -235,7 +235,7 @@ NOTIFY = REAL_SETTINGS.getSetting('notify')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop") == "true"
 OS_SET = int(REAL_SETTINGS.getSetting("os"))
-
+        
 if (OS_SET <= 5 or OS_SET == 10 or OS_SET == 12) and REAL_SETTINGS.getSetting("OS_SET_OVERRIDE") != "true":
     LOWPOWER = True
 else:
@@ -247,6 +247,7 @@ quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quar
 daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge
 weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge
 monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge
+seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))        #System Purge
 #FileLists
 localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",24)                     #System Purge
 liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge

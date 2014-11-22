@@ -360,5 +360,237 @@
             </control>
         </control>
         </control>
+         <!-- Overlay Sidebar Menu -->
+        <control type="group" id="119">
+            <visible></visible>
+            <control type="image">
+                <description>Background Image</description>
+                <posx>0</posx>
+                <posy>0</posy>
+                <width>1280</width>
+                <height>720</height>
+                <texture>pstvlMenuWindow.png</texture>
+            </control>
+            <control type="image" id="995">
+                <description>Logo</description>
+                <posx>44</posx>
+                <posy>0</posy>
+                <width>151</width>
+                <height>151</height>
+                <texture></texture>
+                <aspectratio>keep</aspectratio>
+                <visible>Control.IsVisible(119)</visible>
+            </control>
+            <control type="button" id="997">
+                <posx>44</posx>
+                <posy>160</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>OnNow</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1010</onup>
+                <ondown>998</ondown>
+            </control>
+            <control type="button" id="998">
+                <posx>44</posx>
+                <posy>200</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>OnDemand</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>997</onup>
+                <ondown>999</ondown>
+            </control>
+            <control type="button" id="999">
+                <posx>44</posx>
+                <posy>240</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>LastChannel</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>998</onup>
+                <ondown>1000</ondown>
+            </control>
+            <control type="button" id="1000">
+                <posx>44</posx>
+                <posy>280</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>Favorites</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>999</onup>
+                <ondown>1001</ondown>
+            </control>
+            <control type="button" id="1001">
+                <posx>44</posx>
+                <posy>320</posy>
+                <width>151</width>
+                <height>40</height>
+                <label></label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1000</onup>
+                <ondown>1002</ondown>
+            </control>
+            <control type="button" id="1002">
+                <posx>44</posx>
+                <posy>360</posy>
+                <width>151</width>
+                <height>40</height>
+                <label></label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1001</onup>
+                <ondown>1003</ondown>
+            </control>
+            <control type="button" id="1003">
+                <posx>44</posx>
+                <posy>400</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>EPGType</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1002</onup>
+                <ondown>1004</ondown>
+            </control>
+            <control type="button" id="1004">
+                <posx>44</posx>
+                <posy>440</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>Record</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1003</onup>
+                <ondown>1005</ondown>
+            </control>
+            <control type="button" id="1005">
+                <posx>44</posx>
+                <posy>480</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>Mute</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1004</onup>
+                <ondown>1006</ondown>
+            </control>
+            <control type="button" id="1006">
+                <posx>44</posx>
+                <posy>520</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>Subtitle</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1005</onup>
+                <ondown>1007</ondown>
+            </control>
+            <control type="button" id="1007">
+                <posx>44</posx>
+                <posy>560</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>VOSD</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1006</onup>
+                <ondown>1008</ondown>
+            </control>
+            <control type="button" id="1008">
+                <posx>44</posx>
+                <posy>600</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>Sleep</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1007</onup>
+                <ondown>1009</ondown>
+            </control>
+            <control type="button" id="1009">
+                <posx>44</posx>
+                <posy>640</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>Settings</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1008</onup>
+                <ondown>1010</ondown>
+            </control>
+            <control type="button" id="1010">
+                <posx>44</posx>
+                <posy>680</posy>
+                <width>151</width>
+                <height>40</height>
+                <label>Exit</label>
+                <align>center</align>
+                <aligny>center</aligny>
+                <font>font12</font>
+                <textcolor>ffffffff</textcolor>
+                <texturefocus>pstvButtonFocus.png</texturefocus>
+                <texturenofocus>button-nofocus.png</texturenofocus>
+                <onup>1009</onup>
+                <ondown>997</ondown>
+            </control>
+        </control>
     </controls>
 </window>

@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV.
@@ -223,6 +223,12 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         basecur = curchannel
         self.toRemove.append(self.currentTimeBar)
         myadds = []
+        
+        try:
+            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))        
+        except:
+            chtype = 0
+            pass
 
         for i in range(self.rowCount):
             if singlerow == -1 or singlerow == i:
@@ -246,11 +252,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:        
                 if REAL_SETTINGS.getSetting("EPGTextEnable") == "0":
                     # self.getControl(321 + i).setImage(self.channelLogos + self.MyOverlayWindow.channels[curchannel - 1].name + '.png')
-                    try:
-                        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))        
-                    except:
-                        chtype = 0
-                        pass
                     chname = (self.MyOverlayWindow.channels[curchannel - 1].name)
                     plpos = self.determinePlaylistPosAtTime(starttime, (curchannel - 1))
                     mediapath = ascii(self.MyOverlayWindow.channels[curchannel - 1].getItemFilename(plpos))
@@ -303,8 +304,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             n = n.replace(minute=0, second=0, microsecond=0)
 
         return time.mktime(n.timetuple())
-    
-    
+
+        
     def EPGtype(self, genre):
         print 'EPGtype'
         
@@ -373,7 +374,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             # if chname == 'PseudoCinema':
                 # if self.MyOverlayWindow.channels[curchannel - 1].getItemDuration(playlistpos) <= 1800:
                     # self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
-
+                    
             if chname in BYPASS_EPG:
                 self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
                 
@@ -659,7 +660,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
 
     def closeEPG(self):
         self.log('closeEPG')
-
+        self.MyOverlayWindow.showingEPG = False
+        
         try:
             self.removeControl(self.currentTimeBar)
             self.MyOverlayWindow.startSleepTimer()

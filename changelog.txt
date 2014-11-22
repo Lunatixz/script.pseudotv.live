@@ -1,4 +1,7 @@
-[*] Sidebar Menu, Activated while the InfoOverlay is displaying click Left. Click Right, Back or Close to exit.
+[*] Seasonal Channel, Channel based on Monthly Youtube Playlists, No Playlist = No Channel.
+[*] Idle timer, and ScreenSaver. *Thanks Anisan.
+[*] Sidebar Menu, Activated while the Info Overlay is displaying; click Left. Click Right, Back or Close to exit.
+[*] IPTV/LiveStream/NaviX parsing improvements.
 [*] [COLOR=blue]^ v.0.5.7 ^[/COLOR] 
 [*] Full XMLTV Listings for SmoothStream LiveTV EPG.
 [*] NEW! Playback timeout option. Found under "Misc", What does it do? PTVL tries to cancel playback after the configured 

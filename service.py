@@ -1,4 +1,4 @@
-﻿#   Copyright (C) 2013 Lunatixz
+﻿#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.

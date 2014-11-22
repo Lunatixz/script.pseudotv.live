@@ -1,5 +1,5 @@
 #
-#      Copyright (C) 2013 Lunatixz
+#      Copyright (C) 2013 Kevin S. Graer
 #      http://tommy.winther.nu
 #
 #  This Program is free software; you can redistribute it and/or modify

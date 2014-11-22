@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV.
@@ -185,6 +185,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.notPlayingAction = 'Up'
         self.ActionTimerInt = float(REAL_SETTINGS.getSetting("Playback_timeout"))
         self.Browse = ''
+        self.showingEPG = False
         
         if REAL_SETTINGS.getSetting("UPNP1") == "true" or REAL_SETTINGS.getSetting("UPNP2") == "true" or REAL_SETTINGS.getSetting("UPNP3") == "true":
             self.UPNP = True
@@ -207,10 +208,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.channels[i].setAccessTime(self.timeStarted - self.channels[i].totalTimePlayed)
 
             
-    def onFocus(self, controlId):
-        pass
-
-        
     def Backup(self, org, bak):
         self.log('Backup ' + str(org) + ' - ' + str(bak))
         if FileAccess.exists(org):
@@ -489,6 +486,12 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.startSleepTimer()
         self.startNotificationTimer()
         self.playerTimer.start()
+        
+        if REAL_SETTINGS.getSetting("Idle_Screensaver") == "true":
+            REAL_SETTINGS.setSetting("Idle_showingIdle","false")
+            self.IdleTime = threading.Timer(60.0, self.IdleTimer)
+            self.IdleTime.name = "IdleTime"
+            self.IdleTime.start()
 
         if self.backgroundUpdating < 2 or self.isMaster == False:
             self.channelThread.name = "ChannelThread"
@@ -512,6 +515,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             if self.channelList.autoplaynextitem == True:
                 self.message('Its recommend you DISABLE XBMC Video Playback Setting "Play the next video Automatically"')
             REAL_SETTINGS.setSetting('StartupMessage', 'true')
+
         self.log('onInit return')
     
 
@@ -804,7 +808,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
         # First, check to see if the video is a strm
         if self.channels[self.currentChannel - 1].getItemFilename(self.channels[self.currentChannel - 1].playlistPosition)[-4:].lower() == 'strm' or chtype == 8 or chtype == 9:
-            self.log("Ignoring a stop because of a strm or chtype = 8 or 9")
+            self.log("Ignoring a stop because of a strm or chtype = 8, 9")
             self.Player.ignoreNextStop = True
         
         self.log("about to mute");
@@ -987,13 +991,6 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log('waitForVideoPaused return')
         return True
 
-        
-    def setShowMenu(self):
-        self.log('setShowMenu')
-        # cmd = 'ActivateWindow(10025,library://video/tvshows/),return'
-        # xbmc.executebuiltin(cmd)
-
-        
         
     def setShowInfo(self):
         self.log('setShowInfo')
@@ -1353,22 +1350,22 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log("showMenu")
         self.hideInfo()
         self.hidePOP()
-        self.showingMenu = True   
-        self.setFocusId(997)
-        self.getControl(119).setVisible(True)
-        # self.button0 = xbmcgui.ControlButton(80, 0, 80, 30, "HELLO")
-        # self.addControl(self.button0)
-        # self.setFocus(self.button0)
-        # self.button1 = xbmcgui.ControlButton(80, 100, 80, 30, "TEST")
-        # self.addControl(self.button1)
-        # stream = xbmcgui.Dialog().browse(1,'Test', 'video', '')
-
+        try:
+            self.setFocusId(997)
+            self.getControl(119).setVisible(True)
+            self.showingMenu = True
+        except:
+            pass
         
+
     def hideMenu(self):    
         self.log("hideMenu")
-        self.getControl(119).setVisible(False)
-        xbmc.sleep(100)
-        self.showingMenu = False
+        try:
+            self.getControl(119).setVisible(False)
+            xbmc.sleep(100)
+            self.showingMenu = False
+        except:
+            pass
         
         
     def hidePOP(self):
@@ -1441,6 +1438,25 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", SMSG, 1000, THUMB) )    
             
             
+    def IdleTimer(self):
+        self.log("IdleTimer")
+        self.showingIdle = REAL_SETTINGS.getSetting("Idle_showingIdle")            
+        self.IdleSeconds = 300
+        self.PausedPlayback = bool(xbmc.getCondVisibility("Player.Paused"))
+        self.ActivePlayback = bool(xbmc.Player().isPlaying())
+        
+        if ((xbmc.getGlobalIdleTime() >= self.IdleSeconds and self.showingIdle == "false") and (self.PausedPlayback or self.showingEPG)):
+            REAL_SETTINGS.setSetting("Idle_showingIdle","true")
+            xbmc.executebuiltin('XBMC.RunScript(' + ADDON_PATH + '/resources/lib/idle.py)')
+        elif xbmc.getGlobalIdleTime() < self.IdleSeconds:
+            REAL_SETTINGS.setSetting("Idle_showingIdle","false")
+            
+        self.log("IdleTimer, XBMCidle = " + str(xbmc.getGlobalIdleTime()) + ", IdleSeconds = " + str(self.IdleSeconds) + ', PausedPlayback = ' + str(self.PausedPlayback) + ', showingIdle = ' + str(self.showingIdle) + ', showingEPG = ' + str(self.showingEPG) + ', ActivePlayback = ' + str(self.ActivePlayback))
+        self.IdleTime = threading.Timer(60.0, self.IdleTimer)
+        self.IdleTime.name = "IdleTime"
+        self.IdleTime.start()
+                 
+                 
     # return a valid channel in the proper range
     def fixChannel(self, channel, increasing = True):
         while channel < 1 or channel > self.maxChannels:
@@ -1456,6 +1472,10 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             return self.fixChannel(channel + direction, increasing)
 
         return channel
+        
+            
+    def onFocus(self, controlId):
+        pass
 
         
     def onClick(self, controlId):
@@ -1465,77 +1485,92 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         if self.actionSemaphore.acquire(False) == False:
             self.log('Unable to get semaphore')
             return
+
+        lastaction = time.time() - self.lastActionTime
+ 
+        # during certain times we just want to discard all input
+        if lastaction < 2:
+            self.log('Not allowing actions')
+            action = ACTION_INVALID
+
+        self.startSleepTimer()
         
         if controlId == 997:
             if self.showingMenu:
-                print 'OnNow'
+                self.log("OnNow")
                 xbmc.executebuiltin("ActivateWindow(12003)")
                     
         elif controlId == 998:
             if self.showingMenu:
-                print 'OnDemand'
-                self.Browse = dlg.browse(1,'OnDemand', 'video', '.avi|.flv|.mkv|.mp4|.strm|.ts', True, True)
-                if self.Browse:
+                self.log("OnDemand")
+                extTypes = ['.avi', '.flv', '.mkv', '.mp4', '.strm', '.ts']
+                self.Browse = dlg.browse(1,'OnDemand', 'video', '.avi|.flv|.mkv|.mp4|.strm|.ts', True, True, 'special://videoplaylists')
+                if (self.Browse)[-4:].lower() in extTypes:
+                    self.log("onClick, OnDemand = " + self.Browse)
                     self.Player.play(self.Browse)
                     self.hideMenu()
                 
         elif controlId == 999:
             if self.showingMenu:
-                print 'Favorites'
-                xbmc.executebuiltin("ActivateWindow(10134)")
-                    
-        elif controlId == 1000:
-            if self.showingMenu:
-                print ''
-                xbmc.executebuiltin("ActivateWindow(Videos,MovieTitles)")
-                
-        elif controlId == 1001:
-            if self.showingMenu:
-                print ''
-                xbmc.executebuiltin("ActivateWindow(Videos,videodb://movies/titles/)")
-                    
-        elif controlId == 1002:
-            if self.showingMenu:
-                print ''
-                xbmc.executebuiltin("ActivateWindow(Videos,special://videoplaylists/)")
-                
-        elif controlId == 1003:
-            if self.showingMenu:
-                print 'LastChannel'
+                self.log("LastChannel")
                 self.LastChannelJump()
                 self.setChannel(self.LastChannel)
                 self.hideMenu()
+                    
+        elif controlId == 1000:
+            if self.showingMenu:
+                self.log("Favorites")
+                xbmc.executebuiltin("ActivateWindow(10134)")
+                
+        elif controlId == 1001:
+            if self.showingMenu:
+                self.log("")
+                    
+        elif controlId == 1002:
+            if self.showingMenu:
+                self.log("")
+                
+        elif controlId == 1003:
+            if self.showingMenu:
+                self.log("EPGType")
+                self.EPGtypeToggle()
                 
         elif controlId == 1004:
             if self.showingMenu:
-                print 'Record'
+                self.log("Record")
                 
         elif controlId == 1005:
             if self.showingMenu:
-                print 'Mute'
+                self.log("Mute")
                 xbmc.executebuiltin("Mute()");
 
         elif controlId == 1006:
             if self.showingMenu:
-                print ''
+                self.log("Subtitle")
+                # xbmc.executebuiltin("ActivateWindow(10153)")
+                xbmc.executebuiltin("ActivateWindow(SubtitleSearch)")
+                self.hideMenu()
                 
         elif controlId == 1007:
             if self.showingMenu:
-                print 'Subtitle'
-                xbmc.executebuiltin("ActivateWindow(10153)")
-                    
-        elif controlId == 1008:
-            if self.showingMenu:
-                print 'VideoMenu'
+                self.log("VideoMenu")
                 xbmc.executebuiltin("ActivateWindow(12901)")
                 self.hideMenu()
                     
+        elif controlId == 1008:
+            if self.showingMenu:
+                self.log("Sleep")
+                self.SleepButton()           
+                    
         elif controlId == 1009:
             if self.showingMenu:
-                self.SleepButton()
+                self.log("Settings")
+                print 'Settings'
+                xbmcaddon.Addon(id='script.pseudotv.live').openSettings()
                 
         elif controlId == 1010:
             if self.showingMenu:
+                self.log("Exit")
                 if dlg.yesno("Exit?", "Are you sure you want to exit PseudoTV Live?"):
                     self.hideMenu()
                     self.end()
@@ -1605,6 +1640,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     self.hideInfo()
                     self.hidePOP()
                     self.newChannel = 0
+                    self.showingEPG = True
                     self.myEPG.doModal()
 
                     if self.channelThread.isAlive():
@@ -1629,9 +1665,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             if self.showingInfo:
                 self.infoOffset -= 1  
                 
-                if self.infoOffset <= 0:
+                if self.infoOffset < 0:
                     self.showMenu()
-                    
+                                        
                 if not self.showingMenu:
                     self.showInfo(self.InfTimer)
                 
@@ -2141,8 +2177,26 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             SSxmltv = self.channelList.SyncSSTV(False, False)
             FTVxmltv = self.channelList.SyncFTV(False, False)
             REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
-
-
+    
+    
+    def EPGtypeToggle(self):
+        self.log('EPGtype')     
+        ColorType = REAL_SETTINGS.getSetting('EPGcolor_enabled')
+ 
+        if ColorType == '0':
+            REAL_SETTINGS.setSetting("EPGcolor_enabled", "1")
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "EPG Color by Genre ", 1000, THUMB) )
+        elif ColorType == '1':
+            REAL_SETTINGS.setSetting("EPGcolor_enabled", "2")
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "EPG Color by Chtype", 1000, THUMB) )
+        elif ColorType == '2':
+            REAL_SETTINGS.setSetting("EPGcolor_enabled", "3")
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "EPG Color by Rating", 1000, THUMB) )
+        elif ColorType == '3':
+            REAL_SETTINGS.setSetting("EPGcolor_enabled", "0")
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "EPG Color Disabled", 1000, THUMB) )
+            
+            
     def end(self):
         self.log('end')     
         
@@ -2250,6 +2304,13 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             if self.infoTimer.isAlive():
                 self.infoTimer.cancel()
                 self.infoTimer.join()
+        except:
+            pass
+
+        try:
+            if self.IdleTime.isAlive():
+                self.IdleTime.cancel()
+                self.IdleTime.join()
         except:
             pass
 
