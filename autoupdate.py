@@ -28,11 +28,11 @@ def UPDATEFILES():
     xbmc.log('script.pseudotv.live-autoupdate: UPDATEFILES')
     
     if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-        url='https://github.com/Kevin S. Graer/script.pseudotv.live/archive/master.zip'
-        changelog = 'https://raw.githubusercontent.com/Kevin S. Graer/script.pseudotv.live/master/changelog.txt'    
+        url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
+        changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt'    
     elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
-        url='https://github.com/Kevin S. Graer/script.pseudotv.live/archive/development.zip'
-        changelog = 'https://raw.githubusercontent.com/Kevin S. Graer/script.pseudotv.live/development/changelog.txt'  
+        url='https://github.com/Lunatixz/script.pseudotv.live/archive/development.zip'
+        changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/changelog.txt'  
       
     name = 'script.pseudotv.live.zip'   
     path = xbmc.translatePath(os.path.join('special://home/addons','packages'))

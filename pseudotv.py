@@ -27,7 +27,7 @@ from resources.lib.ga import *
 # Script constants
 __scriptname__ = "PseudoTV Live"
 __author__     = "Lunatixz, Jason102"
-__url__        = "https://github.com/Kevin S. Graer/script.pseudotv.live"
+__url__        = "https://github.com/Lunatixz/script.pseudotv.live"
 __settings__   = xbmcaddon.Addon(id='script.pseudotv.live')
 __cwd__        = __settings__.getAddonInfo('path')
 __version__    = __settings__.getAddonInfo('version')
