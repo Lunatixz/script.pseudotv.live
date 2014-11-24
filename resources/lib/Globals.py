@@ -247,7 +247,7 @@ quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quar
 daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge
 weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge
 monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge
-seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))        #System Purge
+seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 2))        #System Purge
 #FileLists
 localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",24)                     #System Purge
 liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge

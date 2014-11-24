@@ -710,11 +710,15 @@ class ChannelList:
                     self.seasonal = True
                     today = datetime.datetime.now()
                     month = today.strftime('%B')
+                    #If Month != Update, and clear old cache.
                     if setting1.lower() != month.lower():
                         seasonal.delete("%") 
                         ADDON_SETTINGS.setSetting("Channel_" + str(channel) + "_1", month)
                         
-                fileList = self.createYoutubeFilelist(setting1, setting2, setting3, setting4, channel)            
+                fileList = self.createYoutubeFilelist(setting1, setting2, setting3, setting4, channel)
+                #clear cache if no results.
+                if len(fileList) == 0:
+                    seasonal.delete("%") 
             else:
                 self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'self.youtube_ok invalid: ' + str(setting2))
                 return                 

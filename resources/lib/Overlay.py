@@ -96,33 +96,36 @@ class MyPlayer(xbmc.Player):
         try:
             file = xbmc.Player().getPlayingFile()
             file = file.replace("\\\\","\\")
+           
+            self.overlay.seektime = 0
             
-            global seektime
-            seektime = 0
-            
-            if seektime == 0:
-                seektime = xbmc.Player().getTime()
+            if self.overlay.seektime == 0:
+                self.overlay.seektime = xbmc.Player().getTime()
            
             if REAL_SETTINGS.getSetting("UPNP1") == "true":
                 self.log('UPNP1 Sharing')
-                UPNP1 = SendUPNP(IPP1, file, seektime)
+                UPNP1 = SendUPNP(IPP1, file, self.overlay.seektime)
             if REAL_SETTINGS.getSetting("UPNP2") == "true":
                 self.log('UPNP2 Sharing')
-                UPNP2 = SendUPNP(IPP2, file, seektime)
+                UPNP2 = SendUPNP(IPP2, file, self.overlay.seektime)
             if REAL_SETTINGS.getSetting("UPNP3") == "true":
                 self.log('UPNP3 Sharing')
-                UPNP3 = SendUPNP(IPP3, file, seektime)
+                UPNP3 = SendUPNP(IPP3, file, self.overlay.seektime)
         except:
             pass
     
     
     def onPlayBackEnded(self):
-        self.log('onPlayBackEnded')   
+        self.log('onPlayBackEnded') 
+        if self.overlay.OnDemand == True:
+            self.overlay.OnDemand = False  
         
     
     def onPlayBackStopped(self):
         if self.stopped == False:
             self.log('Playback stopped')
+            if self.overlay.OnDemand == True:
+                self.overlay.OnDemand = False
 
             if self.ignoreNextStop == False:
                 if self.overlay.sleepTimeValue == 0:
@@ -157,6 +160,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.showingPop = False
         self.showingInfo = False
         self.showingMenu = False
+        self.OnDemand = False
         self.infoOffset = 0
         self.invalidatedChannelCount = 0
         self.showChannelBug = False
@@ -690,7 +694,9 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.channelList.sendJSON(json_query)
         self.showingInfo = True #False flag showingInfo to keep POPup from showing
         
-        global seektime
+        if self.OnDemand == True:
+            self.OnDemand = False
+            
         self.runActions(RULES_ACTION_OVERLAY_SET_CHANNEL, channel, self.channels[channel - 1])
 
         if self.Player.stopped:
@@ -861,27 +867,27 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 overtime = float((int(self.channels[self.currentChannel - 1].getItemDuration(self.channels[self.currentChannel - 1].playlistPosition))/8)*6)
         
                 if (mediapath[-4:].lower() == 'strm' or mediapath.startswith('plugin')):
-                    seektime = self.SmartSeek(mediapath, seektime1, seektime2, overtime)
+                    self.seektime = self.SmartSeek(mediapath, seektime1, seektime2, overtime)
                     
                     if self.UPNP:
-                        self.PlayUPNP(mediapath, seektime)
+                        self.PlayUPNP(mediapath, self.seektime)
                 else:
                     try:
                         self.Player.seekTime(seektime1)
-                        seektime = seektime1
+                        self.seektime = seektime1
                         self.log("seektime1")
                     except:
                         self.log("Unable to set proper seek time, trying different value")
                         try:
                             self.Player.seekTime(seektime2)
-                            seektime = seektime2
+                            self.seektime = seektime2
                             self.log("seektime2")
                         except:
                             self.log('Exception during seek', xbmc.LOGERROR)
                             pass    
                             
                     if self.UPNP:
-                        self.PlayUPNP(mediapath, seektime)   
+                        self.PlayUPNP(mediapath, self.seektime)   
         
         # Unmute
         self.log("Finished, unmuting");
@@ -1028,6 +1034,14 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
 
                 if self.channels[self.currentChannel - 1].getItemDuration(position) >= self.shortItemLength:
                     curoffset += 1
+                    
+            mediapath = (self.channels[self.currentChannel - 1].getItemFilename(position))
+        
+        elif self.OnDemand == True:
+            print 'self.OnDemand'
+            position = -999
+            mediapath = self.Browse
+        
         else:
             #same logic as in setchannel; loop till we get the current show
             if chtype == 8:
@@ -1050,14 +1064,20 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                     position = self.channels[self.currentChannel - 1].playlistPosition
             else: #original code
                 position = xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition() + self.infoOffset
-
-        mediapath = (self.channels[self.currentChannel - 1].getItemFilename(position))
-        genre = (self.channels[self.currentChannel - 1].getItemgenre(position))
-        title = (self.channels[self.currentChannel - 1].getItemTitle(position))
-        LiveID = (self.channels[self.currentChannel - 1].getItemLiveID(position))
-        EpisodeTitle = (self.channels[self.currentChannel - 1].getItemEpisodeTitle(position))
+            
+            mediapath = (self.channels[self.currentChannel - 1].getItemFilename(position))
+                
+        self.log('setShowInfo, setshowposition = ' + str(position)) 
         chname = (self.channels[self.currentChannel - 1].name)
+        LiveID = self.SetMediaInfo(chtype, chname, mediapath, position)
+        LiveID = self.channelList.unpackLiveID(LiveID)
         
+        #Art Info
+        type = LiveID[0]
+        id = LiveID[1]
+        Managed = LiveID[3]
+        playcount = int(LiveID[4])
+
         if mediapath[0:5] == 'stack':
             smpath = (mediapath.split(' , ')[0]).replace('stack://','')
             mpath = (os.path.split(smpath)[0])
@@ -1067,64 +1087,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             mpath = (mpath + '/' + YTid).replace('/?path=/root','')
         else:
             mpath = (os.path.split(mediapath)[0])
-        
-        #PVR Globals
-        self.PVRchtype = chtype
-        self.PVRmediapath = mediapath
-        self.PVRchname = chname
-        self.PVRtitle = title
-        
-        LiveID = self.channelList.unpackLiveID(LiveID)
-        type = LiveID[0]
-        id = LiveID[1]
-        Managed = LiveID[3]
-        playcount = int(LiveID[4])
 
-        # # Unwatch Local Media if applicable    
-        # if REAL_SETTINGS.getSetting("Disable_Watched") == "true" and self.Player.stopped:
-            # if chtype <= 6 and id != '0':
-                # if type == 'tvshow':
-                    # media_type = 'episode'
-                    # try:
-                        # EPtitle = EpisodeTitle.split(' -')[0]
-                        # season = EPtitle.split('x')[0]
-                        # episode = EPtitle.split('x')[1]
-                    # except Exception,e:
-                        # EPtitle = EpisodeTitle.split(' -')[0]
-                        # season = (EPtitle.split('E')[0]).replace('S','')
-                        # episode = EPtitle.split('E')[1]
-                    # except Exception,e:
-                        # season = 0
-                        # episode = 0
-                        # pass
-                # else:
-                    # media_type = 'movie'
-                    # season = ''
-                    # episode = ''
-                    # self.Unwatch(media_type, title, id, season, episode, '', playcount)
-                    
-        SEtitle = self.channels[self.currentChannel - 1].getItemEpisodeTitle(position)
-
-        try:
-            if self.showSeasonEpisode:
-                SEinfo = SEtitle.split(' -')[0]
-                season = int(SEinfo.split('x')[0])
-                episode = int(SEinfo.split('x')[1])
-                eptitles = SEtitle.split('- ')
-                eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
-                swtitle = ('S' + ('0' if season < 10 else '') + str(season) + 'E' + ('0' if episode < 10 else '') + str(episode) + ' - ' + (eptitle)).replace('  ',' ')
-            else:
-                swtitle = SEtitle      
-        except:
-            swtitle = SEtitle
-            pass
-  
-        self.log('setShowInfo, setshowposition = ' + str(position)) 
-        self.getControl(503).setLabel((self.channels[self.currentChannel - 1].getItemTitle(position)).replace("*NEW*",""))
-        self.getControl(504).setLabel(swtitle)
-        self.getControl(505).setLabel(self.channels[self.currentChannel - 1].getItemDescription(position))
-        self.getControl(506).setImage(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png') 
-        
         if REAL_SETTINGS.getSetting("ArtService_Running") == "false" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":  
             self.log('setShowInfo, Dynamic artwork enabled')
                 
@@ -1508,6 +1471,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 if (self.Browse)[-4:].lower() in extTypes:
                     self.log("onClick, OnDemand = " + self.Browse)
                     self.Player.play(self.Browse)
+                    self.OnDemand = True
                     self.hideMenu()
                 
         elif controlId == 999:
@@ -2195,8 +2159,56 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         elif ColorType == '3':
             REAL_SETTINGS.setSetting("EPGcolor_enabled", "0")
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "EPG Color Disabled", 1000, THUMB) )
-            
-            
+      
+
+    def SetMediaInfo(self, chtype, chname, mediapath, position):
+        self.log('SetMediaInfo')   
+        
+        if position == -999:
+            #Core OnDemand Info
+            genre = 'Unknown'
+            title = 'OnDemand'
+            LiveID  = 'tvshow|0|0|False|1|NR|'
+            EpisodeTitle = 'OnDemand'
+            SEtitle = 'OnDemand'
+            Description = mediapath
+            self.getControl(506).setImage(os.path.join(IMAGES_LOC,'Default.png'))
+        else:
+            #Core Playlist Info
+            genre = (self.channels[self.currentChannel - 1].getItemgenre(position))
+            title = (self.channels[self.currentChannel - 1].getItemTitle(position))
+            LiveID = (self.channels[self.currentChannel - 1].getItemLiveID(position))
+            EpisodeTitle = (self.channels[self.currentChannel - 1].getItemEpisodeTitle(position))
+            SEtitle = self.channels[self.currentChannel - 1].getItemEpisodeTitle(position)
+            Description = (self.channels[self.currentChannel - 1].getItemDescription(position))
+            self.getControl(506).setImage(self.channelLogos + (self.channels[self.currentChannel - 1].name) + '.png') 
+ 
+        #PVR Globals
+        self.PVRchtype = chtype
+        self.PVRmediapath = mediapath
+        self.PVRchname = chname
+        self.PVRtitle = title
+        
+        try:
+            if self.showSeasonEpisode:
+                SEinfo = SEtitle.split(' -')[0]
+                season = int(SEinfo.split('x')[0])
+                episode = int(SEinfo.split('x')[1])
+                eptitles = SEtitle.split('- ')
+                eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
+                swtitle = ('S' + ('0' if season < 10 else '') + str(season) + 'E' + ('0' if episode < 10 else '') + str(episode) + ' - ' + (eptitle)).replace('  ',' ')
+            else:
+                swtitle = SEtitle      
+        except:
+            swtitle = SEtitle
+            pass
+
+        self.getControl(503).setLabel((title).replace("*NEW*",""))
+        self.getControl(504).setLabel(swtitle)
+        self.getControl(505).setLabel(Description)
+        return LiveID
+     
+     
     def end(self):
         self.log('end')     
         

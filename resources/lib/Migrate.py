@@ -27,6 +27,15 @@ from FileAccess import FileLock, FileAccess
 from urllib import unquote
 from utils import *
 
+try:
+    from Donor import *
+    Donor_Downloaded = True
+    xbmc.log("script.pseudotv.live-Migrate: Donor Imported")
+except Exception,e:
+    Donor_Downloaded = False
+    xbmc.log("script.pseudotv.live-Migrate: Donor Import Failed, Disabling Donor Features" + str(e))
+    pass
+    
 class Migrate:
 
     def log(self, msg, level = xbmc.LOGDEBUG):
@@ -61,6 +70,44 @@ class Migrate:
         chanlist.makenewlists = True
         RAND = True
         
+        self.log("autoTune, autoFindCustom " + str(Globals.REAL_SETTINGS.getSetting("autoFindCustom")))
+        self.log("autoTune, autoFindSuperFav " + str(Globals.REAL_SETTINGS.getSetting("autoFindSuperFav")))
+        self.log("autoTune, autoFindLivePVR " + str(Globals.REAL_SETTINGS.getSetting("autoFindLivePVR")))
+        self.log("autoTune, autoFindLiveHD " + str(Globals.REAL_SETTINGS.getSetting("autoFindLiveHD")))
+        self.log("autoTune, autoFindUSTVNOW " + str(Globals.REAL_SETTINGS.getSetting("autoFindUSTVNOW")))
+        self.log("autoTune, autoFindSmoothStreams " + str(Globals.REAL_SETTINGS.getSetting("autoFindSmoothStreams")))
+        self.log("autoTune, autoFindFilmonFavourites " + str(Globals.REAL_SETTINGS.getSetting("autoFindFilmonFavourites")))
+        self.log("autoTune, autoFindNetworks " + str(Globals.REAL_SETTINGS.getSetting("autoFindNetworks")))
+        self.log("autoTune, autoFindTVGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindTVGenres")))
+        self.log("autoTune, autoFindStudios " + str(Globals.REAL_SETTINGS.getSetting("autoFindStudios")))
+        self.log("autoTune, autoFindMovieGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMovieGenres")))
+        self.log("autoTune, autoFindMixGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMixGenres")))
+        self.log("autoTune, autoFindRecent " + str(Globals.REAL_SETTINGS.getSetting("autoFindRecent")))
+        self.log("autoTune, autoFindMusicGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicGenres")))
+        self.log("autoTune, autoFindMusicVideosMusicTV " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosMusicTV")))
+        self.log("autoTune, autoFindMusicVideosLastFM " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosLastFM")))
+        self.log("autoTune, autoFindMusicVideosYoutube " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosYoutube")))
+        self.log("autoTune, autoFindMusicVideosVevoTV " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosVevoTV")))
+        self.log("autoTune, autoFindMusicVideosLocal " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicVideosLocal")))
+        self.log("autoTune, autoFindYoutube " + str(Globals.REAL_SETTINGS.getSetting("autoFindYoutube")))
+        self.log("autoTune, autoFindPlayonAmazon " + str(Globals.REAL_SETTINGS.getSetting("autoFindPlayonAmazon")))
+        self.log("autoTune, autoFindPlayonHulu " + str(Globals.REAL_SETTINGS.getSetting("autoFindPlayonHulu")))
+        self.log("autoTune, autoFindPlayonNetflix " + str(Globals.REAL_SETTINGS.getSetting("autoFindPlayonNetflix")))
+        self.log("autoTune, autoFindCommunity_Source " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Source")))
+        self.log("autoTune, autoFindCommunity_Plugins " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Plugins")))
+        self.log("autoTune, autoFindCommunity_InternetTV " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_InternetTV")))
+        self.log("autoTune, autoFindCommunity_RSS " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_RSS")))
+        self.log("autoTune, autoFindCommunity_Youtube_Networks " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Networks")))
+        self.log("autoTune, autoFindCommunity_Youtube_Seasonal " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Seasonal")))
+        self.log("autoTune, autoFindCommunity_Youtube_Channels " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Channels")))
+        self.log("autoTune, autoFindCommunity_Youtube_Playlists " + str(Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Playlists")))
+        self.log("autoTune, autoFindInternetSamples " + str(Globals.REAL_SETTINGS.getSetting("autoFindInternetSamples")))
+        self.log("autoTune, autoFindPopcorn " + str(Globals.REAL_SETTINGS.getSetting("autoFindPopcorn")))
+        self.log("autoTune, autoFindCinema " + str(Globals.REAL_SETTINGS.getSetting("autoFindCinema")))
+        self.log("autoTune, autoFindIPTV_Source " + str(Globals.REAL_SETTINGS.getSetting("autoFindIPTV_Source")))
+        self.log("autoTune, autoFindLive_Source " + str(Globals.REAL_SETTINGS.getSetting("autoFindLive_Source")))
+        self.log("autoTune, autoFindNavix_Source " + str(Globals.REAL_SETTINGS.getSetting("autoFindNavix_Source")))
+
         #Reserve channel check            
         if Globals.REAL_SETTINGS.getSetting("reserveChannels") == "true":
             print 'Reserved for Autotune'
@@ -544,8 +591,6 @@ class Migrate:
                     
         #TV - Networks/Genres
         self.updateDialogProgress = 20
-        self.log("autoTune, autoFindNetworks " + str(Globals.REAL_SETTINGS.getSetting("autoFindNetworks")))
-        self.log("autoTune, autoFindTVGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindTVGenres")))
         if (Globals.REAL_SETTINGS.getSetting("autoFindNetworks") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindTVGenres") == "true"):
             self.log("autoTune, Searching for TV Channels")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for TV Channels"," ")
@@ -584,8 +629,6 @@ class Migrate:
                     channelNum += 1
         
         self.updateDialogProgress = 23
-        self.log("autoTune, autoFindStudios " + str(Globals.REAL_SETTINGS.getSetting("autoFindStudios")))
-        self.log("autoTune, autoFindMovieGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMovieGenres")))
         if (Globals.REAL_SETTINGS.getSetting("autoFindStudios") == "true" or Globals.REAL_SETTINGS.getSetting("autoFindMovieGenres") == "true"):
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Movie Channels","")
             chanlist.fillMovieInfo()
@@ -623,7 +666,6 @@ class Migrate:
                     channelNum += 1
                 
         self.updateDialogProgress = 26
-        self.log("autoTune, autoFindMixGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMixGenres")))
         if Globals.REAL_SETTINGS.getSetting("autoFindMixGenres") == "true":
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Mixed Channels"," ")
             chanlist.fillMixedGenreInfo()
@@ -677,7 +719,6 @@ class Migrate:
             channelNum += 1
             
         self.updateDialogProgress = 40
-        self.log("autoTune, autoFindMusicGenres " + str(Globals.REAL_SETTINGS.getSetting("autoFindMusicGenres")))
         if Globals.REAL_SETTINGS.getSetting("autoFindMusicGenres") == "true":
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","Searching for Music Channels"," ")
             chanlist.fillMusicInfo()
@@ -1221,6 +1262,8 @@ class Migrate:
                     print line
                     print "!!!!COMMUNITY LIST Youtube Network FORMATING ERROR!!!!"
 
+                    
+        #Youtube Network - Seasonal
         self.updateDialogProgress = 74
         if Globals.REAL_SETTINGS.getSetting("autoFindCommunity_Youtube_Seasonal") == "true":
            if Youtube != False:
@@ -1232,9 +1275,11 @@ class Migrate:
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "31")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
-                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "Seasonal Channel")  
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "168")  
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                 self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding Youtube Networks","Seasonal Channel")
                 channelNum += 1 
@@ -1285,6 +1330,7 @@ class Migrate:
                         channelNum += 1
                 except:
                     pass
+            
             
         #Youtube Playlists
         self.updateDialogProgress = 76
@@ -1741,8 +1787,9 @@ class Migrate:
                                 channelNum += 1
                                 fileNum += 1
                 else:
-                    print line
-                    print "!!!!Recommended LIST FORMATING ERROR!!!!"
+                    if line != '':
+                        print line
+                        print "!!!!Recommended LIST FORMATING ERROR!!!!"
         
                 if fileNum >= limit:
                     break
