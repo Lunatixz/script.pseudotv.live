@@ -193,7 +193,107 @@ class Migrate:
                                         channelNum += 1
                 except:
                     pass
+        # Livestramspro
+        self.updateDialogProgress = 5
+        if Globals.REAL_SETTINGS.getSetting("autoFindLSpro") == "true" :
+            self.log("BuildLspro")
+            LSpro = chanlist.plugin_ok('plugin://plugin.video.live.streamspro')
+            print 'LSpro plugin found'
+            SF = 0
+            try:
+                 if LSpro == True:
+
+                    source_file = str(xbmc.translatePath('special://profile/addon_data/plugin.video.live.streamspro/source_file'))
+                    import simplejson as json
+                    sources = json.loads(open(source_file,"r").read())
+                    print 'sources:',sources
+                    
+                    if len(sources) > 0:
+                        #total = len(items)
+                        for i in range(len(sources)):
+                            sett =[]
                             
+                            name = sources[i]['title']
+                            print 'source found is:'
+                            strm_folder =(xbmc.translatePath("special://profile/addon_data/script.pseudotv.live/cache/LSpro_strms/"))                            
+                            url = sources[i]['url']
+                            dialog = xbmcgui.Dialog()
+                            ret = dialog.yesno('LiveStreamsPro', 'Do you want this source : %s items add to PseudoTV?' %name)
+                            if ret:
+                                strm_folder = os.path.join(strm_folder, name)
+                                strm_folder = strm_folder.encode('utf-8')
+                                print strm_folder
+                                if not os.path.exists(strm_folder):
+                                    print 'trying to folder created for source:',name
+                                    FileAccess._makedirs(strm_folder)
+                                    print 'cach folder created for source:',name
+                                if url.startswith('http'):
+                                
+                                    f = Open_URL(url)
+                                    import bs4
+                                    soup = bs4.BeautifulSoup(f,'html.parser')
+                                    print 'getting items soup', len(soup)
+                                else:
+                                    print 'eeeeeeelsee'
+                                    import bs4
+                                    print url
+                                    soup = bs4.BeautifulSoup(open(url, 'r').read(),'html.parser')    
+                                    
+                            else:
+                                continue
+                            items=soup('item')
+                            print len(items),type(items)
+                            item_num =1
+                            for n_items in range(len(items)):
+                                #print items[n_items]
+                                try:
+                                    strm_path,epg = getItems(items[n_items],strm_folder,item_num)
+                                    print 'strm_path',strm_path
+                                    if os.path.isfile(strm_path):
+                                        (ppath,chname) = os.path.split(str(strm_path))
+                                        print chname
+                                        chname = chname.replace('.strm','').replace('_'+str(item_num),'').replace(' ','')
+                                        chname = chname.lower()
+                                        print chname
+                                        print epg
+                                        if epg:
+                                            epg = epg.split(':')
+                                            print epg
+                                            epgfilename = epg[0]
+                                            epgchid = epg[1]
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(epgchid))
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", strm_path)
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", str(epg[0]))
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", chname)
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", chname + ' LSpro')  
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                                        
+                                        
+                                        else:
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", strm_path) #channel not quoting
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", chname+'//'+name) #sourcename
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "LiveStreamPro")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", chname )  
+                                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding LSpro items",chname)  
+                                        channelNum += 1
+                                except Exception:
+                                    print 'trying next link'
+                                    continue
+                                item_num += 1
+            except:
+                pass         
+                                                    
         
         # LiveTV - PVR
         self.updateDialogProgress = 10
@@ -1503,44 +1603,44 @@ class Migrate:
                     channelNum = channelNum + 1
         
         
-        # Extras - Navi-X
-        self.updateDialogProgress = 83
-        if Globals.REAL_SETTINGS.getSetting("autoFindNavix_Source") != "0" and Donor_Downloaded == True:
-            self.log("autoTune, adding Navi-X Channels")
-            self.updateDialog.update(self.updateDialogProgress,"adding Navi-X Channels","This could take a few minutes","Please Wait...")
-            NaviXnum = 0
-                        
-            if Globals.REAL_SETTINGS.getSetting("autoFindNavix_Source") == "1":
-                NaviXurl = Globals.REAL_SETTINGS.getSetting('autoFindNavix_Path_Local')
-            else:
-                NaviXurl = Globals.REAL_SETTINGS.getSetting('autoFindNavix_Path_Online')
-            
-            NaviXlst = chanlist.NaviXtuning(NaviXurl)
-            NaviXname = NaviXurl.replace('//','/')
-            
-            for NaviXnum in range(len(NaviXlst)):
-                if channelNum == 999:
-                    break
-            
-                NaviX = NaviXlst[NaviXnum]
-                title = NaviX[0]
-                link = NaviX[1]
-                Pluginvalid = chanlist.Valid_ok(link)
-                
-                if Pluginvalid != False:
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", link)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", title)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "Navi-X - " + NaviXname)
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
-                    Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum = channelNum + 1
-                    
-                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         Globals.ADDON_SETTINGS.writeSettings()
 
         #set max channels
@@ -1553,6 +1653,7 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindCustom","false")
         Globals.REAL_SETTINGS.setSetting("autoFindSuperFav","false") 
         Globals.REAL_SETTINGS.setSetting('autoFindLivePVR', "false")
+        Globals.REAL_SETTINGS.setSetting('autoFindLSpro', "false")
         Globals.REAL_SETTINGS.setSetting('autoFindLiveHD', "0")
         Globals.REAL_SETTINGS.setSetting('autoFindUSTVNOW', "false")  
         Globals.REAL_SETTINGS.setSetting('autoFindSmoothStreams', "false")  
@@ -1584,8 +1685,8 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindPopcorn","false")
         Globals.REAL_SETTINGS.setSetting("autoFindCinema","false")
         Globals.REAL_SETTINGS.setSetting("autoFindIPTV_Source","0")    
-        Globals.REAL_SETTINGS.setSetting("autoFindLive_Source","0")    
-        Globals.REAL_SETTINGS.setSetting("autoFindNavix_Source","0")        
+        Globals.REAL_SETTINGS.setSetting("autoFindLive_Source","0")        
+
         Globals.REAL_SETTINGS.setSetting("ForceChannelReset","true")
         Globals.ADDON_SETTINGS.setSetting('LastExitTime', str(int(curtime)))
         self.updateDialog.close()
@@ -1746,3 +1847,189 @@ class Migrate:
             pass
             
         return channelNum
+def addon_log(error):
+    print error
+url=None
+name=None
+regexs=None
+def getItems(item,strm_folder,item_num):
+    try:
+        name = item('title')[0].text
+        print name
+        if name is None:
+            name = 'unknown?'
+    except:
+        addon_log('Name Error')
+        name = ''
+
+    try:
+        epg = item('pstvepg')[0].text #hindi:chname
+        print epg
+        if epg is None:
+            name = ''
+    except:
+        addon_log('Epg Error')
+        epg = ''
+
+    try:
+        #url = []
+        if len(item('link')) >0:
+            print 'item link', item('link')
+            for i in item('link'):
+                if not i.string == None:
+                    link= i.string
+                regexs = None
+                if item('regex'):
+                    print item('regex')
+                    try:
+                        regexs = {}
+                        for i in item('regex'):
+                            print i('expres')[0].text
+                            regexs[i('name')[0].text] = {}
+                            #regexs[i('name')[0].text]['expre'] = i('expres')[0].text
+                            try:
+                                regexs[i('name')[0].text]['expre'] = i('expres')[0].text
+                                if not regexs[i('name')[0].text]['expre']:
+                                    regexs[i('name')[0].text]['expre']=''
+                            except:
+                                addon_log("Regex: -- No Referer --")
+                            regexs[i('name')[0].text]['page'] = i('page')[0].text
+                            try:
+                                regexs[i('name')[0].text]['refer'] = i('referer')[0].text
+                            except:
+                                addon_log("Regex: -- No Referer --")
+                            try:
+                                regexs[i('name')[0].text]['connection'] = i('connection')[0].text
+                            except:
+                                addon_log("Regex: -- No connection --")
+                            try:
+                                regexs[i('name')[0].text]['origin'] = i('origin')[0].text
+                            except:
+                                addon_log("Regex: -- No origin --")
+                            try:
+                                regexs[i('name')[0].text]['includeheaders'] = i('includeheaders')[0].text
+                            except:
+                                addon_log("Regex: -- No includeheaders --")                            
+                                
+                            try:
+                                regexs[i('name')[0].text]['x-req'] = i('x-req')[0].text
+                            except:
+                                addon_log("Regex: -- No x-req --")
+                            try:
+                                regexs[i('name')[0].text]['x-forward'] = i('x-forward')[0].text
+                            except:
+                                addon_log("Regex: -- No x-forward --")
+
+                            try:
+                                regexs[i('name')[0].text]['agent'] = i('agent')[0].text
+                            except:
+                                addon_log("Regex: -- No User Agent --")
+                            try:
+                                regexs[i('name')[0].text]['post'] = i('post')[0].text
+                            except:
+                                addon_log("Regex: -- Not a post")
+                            try:
+                                regexs[i('name')[0].text]['rawpost'] = i('rawpost')[0].text
+                            except:
+                                addon_log("Regex: -- Not a rawpost")
+                            try:
+                                regexs[i('name')[0].text]['htmlunescape'] = i('htmlunescape')[0].text
+                            except:
+                                addon_log("Regex: -- Not a htmlunescape")
+                            try:
+                                regexs[i('name')[0].text]['readcookieonly'] = i('readcookieonly')[0].text
+
+                            except:
+                                addon_log("Regex: -- Not a readCookieOnly")
+                            #print i
+                            try:
+                                regexs[i('name')[0].text]['cookiejar'] = i('cookiejar')[0].text
+                                if not regexs[i('name')[0].text]['cookiejar']:
+                                    regexs[i('name')[0].text]['cookiejar']=''
+                            except:
+                                addon_log("Regex: -- Not a cookieJar")							
+                            try:
+                                regexs[i('name')[0].text]['setcookie'] = i('setcookie')[0].text
+                            except:
+                                addon_log("Regex: -- Not a setcookie")
+                                                        
+                            try:
+                                regexs[i('name')[0].text]['ignorecache'] = i('ignorecache')[0].text
+                            except:
+                                addon_log("Regex: -- no ignorecache")
+                            #try:
+                            #    regexs[i('name')[0].text]['ignorecache'] = i('ignorecache')[0].text
+                            #except:
+                            #    addon_log("Regex: -- no ignorecache")			
+
+                        #print regexs
+                        regexs = urllib2.quote(repr(regexs))
+                        print regexs
+                        strm_url = 'plugin://plugin.video.live.streamspro/?url='+urllib.quote_plus(str(link))+'&mode=17&regexs='+str(regexs)
+                    except:
+                        regexs = None
+                else:
+                    
+                    strm_url = 'plugin://plugin.video.live.streamspro/?url='+urllib.quote_plus(str(link))+'&mode=12'
+        elif len(item('sportsdevil')) >0:
+            for i in item('sportsdevil'):
+                if not i.string == None:
+                    print 'adding sportsdevil'
+                    sportsdevil = ('plugin://plugin.video.SportsDevil/?mode=1&amp;item=catcher%3dstreams%26url='
+                                    + urllib.quote_plus(i.string) + '%26referer=' +urllib.quote_plus(item('referer')[0].string))
+                    #sportsdevil = ('plugin://plugin.video.live.streamspro/?url='
+                    #                +urllib.quote_plus('plugin://plugin.video.SportsDevil/?mode=1&amp;item=catcher%3dstreams%26url='
+                    #                +i.string) +'%26referer=' +urllib.quote_plus(item('referer')[0].string)+ '&amp;mode=12')
+                    #referer = item('referer')[0].string
+                    #if referer:
+                    #    print 'referer found'
+                    #    sportsdevil = sportsdevil + urllib.quote_plus('%26referer=' +item('referer')[0].string + '&mode=12')
+                    #print 'sportsdevil been added'
+                    strm_url = sportsdevil
+        elif len(item('yt-dl')) >0:
+            #print 'item youtube', item('youtube')
+            for i in item('yt-dl'):
+                if not i.string == None:
+                    #if addon.getSetting("Youtube backup module") == "true":
+                    if 'http' in i.string or 'https' in i.string:
+                        strm_url = 'plugin://plugin.video.live.streamspro/?url=' + urllib.quote_plus(i.string)+ '&mode=18'
+                    else:
+                        youtube = 'plugin://plugin.video.bromix.youtube/?action=play&id=' + i.string 
+                        strm_url = youtube
+        elif len(item('p2p')) >0:
+            #print 'item youtube', item('youtube')
+  
+            for i in item('p2p'):
+                if not i.string == None:
+                    if 'sop://' in i:
+                        #sop = 'plugin://plugin.video.p2p-streams/?url='+i.string +'&mode=2&' + 'name='+name 
+                        strm_url = 'plugin://plugin.video.p2p-streams/?url='+urllib.quote_plus(i.string)+'&mode=2&' + 'name='+name 
+                    else:
+                        strm_url = 'plugin://plugin.video.p2p-streams/?url='+urllib.quote_plus(i.string)  +'&mode=1&' + 'name='+name
+        elif len(item('vaughn')) >0:
+            #print 'item youtube', item('youtube')
+  
+            for i in item('vaughn'):
+                if not i.string == None:
+
+                    strm_url = 'plugin://plugin.stream.vaughnlive.tv/?mode=PlayLiveStream&amp;channel='+i.string
+        elif len(item('ilive')) >0: #####ilive is very hit and miss Not good for live experience. Dont add it unless you have to.
+            #print 'item youtube', item('youtube')
+        
+            for i in item('ilive'):
+                if not i.string == None:
+                    strm_url = 'plugin://plugin.video.tbh.ilive/?url=http://www.ilive.to/view/'+i.string+'&amp;link=99&amp;mode=iLivePlay'
+        if len(strm_url) < 1:
+            print 'lspro url not added'
+            return
+    except:    
+            addon_log('Error <link> element, Passing:'+name.encode('utf-8', 'ignore'))
+            print 'Error adding item: ',name
+    strm_path= os.path.join(strm_folder, name.encode('utf-8') + '_'+str(item_num)+'.strm')
+    print strm_path
+    with open(strm_path,'w') as f:
+        f.write(strm_url)
+    
+    return (strm_path,epg)
+    #except:
+    #        print 'Url is ignored'         

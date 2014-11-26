@@ -148,6 +148,8 @@
             <setting id="autoFindNavix_Source" type="enum" label="30972" subsetting="true"  enable="eq(-54,true) + eq(-53,true)" visible="eq(-52,true)" values=" |Local|Online" default="0" />
             <setting id="autoFindNavix_Path_Local" type="file" source="auto" label="30973" subsetting="true" enable="eq(-1,1)" visible="eq(-53,true) + eq(-1,1)" default=""/>
             <setting id="autoFindNavix_Path_Online" type="text" source="auto" label="30974" subsetting="true" enable="eq(-2,2)" visible="eq(-54,true) + eq(-2,2)" default=""/>
+            <setting id="autoFindLSpro" type="bool" label="30175" subsetting="true" visible="eq(-55,true)" default="false"/>
+        
         </category>
 <!--BCTs-->   
     <category label="30499">
