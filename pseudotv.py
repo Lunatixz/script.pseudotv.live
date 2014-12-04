@@ -24,6 +24,12 @@ import xbmcaddon
 from resources.lib.Globals import *
 from resources.lib.ga import *
 
+# Commoncache plugin import
+try:
+    import StorageServer
+except Exception,e:
+    import resources.lib.storageserverdummy as StorageServer
+    
 # Script constants
 __scriptname__ = "PseudoTV Live"
 __author__     = "Lunatixz, Jason102"

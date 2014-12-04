@@ -34,6 +34,7 @@
     <string id="30210">EPG Options:</string> 
         <string id="30211">Clock Mode</string>
         <string id="30212">EPG Color by</string>
+        <string id="30255">Use Banner Artwork on Highlight</string>
         <string id="30213">Include Movie Genres</string>
         <string id="30214">Menu uses Channel</string>
         <string id="30229">Displays Extra Info "(Watched)(Rating)"</string>

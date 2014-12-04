@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Jason Anderson, Kevin S. Graer
+#   Copyright (C) 2014 Jason Anderson, Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -3397,7 +3397,7 @@ class ChannelList:
         Plugin_2 = self.plugin_ok('plugin.video.youtube')
         
         if Plugin_1 == True:
-            path = 'plugin://plugin.video.bromix.youtube/?action=play&id='
+            path = 'plugin://plugin.video.bromix.youtube/play/?video_id='
         elif Plugin_2 == True:
             path = 'plugin://plugin.video.youtube/?action=play_video&videoid='
         else:
@@ -5528,3 +5528,25 @@ class ChannelList:
             
             if not FileAccess.exists(LogoFile):
                 Download_URL(logo, LogoFile)
+                
+    
+    def XBMCversion(self):
+        json_query = uni('{ "jsonrpc": "2.0", "method": "Application.GetProperties", "params": {"properties": ["version", "name"]}, "id": 1 }')
+        json_detail = self.sendJSON(json_query)
+        detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_detail)
+        
+        for f in detail:
+            majors = re.search('"major" *: *([0-9]*?),', f)
+            if majors:
+                major = int(majors.group(1))
+
+        if major == 13:
+            version = 'Gotham'
+        elif major < 13:
+            version = 'Frodo'
+        else:
+            version = 'Helix'
+            
+        print 'XBMCversion = ' + version
+        return version
+      

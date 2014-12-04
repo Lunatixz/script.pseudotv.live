@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Kevin S. Graer
+#   Copyright (C) 2014 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV.
@@ -539,7 +539,7 @@ class Artdownloader:
                                     if line[0:5] == 'stack':
                                         line = (line.split(' , ')[0]).replace('stack://','').replace('rar://','')
                                     mpath = (os.path.split(line)[0])
-                                    youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube/?path=/root']
+                                    youtube = ['plugin://plugin.video.bromix.youtube', 'plugin://plugin.video.youtube']
                                     
                                     #Insert Youtube ID for art parsing
                                     if mpath in youtube:
@@ -603,6 +603,7 @@ class Artdownloader:
             for i in range(len(ArtLst)):
                 setImage1 = ''
                 setImage2 = ''
+                setBanner = ''
                 lineLST = ArtLst[i]
                 type = lineLST[0]
                 chtype = lineLST[1]
@@ -615,6 +616,9 @@ class Artdownloader:
                 
                 if type2EXT != '':
                     setImage2 = self.FindArtwork(type, chtype, chname, id, mpath, type2EXT)
+
+                if REAL_SETTINGS.getSetting('EPGbanner_enabled') == 'true' and (chtype <= 7 or self.PVRid != 0):
+                    setBanner = self.FindArtwork(type, chtype, chname, id, mpath, 'banner.jpg')
             
             stop = datetime.datetime.today()
             finished = stop - start
@@ -626,7 +630,4 @@ class Artdownloader:
             
             if NOTIFY == 'true':
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSSG, 2000, THUMB) )
-    
-
-
-        
+   

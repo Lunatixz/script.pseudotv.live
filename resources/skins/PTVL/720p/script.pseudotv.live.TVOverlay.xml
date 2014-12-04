@@ -509,7 +509,7 @@
                 <posy>160</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>OnNow</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -524,7 +524,7 @@
                 <posy>200</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>OnDemand</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -539,7 +539,7 @@
                 <posy>240</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>LastChannel</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -554,7 +554,7 @@
                 <posy>280</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>Favorites</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -599,7 +599,7 @@
                 <posy>400</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>EPGType</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -614,7 +614,7 @@
                 <posy>440</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>Record</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -629,7 +629,7 @@
                 <posy>480</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>Mute</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -644,7 +644,7 @@
                 <posy>520</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>Subtitle</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -659,7 +659,7 @@
                 <posy>560</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>VOSD</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -674,7 +674,7 @@
                 <posy>600</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>Sleep</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -689,7 +689,7 @@
                 <posy>640</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>Settings</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>
@@ -704,7 +704,7 @@
                 <posy>680</posy>
                 <width>151</width>
                 <height>40</height>
-                <label>Exit</label>
+                <label></label>
                 <align>center</align>
                 <aligny>center</aligny>
                 <font>font12</font>

@@ -1,5 +1,5 @@
 import os, re, sys, time, zipfile, threading
-import urllib, urllib2, base64
+import urllib, urllib2, base64, fileinput
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 import urlparse, time
 
@@ -9,12 +9,15 @@ from FileAccess import FileLock, FileAccess
 from Queue import Queue
 from HTMLParser import HTMLParser
 
-# Commoncache plugin import
-try:
-    import StorageServer
-except Exception,e:
-    import storageserverdummy as StorageServer
 
+def replaceAll(file,searchExp,replaceExp):
+    xbmc.log('script.pseudotv.live-videowindow: replaceAll')
+    for line in fileinput.input(file, inplace=1):
+        if searchExp in line:
+            line = line.replace(searchExp,replaceExp)
+        sys.stdout.write(line)
+    
+    
 #Downloader
 def download(url, dest, dp = None):
     if not dp:

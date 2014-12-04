@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Kevin S. Graer
+#   Copyright (C) 2014 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV.
@@ -46,7 +46,7 @@ class Migrate:
         if Globals.DEBUG == 'true':
             Globals.log('Migrate: ' + msg, level)
             
-            
+    
     def migrate(self):
         self.log("migrate")
         settingsFile = xbmc.translatePath(os.path.join(Globals.SETTINGS_LOC, 'settings2.xml'))    
@@ -68,7 +68,10 @@ class Migrate:
         chanlist = ChannelList.ChannelList()
         chanlist.background = True
         chanlist.makenewlists = True
+        chanlist.forceReset = True
         RAND = True
+        
+        settingsFile = xbmc.translatePath(os.path.join(Globals.SETTINGS_LOC, 'settings2.xml'))   
         
         self.log("autoTune, autoFindCustom " + str(Globals.REAL_SETTINGS.getSetting("autoFindCustom")))
         self.log("autoTune, autoFindSuperFav " + str(Globals.REAL_SETTINGS.getSetting("autoFindSuperFav")))
@@ -116,10 +119,7 @@ class Migrate:
             channelNum = 1
         
         self.log('autoTune, Starting channelNum = ' + str(channelNum))
-        
-        if channelNum == 999:
-            return
-        
+               
         updateDialogProgress = 0
         self.updateDialog = xbmcgui.DialogProgress()
         self.updateDialog.create("PseudoTV Live", "Auto Tune")
@@ -151,6 +151,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp'))))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/music') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
+                    channelNum += 1
                 elif xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp'):
                     self.log("autoTune, adding Custom Mixed Playlist Channel")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
@@ -161,6 +162,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp'))))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/mixed') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
+                    channelNum += 1
                 elif xbmcvfs.exists(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'):
                     self.log("autoTune, adding Custom Video Playlist Channel")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "0")
@@ -171,7 +173,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", Globals.uni(chanlist.cleanString(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp'))))
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
                     self.updateDialog.update(self.updateDialogProgress,"PseudoTV Live","Found " + Globals.uni(chanlist.getSmartPlaylistName(xbmc.translatePath('special://profile/playlists/video') + '/Channel_' + str(CChan + 1) + '.xsp')),"")
-                channelNum += 1
+                    channelNum += 1
 
         # Custom SuperFavs
         self.updateDialogProgress = 5
@@ -234,7 +236,14 @@ class Migrate:
         if Globals.REAL_SETTINGS.getSetting("autoFindLivePVR") == "true":
             self.log("autoTune, adding Live PVR Channels")
             self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding PVR Channels"," ")
-
+            
+            #PVR Path by XBMC Version, no json paths?
+            XBMCver = chanlist.XBMCversion()
+            if XBMCver == 'Gotham':
+                PVRverPath = "pvr://channels/tv/All TV channels/"
+            else:
+                PVRverPath = "pvr://channels/tv/All channels/"
+                
             if Globals.REAL_SETTINGS.getSetting("xmltvLOC"):
                 xmltvLOC = xbmc.translatePath(Globals.REAL_SETTINGS.getSetting("xmltvLOC"))
                 xmlTvFile = os.path.join(xmltvLOC, 'xmltv.xml')
@@ -259,11 +268,12 @@ class Migrate:
                             if CHzapit != '0':
                                 inSet = True
                         
+                        
                         if inSet == True:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "pvr://channels/tv/All TV channels/" + str(PVRnum) + ".pvr")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", PVRverPath + str(PVRnum) + ".pvr")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "xmltv")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
@@ -276,7 +286,7 @@ class Migrate:
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
-                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", "pvr://channels/tv/All TV channels/" + str(PVRnum) + ".pvr")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", PVRverPath + str(PVRnum) + ".pvr")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
                             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
@@ -1439,7 +1449,7 @@ class Migrate:
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", "BringThePopcorn")  
                 Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                channelNum = channelNum + 1
+                channelNum += 1
                 self.logDebug('channelNum = ' + str(channelNum))
            
            
@@ -1468,7 +1478,7 @@ class Migrate:
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_4_opt_1", "No")  
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_id", "15")
             Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_5_opt_1", "No")    
-            channelNum = channelNum + 1
+            channelNum += 1
             self.logDebug('channelNum = ' + str(channelNum))
   
   
@@ -1491,7 +1501,7 @@ class Migrate:
             
             for IPTVnum in range(len(IPTVlst)):
                 if channelNum == 999:
-                    break
+                    return
             
                 IPTV = IPTVlst[IPTVnum]
                 title = IPTV[0]
@@ -1509,7 +1519,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum = channelNum + 1
+                    channelNum += 1
         
         
         # Extras - LiveStream
@@ -1529,7 +1539,7 @@ class Migrate:
             
             for LSTVnum in range(len(LSTVlst)):
                 if channelNum == 999:
-                    break
+                    return
             
                 LSTV = LSTVlst[LSTVnum]
                 title = LSTV[0]
@@ -1547,7 +1557,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum = channelNum + 1
+                    channelNum += 1
         
         
         # Extras - Navi-X
@@ -1567,7 +1577,7 @@ class Migrate:
             
             for NaviXnum in range(len(NaviXlst)):
                 if channelNum == 999:
-                    break
+                    return
             
                 NaviX = NaviXlst[NaviXnum]
                 title = NaviX[0]
@@ -1585,7 +1595,7 @@ class Migrate:
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", title)  
                     Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
-                    channelNum = channelNum + 1
+                    channelNum += 1
                     
                     
         Globals.ADDON_SETTINGS.writeSettings()
@@ -1633,7 +1643,7 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting("autoFindCinema","false")
         Globals.REAL_SETTINGS.setSetting("autoFindIPTV_Source","0")    
         Globals.REAL_SETTINGS.setSetting("autoFindLive_Source","0")    
-        Globals.REAL_SETTINGS.setSetting("autoFindNavix_Source","0")        
+        Globals.REAL_SETTINGS.setSetting("autoFindNavix_Source","0")    
         Globals.REAL_SETTINGS.setSetting("ForceChannelReset","true")
         Globals.ADDON_SETTINGS.setSetting('LastExitTime', str(int(curtime)))
         self.updateDialog.close()
@@ -1726,6 +1736,7 @@ class Migrate:
             data = Open_URL_UP(url, USERPASS)
             data = data[2:] #remove first two unwanted lines
             data = ([x for x in data if x != '']) #remove empty lines      
+            i = 0
             
             if RAND == True:
                 random.shuffle(data)

@@ -44,9 +44,10 @@
         <!-- EPG -->
         <setting label="30210" type="lsep"/>
             <setting id="ClockMode" type="enum" label="30211" default="0" values="12 Hour|24 Hour"/>
-            <setting id="EPGcolor_enabled" label="30212" type="enum" values="Disabled|Genre Type|Channel Type|Rating Type" default="0" />
+            <setting id="EPGcolor_enabled" label="30212" type="enum" values="Disabled|Genre|Chtype|Rating|Banner" default="0" />
             <setting id="EPGcolor_MovieGenre" subsetting="true" type="bool" label="30213" default="false" visible="eq(-1,1)" />
             <setting id="EPGTextEnable" type="enum" label="30214" values="Logo|Text" default="0"/>
+            <setting id="EPGbanner_enabled" type="bool" label="30255" default="false"/>
             <setting id="EPG.xInfo" type="bool" label="30229" default="false" />
             <setting id="VideoWindow" type="action" label="30217" option="close" action="RunScript($CWD/videowindow.py, -videowindow)"/>
         <!-- Overlay -->
@@ -147,7 +148,7 @@
             <setting id="autoFindLive_Source" type="enum" label="30969" subsetting="true"  enable="eq(-52,true) + eq(-53,true)" visible="eq(-50,true)" values=" |Local|Online" default="0" />
             <setting id="autoFindLive_Path_Local" type="file" source="auto" label="30970" subsetting="true" enable="eq(-1,1)" visible="eq(-51,true) + eq(-1,1)" default=""/>
             <setting id="autoFindLive_Path_Online" type="text" source="auto" label="30971" subsetting="true" enable="eq(-2,2)" visible="eq(-52,true) + eq(-2,2)" default=""/>
-            <setting id="autoFindNavix_Source" type="enum" label="30972" subsetting="true"  enable="eq(-55,true) + eq(-54,true)" visible="eq(-53,true)" values=" |Local|Online" default="0" />
+            <setting id="autoFindNavix_Source" type="enum" label="30972" subsetting="true"  enable="eq(-55,true) + eq(-56,true)" visible="eq(-53,true)" values=" |Local|Online" default="0" />
             <setting id="autoFindNavix_Path_Local" type="file" source="auto" label="30973" subsetting="true" enable="eq(-1,1)" visible="eq(-54,true) + eq(-1,1)" default=""/>
             <setting id="autoFindNavix_Path_Online" type="text" source="auto" label="30974" subsetting="true" enable="eq(-2,2)" visible="eq(-55,true) + eq(-2,2)" default=""/>
         </category>

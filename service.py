@@ -1,4 +1,4 @@
-﻿#   Copyright (C) 2013 Kevin S. Graer
+﻿#   Copyright (C) 2014 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -46,11 +46,9 @@ chanlist = ChannelList()
 Artdown = Artdownloader()
 
 
-# def Service():
-    # while (not xbmc.abortRequested):
-        # HubSwap()
-        # donorCHK()
-        # xbmc.sleep(1000)
+def Autovideowindow():
+    xbmc.log('script.pseudotv.live-service: Autovideowindow')
+    xbmc.executebuiltin('XBMC.RunScript(' + ADDON_PATH + '/videowindow.py, -autopatch)')
 
         
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
@@ -121,10 +119,34 @@ def autostart():
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
 
 
-REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
-REAL_SETTINGS.setSetting('ArtService_Running', "false")
+#Startup Checks
 HubSwap()
 donorCHK()
 
+#Reset Running Checks
+REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
+REAL_SETTINGS.setSetting('ArtService_Running', "false")
+
+#Autostart Trigger
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
     autostart()    
+    
+# #Monitor for settings change
+# try:
+  # class MyMonitor( xbmc.Monitor ):
+    # def __init__( self, *args, **kwargs ):
+        # xbmc.Monitor.__init__( self )
+        # xbmc.log('script.pseudotv.live-service: MyMonitor - init')   
+        
+    # def onSettingsChanged( self ):
+        # xbmc.log('script.pseudotv.live-service: MyMonitor - HubSwap') 
+        # HubSwap()
+        # Autovideowindow()
+        
+  # xbmc_monitor = MyMonitor()
+# except:
+    # MSG = 'Using Eden API - you need to restart addon for changings to apply' 
+    # xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live",MSG, 4000, THUMB) )
+  
+# while not xbmc.abortRequested:
+  # xbmc.sleep(1000)
