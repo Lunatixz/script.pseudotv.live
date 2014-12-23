@@ -44,35 +44,39 @@ except Exception,e:
 
 # import libraries
 from urllib2 import HTTPError, URLError
-from language import *
 
 # Cache bool
 CACHE_ON = True
 
 API_KEY = FANARTTV_API_KEY
-API_URL_TV = 'http://api.fanart.tv/webservice/series/%s/%s/json/all/1/2'
-API_URL_MOVIE = 'http://api.fanart.tv/webservice/movie/%s/%s/json/all/1/2/'
+API_URL_TV = 'http://webservice.fanart.tv/v3/tv/%s?api_key=%s'
+API_URL_MOVIE = 'http://webservice.fanart.tv/v3/movies/%s?api_key=%s'
 
-IMAGE_TYPES = ['clearlogo',
-               'hdtvlogo',
-               'clearart',
-               'hdclearart',
-               'tvthumb',
-               'characterart',
-               'tvbanner',
-               'movielogo',
-               'hdmovielogo',
-               'movieart',
-               'moviedisc',
-               'hdmovieclearart',
-               'moviethumb',
-               'moviebanner']
+IMAGE_TYPES_MOVIES = ['clearlogo',
+                      'clearart',
+                      'hdclearart',
+                      'movielogo',
+                      'hdmovielogo',
+                      'movieart',
+                      'moviedisc',
+                      'hdmovieclearart',
+                      'moviethumb',
+                      'moviebanner']
+
+IMAGE_TYPES_SERIES = ['clearlogo',
+                      'hdtvlogo',
+                      'clearart',
+                      'hdclearart',
+                      'tvthumb',
+                      'seasonthumb',
+                      'characterart',
+                      'tvbanner',
+                      'seasonbanner']
 
                
 # Retrieve JSON data from cache function
 def get_data(url, data_type ='json'):
     xbmc.log('script.pseudotv.live-fanarttv: get_data')
-    #log('API: %s'% url)
     if CACHE_ON:
         result = parserFANTV.cacheFunction(get_data_new, url, data_type)
     else:
@@ -115,29 +119,46 @@ def get_data_new(url, data_type):
     except:
         data = 'Empty'
     return data
-
-
+    
+    
+def get_language(abbrev):
+    try:
+        lang_string = xbmc.convertLanguage(abbrev, xbmc.ENGLISH_NAME)
+    except:
+        lang_string = 'n/a'
+    return lang_string
+    
+    
+def get_abbrev(lang_string):
+    try:
+        language_abbrev = xbmc.convertLanguage(lang_string, xbmc.ISO_639_1)
+    except:
+        language_abbrev = 'en' ### Default to English if conversion fails
+    return language_abbrev
+    
+    
 def get_image_list_TV(media_id):
     xbmc.log('script.pseudotv.live-fanarttv: get_image_list_TV')
     try:
-        data = get_data(API_URL_TV%(API_KEY,media_id), 'json')
+        data = get_data(API_URL_TV%(media_id, API_KEY), 'json')
         image_list = []
         if data == 'Empty' or not data:
             return image_list
         else:
-            # split 'name' and 'data'
-            for title, value in data.iteritems():
-                for art in IMAGE_TYPES:
-                    if value.has_key(art):
-                        for item in value[art]:
+            for value in data.iteritems():
+                for art in IMAGE_TYPES_SERIES:
+                    if art == value[0]:
+                        for item in value[1]:
                             # Check on what type and use the general tag
                             arttypes = {'clearlogo': 'clearlogo',
                                         'hdtvlogo': 'clearlogo',
                                         'clearart': 'clearart',
                                         'hdclearart': 'clearart',
                                         'tvthumb': 'landscape',
+                                        'seasonthumb': 'seasonlandscape',
                                         'characterart': 'characterart',
                                         'tvbanner': 'banner',
+                                        'seasonbanner': 'seasonbanner',
                                         }
                             if art in ['hdtvlogo', 'hdclearart']:
                                 size = 'HD'
@@ -145,14 +166,21 @@ def get_image_list_TV(media_id):
                                 size = 'SD'
                             else:
                                 size = ''
+                            # Create GUI info tag
                             generalinfo = '%s: %s  |  ' %( 'Language', get_language(item.get('lang')).capitalize())
+                            if item.get('season'):
+                                generalinfo += '%s: %s  |  ' %( 'Season', item.get('season'))
+                            generalinfo += '%s: %s  |  ' %( 'Votes', item.get('likes'))
+                            if art in ['hdtvlogo', 'hdclearart', 'clearlogo', 'clearart']:
+                                generalinfo += '%s: %s  |  ' %( 'Size', size)
                             # Fill list
                             image_list.append({'url': urllib.quote(item.get('url'), ':/'),
                                                'preview': item.get('url') + '/preview',
                                                'id': item.get('id'),
                                                'art_type': [arttypes[art]],
                                                'size': size,
-                                               'language': item.get('lang','en'),
+                                               'season': item.get('season','n/a'),
+                                               'language': item.get('lang'),
                                                'votes': int(item.get('likes')),
                                                'generalinfo': generalinfo})
             if image_list == []:
@@ -174,11 +202,10 @@ def get_image_list_Movie( media_id):
         if data == 'Empty' or not data:
             return image_list
         else:
-            # split 'name' and 'data'
-            for title, value in data.iteritems():
-                for art in IMAGE_TYPES:
-                    if value.has_key(art):
-                        for item in value[art]:
+            for value in data.iteritems():
+                for art in IMAGE_TYPES_MOVIES:
+                    if art == value[0]:
+                        for item in value[1]:
                             # Check on what type and use the general tag
                             arttypes = {'movielogo': 'clearlogo',
                                         'moviedisc': 'discart',
@@ -194,13 +221,19 @@ def get_image_list_Movie( media_id):
                             else:
                                 size = ''
                             generalinfo = '%s: %s  |  ' %( 'Language', get_language(item.get('lang')).capitalize())
+                            if item.get('disc_type'):
+                                generalinfo += '%s: %s (%s)  |  ' %( 'Disc', item.get('disc'), item.get('disc_type'))
+                            if art in ['hdmovielogo', 'hdmovieclearart', 'movielogo', 'movieclearart']:
+                                generalinfo += '%s: %s  |  ' %( 'Size', size)
+                            generalinfo += '%s: %s  |  ' %( 'Votes', item.get('likes'))
                             # Fill list
                             image_list.append({'url': urllib.quote(item.get('url'), ':/'),
                                                'preview': item.get('url') + '/preview',
                                                'id': item.get('id'),
                                                'art_type': [arttypes[art]],
                                                'size': size,
-                                               'language': item.get('lang','en'),
+                                               'season': item.get('season','n/a'),
+                                               'language': item.get('lang'),
                                                'votes': int(item.get('likes')),
                                                'disctype': item.get('disc_type','n/a'),
                                                'discnumber': item.get('disc','n/a'),

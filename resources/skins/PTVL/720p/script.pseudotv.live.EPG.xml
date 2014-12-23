@@ -231,7 +231,7 @@
                 <texture>$INFO[Window(Home).Property(TrendingShows.1.Art(landscape))]</texture>  
                 <visible>!Control.IsVisible(523)</visible>
             </control> 
-            <control type="label">
+            <control type="label" id="522">
                 <posx>-15</posx>
                 <posy>160</posy>
                 <align>center</align>
@@ -247,7 +247,8 @@
         <!-- VideoWindow Box --> 
         <control type="group" id="523">    
             <visible></visible>
-            <control type="label">
+            <!-- NowPlaying VideoWindow Label -->
+            <control type="label" id="524">
                 <posx>-15</posx>
                 <posy>0</posy>
                 <align>center</align>
@@ -255,21 +256,9 @@
                 <height>30</height>
                 <font>font12</font>
                 <textcolor>C0C0C0C0</textcolor>
-                <!-- <visible>!VideoPlayer.Content(tvshows)</visible> -->
-                <label>$INFO[VideoPlayer.Title]</label>
+                <label>True</label>
                 <font>font12</font>  
             </control>   
-<!--             <control type="label">
-                <posx>-15</posx>
-                <posy>0</posy>
-                <align>center</align>
-                <width>300</width>
-                <height>30</height>
-                <textcolor>C0C0C0C0</textcolor>
-                <font>font12</font>
-                <visible>VideoPlayer.Content(tvshows)</visible>
-                <label>$INFO[VideoPlayer.TVShowTitle]</label>
-            </control>    -->
             <!-- #### Skinners Include Everything for videowindow patch to work #### -->
             <!-- PATCH START --> <!-- 
             <control type="videowindow">

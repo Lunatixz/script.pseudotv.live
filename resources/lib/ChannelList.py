@@ -17,7 +17,7 @@
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
-import subprocess, os, sys, re
+import subprocess, os, sys, re, buggalo
 import time, datetime, threading, _strptime
 import httplib, urllib, urllib2, feedparser, socket, json
 import base64, shutil, random, errno
@@ -32,7 +32,7 @@ from Playlist import Playlist
 from Globals import *
 from Channel import Channel
 from VideoParser import VideoParser
-from FileAccess import FileLock, FileAccess
+from FileAccess import FileAccess
 from sickbeard import *
 from couchpotato import *
 from tvdb import *
@@ -378,9 +378,9 @@ class ChannelList:
             needsreset = ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_changed') == 'True'
             
             # force rebuild
-            if chtype == 8:
-                self.log("Force LiveTV rebuild")
-                needsreset = True
+            # if chtype == 8:
+                # self.log("Force LiveTV rebuild")
+                # needsreset = True
  
             if chtype == 16:
                 self.log("Force Playon rebuild")
@@ -586,7 +586,8 @@ class ChannelList:
             else:
                 return os.path.split(setting1)[1]
         elif chtype == 8:
-            return ADDON_SETTINGS.getSetting("Channel_" + str(setting1) + "_opt_1") + " LiveTV"
+            #setting1 = channel
+            return ADDON_SETTINGS.getSetting("Channel_" + str(setting1) + "_opt_1")
             
         return ''
 
@@ -650,7 +651,6 @@ class ChannelList:
         # LiveTV
         elif chtype == 8:
             self.log("Building LiveTV Channel, " + setting1 + " , " + setting2 + " , " + setting3)
-            chname = (self.getChannelName(8, channel))
             
             # HDHomeRun #
             if setting2[0:9] == 'hdhomerun' and REAL_SETTINGS.getSetting('HdhomerunMaster') == "true":
@@ -668,6 +668,7 @@ class ChannelList:
                 # Validate XMLTV Data #
                 if setting3 != '':
                     xmltvValid = self.xmltv_ok(setting1, setting3)
+                    chname = (self.getChannelName(8, channel))
                 
                 if xmltvValid == True:
                     
@@ -675,16 +676,16 @@ class ChannelList:
                         fileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel) 
                         if len(fileList) < 24:
                             # Fill Gap Between Listings #
-                            fileList = self.fillLiveTVFileList(fileList, chname, channel)                    
+                            fileList = self.fillLiveTVFileList(fileList, setting1, setting2, setting3, setting4, chname, channel)             
                     else:
                         fileList = self.buildLiveTVFileList(setting1, setting2, setting3, setting4, channel)
                         
                     # Fill Empty Listings #
                     if len(fileList) == 0:
-                        fileList = self.fillLiveTVFileList(fileList, chname, channel)   
+                        fileList = self.fillLiveTVFileList(fileList, setting1, setting2, setting3, setting4, chname, channel)
                         ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'True')
                 else:
-                    fileList = self.fillLiveTVFileList(fileList, chname, channel)   
+                    fileList = self.fillLiveTVFileList(fileList, setting1, setting2, setting3, setting4, chname, channel)
                     ADDON_SETTINGS.setSetting('Channel_' + str(channel) + '_changed', 'True')
             else:
                 self.log('makeChannelList, CHANNEL: ' + str(channel) + ', CHTYPE: ' + str(chtype), 'fileListCHK invalid: ' + str(setting2))
@@ -1870,7 +1871,11 @@ class ChannelList:
 
                             else:
                                 if year != 0:
-                                    tmpstr += titles.group(1) + ' (' + str(year) + ')' + "//"
+                                    try:
+                                        tmpstr += titles.group(1) + ' (' + str(year) + ')' + "//"
+                                    except:
+                                        tmpstr += titles.group(1) + "//"
+                                        pass    
                                 else:
                                     tmpstr += titles.group(1) + "//"
                                     
@@ -1966,9 +1971,24 @@ class ChannelList:
         #fileList = self.remDupes(fileList)
         return fileList
 
-
-    def fillLiveTVFileList(self, fileList, CHname, channel):
-        self.log("fillLiveTVFileList")
+    
+    def fillLiveTVFileList(self, fileList, setting1, setting2, setting3, setting4, chname, channel):
+        xbmc.log("fillLiveTVFileList Cache")
+        if Cache_Enabled == True and REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':  
+            try:
+                result = liveTV.cacheFunction(self.fillLiveTVFileList_NEW, fileList, setting1, setting2, setting3, setting4, chname, channel)
+            except:
+                result = self.fillLiveTVFileList_NEW(fileList, setting1, setting2, setting3, setting4, chname, channel)
+                pass
+        else:
+            result = self.fillLiveTVFileList_NEW(fileList, setting1, setting2, setting3, setting4, chname, channel)
+        if not result:
+            result = []
+        return result  
+        
+        
+    def fillLiveTVFileList_NEW(self, fileList, setting1, setting2, setting3, setting4, chname, channel):
+        self.log("fillLiveTVFileList_NEW")
         newList = []
         n = 0
         now = str(datetime.datetime.now())
@@ -1978,31 +1998,32 @@ class ChannelList:
         nowDate = nowDate.split('.')[0]
         nowDate = datetime.datetime.strptime(nowDate, '%Y-%m-%d %H:%M:%S')
         
-        if len(fileList) != 0:
-            for i in range(len(fileList)):
-                tmpstrLST = (fileList[i]).split('\n')[0]
-                file = (fileList[i]).split('\n')[1]
-                Dur = tmpstrLST.split(',')[0]
-                startDate = tmpstrLST.split('//')[4]
-                startDate = datetime.datetime.strptime(startDate, '%Y-%m-%d %H:%M:%S')
-                today = nowDate
-                tomorrow = nowDate + datetime.timedelta(days=n)
-                
-                if (today.day == startDate.day and today.hour < startDate.hour) or (tomorrow.day < startDate.day):
-                    print 'match'
-                    startDur = int(self.__total_seconds__(startDate - nowDate))
-                    # startDur = int((startDate - nowDate).total_seconds())
-                    tmpstr = str(startDur) + ',' + CHname + "//" + 'SmoothStreams - LiveTV' + "//" + CHname + "//" + 'Unknown' + "//" + str(now) + "//" + 'tvshow|0|0|False|1|NA|' + '\n' + file
-                    newList.append(tmpstr)
+        if setting3 == 'smoothstreams':
+            if len(fileList) != 0:
+                for i in range(len(fileList)):
+                    tmpstrLST = (fileList[i]).split('\n')[0]
+                    file = (fileList[i]).split('\n')[1]
+                    Dur = tmpstrLST.split(',')[0]
+                    startDate = tmpstrLST.split('//')[4]
+                    startDate = datetime.datetime.strptime(startDate, '%Y-%m-%d %H:%M:%S')
+                    today = nowDate
+                    tomorrow = nowDate + datetime.timedelta(days=n)
+                    
+                    if (today.day == startDate.day and today.hour < startDate.hour) or (tomorrow.day < startDate.day):
+                        print 'match'
+                        startDur = int(self.__total_seconds__(startDate - nowDate))
+                        # startDur = int((startDate - nowDate).total_seconds())
+                        tmpstr = str(startDur) + ',' + chname + "//" + 'SmoothStreams - LiveTV' + "//" + chname + "//" + 'Unknown' + "//" + str(now) + "//" + 'tvshow|0|0|False|1|NA|' + '\n' + file
+                        newList.append(tmpstr)
 
-                tmpstr = tmpstrLST +'\n'+ file
-                newList.append(tmpstr)
-                n +=1
+                    tmpstr = tmpstrLST +'\n'+ file
+                    newList.append(tmpstr)
+                    n +=1
         else:
             print 'Empty LiveTV FileList, adding tmpstr'
-            self.ResetChanLST.insert(0, channel)
+            # self.ResetChanLST.insert(0, channel)#Force Channel Reset
             REAL_SETTINGS.setSetting('ResetChanLST', str(self.ResetChanLST))
-            tmpstr = str(5400) + ',' + 'Listing Unavailable' + "//" + 'LiveTV' + "//" + 'TV Listing Unavailable, Check your xmltv file' + "//" + 'Unknown' + "//" + str(now) + "//" + 'tvshow|0|0|False|1|NA|' + '\n' + CHname
+            tmpstr = str(5400) + ',' + 'Listing Unavailable' + "//" + 'LiveTV' + "//" + 'TV Listing Unavailable, Check your xmltv file' + "//" + 'Unknown' + "//" + str(now) + "//" + 'tvshow|0|0|False|1|NA|' + '\n' + setting2
             newList.append(tmpstr)
             
         return newList
@@ -2188,7 +2209,11 @@ class ChannelList:
                                             pass
                                 
                                         if year:
-                                            titleYR = title + ' (' + str(year) + ')'
+                                            try:
+                                                titleYR = title + ' (' + str(year) + ')'
+                                            except:
+                                                titleYR = title 
+                                                pass
                                         else:
                                             titleYR = title 
                                 
@@ -4265,7 +4290,11 @@ class ChannelList:
         print 'getTVDBID'
         tvdbid = 0
         if year:
-            title = title + ' (' + str(year) + ')'
+            try:
+                title = title + ' (' + str(year) + ')'
+            except:
+                title = title
+                pass
             
         try:
             self.log("getTVDBID, metahander")
@@ -5273,8 +5302,9 @@ class ChannelList:
             pass
 
         CHname = CHname.replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','')
-        matchLST = [CHname.upper(), 'W'+CHname.upper(), CHnum+' '+CHname.upper(), CHnum+' W'+CHname.upper()]
-        print matchLST
+        matchLST = [CHname.upper(), 'W'+CHname.upper(), CHnum+' '+CHname.upper(), CHnum+' W'+CHname.upper(), CHnum]
+        self.log("findZap2itID, CHname = " + CHname)
+        self.log("findZap2itID, matchLST = " + str(matchLST))
 
         for f in (file_detail):
             found = False
@@ -5287,8 +5317,9 @@ class ChannelList:
                 dnames = (dnames.replace("('",'').replace("', '')",'')).split(', ')
 
                 for i in range(len(dnames)):
-                    dname = dnames[i].replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','')
-
+                    dname = dnames[i].replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','').replace("'",'').replace(')','')
+                    print dname
+                    
                     if dname.upper() in matchLST: 
                         self.log("findZap2itID, Match Found: " + str(CHname.upper()) +' == '+ str(dname.upper()) + str(CHid))  
                         found = True
@@ -5472,7 +5503,7 @@ class ChannelList:
                     download(FTVxmltv, FTVXML)
                 return True
              
- 
+             
     def IPTVtuning(self, url):
         IPTVList = []
         IPTVList = IPTVtuning(url)
@@ -5492,8 +5523,10 @@ class ChannelList:
 
         
     def CleanLabels(self, label):
+        self.log('CleanLabels, in = ' + label)
         #add regex wildcard to catch all colors todo
-        label = (label.upper()).replace('[B]','').replace('[/B]','').replace('[/COLOR]','').replace('[COLOR=BLUE]','').replace('[COLOR=CYAN]','').replace('[COLOR=RED]','').replace('[COLOR=GREEB]','').replace('[COLOR=YELLOW]','').replace('[HD]', '').replace('(SUB) ','').replace('(DUB) ','').replace('[CC]','').replace('\\',' ').replace('[COLOR CYAN]','')
+        label = (label.upper()).replace('[B]','').replace('[/B]','').replace('[/COLOR]','').replace('[COLOR=BLUE]','').replace('[COLOR=CYAN]','').replace('[COLOR=RED]','').replace('[COLOR=GREEN]','').replace('[COLOR=YELLOW]','').replace('[HD]', '').replace('(SUB) ','').replace('(DUB) ','').replace('[CC]','').replace('\\',' ').replace('[COLOR CYAN]','').replace('[COLOR GOLD]','')
+        self.log('CleanLabels, out = ' + label.title())
         return label.title()
     
     
@@ -5518,18 +5551,27 @@ class ChannelList:
             # plname[0].childNodes[0].nodeValue.lower() = 'false'
             
         # xml.close()
-       
-       
+
+        
     def GrabLogo(self, url, title):
-        print 'GrabLogo'
-        if REAL_SETTINGS.getSetting('ChannelLogoFolder') != '':
-            LogoPath = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder'))
-            LogoFile = os.path.join(LogoPath, title[0:18] + '.png')
+        self.log("GrabLogo")
+        try:
+            if REAL_SETTINGS.getSetting('ChannelLogoFolder') != '':
+                LogoPath = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder'))
+                LogoFile = os.path.join(LogoPath, title[0:18] + '.png')
+                url = url.replace('.png/','.png').replace('.jpg/','.jpg')
+                if not FileAccess.exists(LogoFile):
+                    if url.startswith('http'):
+                        Download_URL(url, LogoFile)
+                    elif url.startswith('image'):
+                        url = unquote(url).replace("image://",'')
+                        if url.startswith('http'):
+                            Download_URL(url, LogoFile)
+            self.log(url + ' ' + LogoFile)
+        except Exception: 
+            buggalo.onExceptionRaised()   
+
             
-            if not FileAccess.exists(LogoFile):
-                Download_URL(logo, LogoFile)
-                
-    
     def XBMCversion(self):
         json_query = uni('{ "jsonrpc": "2.0", "method": "Application.GetProperties", "params": {"properties": ["version", "name"]}, "id": 1 }')
         json_detail = self.sendJSON(json_query)
@@ -5546,7 +5588,7 @@ class ChannelList:
             version = 'Frodo'
         else:
             version = 'Helix'
-            
-        print 'XBMCversion = ' + version
+        
+        self.log('XBMCversion = ' + version)
         return version
       

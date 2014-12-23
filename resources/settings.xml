@@ -44,12 +44,11 @@
         <!-- EPG -->
         <setting label="30210" type="lsep"/>
             <setting id="ClockMode" type="enum" label="30211" default="0" values="12 Hour|24 Hour"/>
-            <setting id="EPGcolor_enabled" label="30212" type="enum" values="Disabled|Genre|Chtype|Rating|Banner" default="0" />
+            <setting id="EPGcolor_enabled" label="30212" type="enum" values="Disabled|Genre|Chtype|Rating" default="0" />
             <setting id="EPGcolor_MovieGenre" subsetting="true" type="bool" label="30213" default="false" visible="eq(-1,1)" />
             <setting id="EPGTextEnable" type="enum" label="30214" values="Logo|Text" default="0"/>
-            <setting id="EPGbanner_enabled" type="bool" label="30255" default="false"/>
             <setting id="EPG.xInfo" type="bool" label="30229" default="false" />
-            <setting id="VideoWindow" type="action" label="30217" option="close" action="RunScript($CWD/videowindow.py, -videowindow)"/>
+            <setting id="VideoWindow" type="action" label="30217" option="close" action="RunScript($CWD/utilities.py, -videowindow)"/>
         <!-- Overlay -->
         <setting label="30220" type="lsep"/>
             <setting id="COLOR_CHANNUM" type="enum" label="30203" values="Holo|Cyan|Green|Gray|Light Gray|White" default="0"/>
@@ -204,9 +203,9 @@
     <category label="39000">
         <setting id="Donor_Enabled" label="30901" type="bool" default="false"/>
         <setting id="Donor_UP" subsetting="true" label="30902" visible="eq(-1,true)" type="text" default="Username:Password" />    
-        <setting id="DonorDownload" type="action" subsetting="true" label="30904" visible="eq(-2,true)" option="close" action="RunScript($CWD/donordownload.py, -DonorDownloader)"/>
+        <setting id="DonorDownload" type="action" subsetting="true" label="30904" visible="eq(-2,true)" option="close" action="RunScript($CWD/utilities.py, -DonorDownloader)"/>
         <setting id="CAT_Donor" type="bool" label="39004"  visible="false" default="false" />
-        <setting id="LogoDownloader" type="action" subsetting="true" label="30905" visible="eq(-1,true)" option="close" action="RunScript($CWD/donordownload.py, -LogoDownloader)"/>
+        <setting id="LogoDownloader" type="action" subsetting="true" label="30905" visible="eq(-1,true)" option="close" action="RunScript($CWD/utilities.py, -LogoDownloader)"/>
         <setting label="30903" visible="eq(-6,true)" type="lsep" /> 
     </category>
     <!--MISC-->

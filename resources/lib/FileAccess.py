@@ -30,7 +30,6 @@ FILE_LOCK_MAX_FILE_TIMEOUT = 13
 FILE_LOCK_NAME = "FileLock.dat"
 
 
-
 class FileAccess:
     @staticmethod
     def log(msg, level = xbmc.LOGDEBUG):

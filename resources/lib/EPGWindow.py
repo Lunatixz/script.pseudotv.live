@@ -25,7 +25,7 @@ from Playlist import Playlist
 from Globals import *
 from Channel import Channel
 from ChannelList import ChannelList
-from FileAccess import FileLock, FileAccess
+from FileAccess import FileAccess
 from xml.etree import ElementTree as ET
 from Artdownloader import *
 from PVRdownload import *
@@ -530,15 +530,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     elif REAL_SETTINGS.getSetting('EPGcolor_enabled') == '3':
                         rating = (chanlist.unpackLiveID(myLiveID))[5]
                         self.textureButtonNoFocus = self.GetEPGtype(rating)
-                        
-                    elif REAL_SETTINGS.getSetting('EPGcolor_enabled') == '4':
-                        self.textureButtonNoFocus = self.setBanner(type, chtype, chname, id, mediapath)
-                        mylabel = ''
                     else:   
                         self.textureButtonNoFocus = MEDIA_LOC + BUTTON_NO_FOCUS
-             
-                    if REAL_SETTINGS.getSetting('EPGbanner_enabled') == 'true' and (chtype <= 7 or self.PVRid != 0):
-                        self.textureButtonFocus = self.setBanner(type, chtype, chname, id, mediapath)
 
                     #Create Control array
                     self.channelButtons[row].append(xbmcgui.ControlButton(xpos, basey, width, baseh, mylabel, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, font=self.textfont, textColor=self.textcolor, focusedColor=self.focusedcolor))
@@ -953,7 +946,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         elif mediapath.startswith('plugin://plugin.video.bromix.youtube') or mediapath.startswith('plugin://plugin.video.youtube'):
             mpath = (os.path.split(mediapath)[0])
             YTid = mediapath.split('id=')[1]
-            mpath = (mpath + '/' + YTid).replace('/?path=/root','')
+            mpath = (mpath + '/' + YTid).replace('/?path=/root','').replace('/play','')
         else:
             mpath = (os.path.split(mediapath)[0])
         
@@ -981,6 +974,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try:
             if self.MyOverlayWindow.VideoWindow == True:
                 self.getControl(523).setVisible(True)
+                self.getControl(524).setLabel(self.MyOverlayWindow.PVRtitle)
             else:
                 self.getControl(523).setVisible(False)
         except:
@@ -1020,7 +1014,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.getControl(502).setLabel(self.MyOverlayWindow.channels[newchan - 1].getItemDescription(plpos))
         self.getControl(503).setImage(self.channelLogos + ascii(self.MyOverlayWindow.channels[newchan - 1].name) + '.png')
         
-        if REAL_SETTINGS.getSetting("ArtService_Running") == "false" and REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":  
+        if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":  
             self.log('Dynamic artwork enabled')
                             
             #Sickbeard/Couchpotato == Managed
@@ -1081,7 +1075,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try:
             self.getControl(508).setVisible(True)
             self.getControl(508).setImage('NA.png')
-            setImage1 = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, type1EXT)
+            setImage1 = self.Artdownloader.FindArtwork(type, chtype, chname, id, mpath, type1EXT)
             self.getControl(508).setImage(setImage1)
         except:
             self.getControl(508).setVisible(False)
@@ -1093,22 +1087,13 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try: 
             self.getControl(510).setVisible(True)
             self.getControl(510).setImage('NA.png')
-            setImage2 = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, type2EXT)
+            setImage2 = self.Artdownloader.FindArtwork(type, chtype, chname, id, mpath, type2EXT)
             self.getControl(510).setImage(setImage2)
         except:
             self.getControl(510).setVisible(False)
             pass
     
-       
-    def setBanner(self, type, chtype, chname, id, mpath, arttype='banner.jpg'):
-        self.log('setBanner')
-        textureButtonFocus = self.Artdownloader.FindArtwork_NEW(type, chtype, chname, id, mpath, arttype)
-        
-        if textureButtonFocus[-10:].lower() != 'banner.jpg':
-            textureButtonFocus = MEDIA_LOC + BUTTON_FOCUS                                   
-        return textureButtonFocus
-        
-        
+    
     # using the currently selected button, play the proper shows
     def selectShow(self):
         self.log('selectShow')    
@@ -1349,7 +1334,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         now = time.time()
         reminder_time = round(((epochBeginDate - now) / 60) - 1)
         reminder_threadtime = round(((epochBeginDate - now) / 60) - 1) * 60
-        msg = title + ' starts in 1m'
+        msg = title + 'on Channel ' + str(channel) +' starts in 1m'
         
         if jump == False:
             xbmc.executebuiltin('XBMC.AlarmClock(PseudoTV Live, XBMC.Notification("PseudoTV Live",'+ msg +',4000,'+ THUMB +'),'+ str(reminder_time) + ',false)')

@@ -1,6 +1,8 @@
-[*] NEW! EPG Options: Banner artwork EPG Color, Banner artwork on focus. *Tentative Feature, Might not make it into stable.
-[*] Sidebar idle autoclose, Global "Autotune Filter", Filter applies to all chtypes.
-[*] Added Kodi Helix Support, Automated VideoWindow "Re-patching", Updated Bromix Youtube paths.
+[*] Artwork download tweaking: Preferred language artwork filter, updated fanart.tv api to v3. *Thanks Martijn
+[*] Automatic missing LiveTV channel logo downloader, via XMLTV or XBMC Plugin when available.
+[*] F.T.V Autotune fix, Buggalo exception logging, optimized and cleaned code.
+[*] Sidebar idle auto close, Eventghost broadcast renaming.
+[*] Increased Kodi Helix Support, Automated VideoWindow "Re-patching", Updated Bromix Youtube paths.
 [*] Seasonal Channel, Channel based on Monthly Youtube Community List Playlist, No Playlist = No Channel.
 [*] Idle timer, and ScreenSaver. *Thanks Anisan.
 [*] Sidebar Menu, Activated while the Info Overlay is displaying; click Left. Click Right, Back or Close to exit.

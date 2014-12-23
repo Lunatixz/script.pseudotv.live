@@ -653,8 +653,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
 
         self.log("updateListing return")
 
-
-
+        
 __cwd__ = REAL_SETTINGS.getAddonInfo('path')
 
 
