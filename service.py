@@ -17,21 +17,12 @@
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os, shutil, datetime, random, buggalo
+import os, shutil, datetime, random
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
-from resources.lib.ChannelList import *
-from resources.lib.Artdownloader import *
-from resources.lib.utils import *
-from resources.lib.EPGWindow import *
 
-# Commoncache plugin import
-try:
-    import StorageServer
-except Exception,e:
-    import resources.lib.storageserverdummy as StorageServer
-    
+
 # Plugin Info
 ADDON_ID = 'script.pseudotv.live'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -39,23 +30,17 @@ ADDON_ID = REAL_SETTINGS.getAddonInfo('id')
 ADDON_NAME = REAL_SETTINGS.getAddonInfo('name')
 ADDON_PATH = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
-log("Service Started")
-
-chanlist = ChannelList()
-Artdown = Artdownloader()
-
-
-def Autovideowindow():
-    log('Autovideowindow')
-    xbmc.executebuiltin('XBMC.RunScript(' + ADDON_PATH + '/utilities.py, -VWautopatch)')
+THUMB = (xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/' + 'icon.png')
+xbmc.log("Service Started")
 
         
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
-    log('HubSwap')
+    xbmc.log('script.pseudotv.live-Service: HubSwap')
     icon = ADDON_PATH + '/icon'
-    HUB = chanlist.plugin_ok('plugin.program.addoninstaller')
+    HUB = xbmc.getCondVisibility('System.HasAddon(plugin.program.addoninstaller)') == 1
+    
     if HUB == True:
-        log('HubSwap - Hub Edition')
+        xbmc.log('script.pseudotv.live-Service: HubSwap = Hub Edition')
         
         if REAL_SETTINGS.getSetting('Hub') == 'false':
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","Hub-Edition Activated", 4000, THUMB) )
@@ -65,22 +50,22 @@ def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
                 xbmcvfs.copy(icon + 'HUB', icon + '.png')
                 xbmc.executebuiltin("UpdateLocalAddons")
                 xbmc.executebuiltin("ReloadSkin()")
-            except Exception:
-                buggalo.onExceptionRaised()    
+            except:
+                pass
     else:
-        log('HubSwap - Master')
+        xbmc.log('script.pseudotv.live-Service: HubSwap = Master')
         REAL_SETTINGS.setSetting("Hub","false")
         try:
             xbmcvfs.delete(icon + '.png')
             xbmcvfs.copy(icon + 'OEM', icon + '.png')
             xbmc.executebuiltin("UpdateLocalAddons")
             xbmc.executebuiltin("ReloadSkin()")
-        except Exception:
-            buggalo.onExceptionRaised()     
+        except:
+            pass
 
             
 def donorCHK():
-    log('donorCHK')
+    xbmc.log('script.pseudotv.live-Service: donorCHK')
     DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
     DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
     
@@ -99,52 +84,17 @@ def donorCHK():
     
         
 def autostart():
-    log('autostart')   
+    xbmc.log('script.pseudotv.live-Service: autostart')   
     if NOTIFY == 'true':
         xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("AutoStart PseudoTV Live","Service Starting...", 4000, THUMB) )
     
     IDLE_TIME = AUTOSTART_TIMER[int(REAL_SETTINGS.getSetting('timer_amount'))] 
     sleep(IDLE_TIME)
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
+  
+donorCHK()
+HubSwap()
 
 #Autostart Trigger
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
-    autostart()   
-
-# #Service loop    
-# class Service:
-    # def __init__(self):
-        # log('Service - init')
-        # while not xbmc.abortRequested:
-            # try:
-                # if REAL_SETTINGS.getSetting('Hub') == 'false':
-                    # HubSwap()  
-            # except Exception:
-                # REAL_SETTINGS.setSetting("Hub","false")
-                # buggalo.onExceptionRaised()
-            # xbmc.sleep(10000)
- 
-#Startup Checks
-# Service()
-donorCHK()
-
-# #Monitor for settings change
-# try:
-  # class MyMonitor( xbmc.Monitor ):
-    # def __init__( self, *args, **kwargs ):
-        # xbmc.Monitor.__init__( self )
-        # log('MyMonitor - init')
-        
-    # def onSettingsChanged( self ):
-        # log('onSettingsChanged')
-        # if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True": 
-            # if REAL_SETTINGS.getSetting("videowindow_" + Skin_Select) == "false":
-                # Autovideowindow()  
-        
-  # xbmc_monitor = MyMonitor()
-# except:
-    # MSG = 'Using Eden API - you need to restart addon for changings to apply' 
-    # xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live",MSG, 4000, THUMB) )
-    
-# while not xbmc.abortRequested:
-    # xbmc.sleep(1000)
+    autostart() 

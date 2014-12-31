@@ -685,7 +685,8 @@ class Artdownloader:
                 
             stop = datetime.datetime.today()
             finished = stop - start
-            MSSG = ("Artwork Spooled in %d seconds" %finished.seconds)            
+            MSSG = ("Artwork Spooled in %d seconds" %finished.seconds)                
+            REAL_SETTINGS.setSetting("ArtService_Primed","true")              
             REAL_SETTINGS.setSetting("ArtService_Running","false")
             REAL_SETTINGS.setSetting("ArtService_LastRun",str(stop))
             

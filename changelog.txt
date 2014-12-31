@@ -1,18 +1,23 @@
+[*] Added Chtype 15 workaround for "/" in folder name, Replace "/" with "%2F". Example: plugin.audio.music/AC/DC, plugin.audio.music/AC%2FDC
+[*] Include 3D media Advanced Rule.
+[*] Autoupdate removed, Install Lunatixz Repo for "Stable" Updates, or manually download Development branch ".zip" for latest.
+[*] Updated Channel Configuration skin *Thanks Steveb
+[*] Fixed Directory Channel & Local BCT building in Helix.
 [*] Artwork download tweaking: Preferred language artwork filter, updated fanart.tv api to v3. *Thanks Martijn
 [*] Automatic missing LiveTV channel logo downloader, via XMLTV or XBMC Plugin when available.
 [*] F.T.V Autotune fix, Buggalo exception logging, optimized and cleaned code.
 [*] Sidebar idle auto close, Eventghost broadcast renaming.
 [*] Increased Kodi Helix Support, Automated VideoWindow "Re-patching", Updated Bromix Youtube paths.
-[*] Seasonal Channel, Channel based on Monthly Youtube Community List Playlist, No Playlist = No Channel.
+[*] Seasonal Channel, Channel based on Monthly Youtube Community Playlist, No Playlist = No Channel.
 [*] Idle timer, and ScreenSaver. *Thanks Anisan.
 [*] Sidebar Menu, Activated while the Info Overlay is displaying; click Left. Click Right, Back or Close to exit.
 [*] IPTV/LiveStream/NaviX parsing improvements.
-[*] [COLOR=blue]^ v.0.5.7 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.7 ^[/B][/COLOR] 
 [*] Full XMLTV Listings for SmoothStream LiveTV EPG.
 [*] NEW! Playback timeout option. Found under "Misc", What does it do? PTVL tries to cancel playback after the configured 
     time. Tweak timeout time to avoid "Failed Playback" prompt. 0 = Disabled.
 [*] PseudoCinema tweaks, New Eventghost broadcast events and custom video option (WIP).
-[*] [COLOR=blue]^ v.0.5.6 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.6 ^[/B][/COLOR] 
 [*] Settop mode finalized. What is it? It allows PTVL to rebuild/update channel without having to restart.
     How is it used? Any channel you want updated, Setup a advanced channel rule to reset every x hours.
     Enable Settop mode under "General" settings, select the interval you want to check for updates.
@@ -30,15 +35,15 @@
 [*] VideoWindow Patcher now removes XBMC seek OSD.
 [*] NEW! IPTV M3U & Livestream XML and Navi-X PLX Autotuning w/Missing Logo Downloading - Hub Edition and Donors only. 
 [*] NEW! Recently added TV & Movie Autotuning, Channel includes media added to XBMC in the last 14days.
-[*] [COLOR=blue]^ v.0.5.5 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.5 ^[/B][/COLOR] 
 [*] EventGhost JSON broadcasts (Starting,Stopping)
 [*] LiveTV, LocalTV, PluginTV, PlayonTV and LastFM FileList Caching, 
     Purged every 24hrs, 12hrs, 24hrs, 4hrs, 48hrs. Caching is disabled in Settop Box Mode.
 [*] Overall performance enhancements.
-[*] [COLOR=blue]^ v.0.5.4 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.4 ^[/B][/COLOR] 
 [*] LiveTV XMLTV parsing performance tweaks. 
 [*] Added new "Coming Up Next" type. "Overlay" was renamed to "Popup", "Overlay" now triggers standard Overlay panel.
-[*] [COLOR=blue]^ v.0.5.3 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.3 ^[/B][/COLOR] 
 [*] Temporary disabled Art/XMLTV services. They still run at start-up.
 [*] NEW! Optimized "LowPower" configurations based on OS Selection, Override under "Misc" settings.
 [*] Improved plugin detection, Fixed Internet Trailers BCT's
@@ -49,7 +54,7 @@
 [*] Misc. Tweaks and Bug fixes.
 [*] Removed old artwork fallbacks and skin labels.
 [*] Artwork Service Enabled w/ Dynamic artwork. Added Disable during Playback option.
-[*] [COLOR=blue]^ v.0.5.2 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.2 ^[/B][/COLOR] 
 [*] Improved accuracy of Direct Plugin/Playon Parsing.
 [*] NEW! Smoothstreams.tv EPG tweaks *EPGSync issues
 [*] "Recommend List" Genre types, Limit Autotuning for Plugin, Playon, Youtube Network by Genre.
@@ -59,21 +64,21 @@
 [*] NEW! HDHomeRun UPNP autotune option w/xmltv pairing.
 [*] Improved LiveTV channel pairing, parsing and added local xmltv cache.
 [*] Misc. Tweaks and Bug patches.
-[*] [COLOR=blue]^ v.0.5.1 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.1 ^[/B][/COLOR] 
 [*] Initial Smoothstreams.tv support via Hub-Edition Only! *Thanks aaearon
 [*] USTVnow XMLTV fix, InternetTV Autotune now Hub-Edition Only!
 [*] PseudoCinema rewrite (Removed Local CEPACK, Youtube sources only).
 [*] Super Favourites, Plugin Autotune and Seek fix.
 [*] Playon and RSS chtype tweaks.
 [*] EPG speed tweaks.
-[*] [COLOR=blue]^ v.0.5.0 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.5.0 ^[/B][/COLOR] 
 [*] Youtube playlist pagination fix.
 [*] Direct Plugin (Chtype 15) Code rewrite/setting2 format change.
 [*] NEW! Playon & InternetTV Community List autotuning.
 [*] NEW! Playon Amazon/Hulu/Netflix autotuning.
-[*] [COLOR=blue]^ v.0.4.9 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.9 ^[/B][/COLOR] 
 [*] Start on mute fix, Youtube playlist limit fix
-[*] [COLOR=blue]^ v.0.4.8a ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.8a ^[/B][/COLOR] 
 [*] Replaced old mute toggle, with a "Smart Switch". Show Notification option under "General" settings. 
 [*] Automatic settings2 backup/restore after improper exit, Pre-Autotune settings2 restore option under "Misc" settings.
 [*] Temporarily disabled Artwork Service timer (Until Settop box mode is finished).
@@ -88,7 +93,7 @@
 [*] NEW! Movie ratings bumper option, Misc bug fixes, improved "Coming Up Next" overlay.
 [*] Dynamic Artwork disabled while spooling, EPG/Overlay Tweaks.
 [*] PseudoCinema missing channel name fix, Last Channel Recall tweaking.
-[*] [COLOR=blue]^ v.0.4.8 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.8 ^[/B][/COLOR] 
 [*] Hub-Edition activated by having "XBMCHUB ADDONINSTALLER" installed.
 [*] NEW! Internet Bumper option (Community Bumper list Requires Vimeo & Youtube plugin).
 [*] Last Channel recall, requires Virtual Keyboard "ACTION_SHIFT" to be key-mapped.
@@ -100,7 +105,7 @@
 [*] Startup Fix, Settop Box Mode (Experimental), Details found in OP
 [*] Fixed missing guide data for some plugins.
 [*] EPG "New" Icon fixed, Tweaked "Coming Up Next" timers
-[*] [COLOR=blue]^ v.0.4.7 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.7 ^[/B][/COLOR] 
 [*] Background Artwork Cache Spooling and Downloader (Experimental). If Enabled, PseudoTV Live will 
     spool the artwork cache for faster EPG response. Please note that missing artwork will be 
     downloaded to the artwork cache folder. You can disable download via "Find missing guide data"
@@ -116,12 +121,12 @@
 [*] Improved Channel building speed for local media and direct pluginTV chtypes.
 [*] Advanced rules extended to pluginTV chtype 15.
 [*] Seek (Start from beginning fix), Improved EPG Error handling.
-[*] [COLOR=blue]^ v.0.4.6 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.6 ^[/B][/COLOR] 
 [*] Super favourites broken, and will be fixed soon...
 [*] Improved GoTV, GoMovie direct plugin population and enhanced guide data.
     Direct Plugin requires "Auto-play" to be enabled in GoTV, GoMovies settings.
 [*] Youtube seek fix, Chtype 15 rewrites (parsing improvements, check op for config examples).
-[*] [COLOR=blue]^ v.0.4.5 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.5 ^[/B][/COLOR] 
 [*] Reserve channels 501-999 for Autotune option under "Tweaks" Keeps user channels 1-500, while 
     allowing auto tuning.
     Option needs to be enabled and saved before autotuning!
@@ -139,13 +144,13 @@
 [*] Fixed random directory, Trailers in movie channels, Youtube playlist position.
 [*] [COLOR=green]** Donor update required **[/COLOR]
 [*] [COLOR=red]** Force Channel Reset Required!! **[/COLOR]
-[*] [COLOR=blue]^ v.0.4.4 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.4 ^[/B][/COLOR] 
 [*] [COLOR=green]** Donor update required **[/COLOR]
 [*] Channel Change background, Improved dead channel handling (crash proof?)
 [*] XMLTV over network fix?
 [*] Cinema Experience EPG and Overlay tweaks
 [*] [COLOR=green]** Donor update required **[/COLOR]
-[*] [COLOR=blue]^ v.0.4.3a ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.3a ^[/B][/COLOR] 
 [*] [COLOR=green]** Donor update required **[/COLOR]
 [*] Autostart fix, videowindow fix, misc tweaks and fixes.
 [*] "Force Channel Reset" purges daily, weekly and monthly cache.
@@ -155,10 +160,10 @@
     *Thanks Giftie & RagnaroktA, 
 [*] Last.FM tweaking [COLOR=red]Setting2 format change[/COLOR]
 [*] [COLOR=green]** Donor update required **[/COLOR]
-[*] [COLOR=blue]^ v.0.4.3 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.3 ^[/B][/COLOR] 
 [*] Dynamic Artwork added to yifymovies, muchmovies.
 [*] EPG/Overlay Tweaks, Cache Tweaks, Seek fix?
-[*] [COLOR=blue]^ v.0.4.2a ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.2a ^[/B][/COLOR] 
 [*] VideoWindow Patch after autoupdate (if applicable).
 [*] Bumper/Icon Donor Download fix
 [*] Restore previous playcount if "Disable watch flagging" is enabled.
@@ -167,7 +172,7 @@
 [*] Improved TVDB/IMDB Lookup, Overhauled artwork downloader; Landscape art fallback to fanart.
 [*] LiveID update, now includes (playcount, ratings). 
 [*] [COLOR=red]** Force Channel Reset Required!! **[/COLOR]
-[*] [COLOR=blue]^ v.0.4.2 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.2 ^[/B][/COLOR] 
 [*] EPG UTC Syncing = F.T.V/USTVnow Sync fix?, Hideshort Overlay fix.
 [*] Missing settings fix, Misc Tweaks, Videowindow patch after autoupdate.
 [*] Community Network Autotune (Beta code).
@@ -176,10 +181,10 @@
 [*] Plugin Community list format change, Youtube Hide Short Video Tweaks, Improved Direct Plugin Parsing.
 [*] FTV Favourite Autotuning (Initial Code) [COLOR=red]Gotham & HUB Only!![/COLOR]
 [*] [COLOR=red]** Force Channel Reset Required!! **[/COLOR]
-[*] [COLOR=blue]^ v.0.4.1 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.1 ^[/B][/COLOR] 
 [*] EPG speed tweaks.
 [*] Self updating script *Thanks Blazetamer
-[*] [COLOR=blue]^ v.0.4.0 ^[/COLOR] 
+[*] [COLOR=blue][B]^ v.0.4.0 ^[/B][/COLOR] 
 [*] Community List Auto tuning.
 [*] "As Seen On TV" BCT Commercial option, UPNP Video Mirroring, STRM Duration tweaks.
 [*] USTVnow Fix, Donor Commercial and Trailers Fixed. BCT Auto option temporarily removed .

@@ -22,13 +22,46 @@ import os, sys, time, fileinput, re
 import urllib, urllib2
 
 from resources.lib.Globals import *
-from resources.lib.utils import *
 
 try:
     from Donor import *
 except:
     pass
     
+    
+def showText(heading, text):
+    log("showText")
+    id = 10147
+    xbmc.executebuiltin('ActivateWindow(%d)' % id)
+    xbmc.sleep(100)
+    win = xbmcgui.Window(id)
+    retry = 50
+    while (retry > 0):
+        try:
+            xbmc.sleep(10)
+            retry -= 1
+            win.getControl(1).setLabel(heading)
+            win.getControl(5).setText(text)
+            return
+        except:
+            pass
+            
+            
+def showChangelog(addonID=None):
+    log("showChangelog")
+    try:
+        if addonID:
+            ADDON = xbmcaddon.Addon(addonID)
+        else: 
+            ADDON = xbmcaddon.Addon(ADDONID)
+        f = open(ADDON.getAddonInfo('changelog'))
+        text  = f.read()
+        title = "Changelog - PseudoTV Live"
+        showText(title, text)
+    except:
+        pass
+
+
 #DonorDownload
 DonorURLPath = (PTVLURL + 'Donor.py')
 LinkURLPath = (PTVLURL + 'links.py')
@@ -37,6 +70,15 @@ DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
 DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
 
 
+#String replace
+def replaceAll(file,searchExp,replaceExp):
+    log('replaceAll')
+    for line in fileinput.input(file, inplace=1):
+        if searchExp in line:
+            line = line.replace(searchExp,replaceExp)
+        sys.stdout.write(line)
+
+        
 def DDautopatch():
     log("DDautopatch")
     REAL_SETTINGS.setSetting("AT_Donor", "false")
@@ -162,12 +204,12 @@ def LogoDownloader():
         
 #Videowindow
 PTVL_SKIN_SELECT_FLE = xbmc.translatePath(os.path.join(PTVL_SKIN_SELECT, 'script.pseudotv.live.EPG.xml'))   
-Path = (os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', '720p')) #Path to Default PTVL skin, location of mod file.
+Path = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', '720p')) #Path to Default PTVL skin, location of mod file.
 fle = 'custom_script.pseudotv.live_9506.xml' #mod file, copy to xbmc skin folder
-VWPath = (os.path.join(XBMC_SKIN_LOC, fle))
-flePath = (os.path.join(Path, fle)) 
-fle1 = 'dialogseekbar.xml' #xbmc skin file, needs patch
-DSPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, fle1)) 
+VWPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, fle))
+flePath = xbmc.translatePath(os.path.join(Path, fle))
+fle1 = 'DialogSeekBar.xml' #xbmc skin file, needs patch
+DSPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, fle1))
 
 #videowindow
 a = '<!-- PATCH START -->'
@@ -200,11 +242,11 @@ def videowindow(auto):
             Install(True)
     else:
         if auto == False:
-            Install(False)
+            Install()
         
     if auto == False:
         if dlg.yesno("PseudoTV Live", MSG):
-            xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Reboot(),%d,false)" % ( 0.5, ) )
+            xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Reboot(),%d,true)" % ( 0.5, ) )
         else:
             REAL_SETTINGS.openSettings()   
             
@@ -257,7 +299,6 @@ def Install(exist=False):
             MSG = "VideoWindow Patched!"
         REAL_SETTINGS.setSetting("videowindow_Enabled","true")
         REAL_SETTINGS.setSetting("videowindow_"+ Skin_Select,"true")
-        xbmc.executebuiltin("ReloadSkin()")
    
     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 1000, THUMB) )
 
@@ -273,8 +314,8 @@ def Uninstall():
         Error = True
         pass
   
+    #unpatch videowindow
     try:
-        #unpatch videowindow
         f = open(PTVL_SKIN_SELECT_FLE, "r")
         linesLST = f.readlines()    
         f.close()
@@ -326,4 +367,5 @@ elif sys.argv[1] == '-LogoDownloader':
     LogoDownloader()
 elif sys.argv[1] == '-SimpleDownloader':
     xbmcaddon.Addon(id='script.module.simple.downloader').openSettings()
-    
+elif sys.argv[1] == '-showChangelog':
+    showChangelog(ADDON_ID)

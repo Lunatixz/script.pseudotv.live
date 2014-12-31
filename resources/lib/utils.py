@@ -28,35 +28,90 @@ from Queue import Queue
 from HTMLParser import HTMLParser
 
 
+# Compare git version with local version.
+def VersionCompare():
+    log('VersionCompare')
+    try:
+        log("CheckVersion mode = " + str(REAL_SETTINGS.getSetting("Auto_Version")))
+        curver = xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
+        source = open(curver, mode = 'r')
+        link = source.read()
+        source.close()
+        match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+        
+        for vernum in match:
+            log("Original Version = " + str(vernum))
+            
+        #Master - Stable
+        if REAL_SETTINGS.getSetting("Auto_Version") == "1":
+            link = Request_URL('https://raw.githubusercontent.com/Lunatixz/XBMC_Addons/master/script.pseudotv.live/addon.xml')
+        #Development - Latest
+        elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
+            link = Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/addon.xml')
+                
+        link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
+        match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+        
+        if len(match) > 0:
+            if vernum != str(match[0]):
+                dialog = xbmcgui.Dialog()
+
+                if REAL_SETTINGS.getSetting("Auto_Version") == "1":
+                    confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to install the PseudoTV Live repository to stay updated?',"Cancel","Update")
+                elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
+                    confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to update now?',"Cancel","Update")
+
+                if confirm:
+                    UpdateFiles()       
+    except Exception: 
+        pass
+    return
+    
+    
 #autoupdate modified from Blazetamer code.
-def UPDATEFILES():
-    xbmc.log('script.pseudotv.live-utils: UPDATEFILES')
+def UpdateFiles():
+    log('UpdateFiles')
     
     if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-        url='https://github.com/Lunatixz/script.pseudotv.live/archive/master.zip'
-        changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt'    
+        url='https://github.com/Lunatixz/XBMC_Addons/raw/master/zips/repository.lunatixz/repository.lunatixz-1.0.zip'
+        name = 'repository.lunatixz.zip' 
+        MSG = 'Repository Install Complete'    
     elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
         url='https://github.com/Lunatixz/script.pseudotv.live/archive/development.zip'
-        changelog = 'https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/changelog.txt'  
-      
-    name = 'script.pseudotv.live.zip'   
+        name = 'script.pseudotv.live.zip' 
+        MSG = 'Development Build Updated'
+        
     path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
     addonpath = xbmc.translatePath(os.path.join('special://','home/addons'))
     lib = os.path.join(path,name)
-    xbmc.log('script.pseudotv.live-utils: URL = ' + url)
+    log('URL = ' + url)
     
+    # Delete old install package
     try: 
         xbmcvfs.delete(lib)
-        xbmc.log('script.pseudotv.live-utils: deleted old package')
+        log('deleted old package')
+    except: 
+        pass
+    
+    # Delete old install folders  
+    try: 
+        xbmcvfs.delete(xbmc.translatePath(os.path.join('special://home/addons','script.pseudotv.live')))
+    except: 
+        pass
+    try: 
+        xbmcvfs.delete(xbmc.translatePath(os.path.join('special://home/addons','script.pseudotv.live-master')))
+    except: 
+        pass
+    try: 
+        xbmcvfs.delete(xbmc.translatePath(os.path.join('special://home/addons','script.pseudotv.live-development')))
     except: 
         pass
      
     try:
         download(url, lib, '')
-        xbmc.log('script.pseudotv.live-utils: downloaded new package')
+        log('downloaded new package')
         all(lib,addonpath,'')
-        xbmc.log('script.pseudotv.live-utils: extracted new package')
-        MSG = 'Update Complete'
+        log('extracted new package')
     except: 
         MSG = 'Update Failed, Try Again Later'
         pass
@@ -240,23 +295,23 @@ class TextBox:
         heading = "Changelog - PseudoTV Live"
         self.win.getControl(self.CONTROL_LABEL).setLabel(heading)
         
-        # # set text
-        # faq_path =(os.path.join(ADDON_PATH, 'changelog.txt'))
-        # f = open(faq_path)
-        # text = f.read()
-        # self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
+        # set text
+        faq_path =(os.path.join(ADDON_PATH, 'changelog.txt'))
+        f = open(faq_path)
+        text = f.read()
+        self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
         
-        if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-            link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt')
-        elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
-            link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/changelog.txt')
+        # if REAL_SETTINGS.getSetting("Auto_Version") == "1":
+            # link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt')
+        # elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
+            # link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/changelog.txt')
         
-        try:
-            f = urllib2.urlopen(link)
-            text = f.read()
-            self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
-        except:
-            pass
+        # try:
+            # f = urllib2.urlopen(link)
+            # text = f.read()
+            # self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
+        # except:
+            # pass
             
         
 #logo parser
