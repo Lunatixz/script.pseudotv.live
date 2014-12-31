@@ -1,4 +1,4 @@
-﻿#   Copyright (C) 2013 Lunatixz
+﻿#   Copyright (C) 2014 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -21,17 +21,8 @@ import os, shutil, datetime, random
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
-from resources.lib.ChannelList import *
-from resources.lib.Artdownloader import *
-from resources.lib.utils import *
-from resources.lib.EPGWindow import *
 
-# Commoncache plugin import
-try:
-    import StorageServer
-except Exception,e:
-    import resources.lib.storageserverdummy as StorageServer
-    
+
 # Plugin Info
 ADDON_ID = 'script.pseudotv.live'
 REAL_SETTINGS = xbmcaddon.Addon(id=ADDON_ID)
@@ -39,61 +30,42 @@ ADDON_ID = REAL_SETTINGS.getAddonInfo('id')
 ADDON_NAME = REAL_SETTINGS.getAddonInfo('name')
 ADDON_PATH = REAL_SETTINGS.getAddonInfo('path')
 ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
-xbmc.log(ADDON_ID +' '+ ADDON_NAME +' '+ ADDON_PATH +' '+ ADDON_VERSION)
-xbmc.log("script.pseudotv.live-service: Service Started...")
-
-chanlist = ChannelList()
-Artdown = Artdownloader()
-
-
-# def Service():
-    # while (not xbmc.abortRequested):
-        # HubSwap()
-        # donorCHK()
-        # xbmc.sleep(1000)
+THUMB = (xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/' + 'icon.png')
+xbmc.log("Service Started")
 
         
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
-    xbmc.log('script.pseudotv.live-service: HubSwap')
+    xbmc.log('script.pseudotv.live-Service: HubSwap')
+    icon = ADDON_PATH + '/icon'
+    HUB = xbmc.getCondVisibility('System.HasAddon(plugin.program.addoninstaller)') == 1
+    
+    if HUB == True:
+        xbmc.log('script.pseudotv.live-Service: HubSwap = Hub Edition')
         
-    try:#unknown Amazon firetv error encountered here, requires investigation
-        icon = ADDON_PATH + '/icon'
-        HUB = chanlist.plugin_ok('plugin.program.addoninstaller')
-        if HUB == True:
-            xbmc.log('script.pseudotv.live-service: HubSwap - Hub Edition')
-            
-            if REAL_SETTINGS.getSetting('Hub') == 'false':
-                if NOTIFY == 'true':
-                    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","Hub-Edition Activated", 4000, THUMB) )
-                
-                REAL_SETTINGS.setSetting("Hub","true")
-                try:
-                    xbmcvfs.delete(icon + '.png')
-                except:
-                    pass
-                try:
-                    xbmcvfs.copy(icon + 'HUB', icon + '.png')
-                except:
-                    pass      
-        else:
-            xbmc.log('script.pseudotv.live-service: HubSwap - Master')
-            REAL_SETTINGS.setSetting("Hub","false")
+        if REAL_SETTINGS.getSetting('Hub') == 'false':
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","Hub-Edition Activated", 4000, THUMB) )
+            REAL_SETTINGS.setSetting("Hub","true")
             try:
                 xbmcvfs.delete(icon + '.png')
+                xbmcvfs.copy(icon + 'HUB', icon + '.png')
+                xbmc.executebuiltin("UpdateLocalAddons")
+                xbmc.executebuiltin("ReloadSkin()")
             except:
                 pass
-            try:
-                xbmcvfs.copy(icon + 'OEM', icon + '.png')
-            except:
-                pass      
-    except:
+    else:
+        xbmc.log('script.pseudotv.live-Service: HubSwap = Master')
         REAL_SETTINGS.setSetting("Hub","false")
-        pass
+        try:
+            xbmcvfs.delete(icon + '.png')
+            xbmcvfs.copy(icon + 'OEM', icon + '.png')
+            xbmc.executebuiltin("UpdateLocalAddons")
+            xbmc.executebuiltin("ReloadSkin()")
+        except:
+            pass
 
-          
+            
 def donorCHK():
-    xbmc.log('script.pseudotv.live-service: donorCHK')
-    
+    xbmc.log('script.pseudotv.live-Service: donorCHK')
     DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
     DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
     
@@ -112,19 +84,17 @@ def donorCHK():
     
         
 def autostart():
-    xbmc.log('script.pseudotv.live-service: autostart')   
+    xbmc.log('script.pseudotv.live-Service: autostart')   
     if NOTIFY == 'true':
         xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("AutoStart PseudoTV Live","Service Starting...", 4000, THUMB) )
     
     IDLE_TIME = AUTOSTART_TIMER[int(REAL_SETTINGS.getSetting('timer_amount'))] 
     sleep(IDLE_TIME)
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
-
-
-REAL_SETTINGS.setSetting('SyncXMLTV_Running', "false")
-REAL_SETTINGS.setSetting('ArtService_Running', "false")
-HubSwap()
+  
 donorCHK()
+HubSwap()
 
+#Autostart Trigger
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
-    autostart()    
+    autostart() 

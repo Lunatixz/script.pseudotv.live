@@ -9,7 +9,17 @@
     </coordinates>
     <animation effect="fade" time="700">WindowOpen</animation>
     <animation effect="fade" time="700">WindowClose</animation>
-    <controls>
+    <controls>            
+        <!-- #### Skinners Include Everything for videowindow patch to work #### -->
+        <!-- PATCH START --> <!--
+        <control type="videowindow">
+            <description>video</description>
+            <width>1280</width>
+            <height>720</height>
+            <aspectratio>stretch</aspectratio>
+        </control>
+        --> <!-- PATCH END -->
+        <!-- ################################################################## -->
         <control type="button" id="99">
             <visible>false</visible>			
             <label>0xFFFFFFFF</label><!--focused text color-->
@@ -66,16 +76,6 @@
                 <align>center</align>
                 <aspectratio>keep</aspectratio>
             </control>
-            <!-- #### Skinners Include Everything for videowindow patch to work #### -->
-            <!-- PATCH START --> <!--
-            <control type="videowindow">
-                <description>video</description>
-                <width>285</width>
-                <height>125</height>
-                <aspectratio>stretch</aspectratio>
-            </control>
-            --> <!-- PATCH END -->
-            <!-- ################################################################## -->
         </control>
         <control type="image" id="512">
             <description>Unaired NEW Icon</description>            

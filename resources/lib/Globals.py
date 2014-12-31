@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -16,10 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, sys, re
 import xbmcaddon, xbmc, xbmcgui, xbmcvfs
 import Settings
-import sys, re
 
 from FileAccess import FileLock
 
@@ -56,7 +55,6 @@ def ascii(string):
         if isinstance(string, unicode):
            string = string.encode('ascii', 'ignore')
     return string
-    
 
 # Plugin Info
 ADDON_ID = 'script.pseudotv.live'
@@ -122,12 +120,9 @@ GEN_CHAN_LOC = os.path.join(CHANNELS_LOC, 'generated') + '/' #LOCKED
 LOCK_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache')) + '/' #LOCKED
 PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder'))) #PVR Download location
 ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/' #Missing Artwork cache location
-BCT_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'bct')) + '/' #BCT cache location
-FLST_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'filelist')) + '/' #Filelist cache (tmpstr caching) location
 LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location
 LOGO_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'logos')) + '/' #Post Channel logo IMG Processing location
 EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
-BUMPER_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'bumpers')) + '/' #Local bumper location
 IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
 XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/' #Post Channel logo IMG Processing location
 PTVL_SKIN_LOC = os.path.join(ADDON_PATH, 'resources', 'skins') #Path to PTVL Skin folder
@@ -152,29 +147,26 @@ TIME_BAR = 'pstvTimeBar.png'
 BUTTON_FOCUS = 'pstvButtonFocus.png'
 BUTTON_NO_FOCUS = 'pstvButtonNoFocus.png'
 THUMB = (IMAGES_LOC + 'icon.png')
-INTRO = (IMAGES_LOC + 'PTVL_INTRO.mp4')
 
 #Channel Sharing location
 if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
     CHANNEL_SHARING = True
     LOCK_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache')) + '/'
-    BCT_LOC = xbmc.translatePath(os.path.join(LOCK_LOC, 'bct')) + '/'
 else:
     CHANNEL_SHARING = False
     
 # Original Skin Location changes    
 if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
-    if os.path.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Original', xbmc.getSkinDir()))):
-        Skin_Select = os.path.join('Original', xbmc.getSkinDir())
-        print 'Skin_Select', Skin_Select
+    if os.path.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Original', xbmc.getSkinDir(),''))):
+        Skin_Select = os.path.join('Original', xbmc.getSkinDir()) + '/'
         MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live')):
-        Skin_Select = 'special://skin/media'
+    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live/')):
+        Skin_Select = 'special://skin/media/'
         MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv.live')) + '/'
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv')):
-        Skin_Select = 'special://skin/media'
+    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv/')):
+        Skin_Select = 'special://skin/media/'
         MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv')) + '/'
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
     else:
@@ -207,16 +199,16 @@ else:
         EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC 
         
 # Find XBMC Skin path
-if xbmcvfs.exists(os.path.join('special://skin' ,'1080i')):
-    XBMC_SKIN_LOC = (os.path.join('special://skin' ,'1080i'))
+if xbmcvfs.exists(xbmc.translatePath(os.path.join('special://','skin','720p',''))):
+    XBMC_SKIN_LOC = xbmc.translatePath(os.path.join('special://','skin','720p')) + '/'
 else:
-    XBMC_SKIN_LOC = (os.path.join('special://skin' ,'720p'))
+    XBMC_SKIN_LOC = xbmc.translatePath(os.path.join('special://','skin','1080i')) + '/'
     
 # Find PTVL selected skin folder 720 or 1080i ?
-if xbmcvfs.exists(os.path.join(PTVL_SKIN_LOC, Skin_Select, '720p')):
-    PTVL_SKIN_SELECT = xbmc.translatePath(os.path.join(PTVL_SKIN_LOC, Skin_Select, '720p'))
+if xbmcvfs.exists(os.path.join(PTVL_SKIN_LOC, Skin_Select, '720p','')):
+    PTVL_SKIN_SELECT = xbmc.translatePath(os.path.join(PTVL_SKIN_LOC, Skin_Select, '720p')) + '/'
 else:
-    PTVL_SKIN_SELECT = xbmc.translatePath(os.path.join(PTVL_SKIN_LOC, Skin_Select, '1080i'))
+    PTVL_SKIN_SELECT = xbmc.translatePath(os.path.join(PTVL_SKIN_LOC, Skin_Select, '1080i')) + '/'
 
 # PseudoTV Cache Control
 if REAL_SETTINGS.getSetting("Cache_Enabled") == 'true': #
@@ -235,7 +227,7 @@ NOTIFY = REAL_SETTINGS.getSetting('notify')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop") == "true"
 OS_SET = int(REAL_SETTINGS.getSetting("os"))
-
+        
 if (OS_SET <= 5 or OS_SET == 10 or OS_SET == 12) and REAL_SETTINGS.getSetting("OS_SET_OVERRIDE") != "true":
     LOWPOWER = True
 else:
@@ -243,31 +235,37 @@ else:
 
 # Common Cache types, Stacked and sorted for read performance... Todo convert to local db, mysql?
 #General
-quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge
-daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge
-weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge
-monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge
+quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge, AutoUpdate
+daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge, AutoUpdate
+weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge, AutoUpdate
+monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge, AutoUpdate
+seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",(24 * 7))              #System Purge, AutoUpdate
 #FileLists
-localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",24)                     #System Purge
-liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge
-YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",24)                 #System Purge
-RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",24)                         #System Purge
-pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",24)                   #System Purge
-playonTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",4)                    #System Purge
-lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",24)                       #System Purge
+localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",24)                     #System Purge, AutoUpdate
+liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge, AutoUpdate
+YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",24)                 #System Purge, AutoUpdate
+RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",24)                         #System Purge, AutoUpdate
+pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",24)                   #System Purge, AutoUpdate
+playonTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",2)                    #System Purge, AutoUpdate
+lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",24)                       #System Purge, AutoUpdate
+#BCTs
+bumpers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bumpers",((24 * 7) * 4))         #BCT Purge
+ratings = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "ratings",((24 * 7) * 4))         #BCT Purge
+commercials = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "commercials",((24 * 7) * 4)) #BCT Purge
+trailers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "trailers",((24 * 7) * 4))       #BCT Purge
 #Parsers
 parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parsers",((24 * 7) * 4))         #No Purge (API Queries)
 parserFANTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserFANTV",((24 * 7) * 4)) #No Purge (FANART Queries)
 parserTVDB = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserTVDB",((24 * 7) * 4))   #No Purge (TVDB Queries)
 parserTMDB = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserTMDB",((24 * 7) * 4))   #No Purge (TMDB Queries)
 #Artwork
-artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((24 * 7) * 4))         #Artwork Purge, ForceReset
-artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((24 * 7) * 4))       #Artwork Purge, ForceReset
-artwork2 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork2",((24 * 7) * 4))       #Artwork Purge, ForceReset
-artwork3 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork3",((24 * 7) * 4))       #Artwork Purge, ForceReset
-artwork4 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork4",((24 * 7) * 4))       #Artwork Purge, ForceReset
-artwork5 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork5",((24 * 7) * 4))       #Artwork Purge, ForceReset
-artwork6 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork6",((24 * 7) * 4))       #Artwork Purge, ForceReset
+artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((24 * 7) * 4))         #Artwork Purge
+artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((24 * 7) * 4))       #Artwork Purge
+artwork2 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork2",((24 * 7) * 4))       #Artwork Purge
+artwork3 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork3",((24 * 7) * 4))       #Artwork Purge
+artwork4 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork4",((24 * 7) * 4))       #Artwork Purge
+artwork5 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork5",((24 * 7) * 4))       #Artwork Purge
+artwork6 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork6",((24 * 7) * 4))       #Artwork Purge
 
 # HEX COLOR OPTIONS 4 (Overlay CHANBUG, EPG Genre & CHtype) 
 # http://www.w3schools.com/html/html_colornames.asp
@@ -373,27 +371,6 @@ ACTION_TELETEXT_BLUE = 218
 #define ACTION_CHANNEL_SWITCH         183 #last channel?
 #define ACTION_TOGGLE_WATCHED         200 // Toggle watched status (videos)
 #define ACTION_TOGGLE_DIGITAL_ANALOG  202 // switch digital <-> analog
-#Touch Support todo
-#// touch actions
-#define ACTION_TOUCH_TAP              401
-#define ACTION_TOUCH_TAP_TEN          410
-#define ACTION_TOUCH_LONGPRESS        411
-#define ACTION_TOUCH_LONGPRESS_TEN    420
-#define ACTION_GESTURE_NOTIFY         500
-#define ACTION_GESTURE_BEGIN          501
-#define ACTION_GESTURE_ZOOM           502 //sendaction with point and currentPinchScale (fingers together < 1.0 -> fingers apart > 1.0)
-#define ACTION_GESTURE_ROTATE         503
-#define ACTION_GESTURE_PAN            504
-#define ACTION_GESTURE_SWIPE_LEFT       511
-#define ACTION_GESTURE_SWIPE_LEFT_TEN   520
-#define ACTION_GESTURE_SWIPE_RIGHT      521
-#define ACTION_GESTURE_SWIPE_RIGHT_TEN  530
-#define ACTION_GESTURE_SWIPE_UP         531
-#define ACTION_GESTURE_SWIPE_UP_TEN     540
-#define ACTION_GESTURE_SWIPE_DOWN       541
-#define ACTION_GESTURE_SWIPE_DOWN_TEN   550
-#// 5xx is reserved for additional gesture actions
-#define ACTION_GESTURE_END            599
 
 #UTC XMLTV - XMLTV that uses UTC w/ Offset timing (not local time).
 UTC_XMLTV = ['ustvnow', 'ftvguide', 'smoothstreams']

@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Lunatixz
+#   Copyright (C) 2013 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -37,26 +37,29 @@ NUMBER_CHANNEL_TYPES = 8
 class ConfigWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.log("__init__")
-        xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
+        if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
+            xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
 
-        self.madeChanges = 0
-        self.showingList = True
-        self.channel = 0
-        self.channel_type = 9999
-        self.setting1 = ''
-        self.setting2 = ''
-        self.setting3 = ''
-        self.setting4 = ''
-        self.savedRules = False
+            self.madeChanges = 0
+            self.showingList = True
+            self.channel = 0
+            self.channel_type = 9999
+            self.setting1 = ''
+            self.setting2 = ''
+            self.setting3 = ''
+            self.setting4 = ''
+            self.savedRules = False
 
-        if CHANNEL_SHARING:
-            realloc = REAL_SETTINGS.getSetting('SettingsFolder')
-            FileAccess.copy(realloc + '/settings2.xml', SETTINGS_LOC + '/settings2.xml')
+            if CHANNEL_SHARING:
+                realloc = REAL_SETTINGS.getSetting('SettingsFolder')
+                FileAccess.copy(realloc + '/settings2.xml', SETTINGS_LOC + '/settings2.xml')
 
-        ADDON_SETTINGS.loadSettings()
-        ADDON_SETTINGS.disableWriteOnSave()
-        self.doModal()
-        self.log("__init__ return")
+            ADDON_SETTINGS.loadSettings()
+            ADDON_SETTINGS.disableWriteOnSave()
+            self.doModal()
+            self.log("__init__ return")
+        else:
+            xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Not available while running.", 4000, THUMB) )
 
 
     def log(self, msg, level = xbmc.LOGDEBUG):
@@ -650,8 +653,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
 
         self.log("updateListing return")
 
-
-
+        
 __cwd__ = REAL_SETTINGS.getAddonInfo('path')
 
 

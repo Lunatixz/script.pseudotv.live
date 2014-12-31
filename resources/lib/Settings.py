@@ -21,7 +21,7 @@ import sys, re, os
 import time, traceback
 import Globals
 
-from FileAccess import FileLock, FileAccess
+from FileAccess import FileAccess
 
 
 

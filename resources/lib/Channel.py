@@ -21,7 +21,6 @@ from Globals import *
 from Rules import *
 
 
-
 class Channel:
     def __init__(self):
         self.Playlist = Playlist()

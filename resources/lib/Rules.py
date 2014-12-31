@@ -29,7 +29,7 @@ from Playlist import PlaylistItem
 
 class RulesList:
     def __init__(self):
-        self.ruleList = [BaseRule(), ScheduleChannelRule(), HandleChannelLogo(), NoShowRule(), DontAddChannel(), EvenShowsRule(), ForceRandom(), ForceRealTime(), ForceResume(), HandleIceLibrary(), HandleBCT(), HandlePOP(), InterleaveChannel(), OnlyUnWatchedRule(), OnlyWatchedRule(), AlwaysPause(), PlayShowInOrder(), RenameRule(), SetResetTime()]
+        self.ruleList = [BaseRule(), ScheduleChannelRule(), HandleChannelLogo(), NoShowRule(), DontAddChannel(), EvenShowsRule(), ForceRandom(), ForceRealTime(), ForceResume(), Handle3D(), HandleIceLibrary(), HandleBCT(), HandlePOP(), InterleaveChannel(), OnlyUnWatchedRule(), OnlyWatchedRule(), AlwaysPause(), PlayShowInOrder(), RenameRule(), SetResetTime()]
 
 
     def getRuleCount(self):
@@ -1377,11 +1377,51 @@ class SetResetTime(BaseRule):
         return channeldata
 
 
+class Handle3D(BaseRule):
+    def __init__(self):
+        self.name = "Filter 3D Media"
+        self.optionLabels = ['Include 3D Media']
+        self.optionValues = ['Yes']
+        self.myId = 19
+        self.actions = RULES_ACTION_START | RULES_ACTION_FINAL_MADE | RULES_ACTION_FINAL_LOADED
+        self.selectBoxOptions = [["Yes", "No"]]
 
+        
+    def copy(self):
+        return Handle3D()
+
+
+    def getTitle(self):
+        if self.optionValues[0] == 'Yes':
+            return 'Include 3D Media'
+        else:
+            return 'Exclude 3D Media'
+
+
+    def onAction(self, act, optionindex):
+        self.onActionSelectBox(act, optionindex)
+        return self.optionValues[optionindex]
+
+
+    def runAction(self, actionid, channelList, channeldata):
+        if actionid == RULES_ACTION_START:
+            self.stored3dValue = channelList.inc3D
+            self.log("Option for Handle3D is " + self.optionValues[0])
+
+            if self.optionValues[0] == 'Yes':
+                channelList.inc3D = True
+            else:
+                channelList.inc3D = False
+        elif actionid == RULES_ACTION_FINAL_MADE or actionid == RULES_ACTION_FINAL_LOADED:
+            channelList.inc3D = self.stored3dValue
+
+        return channeldata
+
+        
 class HandleIceLibrary(BaseRule):
     def __init__(self):
-        self.name = "IceLibrary Streams"
-        self.optionLabels = ['Include Streams']
+        self.name = "Filter STRM Files"
+        self.optionLabels = ['Include STRM Files']
         self.optionValues = ['Yes']
         self.myId = 14
         self.actions = RULES_ACTION_START | RULES_ACTION_FINAL_MADE | RULES_ACTION_FINAL_LOADED
@@ -1394,9 +1434,9 @@ class HandleIceLibrary(BaseRule):
 
     def getTitle(self):
         if self.optionValues[0] == 'Yes':
-            return 'Include IceLibrary Streams'
+            return 'Include STRM Files'
         else:
-            return 'Exclude IceLibrary Streams'
+            return 'Exclude STRM Files'
 
 
     def onAction(self, act, optionindex):
@@ -1407,7 +1447,7 @@ class HandleIceLibrary(BaseRule):
     def runAction(self, actionid, channelList, channeldata):
         if actionid == RULES_ACTION_START:
             self.storedIceLibValue = channelList.incIceLibrary
-            self.log("Option for IceLibrary is " + self.optionValues[0])
+            self.log("Option for HandleIceLibrary is " + self.optionValues[0])
 
             if self.optionValues[0] == 'Yes':
                 channelList.incIceLibrary = True
@@ -1421,7 +1461,7 @@ class HandleIceLibrary(BaseRule):
         
 class HandleBCT(BaseRule):
     def __init__(self):
-        self.name = "BCT's"
+        self.name = "Ignore BCT's"
         self.optionLabels = ["Include BCT's"]
         self.optionValues = ['Yes']
         self.myId = 17
@@ -1462,7 +1502,7 @@ class HandleBCT(BaseRule):
            
 class HandlePOP(BaseRule):
     def __init__(self):
-        self.name = "Coming up next popup"
+        self.name = 'Ignore "Coming up" popup'
         self.optionLabels = ['Display Coming Up Next']
         self.optionValues = ['Yes']
         self.myId = 18

@@ -27,7 +27,7 @@
     # xbmcaddon.Addon('plugin.program.super.favourites').openSettings()
     # return
     
-   #   Copyright (C) 2014 Lunatixz
+   #   Copyright (C) 2014 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
