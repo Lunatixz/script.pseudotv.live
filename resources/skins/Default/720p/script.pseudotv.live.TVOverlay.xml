@@ -46,6 +46,9 @@
                 <height>720</height>
                 <texture>pstvlInfoWindow.png</texture>
             </control>
+            <control type="group" id="515">  
+                <visible>false</visible>
+            </control>
             <!--line 1 -->
             <control type="grouplist">
                 <posx>155</posx>
@@ -360,9 +363,19 @@
             </control>
         </control>
         </control>
+        
          <!-- Overlay Sidebar Menu -->
         <control type="group" id="119">
             <visible></visible>
+            <control type="image" id="130">
+                <description>Background Image</description>
+                <posx>0</posx>
+                <posy>0</posy>
+                <width>1280</width>
+                <height>720</height>
+                <visible></visible>
+                <texture>pstvlMenuWindowAlt.png</texture>
+            </control>
             <control type="image">
                 <description>Background Image</description>
                 <posx>0</posx>
@@ -380,6 +393,16 @@
                 <texture></texture>
                 <aspectratio>keep</aspectratio>
                 <visible>Control.IsVisible(119)</visible>
+            </control>
+            <control type="image" id="131">
+                <description>Logo</description>
+                <posx>175</posx>
+                <posy>25</posy>
+                <width>300</width>
+                <height>125</height>
+                <texture></texture>
+                <aspectratio>keep</aspectratio>
+                <visible>Control.IsVisible(130)</visible>
             </control>
             <control type="button" id="997">
                 <posx>44</posx>

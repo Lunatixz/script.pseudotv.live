@@ -1,7 +1,7 @@
-#   Copyright (C) 2014 Kevin S. Graer
+#   Copyright (C) 2015 Kevin S. Graer
 #
 #
-# This file is part of PseudoTV.
+# This file is part of PseudoTV Live.
 #
 # PseudoTV is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -258,6 +258,7 @@ class Migrate:
                     file_detail = str(file_detail)
                     CHnameLST = re.findall('"label" *: *(.*?),', file_detail)
                     CHidLST = re.findall('"channelid" *: *(.*?),', file_detail)
+                    chanlist.cached_json_detailed_xmltvChannels = []
                         
                     for PVRnum in range(len(file_detail)):
                         CHname = CHnameLST[PVRnum]
@@ -305,6 +306,7 @@ class Migrate:
         if Globals.REAL_SETTINGS.getSetting("autoFindLiveHD") != "0" and Globals.REAL_SETTINGS.getSetting("xmltvLOC") and Globals.REAL_SETTINGS.getSetting('autoFindLiveHDPath'):
             xmltvLOC = xbmc.translatePath(Globals.REAL_SETTINGS.getSetting("xmltvLOC"))
             xmlTvFile = os.path.join(xmltvLOC, 'xmltv.xml')
+            chanlist.cached_json_detailed_xmltvChannels = []
             HDstrmPath = Globals.REAL_SETTINGS.getSetting('autoFindLiveHDPath') + '/'
             HDSTRMnum = 0
             
@@ -425,6 +427,7 @@ class Migrate:
                     json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.ustvnow/live?mode=live","media":"video","properties":["thumbnail"]},"id":1}')
                     json_folder_detail = chanlist.sendJSON(json_query)
                     file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+                    chanlist.cached_json_detailed_xmltvChannels = []
 
                     for USTVnum in file_detail:      
                         files = re.search('"file" *: *"(.*?)"', USTVnum)
@@ -564,6 +567,7 @@ class Migrate:
                     json_folder_detail = chanlist.sendJSON(json_query)
                     file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
                     FTVXML = (xbmc.translatePath(os.path.join(XMLTV_CACHE_LOC, 'ftvguide.xml')))
+                    chanlist.cached_json_detailed_xmltvChannels = []
 
                     for FTVnum in file_detail:   
                         files = re.search('"file" *: *"(.*?)"', FTVnum)

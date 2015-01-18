@@ -36,8 +36,8 @@
     </category>
 <!--Visual-->
     <category label="30200">
-        <setting id="SkinSelector" type="enum"  label="30202" values="Classic|Custom|Default|PTVL|(WIP) ConCast|(N/A) Time Whorner" default="3"/>
-        <setting id="ArtService_Enabled" label="30201" type="bool" default="true" /> 
+        <setting id="SkinSelector" type="enum"  label="30202" values="Classic|Custom|Default|PTVL|ConCast" default="3"/>
+        <setting id="ArtService_Enabled" label="30201" visible="false" type="bool" default="true" /> 
         <setting id="FindLogos_Enabled" type="bool" label="34547" enable="false" subsetting="true" visible="eq(-4,true)" default="false"/>
         <setting id="ShowSeEp" type="bool" label="30301" default="false"/>
         <setting id="ChannelLogoFolder" type="folder" source="auto" label="30225" default=""/>

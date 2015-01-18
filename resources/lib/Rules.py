@@ -1,7 +1,7 @@
-#   Copyright (C) 2011 Jason Anderson
+#   Copyright (C) 2015 Kevin S. Graer
 #
 #
-# This file is part of PseudoTV.
+# This file is part of PseudoTV Live.
 #
 # PseudoTV is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1501,45 +1501,46 @@ class HandleBCT(BaseRule):
 
            
 class HandlePOP(BaseRule):
-    def __init__(self):
-        self.name = 'Ignore "Coming up" popup'
-        self.optionLabels = ['Display Coming Up Next']
-        self.optionValues = ['Yes']
-        self.myId = 18
-        self.actions = RULES_ACTION_OVERLAY_SET_CHANNEL | RULES_ACTION_OVERLAY_SET_CHANNEL_END
-        self.selectBoxOptions = [["Yes", "No"]]
+    print 'HandlePOP temp disabled'
+    # def __init__(self):
+        # self.name = 'Ignore "Coming up" popup'
+        # self.optionLabels = ['Display Coming Up Next']
+        # self.optionValues = ['Yes']
+        # self.myId = 18
+        # self.actions = RULES_ACTION_OVERLAY_SET_CHANNEL | RULES_ACTION_OVERLAY_SET_CHANNEL_END
+        # self.selectBoxOptions = [["Yes", "No"]]
 
 
-    def copy(self):
-        return HandlePOP()
+    # def copy(self):
+        # return HandlePOP()
 
 
-    def getTitle(self):
-        if self.optionValues[0] == 'Yes':
-            return 'Display Coming Up Next'
-        else:
-            return 'Hide Coming Up Next'
+    # def getTitle(self):
+        # if self.optionValues[0] == 'Yes':
+            # return 'Display Coming Up Next'
+        # else:
+            # return 'Hide Coming Up Next'
 
 
-    def onAction(self, act, optionindex):
-        self.onActionSelectBox(act, optionindex)
-        return self.optionValues[optionindex]
+    # def onAction(self, act, optionindex):
+        # self.onActionSelectBox(act, optionindex)
+        # return self.optionValues[optionindex]
 
 
-    def runAction(self, actionid, overlay, channeldata):
-        if actionid == RULES_ACTION_OVERLAY_SET_CHANNEL:
-            self.storedPopValue = overlay.showNextItem
+    # def runAction(self, actionid, overlay, channeldata):
+        # if actionid == RULES_ACTION_OVERLAY_SET_CHANNEL:
+            # self.storedPopValue = overlay.showNextItem
 
-            if self.optionValues[0] == 'Yes':
-                overlay.showNextItem = True
-                self.log("setting popup to true")
-            else:
-                overlay.showNextItem = False
-        elif actionid == RULES_ACTION_OVERLAY_SET_CHANNEL_END:
-            overlay.showNextItem = self.storedPopValue
-            self.log("set Coming Up Next to " + str(overlay.showNextItem))
+            # if self.optionValues[0] == 'Yes':
+                # overlay.showNextItem = True
+                # self.log("setting popup to true")
+            # else:
+                # overlay.showNextItem = False
+        # elif actionid == RULES_ACTION_OVERLAY_SET_CHANNEL_END:
+            # overlay.showNextItem = self.storedPopValue
+            # self.log("set Coming Up Next to " + str(overlay.showNextItem))
 
-        return channeldata
+        # return channeldata
        
         
 class HandleChannelLogo(BaseRule):

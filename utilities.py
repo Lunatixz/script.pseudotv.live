@@ -1,4 +1,4 @@
-#   Copyright (C) 2014 Kevin S. Graer
+#   Copyright (C) 2015 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -231,25 +231,26 @@ def videowindow(auto):
     log('XBMC_SKIN_LOC = ' + XBMC_SKIN_LOC)
     MSG = "VideoWindow Patched!\nXBMC Reboot is required, Proceed?"
     
-    if xbmcvfs.exists(VWPath):
-        if auto == False:
-            if dlg.yesno("PseudoTV Live", "VideoWindow Patch Found!\nRemove Patch?"):
-                Uninstall()
-                MSG = "VideoWindow Patch Removed!\nXBMC Reboot is required, Proceed?"
+    if int(REAL_SETTINGS.getSetting('SkinSelector')) != 0:
+        if xbmcvfs.exists(VWPath):
+            if auto == False:
+                if dlg.yesno("PseudoTV Live", "VideoWindow Patch Found!\nRemove Patch?"):
+                    Uninstall()
+                    MSG = "VideoWindow Patch Removed!\nXBMC Reboot is required, Proceed?"
+                else:
+                    Install(True)
             else:
                 Install(True)
         else:
-            Install(True)
-    else:
-        if auto == False:
-            Install()
-        
-    if auto == False:
-        if dlg.yesno("PseudoTV Live", MSG):
-            xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Reboot(),%d,true)" % ( 0.5, ) )
-        else:
-            REAL_SETTINGS.openSettings()   
+            if auto == False:
+                Install()
             
+        if auto == False:
+            if dlg.yesno("PseudoTV Live", MSG):
+                xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Reboot(),%d,true)" % ( 0.5, ) )
+            else:
+                REAL_SETTINGS.openSettings()   
+                
      
 def Install(exist=False):
     Error = False  

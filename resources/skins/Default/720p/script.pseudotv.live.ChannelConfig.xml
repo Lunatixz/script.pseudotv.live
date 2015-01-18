@@ -240,6 +240,7 @@
                 <ondown>112</ondown>
                 <colordiffuse></colordiffuse>
             </control>
+            
             <!-- OK -->
             <control type="button" id="112">               
                 <left>205</left>
@@ -257,6 +258,7 @@
                 <align>center</align>
                 <colordiffuse></colordiffuse>
             </control>
+            
             <!-- CANCEL -->
             <control type="button" id="113">
                 <left>415</left>
@@ -283,6 +285,19 @@
                 <top>110</top>
                 <width>720</width>
                 <height>455</height>
+                
+                <control type="label">
+                    <left>47</left>
+                    <top>105</top>
+                    <width>720</width>
+                    <height>35</height>               
+                    <font>font13</font>
+                    <label>Playlist:</label>
+                    <textcolor>white</textcolor>
+                    <aligny>center</aligny>
+                    <align>left</align>
+                </control>
+                
                 <control type="button" id="130">
                     <left>40</left>
                     <top>105</top>
@@ -295,16 +310,6 @@
                     <onup>110</onup>
                     <ondown>114</ondown>
                     <colordiffuse></colordiffuse>
-                </control>
-                <control type="label">
-                    <left>47</left>
-                    <top>105</top>
-                    <width>720</width>
-                    <height>35</height>               
-                    <font>font13</font>
-                    <textcolor>white</textcolor>
-                    <aligny>center</aligny>
-                    <align>left</align>
                 </control>
             </control>
     

@@ -1,4 +1,4 @@
-#   Copyright (C) 2013 Kevin S. Graer
+#   Copyright (C) 2015 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -30,9 +30,7 @@ from resources.lib.AdvancedConfig import AdvancedConfig
 from resources.lib.FileAccess import FileAccess
 from resources.lib.Migrate import Migrate
 
-
 NUMBER_CHANNEL_TYPES = 8
-
 
 class ConfigWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
@@ -243,9 +241,9 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
         elif controlId == 130:      # Playlist-type channel, playlist button
             dlg = xbmcgui.Dialog()
             retval = dlg.browse(1, "Channel " + str(self.channel) + " Playlist", "files", ".xsp", False, False, "special://videoplaylists/")
-
             if retval != "special://videoplaylists/":
                 self.getControl(130).setLabel(self.getSmartPlaylistName(retval), label2=retval)
+                
         elif controlId == 140:      # Network TV channel, left
             self.changeListData(self.networkList, 142, -1)
         elif controlId == 141:      # Network TV channel, right
@@ -423,8 +421,8 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
 
             if len(plname) == 0:
                 chansetting1 = ''
-
             self.getControl(130).setLabel(self.getSmartPlaylistName(chansetting1), label2=chansetting1)
+            
         elif chantype == 1:
             self.getControl(142).setLabel(self.findItemInList(self.networkList, chansetting1))
         elif chantype == 2:

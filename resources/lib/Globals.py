@@ -105,7 +105,7 @@ MODE_SERIAL = MODE_RESUME | MODE_ALWAYSPAUSE | MODE_ORDERAIRDATE
 MODE_STARTMODES = MODE_RANDOM | MODE_REALTIME | MODE_RESUME
 
 # Maximum is 10 for this
-RULES_PER_PAGE = 7
+RULES_PER_PAGE = 10
 
 #UPNP Clients
 IPP1 = (REAL_SETTINGS.getSetting("UPNP1_IPP"))
@@ -121,7 +121,6 @@ LOCK_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache')) + '/' #LOCKED
 PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder'))) #PVR Download location
 ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/' #Missing Artwork cache location
 LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location
-LOGO_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'logos')) + '/' #Post Channel logo IMG Processing location
 EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
 IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
 XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/' #Post Channel logo IMG Processing location
@@ -157,25 +156,21 @@ else:
     
 # Original Skin Location changes    
 if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
-    if os.path.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Original', xbmc.getSkinDir(),''))):
-        Skin_Select = os.path.join('Original', xbmc.getSkinDir()) + '/'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live/')):
+    if os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live/')):
         Skin_Select = 'special://skin/media/'
         MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv.live')) + '/'
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-    elif os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv/')):
-        Skin_Select = 'special://skin/media/'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv')) + '/'
+    elif os.path.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Original', xbmc.getSkinDir(),''))):
+        Skin_Select = os.path.join('Original', xbmc.getSkinDir()) + '/'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
     else:
         Skin_Select = 'Default'
-        REAL_SETTINGS.setSetting("SkinSelector","2")
-        
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
+      
     if not xbmcvfs.exists(MEDIA_LOC):
         MEDIA_LOC = DEFAULT_MEDIA_LOC 
-        
     if not xbmcvfs.exists(EPGGENRE_LOC):
         EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC         
 else:
@@ -188,9 +183,7 @@ else:
         Skin_Select = 'PTVL'   
     elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
         Skin_Select = 'ConCast' 
-    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
-        Skin_Select = 'TWC'     
-
+        
     MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
                 
     if xbmcvfs.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'):
@@ -200,9 +193,9 @@ else:
         
 # Find XBMC Skin path
 if xbmcvfs.exists(xbmc.translatePath(os.path.join('special://','skin','720p',''))):
-    XBMC_SKIN_LOC = xbmc.translatePath(os.path.join('special://','skin','720p')) + '/'
+    XBMC_SKIN_LOC = xbmc.translatePath(os.path.join('special://','skin','720p',''))
 else:
-    XBMC_SKIN_LOC = xbmc.translatePath(os.path.join('special://','skin','1080i')) + '/'
+    XBMC_SKIN_LOC = xbmc.translatePath(os.path.join('special://','skin','1080i',''))
     
 # Find PTVL selected skin folder 720 or 1080i ?
 if xbmcvfs.exists(os.path.join(PTVL_SKIN_LOC, Skin_Select, '720p','')):
@@ -224,6 +217,7 @@ ADDON_SETTINGS = Settings.Settings()
 GlobalFileLock = FileLock()
 Donor_Downloaded = False
 NOTIFY = REAL_SETTINGS.getSetting('notify')
+SILENT = REAL_SETTINGS.getSetting('silent')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop") == "true"
 OS_SET = int(REAL_SETTINGS.getSetting("os"))

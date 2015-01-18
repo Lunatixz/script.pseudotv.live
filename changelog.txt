@@ -1,3 +1,13 @@
+[*] [COLOR=red]!!PseudoTV Live temporarily locked to PTVL Skin, all other skins are disabled!![/COLOR]
+[*] Artwork Service Disabled, deprecated? 
+[*] Improved Idle ScreenSaver logic, Temporarily Removed Time Whorner Skin. 
+[*] Reworked Artwork function and service, Added RSS artwork.
+[*] Various tweaks & bug corrections; including PluginTV/Playon patches, Directory Channel fix?
+[*] Added "OnNow" Sidebar (Beta) and *"Now Watching" info screen, *Requires updated "script.extendedinfo".
+[*] Removed backward compatibility for PseudoTV "Classic" Skins, Old Skins will require updating in-order to work.
+[*] Improved PluginTV/Playon Parsing.
+[*] Improved filelist caching for LiveTV/Youtube/RSS/MusicVideos/PluginTV/PlayonTV
+[*] [COLOR=blue][B]^ v.0.5.8 ^[/B][/COLOR]
 [*] Added Chtype 15 workaround for "/" in folder name, Replace "/" with "%2F". Example: plugin.audio.music/AC/DC, plugin.audio.music/AC%2FDC
 [*] Include 3D media Advanced Rule.
 [*] Autoupdate removed, Install Lunatixz Repo for "Stable" Updates, or manually download Development branch ".zip" for latest.
