@@ -17,7 +17,7 @@
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
-import subprocess, os, sys, re, buggalo, xmltv
+import subprocess, os, sys, re, xmltv
 import time, datetime, threading, _strptime
 import httplib, urllib, urllib2, feedparser, socket, json
 import base64, shutil, random, errno
@@ -43,6 +43,14 @@ from datetime import date
 from utils import *
 from datetime import timedelta
 
+socket.setdefaulttimeout(30)
+
+try:
+    import buggalo
+    buggalo.GMAIL_RECIPIENT = "PseudoTV@nyc.rr.com"
+except:
+    pass
+    
 # Commoncache plugin import
 try:
     import StorageServer
@@ -81,6 +89,8 @@ class ChannelList:
         self.movieGenreList = []
         self.movie3Dlist = []
         self.musicGenreList = []
+        self.pluginPathList = []
+        self.pluginNameList = []
         self.showList = []
         self.channels = []
         self.cached_json_detailed_TV = []
@@ -626,22 +636,22 @@ class ChannelList:
         fileList = []
         limit = self.limit
                   
-        if setting4 == '0':
+        if setting4 == '0' or setting4 == 'Default':
             #DEFAULT
             israndom = False  
             reverseOrder = False
-        elif setting4 == '1':
+        elif setting4 == '1' or setting4 == 'Random':
             #RANDOM
             israndom = True
             reverseOrder = False
-        elif setting4 == '2':
+        elif setting4 == '2' or setting4 == 'Reverse':
             #REVERSE ORDER
             israndom = False
             reverseOrder = True
         
         # Directory
         if chtype == 7:
-            fileList = self.createDirectoryPlaylist(setting1,limit)
+            fileList = self.createDirectoryPlaylist(setting1, setting4, limit)
               
         # LiveTV
         elif chtype == 8:
@@ -1144,22 +1154,22 @@ class ChannelList:
         return flename
         
         
-    def createDirectoryPlaylist(self, setting1, limit):
+    def createDirectoryPlaylist(self, setting1, setting4, limit):
         self.log("createDirectoryPlaylist Cache")
         if Cache_Enabled == True and SETTOP == False:
             try:
-                result = localTV.cacheFunction(self.createDirectoryPlaylist_NEW, setting1, limit)
+                result = localTV.cacheFunction(self.createDirectoryPlaylist_NEW, setting1, setting4, limit)
             except:
-                result = self.createDirectoryPlaylist_NEW(setting1, limit)
+                result = self.createDirectoryPlaylist_NEW(setting1, setting4, limit)
                 pass
         else:
-            result = self.createDirectoryPlaylist_NEW(setting1, limit)
+            result = self.createDirectoryPlaylist_NEW(setting1, setting4, limit)
         if not result:
             result = []
         return result 
 
 
-    def createDirectoryPlaylist_NEW(self, setting1, limit):
+    def createDirectoryPlaylist_NEW(self, setting1, setting4, limit):
         self.log("createDirectoryPlaylist_NEW " + setting1)
         fileList = []
         LocalLST = []
@@ -4097,7 +4107,7 @@ class ChannelList:
     
     def loadFavourites(self):
         self.log("loadFavourites")   
-        entries = list()
+        entries = []
         path = xbmc.translatePath('special://userdata/favourites.xml')
         if FileAccess.exists(path):
             f = open(path)
@@ -4114,11 +4124,9 @@ class ChannelList:
                         value = value[10:-1]
                     else:
                         continue
-
                     entries.append(value)
             except ExpatError:
                 pass
-
         return entries
     
     
@@ -5237,7 +5245,7 @@ class ChannelList:
     def threadPause(self):
         if threading.activeCount() > 1:
             while self.threadPaused == True and self.myOverlay.isExiting == False:
-                time.sleep(self.sleepTime)
+                xbmc.sleep(self.sleepTime)
 
             # This will fail when using config.py
             try:
@@ -5288,61 +5296,81 @@ class ChannelList:
      
     def findZap2itID(self, CHname, filename):
         self.log("findZap2itID, CHname = " + CHname)
-        
-        if filename[0:4] == 'http':
-            self.log("findZap2itID, filename http = " + filename)
-            if not self.cached_json_detailed_xmltvChannels:
-                self.cached_json_detailed_xmltvChannels = str(xmltv.read_channels(Open_URL(filename)))
-            json_details = self.cached_json_detailed_xmltvChannels
-        else:
-            self.log("findZap2itID, filename local = " + filename)
-            fle = FileAccess.open(filename, "r")
-            if not self.cached_json_detailed_xmltvChannels:
-                self.cached_json_detailed_xmltvChannels = str(xmltv.read_channels(fle))
-            json_details = self.cached_json_detailed_xmltvChannels
-
-        file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_details)
-        print file_detail
-        
+        orgCHname = CHname
+        XMLTVMatchlst = []
+        sorted_XMLTVMatchlst = []
+        found = False
         try:
-            CHnum = CHname.split(' ')[0]
-            CHname = CHname.split(' ')[1]
-        except:
-            CHnum = ''
-            pass
-        
-        CHname = CHname.replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','')
-        matchLST = [CHname.upper(), 'W'+CHname.upper()]
-        self.log("findZap2itID, Cleaned CHname = " + CHname)
-        self.log("findZap2itID, matchLST = " + str(matchLST))
-        
-        for f in (file_detail):
-            found = False
-            match = re.search("'display-name' *: *\[(.*?)\]", f)
-            id = re.search("'id': (.+)", f)
-            
-            if match != None and len(match.group(1)) > 0:
-                dnames = match.group(1)
-                dnames = (dnames.replace("('",'').replace("', '')",'')).split(', ')
-                
-                for i in range(len(dnames)):
-                    dname = dnames[i].replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','').replace("'",'').replace(')','')
-                    
-                    if dname.upper() in matchLST: 
-                        if id != None and len(id.group(1)) > 0:
-                            CHid = (id.group(1)).replace("'",'')
-                            self.log("findZap2itID, Match Found: " + str(CHname.upper()) +' == '+ str(dname.upper()) + ' ' + str(CHid))  
-                            found = True
-                            break
-                            
-            if found == True:
-                break
+            if filename[0:4] == 'http':
+                self.log("findZap2itID, filename http = " + filename)
+                if not self.cached_json_detailed_xmltvChannels:
+                    self.log("findZap2itID, no cached_json_detailed_xmltvChannels")
+                    self.cached_json_detailed_xmltvChannels = str(xmltv.read_channels(Open_URL(filename)))
+                json_details = self.cached_json_detailed_xmltvChannels
             else:
+                self.log("findZap2itID, filename local = " + filename)
+                fle = FileAccess.open(filename, "r")
+                if not self.cached_json_detailed_xmltvChannels:
+                    self.log("findZap2itID, no cached_json_detailed_xmltvChannels")
+                    self.cached_json_detailed_xmltvChannels = str(xmltv.read_channels(fle))
+                json_details = self.cached_json_detailed_xmltvChannels
+            
+            xbmc.sleep(100)
+            fle.close()
+            file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_details)
+            
+            try:
+                CHnum = CHname.split(' ')[0]
+                CHname = CHname.split(' ')[1]
+            except:
+                CHnum = ''
+                pass
+            
+            CHname = CHname.replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','')
+            matchLST = [CHname.upper(), 'W'+CHname.upper(), orgCHname, 'W'+orgCHname.upper()]
+            self.log("findZap2itID, Cleaned CHname = " + CHname)
+            self.log("findZap2itID, matchLST = " + str(matchLST))
+            
+            for f in (file_detail):
+                found = False
+                dnameID = []
                 CHid = '0'
-                        
-        fle.close()
-        return CHname, CHid
-        
+                match = re.search("'display-name' *: *\[(.*?)\]", f)
+                id = re.search("'id': (.+)", f)
+                
+                if match != None and len(match.group(1)) > 0 and id != None and len(id.group(1)) > 0:
+                    dnames = match.group(1)
+                    dnames = (dnames.replace("('",'').replace("', '')",'')).split(', ')
+                    CHid = (id.group(1)).replace("'",'')
+                    
+                    for i in range(len(dnames)):
+                        dname = dnames[i].replace('-DT','DT').replace(' DT','DT').replace('DT','').replace('-HD','HD').replace(' HD','HD').replace('HD','').replace('-SD','SD').replace(' SD','SD').replace('SD','').replace("'",'').replace(')','')
+                        dnameID = dname + ' : ' + CHid
+                        XMLTVMatchlst.append(dnameID)
+            sorted_XMLTVMatchlst = sorted_nicely(XMLTVMatchlst)
+            
+            for n in range(len(sorted_XMLTVMatchlst)):
+                CHid = '0'
+                dnameID = sorted_XMLTVMatchlst[n]
+                dname = dnameID.split(' : ')[0]
+                CHid = dnameID.split(' : ')[1]
+
+                if dname.upper() in matchLST: 
+                    self.log("findZap2itID, Match Found: " + str(CHname.upper()) +' == '+ str(dname.upper()) + ' ' + str(CHid))  
+                    found = True
+                    return orgCHname, CHid
+                    
+            if not found: 
+                select = selectDialog(sorted_XMLTVMatchlst, 'Select matching id to [B]%s[/B]' % orgCHname)
+                dnameID = sorted_XMLTVMatchlst[select]
+                CHid = dnameID.split(' : ')[1]
+                return orgCHname, CHid
+                
+        except Exception: 
+            buggalo.addExtraData("findZap2itID, CHname = ", CHname)
+            buggalo.addExtraData("findZap2itID, file_detail = ", file_detail)
+            buggalo.onExceptionRaised()
+            
         
     def SyncUSTVnow(self, silent=False, force=False):
         self.log('SyncUSTVnow')
@@ -5550,29 +5578,6 @@ class ChannelList:
         self.log('CleanLabels, out = ' + text)
         return text
     
-    
-    def GUISetSwitch(self):
-        self.log('GUISetSwitch')
-        # fle = xbmc.translatePath("special://profile/guisettings.xml")
-
-        # try:
-            # xml = FileAccess.open(fle, "r")
-            # dom = parse(xml)
-        # except Exception,e:
-            # return
-
-        # # try:
-        # plname = dom.getElementsByTagName('autoplaynextitem')
-        # NextEnabled = (plname[0].childNodes[0].nodeValue.lower() == 'true')
-        # REAL_SETTINGS.setSetting("AutoPlayNext",str(NextEnabled))
-        
-        # if REAL_SETTINGS.getSetting('AutoPlayNext') == "true":
-            # plname[0].childNodes[0].nodeValue.lower() = 'true'
-        # else:
-            # plname[0].childNodes[0].nodeValue.lower() = 'false'
-            
-        # xml.close()
-
         
     def GrabLogo(self, url, title):
         self.log("GrabLogo")
@@ -5600,7 +5605,7 @@ class ChannelList:
         file = file.replace('plugin://plugin.video.youtube/?action=play_video&videoid=', self.youtube_ok)
         file = file.replace('plugin://plugin.video.bromix.youtube/play/?video_id=', self.youtube_ok)
         return file
-            
+        
             
     def XBMCversion(self):
         json_query = uni('{ "jsonrpc": "2.0", "method": "Application.GetProperties", "params": {"properties": ["version", "name"]}, "id": 1 }')
@@ -5621,3 +5626,60 @@ class ChannelList:
         
         self.log('XBMCversion = ' + version)
         return version
+        
+        
+    def fillPluginList(self):
+        self.log('fillPluginList')
+        json_query = uni('{"jsonrpc":"2.0","method":"Addons.GetAddons","params":{"type":"xbmc.addon.video","content":"video","enabled":true,"properties":["path","name"]}, "id": 1 }')
+        json_detail = self.sendJSON(json_query)
+        detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_detail)
+        TMPpluginList = []
+        
+        for f in detail:
+            names = re.search('"name" *: *"(.*?)",', f)
+            paths = re.search('"addonid" *: *"(.*?)",', f)
+            if names and paths:
+                name = self.CleanLabels(names.group(1))
+                path = paths.group(1)
+                TMPpluginList.append(name+','+path)  
+                
+        SortedpluginList = sorted_nicely(TMPpluginList)
+        for i in range(len(SortedpluginList)):
+            name = (SortedpluginList[i]).split(',')[0]
+            path = (SortedpluginList[i]).split(',')[1]
+            self.pluginPathList.append(path)   
+            self.pluginNameList.append(self.CleanLabels(name))           
+            
+            
+    def fillSuperFavs(self):
+        self.log('fillSuperFavs')
+        # SuperFav = self.plugin_ok('plugin.program.super.favourites')
+
+        # if SuperFav == True:
+            # plugin_details = self.PluginQuery('plugin://plugin.program.super.favourites')
+            # filter =['create new super folder','explore favourites','explore  favourites','explore xbmc favourites','explore kodi favourites','isearch','search']
+            # Match = True
+            # while Match:
+
+            # for SF in (plugin_details):
+            # filetypes = re.search('"filetype" *: *"(.*?)"', SF)
+            # labels = re.search('"label" *: *"(.*?)"', SF)
+            # files = re.search('"file" *: *"(.*?)"', SF)
+
+            # #if core variables have info proceed
+            # if filetypes and files and labels:
+                # filetype = filetypes.group(1)
+                # file = (files.group(1))
+                # label = (labels.group(1))
+
+                # if label.lower() not in filter and label != '':
+                    # if filetype == 'directory':
+                        # SFmatch = unquote(file)
+                        # SFmatch = SFmatch.split('Super+Favourites')[1].replace('\\','/')
+                        # if SFmatch == '/PseudoTV_Live':
+                            # plugin_details = chanlist.PluginQuery(file)
+                            # break
+                        # else:
+                            # if SFmatch[0:9] != '/Channel_':
+                                # Match = False
+        

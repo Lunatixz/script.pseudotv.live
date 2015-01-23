@@ -17,7 +17,7 @@
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
     
     
-import os, sys, re, shutil, buggalo, threading
+import os, sys, re, shutil, threading
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from resources.lib.ga import *
@@ -40,8 +40,11 @@ __cwd__        = __settings__.getAddonInfo('path')
 __version__    = __settings__.getAddonInfo('version')
 __language__   = __settings__.getLocalizedString
        
-# Buggalo gmail
-buggalo.GMAIL_RECIPIENT = 'pseudotvlive@gmail.com'
+try:
+    import buggalo
+    buggalo.GMAIL_RECIPIENT = "PseudoTV@nyc.rr.com"
+except:
+    pass
 
 def PseudoTV():
     xbmcgui.Window(10000).setProperty("PseudoTVRunning", "True")

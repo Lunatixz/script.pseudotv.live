@@ -377,7 +377,7 @@ class RenameRule(BaseRule):
     def __init__(self):
         self.name = "Set Channel Name"
         self.optionLabels = ['New Channel Name']
-        self.optionValues = ['']
+        self.optionValues = [' ']
         self.myId = 1
         self.actions = RULES_ACTION_FINAL_MADE | RULES_ACTION_FINAL_LOADED
 
@@ -416,7 +416,7 @@ class NoShowRule(BaseRule):
     def __init__(self):
         self.name = "Don't Include a Show"
         self.optionLabels = ['Show Name']
-        self.optionValues = ['']
+        self.optionValues = [' ']
         self.myId = 2
         self.actions = RULES_ACTION_LIST
 

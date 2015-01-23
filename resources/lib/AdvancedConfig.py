@@ -33,7 +33,6 @@ class AdvancedConfig(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.log("__init__")
         xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
-
         self.ruleList = []
         self.allRules = RulesList()
 

@@ -17,9 +17,9 @@
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
 import xbmc, xbmcgui, xbmcaddon
-import subprocess, os, buggalo
+import subprocess, os
 import time, datetime, random
-import datetime
+import threading
 import sys, re
 import random, traceback
 import urllib, urllib2, urlparse
@@ -36,6 +36,12 @@ from urllib import unquote, quote
 from metahandler import metahandlers
 from utils import *
 
+try:
+    import buggalo
+    buggalo.GMAIL_RECIPIENT = "pseudotvlive@gmail.com"
+except:
+    pass
+    
 # Commoncache plugin import
 try:
     import StorageServer
@@ -371,12 +377,13 @@ class Artdownloader:
         setImage = ''
         tvdbAPI = TVDB(TVDB_API_KEY)
         tmdbAPI = TMDB(TMDB_API_KEY)  
+        
         drive, path = os.path.splitdrive(cachefile)
         path, filename = os.path.split(path)
         
         if not FileAccess.exists(path):
             FileAccess.makedirs(path)
-
+        
         if type == 'tvshow':
             self.logDebug('DownloadArt, tvshow')
             FanTVDownload = True
@@ -418,11 +425,19 @@ class Artdownloader:
                                             fanPath = fanPaths.group(1).replace("u'",'').replace("'",'')
                                             if fanPath.startswith('http'):
                                                 requestDownload(fanPath,TVFilePath)
-                                                break
+                                                break 
                 except:
                     pass
+                    
+            # self.DownloadThread = threading.Timer(5.0, requestDownload,(url,TVFilePath))
+            # self.DownloadThread.name = "DownloadThread"
+            
+            # if self.DownloadThread.isAlive():
+                # self.DownloadThread.join()
+            # else:
+                # self.DownloadThread.start()
             return TVFilePath
-                           
+                                                  
         elif type == 'movie':
             self.logDebug('DownloadArt, movie')
             FanMovieDownload = True
@@ -469,7 +484,15 @@ class Artdownloader:
                                             fanPath = fanPaths.group(1).replace("u'",'').replace("'",'')
                                             if fanPath.startswith('http'):
                                                 requestDownload(fanPath,MovieFilePath)
-                                                break
+                                                break                            
                 except:
                     pass
+                    
+            # self.DownloadThread = threading.Timer(5.0, requestDownload,(url,MovieFilePath))
+            # self.DownloadThread.name = "DownloadThread"
+            
+            # if self.DownloadThread.isAlive():
+                # self.DownloadThread.join()
+            # else:
+                # self.DownloadThread.start()
             return MovieFilePath

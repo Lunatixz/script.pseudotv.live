@@ -1,5 +1,4 @@
 <settings>
-
 <!--General-->
     <category label="30000">
         <setting label="300001" type="lsep"/>
@@ -26,7 +25,7 @@
         <setting id="SUPchannel" type="enum"  label="30303" values="Last Channel|Preferred Channel" default="0"/>
         <setting id="CurrentChannel" type="text" label="30304" subsetting="true" visible="eq(-1,1)" default="1"/>
         <setting id="Disable_Watched" type="bool" label="30311" default="false"/>
-        <setting id="EnhancedGuideData" type="bool" label="30405" default="true" />
+        <setting id="EnhancedGuideData" type="bool" label="30405" default="false" />
         <setting id="AutoJump" type="bool" label="30408" default="false" />
         <setting id="SelectAction" type="enum" enable="false" values="Watch Now|Set Reminder|Always Ask" label="30409" default="0" />
         <setting id="HideClips" type="bool" label="30215" default="true"/>
@@ -73,7 +72,7 @@
         <setting id="couchpotato.apikey" subsetting="true" label="30710" visible="eq(-2,true)" type="text" default="Enter API KEY"/>
         <setting id="SimpleDownloader" type="action" label="30719" option="close"  visible="System.HasAddon(script.module.simple.downloader)" action="RunScript($CWD/donordownload.py, -SimpleDownloader)"/>
     </category> 
-<!--Community Network-->
+<!--AutoTune Filter-->
     <category label="30700"> 
         <setting label="30701" type="lsep" default="" /> 
         <setting id="CN_TV" label="30702" type="bool" default="true" />
@@ -102,19 +101,19 @@
             <setting id="autoFindLiveHD" type="enum" label="30097" subsetting="true" visible="eq(-6,true)" values=" |Dual -Strms|Prime - UPNP" default="0" />
             <setting id="autoFindLiveHDPath" type="folder" source="auto" label="30098" subsetting="true" visible="!eq(-1,0) + eq(-7,true)"default=""/>
             <setting id="autoFindUSTVNOW" type="bool" label="30074" subsetting="true" visible="eq(-8,true)" default="false"/>
-            <setting id="autoFindSmoothStreams" type="bool" label="30174" subsetting="true" visible="eq(-12,true) + eq(-9,true)" default="false"/>
-            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-13,true) + eq(-10,true)" default="false"/>
-        <setting type="lsep" label="30076" visible="eq(-11,true)"/>
-            <setting id="autoFindNetworks" type="bool" label="30078" subsetting="true" visible="eq(-12,true)" default="false"/>
-            <setting id="autoFindStudios" type="bool" label="30079" subsetting="true" visible="eq(-13,true)" default="false"/>
-            <setting id="autoFindTVGenres" type="bool" label="30080" subsetting="true" visible="eq(-14,true)" default="false"/>
-            <setting id="autoFindMovieGenres" type="bool" label="30081" subsetting="true" visible="eq(-15,true)" default="false"/>
-            <setting id="autoFindMixGenres" type="bool" label="30082" subsetting="true" visible="eq(-16,true)" default="false"/>
-            <setting id="autoFindRecent" type="bool" label="30883" subsetting="true" visible="eq(-17,true)" default="false"/>
+            <setting id="autoFindUSIPTV" type="bool" label="30194" subsetting="true" visible="eq(-12,true) + eq(-9,true)" default="false"/>
+            <setting id="autoFindSmoothStreams" type="bool" label="30174" subsetting="true" visible="eq(-13,true) + eq(-10,true)" default="false"/>
+            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-14,true) + eq(-11,true)" default="false"/>
+        <setting type="lsep" label="30076" visible="eq(-12,true)"/>
+            <setting id="autoFindNetworks" type="bool" label="30078" subsetting="true" visible="eq(-13,true)" default="false"/>
+            <setting id="autoFindStudios" type="bool" label="30079" subsetting="true" visible="eq(-14,true)" default="false"/>
+            <setting id="autoFindTVGenres" type="bool" label="30080" subsetting="true" visible="eq(-15,true)" default="false"/>
+            <setting id="autoFindMovieGenres" type="bool" label="30081" subsetting="true" visible="eq(-16,true)" default="false"/>
+            <setting id="autoFindMixGenres" type="bool" label="30082" subsetting="true" visible="eq(-17,true)" default="false"/>
+            <setting id="autoFindRecent" type="bool" label="30883" subsetting="true" visible="eq(-18,true)" default="false"/>
             <setting id="autoFind3DMovies" type="bool" label="30884" subsetting="true" visible="false" default="false"/>
-        <setting type="lsep" label="30083" visible="eq(-19,true)"/>
-            <setting id="autoFindMusicGenres" type="bool" label="30084" subsetting="true" visible="eq(-20,true)" default="false"/>
-            <setting id="autoFindMusicVideosYoutube" type="bool" label="30085" subsetting="true" visible="eq(-21,true)" default="false"/>
+        <setting type="lsep" label="30083" visible="eq(-20,true)"/>
+            <setting id="autoFindMusicGenres" type="bool" label="30084" subsetting="true" visible="eq(-21,true)" default="false"/>
             <setting id="autoFindMusicVideosVevoTV" type="bool" label="30086" subsetting="true" visible="eq(-22,true)" default="false"/>
             <setting id="autoFindMusicVideosMusicTV" type="bool" label="30898" subsetting="true" visible="eq(-23,true)" default="false"/>
             <setting id="autoFindMusicVideosLastFM" type="bool" label="30087" subsetting="true" visible="eq(-24,true)" default="false"/>

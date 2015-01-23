@@ -78,6 +78,7 @@ class Migrate:
         self.log("autoTune, autoFindLivePVR " + str(Globals.REAL_SETTINGS.getSetting("autoFindLivePVR")))
         self.log("autoTune, autoFindLiveHD " + str(Globals.REAL_SETTINGS.getSetting("autoFindLiveHD")))
         self.log("autoTune, autoFindUSTVNOW " + str(Globals.REAL_SETTINGS.getSetting("autoFindUSTVNOW")))
+        self.log("autoTune, autoFindUSIPTV " + str(Globals.REAL_SETTINGS.getSetting("autoFindUSIPTV")))
         self.log("autoTune, autoFindSmoothStreams " + str(Globals.REAL_SETTINGS.getSetting("autoFindSmoothStreams")))
         self.log("autoTune, autoFindFilmonFavourites " + str(Globals.REAL_SETTINGS.getSetting("autoFindFilmonFavourites")))
         self.log("autoTune, autoFindNetworks " + str(Globals.REAL_SETTINGS.getSetting("autoFindNetworks")))
@@ -481,7 +482,73 @@ class Migrate:
                             channelNum += 1
                 except:
                     pass
-        
+                    
+                    
+        # LiveTV - USIPTV
+        self.updateDialogProgress = 14
+        if Globals.REAL_SETTINGS.getSetting("autoFindUSIPTV") == "true":
+            self.log("autoTune, adding USIPTV Channels")
+            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USIPTV Channels"," ")
+            USIPTVnum = 0
+            USIPTV = chanlist.plugin_ok('plugin.video.usiptv')
+            
+            if USIPTV == True: 
+                try:
+                    json_query = uni('{"jsonrpc":"2.0","method":"Files.GetDirectory","params":{"directory":"plugin://plugin.video.usiptv","properties":["thumbnail"]},"id":1}')
+                    json_folder_detail = chanlist.sendJSON(json_query)
+                    file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_folder_detail)
+                    USIPTVXML = (xbmc.translatePath(os.path.join(XMLTV_CACHE_LOC, 'usiptv.xml')))
+                    print file_detail
+                    
+                    for USIPTVnum in file_detail:      
+                        files = re.search('"file" *: *"(.*?)"', USIPTVnum)
+                        labels = re.search('"label" *: *"(.*?)"', USIPTVnum)
+                        thumbnails = re.search('"thumbnail" *: *"(.*?)"', USIPTVnum)
+                        
+                        if files and labels:
+                            file = files.group(1)
+                            CHname = labels.group(1)
+                            inSet = False
+                                    
+                            if thumbnails != None and len(thumbnails.group(1)) > 0:
+                                thumbnail = thumbnails.group(1)
+                                chanlist.GrabLogo(thumbnail, CHname + ' USIPTV')
+                                
+                            if xbmcvfs.exists(USIPTVXML):  
+                                CHSetName, CHzapit = chanlist.findZap2itID(CHname, USIPTVXML)
+                                
+                                if CHzapit != '0':
+                                    inSet = True
+                                    
+                            if inSet == True:
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", str(CHzapit))
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "usiptv")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", CHname)
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USIPTV')  
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+                            else:
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "9")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", "5400")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", file)
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", 'Listing Unavailable')
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_4", "TV Listing Unavailable, Check your xmltv file")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "1")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' USIPTV')  
+                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")
+
+                            self.updateDialog.update(self.updateDialogProgress,"Auto Tune","adding USIPTV Channels",CHname)
+                            channelNum += 1
+                except:
+                    pass
         
         # LiveTV - smoothstreams
         self.updateDialogProgress = 14
@@ -1614,6 +1681,7 @@ class Migrate:
         Globals.REAL_SETTINGS.setSetting('autoFindLivePVR', "false")
         Globals.REAL_SETTINGS.setSetting('autoFindLiveHD', "0")
         Globals.REAL_SETTINGS.setSetting('autoFindUSTVNOW', "false")  
+        Globals.REAL_SETTINGS.setSetting('autoFindUSIPTV', "false") 
         Globals.REAL_SETTINGS.setSetting('autoFindSmoothStreams', "false")  
         Globals.REAL_SETTINGS.setSetting("autoFindFilmonFavourites","false")
         Globals.REAL_SETTINGS.setSetting("autoFindNetworks","false")

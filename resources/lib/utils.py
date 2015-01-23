@@ -18,7 +18,7 @@
 
 
 import os, re, sys, time, zipfile, threading, requests
-import urllib, urllib2, base64, fileinput, shutil
+import urllib, urllib2, base64, fileinput, shutil, socket
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
 import urlparse, time, string
 
@@ -27,7 +27,59 @@ from FileAccess import FileAccess
 from Queue import Queue
 from HTMLParser import HTMLParser
 
+socket.setdefaulttimeout(30)
+# def __init__(self):
+    
+def sorted_nicely(lst): 
+    log('sorted_nicely')
+    """ Sort the given iterable in the way that humans expect.""" 
+    list = set(lst)
+    convert = lambda text: int(text) if text.isdigit() else text 
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+    return sorted(list, key = alphanum_key)
+    
+    
+def infoDialog(str, header=ADDON_NAME):
+    try: xbmcgui.Dialog().notification(header, str, THUMB, 3000, sound=False)
+    except: xbmc.executebuiltin("Notification(%s,%s, 3000, %s)" % (header, str, THUMB))
+
+    
+def okDialog(str1, str2, header=ADDON_NAME):
+    xbmcgui.Dialog().ok(header, str1, str2)
+
+    
+def selectDialog(list, header=ADDON_NAME):
+    log('selectDialog')
+    select = xbmcgui.Dialog().select(header, list)
+    return select
+
+    
+def yesnoDialog(str1, str2, header=ADDON_NAME, str3='', str4=''):
+    answer = xbmcgui.Dialog().yesno(header, str1, str2, '', str4, str3)
+    return answer
+
+    
+def getProperty(str):
+    property = xbmcgui.Window(10000).getProperty(str)
+    return property
+
+    
+def setProperty(str1, str2):
+    xbmcgui.Window(10000).setProperty(str1, str2)
+
+    
+def clearProperty(str):
+    xbmcgui.Window(10000).clearProperty(str)
+
+    
+def addon_status(id):
+    check = xbmcaddon.Addon(id=id).getAddonInfo("name")
+    if not check == ADDON_NAME: return True
+    
+
 def requestDownload(url, fle):
+    log('requestDownload')
+    # requests = requests.Session()
     response = requests.get(url, stream=True)
     with open(fle, 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
@@ -48,30 +100,29 @@ def ClearPlaylists():
 # Compare git version with local version.
 def VersionCompare():
     log('VersionCompare')
+    curver = xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
+    source = open(curver, mode = 'r')
+    link = source.read()
+    source.close()
+    match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+    
+    for vernum in match:
+        log("Current Version = " + str(vernum))
     try:
-        curver = xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
-        source = open(curver, mode = 'r')
-        link = source.read()
-        source.close()
-        match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
-        
-        for vernum in match:
-            log("Original Version = " + str(vernum))
-            
         link = Request_URL('https://raw.githubusercontent.com/Lunatixz/XBMC_Addons/master/script.pseudotv.live/addon.xml')               
-        link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
-        match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
-        
-        if len(match) > 0:
-            if vernum != str(match[0]):
-                dialog = xbmcgui.Dialog()
-                RepoFound = xbmc.getCondVisibility('System.HasAddon(%s)' % 'repository.lunatixz') == 1
-                if RepoFound == False:
-                    confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to install the PseudoTV Live repository to stay updated?',"Cancel","Update")
-                    if confirm:
-                        UpdateFiles()       
-    except Exception: 
-        pass
+    except:
+        link='nill'
+    
+    link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
+    match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+ 
+    if len(match) > 0:
+        print vernum, str(match)[0]
+        if vernum != str(match[0]):
+            dialog = xbmcgui.Dialog()
+            confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to install the PseudoTV Live repository to stay updated?',"Cancel","Install")
+            if confirm:
+                UpdateFiles()       
     return
     
     
@@ -101,6 +152,7 @@ def UpdateFiles():
     except: 
         MSG = 'Failed to install Lunatixz Repository, Try Again Later'
         pass
+    xbmc.executebuiltin("XBMC.UpdateLocalAddons()"); 
     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 1000, THUMB) )
     return
 
