@@ -1,0 +1,584 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://github.com/CodeMonkeyZero -->
+<window>
+   <allowoverlay>no</allowoverlay>
+   <onload>ActivateWindow(9506)</onload>
+   <onunload>ActivateWindow(12005)</onunload>
+   <coordinates>
+      <system>1</system>
+      <posx>0</posx>
+      <posy>0</posy>
+   </coordinates>
+   <animation effect="fade" time="900">WindowOpen</animation>
+   <animation effect="fade" time="900">WindowClose</animation>
+   <controls>
+      <control type="button" id="99">
+         <visible>false</visible>
+         <label>0xFFFFFFFF</label>
+      </control>
+      <control type="button" id="100">
+         <visible>false</visible>
+         <label>0xFFFFFFFF</label>
+      </control>
+      <control type="button" id="105">
+         <visible>false</visible>
+         <label>font14</label>
+      </control>
+      <!-- VIDEOWINDOW BOX -->
+      <control type="group" id="523">
+         <control type="label" id="524">
+            <visible>false</visible>
+         </control>
+         <!-- #### SKINNERS INCLUDE EVERYTHING FOR VIDEOWINDOW PATCH TO WORK #### -->
+         <!-- PATCH START -->
+<!--          <control type="videowindow" id="2">
+            <description>VIDEO</description>
+            <posx>0</posx>
+            <posy>0</posy>
+            <width>1920</width>
+            <height>1080</height>
+            <aspectratio align="center" aligny="center">scale</aspectratio>
+         </control> -->
+         <!-- PATCH END -->
+         <!-- ################################################################## -->
+      </control>
+      <!-- EPG BG -->
+      <control type="image">
+         <description>INFO BACKGROUND</description>
+         <posx>0</posx>
+         <posy>0</posy>
+         <width>1920</width>
+         <height>1080</height>
+         <texture>epgmain.png</texture>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+      </control>
+      <!-- NOW WATCHING -->
+      <control type="label" id="523">
+         <description>NOW WATCHING LABEL</description>
+         <posx>1425</posx>
+         <posy>788</posy>
+         <width>450</width>
+         <height>45</height>
+         <font>Font_Bold34</font>
+         <align>center</align>
+         <label>NOW WATCHING:</label>
+         <textcolor>C0C0C0C0</textcolor>
+      </control>
+      <!-- NOW PLAYING -->
+      <control type="group">
+         <posx>1487</posx>
+         <posy>847</posy>
+         <!-- DYNAMIC ARTWORK 507/508 -->
+         <control type="button" id="507">
+            <posx>3</posx>
+            <posy>3</posy>
+            <description>DYNAMIC ART</description>
+            <label>landscape</label>
+            <visible>false</visible>
+            <width>150</width>
+            <height>150</height>
+         </control>
+         <control type="image" id="508">
+            <posx>3</posx>
+            <posy>3</posy>
+            <description>DYNAMIC ART</description>
+            <width>320</width>
+            <height>180</height>
+            <align>center</align>
+            <aspectratio>stretch</aspectratio>
+         </control>
+		 <control type="image" id="510">
+            <visible>false</visible>
+         </control>
+		 <control type="image" id="512">
+            <visible>false</visible>
+         </control>
+         <control type="group" id="515" />
+      </control>
+      <!-- L/R/NAV ART -->
+      <control type="image">
+         <description>LEFT</description>
+         <posx>563</posx>
+         <posy>233</posy>
+         <width>15</width>
+         <height>27</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>left.png</texture>
+      </control>
+      <control type="image">
+         <description>RIGHT</description>
+         <posx>1845</posx>
+         <posy>233</posy>
+         <width>15</width>
+         <height>27</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>right.png</texture>
+      </control>
+      <control type="image">
+         <description>NAV</description>
+         <posx>100</posx>
+         <posy>1020</posy>
+         <width>360</width>
+         <height>30</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>navflagepg.png</texture>
+      </control>	  
+      <!-- DARK COL -->
+      <control type="image">
+         <description>CH OVERLAY</description>
+         <posx>116</posx>
+         <posy>278</posy>
+         <width>426</width>
+         <height>77</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>pstvButtonNoFocus.png</texture>
+      </control>
+      <control type="image">
+         <description>CH OVERLAY</description>
+         <posx>116</posx>
+         <posy>360</posy>
+         <width>426</width>
+         <height>77</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>pstvButtonNoFocus.png</texture>
+      </control>
+      <control type="image">
+         <description>CH OVERLAY</description>
+         <posx>116</posx>
+         <posy>443</posy>
+         <width>426</width>
+         <height>77</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>pstvButtonNoFocus.png</texture>
+      </control>
+      <control type="image">
+         <description>CH OVERLAY</description>
+         <posx>116</posx>
+         <posy>525</posy>
+         <width>426</width>
+         <height>77</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>pstvButtonNoFocus.png</texture>
+      </control>
+      <control type="image">
+         <description>CH OVERLAY</description>
+         <posx>116</posx>
+         <posy>608</posy>
+         <width>426</width>
+         <height>77</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>pstvButtonNoFocus.png</texture>
+      </control>
+      <control type="image">
+         <description>CH OVERLAY</description>
+         <posx>116</posx>
+         <posy>690</posy>
+         <width>426</width>
+         <height>77</height>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+         <texture>pstvButtonNoFocus.png</texture>
+      </control>
+      <!-- TIME/WEATHER -->
+      <control type="label">
+         <description>TIME</description>
+         <posx>75</posx>
+         <posy>90</posy>
+         <width>150</width>
+         <height>45</height>
+         <label>$INFO[System.Time]</label>
+         <font>font25</font>
+         <align>center</align>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <!-- WEATHER -->
+      <control type="image" id="800">
+         <posx>270</posx>
+         <posy>69</posy>
+         <width>90</width>
+         <height>90</height>
+         <aspectratio align="center">keep</aspectratio>
+         <info>Window(weather).Property(Current.ConditionIcon)</info>
+      </control>
+      <control type="label">
+         <description>WEATHER</description>
+         <posx>270</posx>
+         <posy>90</posy>
+         <width min="60" max="150">auto</width>
+         <height>15</height>
+         <label>$INFO[Window(weather).Property(Current.Temperature)] $INFO[System.TemperatureUnits]</label>
+         <font>Font_Reg10</font>
+         <align>center</align>
+         <textcolor>FFFFFFFF</textcolor>
+         <visible>!Control.IsVisible(800)</visible>
+      </control>
+      <control type="grouplist">
+         <posx>102</posx>
+         <posy>788</posy>
+         <width>1500</width>
+         <height>60</height>
+         <align>left</align>
+         <aligny>center</aligny>
+         <orientation>horizontal</orientation>
+         <itemgap>8</itemgap>
+         <control type="label" id="500">
+            <description>SHOW NAME LABEL</description>
+            <width min="8" max="900">auto</width>
+            <height>60</height>
+            <label>Show Name</label>
+            <font>Font_Bold34</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF00B4DB</textcolor>
+         </control>
+         <control type="label">
+            <description>SHOW NAME LABEL</description>
+            <width>15</width>
+            <height>60</height>
+            <label>•</label>
+            <font>font12</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF00B4DB</textcolor>
+         </control>
+         <control type="label" id="501">
+            <description>SHOW TITLE LABEL</description>
+            <width min="8" max="320">auto</width>
+            <height>60</height>
+            <font>font12</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FFFFFFFF</textcolor>
+         </control>
+      </control>
+      <control type="image" id="511">
+         <description>SICKBEARD/COUCHPOTATO ICO</description>
+         <posx>1320</posx>
+         <posy>788</posy>
+         <width>30</width>
+         <height>30</height>
+         <aspectratio>keep</aspectratio>
+      </control>
+      <control type="label" id="502">
+         <description>SHOW DESC LBL</description>
+         <posx>102</posx>
+         <posy>851</posy>
+         <width>1253</width>
+         <height>150</height>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>top</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+         <wrapmultiline>true</wrapmultiline>
+      </control>
+      <control type="image" id="503">
+         <description>SHOW CH ICO</description>
+         <posx>1965</posx>
+         <posy>908</posy>
+         <width>2</width>
+         <height>2</height>
+         <aspectratio>keep</aspectratio>
+         <aligny>top</aligny>
+      </control>
+      <control type="button" id="100">
+         <label>FFFFFFFF</label>
+         <visible>false</visible>
+      </control>
+      <control type="label" id="101">
+         <description>TIME L LBL</description>
+         <posx>600</posx>
+         <posy>228</posy>
+         <width>405</width>
+         <height>39</height>
+         <label>Time 1</label>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="label" id="102">
+         <description>TIME MID LBL</description>
+         <posx>968</posx>
+         <posy>228</posy>
+         <width>405</width>
+         <height>39</height>
+         <label>Time 2</label>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="label" id="103">
+         <description>TIME R LBL</description>
+         <posx>1373</posx>
+         <posy>228</posy>
+         <width>405</width>
+         <height>39</height>
+         <label>Time 2</label>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <!--DATE-->
+      <control type="label" id="104">
+         <description>DATE LBL</description>
+         <posx>203</posx>
+         <posy>228</posy>
+         <width>405</width>
+         <height>39</height>
+         <label>Current Date</label>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <!--SHOW LIST -->
+      <control type="group" id="111">
+         <posx>548</posx>
+         <posy>278</posy>
+         <width>1320</width>
+         <height>77</height>
+      </control>
+      <control type="group" id="112">
+         <posx>548</posx>
+         <posy>360</posy>
+         <width>1320</width>
+         <height>77</height>
+      </control>
+      <control type="group" id="113">
+         <posx>548</posx>
+         <posy>443</posy>
+         <width>1320</width>
+         <height>77</height>
+      </control>
+      <control type="group" id="114">
+         <posx>548</posx>
+         <posy>525</posy>
+         <width>1320</width>
+         <height>77</height>
+      </control>
+      <control type="group" id="115">
+         <posx>548</posx>
+         <posy>608</posy>
+         <width>1320</width>
+         <height>77</height>
+      </control>
+      <control type="group" id="116">
+         <posx>548</posx>
+         <posy>690</posy>
+         <width>1320</width>
+         <height>77</height>
+      </control>
+      <control type="group" id="120">
+         <posx>548</posx>
+         <posy>270</posy>
+         <width>30</width>
+         <height>495</height>
+      </control>
+      <!--CH BUTTONS AND LBLS-->
+      <control type="label" id="301">
+         <description>CH 1 NAME</description>
+         <posx>165</posx>
+         <posy>285</posy>
+         <width>300</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FF00B4DB</textcolor>
+         <visible>StringCompare(Control.GetLabel(321),)</visible>
+      </control>
+      <control type="label" id="311">
+         <description>CH 1 NUM</description>
+         <posx>113</posx>
+         <posy>285</posy>
+         <width>60</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>right</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="image" id="321">
+         <description>CH 1 ICO</description>
+         <posx>158</posx>
+         <posy>278</posy>
+         <width>338</width>
+         <height>75</height>
+         <align>center</align>
+         <aligny>center</aligny>
+         <aspectratio>keep</aspectratio>
+         <visible>!StringCompare(Control.GetLabel(321),)</visible>
+      </control>
+      <control type="label" id="302">
+         <description>CH 2 NAME</description>
+         <posx>165</posx>
+         <posy>365</posy>
+         <width>300</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FF00B4DB</textcolor>
+         <visible>StringCompare(Control.GetLabel(322),)</visible>
+      </control>
+      <control type="label" id="312">
+         <description>CH 2 NUM</description>
+         <posx>113</posx>
+         <posy>365</posy>
+         <width>60</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>right</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="image" id="322">
+         <description>CH 2 ICO</description>
+         <posx>158</posx>
+         <posy>365</posy>
+         <width>338</width>
+         <height>75</height>
+         <align>center</align>
+         <aligny>center</aligny>
+         <aspectratio>keep</aspectratio>
+         <visible>!StringCompare(Control.GetLabel(322),)</visible>
+      </control>
+      <control type="label" id="303">
+         <description>CH 3 NAME</description>
+         <posx>165</posx>
+         <posy>447</posy>
+         <width>300</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FF00B4DB</textcolor>
+         <visible>StringCompare(Control.GetLabel(323),)</visible>
+      </control>
+      <control type="label" id="313">
+         <description>CH 3 NUM</description>
+         <posx>113</posx>
+         <posy>447</posy>
+         <width>60</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>right</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="image" id="323">
+         <description>CH 3 ICO</description>
+         <posx>158</posx>
+         <posy>447</posy>
+         <width>338</width>
+         <height>75</height>
+         <align>center</align>
+         <aligny>center</aligny>
+         <aspectratio>keep</aspectratio>
+         <visible>!StringCompare(Control.GetLabel(323),)</visible>
+      </control>
+      <control type="label" id="304">
+         <description>CH 4 NAME</description>
+         <posx>165</posx>
+         <posy>528</posy>
+         <width>300</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FF00B4DB</textcolor>
+         <visible>StringCompare(Control.GetLabel(324),)</visible>
+      </control>
+      <control type="label" id="314">
+         <description>CH 4 NUM</description>
+         <posx>113</posx>
+         <posy>528</posy>
+         <width>60</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>right</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="image" id="324">
+         <description>CH 4 ICO</description>
+         <posx>158</posx>
+         <posy>528</posy>
+         <width>338</width>
+         <height>75</height>
+         <align>center</align>
+         <aligny>center</aligny>
+         <aspectratio>keep</aspectratio>
+         <visible>!StringCompare(Control.GetLabel(324),)</visible>
+      </control>
+      <control type="label" id="305">
+         <description>CH 5 NAME</description>
+         <posx>165</posx>
+         <posy>611</posy>
+         <width>300</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FF00B4DB</textcolor>
+         <visible>StringCompare(Control.GetLabel(325),)</visible>
+      </control>
+      <control type="label" id="315">
+         <description>CH 5 NUM</description>
+         <posx>113</posx>
+         <posy>611</posy>
+         <width>60</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>right</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="image" id="325">
+         <description>CH 5 ICO</description>
+         <posx>158</posx>
+         <posy>611</posy>
+         <width>338</width>
+         <height>75</height>
+         <align>center</align>
+         <aligny>center</aligny>
+         <aspectratio>keep</aspectratio>
+         <visible>!StringCompare(Control.GetLabel(325),)</visible>
+      </control>
+      <control type="label" id="306">
+         <description>CH 6 NAME</description>
+         <posx>165</posx>
+         <posy>692</posy>
+         <width>300</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FF00B4DB</textcolor>
+         <visible>StringCompare(Control.GetLabel(326),)</visible>
+      </control>
+      <control type="label" id="316">
+         <description>CH 6 NUM</description>
+         <posx>113</posx>
+         <posy>692</posy>
+         <width>60</width>
+         <height>63</height>
+         <font>font13</font>
+         <align>right</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="image" id="326">
+         <description>CH 6 ICO</description>
+         <posx>158</posx>
+         <posy>692</posy>
+         <width>338</width>
+         <height>75</height>
+         <align>center</align>
+         <aligny>center</aligny>
+         <aspectratio>keep</aspectratio>
+         <visible>!StringCompare(Control.GetLabel(326),)</visible>
+      </control>
+   </controls>
+</window>
