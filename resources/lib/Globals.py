@@ -76,7 +76,7 @@ AUTOSTART_TIMER = [0,5,10,15,20]#in seconds
 ART_TIMER = [6,12,24,48,72]
 SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
-MEDIA_LIMIT = [10,25,50,100,250,500,1000,0]#Media Per/Channel, 0 = Unlimited
+MEDIA_LIMIT = [25,50,100,250,500,1000,0]#Media Per/Channel, 0 = Unlimited
 REFRESH_INT = [14520,28920,43320,86520]#in seconds (4|8|12|24hrs) + 2min offset
 TIMEOUT = 15 * 1000
 TOTAL_FILL_CHANNELS = 20
@@ -105,7 +105,7 @@ MODE_SERIAL = MODE_RESUME | MODE_ALWAYSPAUSE | MODE_ORDERAIRDATE
 MODE_STARTMODES = MODE_RANDOM | MODE_REALTIME | MODE_RESUME
 
 # Maximum is 10 for this
-RULES_PER_PAGE = 10
+RULES_PER_PAGE = 7
 
 #UPNP Clients
 IPP1 = (REAL_SETTINGS.getSetting("UPNP1_IPP"))
@@ -123,7 +123,9 @@ ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '
 LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location
 EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
 IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
-XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/' #Post Channel logo IMG Processing location
+XMLTV_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'))) + '/'
+XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/'
+STRM_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'strm','')) 
 PTVL_SKIN_LOC = os.path.join(ADDON_PATH, 'resources', 'skins') #Path to PTVL Skin folder
 
 #XMLTV FILENAMES
@@ -145,6 +147,7 @@ DEFAULT_LOGO_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'logos')) + '/'
 TIME_BAR = 'pstvTimeBar.png'
 BUTTON_FOCUS = 'pstvButtonFocus.png'
 BUTTON_NO_FOCUS = 'pstvButtonNoFocus.png'
+BUTTON_NO_FOCUS_ALT = 'pstvButtonNoFocusAlt.png'
 THUMB = (IMAGES_LOC + 'icon.png')
 
 #Channel Sharing location
@@ -153,44 +156,36 @@ if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
     LOCK_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache')) + '/'
 else:
     CHANNEL_SHARING = False
-    
-# Original Skin Location changes    
-if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
+      
+# SKIN SELECT
+if int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
+        Skin_Select = 'PTVL'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
+# Custom skin downloader todo.    
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
+        Skin_Select = 'Custom' 
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'
+else: 
+    #Use XBMC's included PTVL skin, else Default.
     if os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live/')):
         Skin_Select = 'special://skin/media/'
         MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv.live')) + '/'
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-    elif os.path.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Original', xbmc.getSkinDir(),''))):
-        Skin_Select = os.path.join('Original', xbmc.getSkinDir()) + '/'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
     else:
         Skin_Select = 'Default'
         MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
-      
-    if not xbmcvfs.exists(MEDIA_LOC):
-        MEDIA_LOC = DEFAULT_MEDIA_LOC 
-    if not xbmcvfs.exists(EPGGENRE_LOC):
-        EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC         
-else:
-    # SKIN SELECT
-    if int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
-        Skin_Select = 'Custom' 
-    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
-        Skin_Select = 'Default'
-    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
-        Skin_Select = 'PTVL'   
-    elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
-        Skin_Select = 'ConCast' 
-        
-    MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-                
-    if xbmcvfs.exists(xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'):
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
-    else:  
-        EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC 
-        
+          
+#Double check core image folders
+if not xbmcvfs.exists(MEDIA_LOC):
+    print 'forcing default DEFAULT_MEDIA_LOC'
+    MEDIA_LOC = DEFAULT_MEDIA_LOC 
+if not xbmcvfs.exists(EPGGENRE_LOC):
+    print 'forcing default DEFAULT_EPGGENRE_LOC'
+    EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC         
+           
 # Find XBMC Skin path
 if xbmcvfs.exists(xbmc.translatePath(os.path.join('special://','skin','720p',''))):
     XBMC_SKIN_LOC = xbmc.translatePath(os.path.join('special://','skin','720p',''))
@@ -220,28 +215,31 @@ NOTIFY = REAL_SETTINGS.getSetting('notify')
 SILENT = REAL_SETTINGS.getSetting('silent')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop") == "true"
-OS_SET = int(REAL_SETTINGS.getSetting("os"))
-        
+OS_SET = int(REAL_SETTINGS.getSetting("os"))   
+FILTER_3D = ['3d','sbs','fsbs','ftab','hsbs','h.sbs','h-sbs','htab','sbs3d','3dbd','halfsbs','half.sbs','half-sbs','fullsbs','full.sbs','full-sbs','3dsbs','3d.sbs']
+SETTOP_REFRESH = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]  
+
 if (OS_SET <= 5 or OS_SET == 10 or OS_SET == 12) and REAL_SETTINGS.getSetting("OS_SET_OVERRIDE") != "true":
     LOWPOWER = True
 else:
     LOWPOWER = False
 
-# Common Cache types, Stacked and sorted for read performance... Todo convert to local db, mysql?
+# Common Cache types, Stacked and sorted for read performance... Todo convert to local db, mysql? 22Hr daily clock
 #General
 quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge, AutoUpdate
-daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge, AutoUpdate
-weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge, AutoUpdate
-monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge, AutoUpdate
-seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",(24 * 7))              #System Purge, AutoUpdate
+bidaily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bidaily",12)                     #System Purge, AutoUpdate
+daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22)                         #System Purge, AutoUpdate
+weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",22 * 7)                   #System Purge, AutoUpdate
+seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "seasonal",((22 * 7) * 3))       #System Purge, AutoUpdate
+monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((22 * 7) * 4))         #System Purge, AutoUpdate
 #FileLists
-localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",24)                     #System Purge, AutoUpdate
-liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge, AutoUpdate
-YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",24)                 #System Purge, AutoUpdate
-RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",24)                         #System Purge, AutoUpdate
-pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",24)                   #System Purge, AutoUpdate
-playonTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",2)                    #System Purge, AutoUpdate
-lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",24)                       #System Purge, AutoUpdate
+localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",(SETTOP_REFRESH - 2))   #System Purge, AutoUpdate
+liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",22)                       #System Purge, AutoUpdate
+YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",22)                 #System Purge, AutoUpdate
+RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",22)                         #System Purge, AutoUpdate
+pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",22)                   #System Purge, AutoUpdate
+upnpTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",2)                      #System Purge, AutoUpdate
+lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",22)                       #System Purge, AutoUpdate
 #BCTs
 bumpers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bumpers",((24 * 7) * 4))         #BCT Purge
 ratings = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "ratings",((24 * 7) * 4))         #BCT Purge
@@ -370,8 +368,8 @@ ACTION_TELETEXT_BLUE = 218
 UTC_XMLTV = ['ustvnow', 'ftvguide', 'smoothstreams']
 
 #Dynamic Artwork plugins - #Title format must be "Title (Year)" or "Title" or "Title - Episode"
-DYNAMIC_PLUGIN_TV = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.iwannawatch', 'plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'plugin.video.F.T.V', 'plugin.video.salts']
+DYNAMIC_PLUGIN_TV = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'UPNP', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.iwannawatch', 'plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'UPNP', 'plugin.video.F.T.V', 'plugin.video.salts']
 
 # Plugin seek blacklist - Plugins that are known to use rtmp source which lockup xbmc during seek
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow', 'plugin.video.mystreamstv.beta']

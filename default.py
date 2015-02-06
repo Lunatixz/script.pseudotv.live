@@ -42,7 +42,7 @@ __language__   = __settings__.getLocalizedString
        
 try:
     import buggalo
-    buggalo.GMAIL_RECIPIENT = "PseudoTV@nyc.rr.com"
+    buggalo.SUBMIT_URL = 'http://pseudotvlive.com/buggalo-web/submit.php'
 except:
     pass
 
@@ -80,28 +80,18 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
         PTVL_Version = REAL_SETTINGS.getSetting("PTVL_Version")
         pass  
     
-    CurSkin = REAL_SETTINGS.getSetting("SkinSelector")
-    try:
-        LastSkin = REAL_SETTINGS.getSetting("LastSkin")
-    except:
-        REAL_SETTINGS.setSetting("LastSkin", CurSkin)
-        LastSkin = REAL_SETTINGS.getSetting("LastSkin")
-        pass
-
     if PTVL_Version != __version__:
         ClearPlaylists()
         REAL_SETTINGS.setSetting('ClearCache', 'true')
         REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
         REAL_SETTINGS.setSetting("PTVL_Version", __version__)
-        xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-VWautopatch)")
         xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-DDautopatch)")
         
         #call showChangeLog like this to workaround bug in openElec, *Thanks spoyser
         xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-showChangelog)")
         
         if dlg.yesno("PseudoTV Live", "System Reboot recommend after update, Exit XBMC?"):
-            xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),%d,true)" % ( 0.5, ) )
-            
+            xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),%d,true)" % ( 0.5, ) )         
     else:
         #Check if Outdated/Install Repo
         VersionCompare()
@@ -109,27 +99,28 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
         # #Check Messaging Service todo
         # Announcement()
 
+        # Auto VideoWindow Patch.
+        VideoWindow()
+        
         # Clear System Caches    
         if REAL_SETTINGS.getSetting("ClearCache") == "true":
             log('ClearCache')  
             quarterly.delete("%") 
+            bidaily.delete("%") 
             daily.delete("%") 
             weekly.delete("%")
-            monthly.delete("%")
             seasonal.delete("%") 
+            monthly.delete("%")
             localTV.delete("%")
             liveTV.delete("%")
             YoutubeTV.delete("%")
             RSSTV.delete("%")
             pluginTV.delete("%")
-            playonTV.delete("%")
+            upnpTV.delete("%")
             lastfm.delete("%")
             REAL_SETTINGS.setSetting('ClearCache', "false")
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "System Cache Cleared", 1000, THUMB) )
        
-        #TEMP PTVL SKIN LOCK/Disable art spooling, no longer needed?
-        REAL_SETTINGS.setSetting('SkinSelector', "3")
-        REAL_SETTINGS.setSetting("ArtService_Enabled", "false")
            
         # Clear BCT Caches
         if REAL_SETTINGS.getSetting("ClearBCT") == "true":
@@ -180,14 +171,11 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             REAL_SETTINGS.setSetting("sickbeard.enabled", "false")
             REAL_SETTINGS.setSetting("couchpotato.enabled", "false")  
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Optimized Configurations Applied", 1000, THUMB) )
+        else:
+            REAL_SETTINGS.setSetting("ArtService_Enabled", "true")
             
-        # Trigger Auto VideoWindow Patch on skin change.
-        if LastSkin != CurSkin:
-            REAL_SETTINGS.setSetting("LastSkin", CurSkin)
-            xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-VWautopatch)")
-
         #Start PseudoTV
         PseudoTV()
 else:
     log('script.pseudotv.live - Already running, exiting', xbmc.LOGERROR)
-    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Already running" , "Try Rebooting?", 1000, THUMB) )
+    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Already running, Try Rebooting?", 1000, THUMB) )

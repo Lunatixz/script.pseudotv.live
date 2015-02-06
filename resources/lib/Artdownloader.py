@@ -38,7 +38,7 @@ from utils import *
 
 try:
     import buggalo
-    buggalo.GMAIL_RECIPIENT = "pseudotvlive@gmail.com"
+    buggalo.SUBMIT_URL = 'http://pseudotvlive.com/buggalo/submit.php'
 except:
     pass
     

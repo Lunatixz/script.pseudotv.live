@@ -223,6 +223,25 @@
                 <colordiffuse></colordiffuse>
             </control>
             
+            <!-- Submit Configuration -->
+            <control type="button" id="115">
+                <left>205</left>
+                <top>400</top>
+                <width>410</width>
+				<height>40</height>
+				<align>center</align>
+				<aligny>center</aligny>
+                <label>Submit Channel to Community List</label>
+                <texturefocus border="5">ptv_button-focus.png</texturefocus>
+                <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                <textcolor>gray</textcolor>
+                <focusedcolor>white</focusedcolor>
+                <onup>107</onup>
+                <ondown>114</ondown>
+                <visible>Control.IsVisible(128) | Control.IsVisible(129) | Control.IsVisible(130) | Control.IsVisible(131) | Control.IsVisible(135) | Control.IsVisible(136)</visible>  
+                <colordiffuse></colordiffuse>
+            </control>
+            
             <!-- ADV CHANNEL RULES -->
             <control type="button" id="114">
                 <left>205</left>
@@ -236,7 +255,7 @@
                 <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
                 <textcolor>gray</textcolor>
                 <focusedcolor>white</focusedcolor>
-                <onup>107</onup>
+                <onup>115</onup>
                 <ondown>112</ondown>
                 <colordiffuse></colordiffuse>
             </control>
@@ -285,7 +304,6 @@
                 <top>110</top>
                 <width>720</width>
                 <height>455</height>
-                
                 <control type="label">
                     <left>47</left>
                     <top>105</top>
@@ -296,8 +314,8 @@
                     <textcolor>white</textcolor>
                     <aligny>center</aligny>
                     <align>left</align>
+                    <visible>IsEmpty(Control.GetLabel(330))</visible>
                 </control>
-                
                 <control type="button" id="330">
                     <left>40</left>
                     <top>105</top>
@@ -308,8 +326,43 @@
                     <textcolor>white</textcolor>                   
                     <align>left</align>
                     <onup>110</onup>
+                    <ondown>331</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>105</top>
+                    <width>720</width>
+                    <height>35</height>               
+                    <font>font13</font>
+                    <label></label>
+                    <textcolor>white</textcolor>
+                    <aligny>center</aligny>
+                    <align>left</align>
+                </control>
+                <control type="button" id="331">
+                    <left>40</left>
+                    <top>145</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textcolor>white</textcolor>                   
+                    <align>left</align>
+                    <onup>330</onup>
                     <ondown>114</ondown>
                     <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>145</top>
+                    <width>720</width>
+                    <height>35</height>               
+                    <font>font13</font>
+                    <label>Edit SmartPlaylist (Coming Soon)</label>
+                    <textcolor>white</textcolor>
+                    <aligny>center</aligny>
+                    <align>left</align>
                 </control>
             </control>
     
@@ -659,66 +712,29 @@
                 <top>110</top>
                 <width>720</width>
                 <height>455</height>                
-                <control type="image">
+                <control type="button" id="190">
                     <left>40</left>
                     <top>105</top>
                     <width>720</width>
                     <height>40</height>
-                    <texture border="5">ptv_button-nofocus.png</texture>              
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>110</onup>
+                    <ondown>194</ondown>
+                    <colordiffuse></colordiffuse>
                 </control>
-                <control type="image">
-                    <left>40</left>
-                    <top>105</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(190) | Control.HasFocus(191)</visible>               
-                </control>    
                 <control type="label">
                     <left>47</left>
                     <top>105</top>
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Show:</label>
-                    <aligny>center</aligny>
-                    <align>left</align>
-                </control>    
-                <control type="label" id="192">
-                    <left>400</left>
-                    <top>105</top>
-                    <width>270</width>
-                    <height>40</height>
-                    <textcolor>white</textcolor>
-                    <aligny>center</aligny>
-                    <align>right</align>
-                </control>    
-                <control type="button" id="190">
-                    <left>687</left>
-                    <top>114</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>110</onup>
-                    <ondown>194</ondown>
-                    <onleft>191</onleft>
-                    <onright>191</onright>
-                    <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="191">
-                    <left>720</left>
-                    <top>114</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>111</onup>
-                    <ondown>194</ondown>
-                    <onleft>190</onleft>
-                    <onright>190</onright>
-                    <colordiffuse></colordiffuse>
-                </control>   
+                    <label>TV Show:</label>
+                    <aligny>center</aligny>                   
+                </control>
                 <control type="radiobutton" id="194">
                     <left>40</left>
                     <top>150</top>
@@ -767,9 +783,64 @@
                     <label>Directory:</label>
                     <aligny>center</aligny>                   
                 </control>
-                <control type="label" id="203">
+                <!-- Media Limit -->
+                <control type="button" id="201">
+                    <left>40</left>
+                    <top>145</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>200</onup>
+                    <ondown>202</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>145</top>
+                    <width>500</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label>Media Limit:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <!-- Sort Order -->
+                <control type="button" id="202">
+                    <left>40</left>
+                    <top>185</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>201</onup>
+                    <ondown>114</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>185</top>
+                    <width>500</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label>Sort Order:</label>
+                    <aligny>center</aligny>                      
+                </control>
+            </control>
+            <!-- Controls for type LiveTV -->
+            <control type="group" id="128">
+                <left>240</left>
+                <top>110</top>
+                <width>720</width>
+                <height>455</height>
+                <control type="label" id="214">
                     <left>400</left>
-                    <top>225</top>
+                    <top>105</top>
                     <width>270</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
@@ -778,84 +849,53 @@
                 </control> 
                 <control type="label">
                     <left>47</left>
-                    <top>225</top>
+                    <top>105</top>
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Sort Order:</label>
+                    <label>Source:</label>
                     <aligny>center</aligny>                   
-                </control>      
+                </control>                     
                 <control type="image">
                     <left>40</left>
-                    <top>225</top>
+                    <top>105</top>
                     <width>720</width>
                     <height>40</height>
                     <texture border="5">ptv_button-nofocus.png</texture>        
                 </control>     
                 <control type="image">
                     <left>40</left>
-                    <top>225</top>
+                    <top>105</top>
                     <width>720</width>
                     <height>40</height>
                     <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(201) | Control.HasFocus(202)</visible>                 
+                    <visible>Control.HasFocus(215) | Control.HasFocus(210)</visible>               
                 </control>   
-                <control type="button" id="201">
+                <control type="button" id="215">
                     <left>687</left>
-                    <top>235</top>
+                    <top>115</top>
                     <width>33</width>
                     <height>22</height>
                     <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
                     <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>200</onup>
-                    <ondown>114</ondown>
-                    <onleft>201</onleft>
-                    <onright>202</onright>
+                    <onup>110</onup>
+                    <ondown>210</ondown>
+                    <onleft>215</onleft>
+                    <onright>210</onright>
                     <colordiffuse></colordiffuse>
                 </control>    
-                <control type="button" id="202">
+                <control type="button" id="210">
                     <left>720</left>
-                    <top>235</top>
+                    <top>115</top>
                     <width>33</width>
                     <height>22</height>
                     <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
                     <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>200</onup>
-                    <ondown>114</ondown>
-                    <onleft>202</onleft>
-                    <onright>201</onright>
-                    <colordiffuse></colordiffuse>
-                </control>
-            </control>
-
-            <!-- Controls for type LiveTV -->
-            <control type="group" id="128">
-                <left>240</left>
-                <top>110</top>
-                <width>720</width>
-                <height>455</height>
-                <control type="button" id="210">
-                    <left>40</left>
-                    <top>105</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <textcolor>white</textcolor>
-                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
-                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
-                    <textoffsetx>7</textoffsetx>
-                    <align>right</align>
-                    <onup>110</onup>
+                    <onup>215</onup>
                     <ondown>211</ondown>
+                    <onleft>215</onleft>
+                    <onright>210</onright>
                     <colordiffuse></colordiffuse>
-                </control>
-                <control type="label">
-                    <left>47</left>
-                    <top>105</top>
-                    <width>200</width>
-                    <height>40</height>
-                    <textcolor>white</textcolor>
-                    <label>Channel ID:</label>
-                    <aligny>center</aligny>                   
                 </control>
                 <control type="button" id="211">
                     <left>40</left>
@@ -877,9 +917,9 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Source Path:</label>
+                    <label>Click to browse:</label>
                     <aligny>center</aligny>                   
-                </control>
+                </control>               
                 <control type="button" id="212">
                     <left>40</left>
                     <top>185</top>
@@ -914,7 +954,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>212</onup>
-                    <ondown>114</ondown>
+                    <ondown>216</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -926,17 +966,9 @@
                     <label>Channel Name:</label>
                     <aligny>center</aligny>                   
                 </control>
-            </control>
-            
-            <!-- Controls for type InternetTV -->
-            <control type="group" id="129">
-                <left>240</left>
-                <top>110</top>
-                <width>720</width>
-                <height>455</height>
-                <control type="button" id="220">
+                <control type="button" id="216">
                     <left>40</left>
-                    <top>105</top>
+                    <top>265</top>
                     <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
@@ -944,18 +976,92 @@
                     <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                    <onup>110</onup>
-                    <ondown>221</ondown>
+                    <onup>213</onup>
+                    <ondown>114</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>265</top>
+                    <width>200</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label>Channel ID:</label>
+                    <aligny>center</aligny>                   
+                </control>
+                <control type="label" id="217">
+                    <left>47</left>
+                    <top>305</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <aligny>center</aligny>                   
+                </control>
+            </control>
+            <!-- Controls for type InternetTV -->
+            <control type="group" id="129">
+                <left>240</left>
+                <top>110</top>
+                <width>720</width>
+                <height>455</height>
+                <control type="label" id="224">
+                    <left>400</left>
+                    <top>105</top>
+                    <width>270</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <aligny>center</aligny>
+                    <align>right</align>
+                </control> 
                 <control type="label">
                     <left>47</left>
                     <top>105</top>
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Duration:</label>
+                    <label>Source:</label>
                     <aligny>center</aligny>                   
+                </control>                     
+                <control type="image">
+                    <left>40</left>
+                    <top>105</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <texture border="5">ptv_button-nofocus.png</texture>        
+                </control>     
+                <control type="image">
+                    <left>40</left>
+                    <top>105</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <texture border="5">ptv_button-focus2.png</texture>
+                    <visible>Control.HasFocus(225) | Control.HasFocus(220)</visible>               
+                </control>   
+                <control type="button" id="220">
+                    <left>687</left>
+                    <top>115</top>
+                    <width>33</width>
+                    <height>22</height>
+                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
+                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
+                    <onup>110</onup>
+                    <ondown>225</ondown>
+                    <onleft>220</onleft>
+                    <onright>225</onright>
+                    <colordiffuse></colordiffuse>
+                </control>    
+                <control type="button" id="225">
+                    <left>720</left>
+                    <top>115</top>
+                    <width>33</width>
+                    <height>22</height>
+                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
+                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
+                    <onup>220</onup>
+                    <ondown>221</ondown>
+                    <onleft>220</onleft>
+                    <onright>225</onright>
+                    <colordiffuse></colordiffuse>
                 </control>
                 <control type="button" id="221">
                     <left>40</left>
@@ -967,8 +1073,8 @@
                     <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                    <onup>220</onup>
-                    <ondown>222</ondown>
+                    <onup>225</onup>
+                    <ondown>226</ondown>
                     <colordiffuse></colordiffuse>
                 </control>       
                 <control type="label">
@@ -977,10 +1083,10 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Source Path:</label>
+                    <label>Click to browse:</label>
                     <aligny>center</aligny>                   
                 </control>
-                <control type="button" id="222">
+                <control type="button" id="226">
                     <left>40</left>
                     <top>185</top>
                     <width>720</width>
@@ -991,7 +1097,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>221</onup>
-                    <ondown>223</ondown>
+                    <ondown>222</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1000,12 +1106,35 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
+                    <label>Duration:</label>
+                    <aligny>center</aligny>                   
+                </control>
+                <control type="button" id="222">
+                    <left>40</left>
+                    <top>225</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>226</onup>
+                    <ondown>223</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>225</top>
+                    <width>200</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
                     <label>Title:</label>
                     <aligny>center</aligny>                   
                 </control>
                 <control type="button" id="223">
                     <left>40</left>
-                    <top>225</top>
+                    <top>265</top>
                     <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
@@ -1019,47 +1148,32 @@
                 </control>
                 <control type="label">
                     <left>47</left>
-                    <top>225</top>
+                    <top>265</top>
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Description:</label>
                     <aligny>center</aligny>                   
                 </control>
+                <control type="label" id="227">
+                    <left>47</left>
+                    <top>305</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <aligny>center</aligny>                   
+                </control>
             </control>
-            
             <!-- Controls for type Youtube -->
             <control type="group" id="130">
                 <left>240</left>
                 <top>110</top>
                 <width>720</width>
                 <height>455</height>
-                <control type="button" id="230">
-                    <left>40</left>
-                    <top>105</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <textcolor>white</textcolor>
-                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
-                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
-                    <textoffsetx>7</textoffsetx>
-                    <align>right</align>
-                    <onup>110</onup>
-                    <ondown>234</ondown>
-                    <colordiffuse></colordiffuse>
-                </control>
-                <control type="label">
-                    <left>47</left>
-                    <top>105</top>
-                    <width>500</width>
-                    <height>40</height>
-                    <textcolor>white</textcolor>
-                    <label>Channel/Playlist:</label>
-                    <aligny>center</aligny>                   
-                </control>
-                <control type="label" id="231">
+                <!-- Youtube type -->
+                <control type="label" id="232">
                     <left>400</left>
-                    <top>145</top>
+                    <top>105</top>
                     <width>270</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
@@ -1068,7 +1182,7 @@
                 </control> 
                 <control type="label">
                     <left>47</left>
-                    <top>145</top>
+                    <top>105</top>
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
@@ -1077,171 +1191,160 @@
                 </control>                     
                 <control type="image">
                     <left>40</left>
-                    <top>145</top>
+                    <top>105</top>
                     <width>720</width>
                     <height>40</height>
                     <texture border="5">ptv_button-nofocus.png</texture>        
                 </control>     
                 <control type="image">
                     <left>40</left>
-                    <top>145</top>
+                    <top>105</top>
                     <width>720</width>
                     <height>40</height>
                     <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(234) | Control.HasFocus(235)</visible>               
+                    <visible>Control.HasFocus(231) | Control.HasFocus(230)</visible>               
                 </control>   
-                <control type="button" id="234">
+                <control type="button" id="231">
                     <left>687</left>
-                    <top>155</top>
+                    <top>115</top>
                     <width>33</width>
                     <height>22</height>
                     <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
                     <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>230</onup>
-                    <ondown>235</ondown>
-                    <onleft>234</onleft>
-                    <onright>235</onright>
+                    <onup>110</onup>
+                    <ondown>230</ondown>
+                    <onleft>231</onleft>
+                    <onright>230</onright>
                     <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="235">
+                </control>   
+                <control type="button" id="230">
                     <left>720</left>
-                    <top>155</top>
+                    <top>115</top>
                     <width>33</width>
                     <height>22</height>
                     <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
                     <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>234</onup>
-                    <ondown>238</ondown>
-                    <onleft>234</onleft>
-                    <onright>235</onright>
+                    <onup>231</onup>
+                    <ondown>233</ondown>
+                    <onleft>231</onleft>
+                    <onright>230</onright>
                     <colordiffuse></colordiffuse>
                 </control>
-                <control type="label" id="232">
-                    <left>400</left>
-                    <top>185</top>
-                    <width>270</width>
+                <!-- Community List -->
+                <control type="button" id="233">
+                    <left>40</left>
+                    <top>145</top>
+                    <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <aligny>center</aligny>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                </control> 
+                    <onup>230</onup>
+                    <ondown>234</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>145</top>
+                    <width>500</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <visible>Control.IsVisible(233)</visible>
+                    <label>Browse Community List:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <!-- Channel ID -->
+                <control type="button" id="234">
+                    <left>40</left>
+                    <top>185</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>233</onup>
+                    <ondown>235</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
                 <control type="label">
                     <left>47</left>
                     <top>185</top>
-                    <width>200</width>
+                    <width>500</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label>Channel ID:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <!-- Media Limit -->
+                <control type="button" id="235">
+                    <left>40</left>
+                    <top>225</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>234</onup>
+                    <ondown>236</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>225</top>
+                    <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Media Limit:</label>
-                    <aligny>center</aligny>                   
-                </control>      
-                <control type="image">
-                    <left>40</left>
-                    <top>185</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-nofocus.png</texture>        
-                </control>     
-                <control type="image">
-                    <left>40</left>
-                    <top>185</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(238) | Control.HasFocus(239)</visible>                 
-                </control>   
-                <control type="button" id="238">
-                    <left>687</left>
-                    <top>195</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>235</onup>
-                    <ondown>239</ondown>
-                    <onleft>238</onleft>
-                    <onright>239</onright>
-                    <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="239">
-                    <left>720</left>
-                    <top>195</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>238</onup>
-                    <ondown>236</ondown>
-                    <onleft>239</onleft>
-                    <onright>238</onright>
-                    <colordiffuse></colordiffuse>
+                    <aligny>center</aligny>                      
                 </control>
-                <control type="label" id="233">
-                    <left>400</left>
-                    <top>225</top>
-                    <width>270</width>
+                <!-- Sort Order -->
+                <control type="button" id="236">
+                    <left>40</left>
+                    <top>265</top>
+                    <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <aligny>center</aligny>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                </control> 
+                    <onup>235</onup>
+                    <ondown>114</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
                 <control type="label">
                     <left>47</left>
-                    <top>225</top>
-                    <width>200</width>
+                    <top>265</top>
+                    <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Sort Order:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <control type="label" id="239">
+                    <left>47</left>
+                    <top>305</top>
+                    <width>700</width>
+                    <height>80</height>
+                    <textcolor>white</textcolor>
+                    <label></label>
+                    <wrapmultiline>true</wrapmultiline>
                     <aligny>center</aligny>                   
-                </control>      
-                <control type="image">
-                    <left>40</left>
-                    <top>225</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-nofocus.png</texture>        
-                </control>     
-                <control type="image">
-                    <left>40</left>
-                    <top>225</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(236) | Control.HasFocus(237)</visible>                 
-                </control>   
-                <control type="button" id="236">
-                    <left>687</left>
-                    <top>235</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>239</onup>
-                    <ondown>237</ondown>
-                    <onleft>236</onleft>
-                    <onright>237</onright>
-                    <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="237">
-                    <left>720</left>
-                    <top>235</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>236</onup>
-                    <ondown>114</ondown>
-                    <onleft>237</onleft>
-                    <onright>236</onright>
-                    <colordiffuse></colordiffuse>
                 </control>
             </control>
-            
             <!-- Controls for type RSS -->
             <control type="group" id="131">
                 <left>240</left>
                 <top>110</top>
                 <width>720</width>
                 <height>455</height>
+                <!-- Community List -->
                 <control type="button" id="240">
                     <left>40</left>
                     <top>105</top>
@@ -1253,136 +1356,99 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>110</onup>
-                    <ondown>248</ondown>
+                    <ondown>241</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
                     <left>47</left>
                     <top>105</top>
+                    <width>500</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label>Browse Community List:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <control type="button" id="241">
+                    <left>40</left>
+                    <top>145</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>240</onup>
+                    <ondown>242</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>145</top>
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Feed URL:</label>
                     <aligny>center</aligny>                   
                 </control>
-                <control type="label" id="242">
-                    <left>400</left>
+                <!-- Media Limit -->
+                <control type="button" id="242">
+                    <left>40</left>
                     <top>185</top>
-                    <width>270</width>
+                    <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <aligny>center</aligny>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                </control> 
+                    <onup>241</onup>
+                    <ondown>243</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
                 <control type="label">
                     <left>47</left>
                     <top>185</top>
-                    <width>200</width>
+                    <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Media Limit:</label>
-                    <aligny>center</aligny>                   
-                </control>      
-                <control type="image">
-                    <left>40</left>
-                    <top>185</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-nofocus.png</texture>        
-                </control>     
-                <control type="image">
-                    <left>40</left>
-                    <top>185</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(248) | Control.HasFocus(249)</visible>                 
-                </control>   
-                <control type="button" id="248">
-                    <left>687</left>
-                    <top>195</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>240</onup>
-                    <ondown>249</ondown>
-                    <onleft>248</onleft>
-                    <onright>249</onright>
-                    <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="249">
-                    <left>720</left>
-                    <top>195</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>248</onup>
-                    <ondown>246</ondown>
-                    <onleft>249</onleft>
-                    <onright>248</onright>
-                    <colordiffuse></colordiffuse>
+                    <aligny>center</aligny>                      
                 </control>
-                <control type="label" id="243">
-                    <left>400</left>
+                <!-- Sort Order -->
+                <control type="button" id="243">
+                    <left>40</left>
                     <top>225</top>
-                    <width>270</width>
+                    <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <aligny>center</aligny>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                </control> 
+                    <onup>242</onup>
+                    <ondown>114</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
                 <control type="label">
                     <left>47</left>
                     <top>225</top>
-                    <width>200</width>
+                    <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Sort Order:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <control type="label" id="239">
+                    <left>47</left>
+                    <top>305</top>
+                    <width>700</width>
+                    <height>80</height>
+                    <textcolor>white</textcolor>
+                    <label></label>
+                    <wrapmultiline>true</wrapmultiline>
                     <aligny>center</aligny>                   
-                </control>      
-                <control type="image">
-                    <left>40</left>
-                    <top>225</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-nofocus.png</texture>        
-                </control>     
-                <control type="image">
-                    <left>40</left>
-                    <top>225</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(246) | Control.HasFocus(247)</visible>                 
-                </control>   
-                <control type="button" id="246">
-                    <left>687</left>
-                    <top>235</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>249</onup>
-                    <ondown>247</ondown>
-                    <onleft>249</onleft>
-                    <onright>247</onright>
-                    <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="247">
-                    <left>720</left>
-                    <top>235</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>246</onup>
-                    <ondown>114</ondown>
-                    <onleft>247</onleft>
-                    <onright>246</onright>
-                    <colordiffuse></colordiffuse>
-                </control> 
+                </control>
             </control>
             
             <!-- Controls for type Music -->
@@ -1715,7 +1781,7 @@
                     <label>Plugin:</label>
                     <aligny>center</aligny>                   
                 </control>
-                <!-- Plugin Directory -->
+                <!-- Plugin Split Directory -->
                 <control type="button" id="281">
                     <left>40</left>
                     <top>145</top>
@@ -1736,7 +1802,7 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Directory:</label>
+                    <label>Click to Browse:</label>
                     <aligny>center</aligny>                   
                 </control>
                 <!-- Hidden: Plugin Setting1 -->
@@ -1764,7 +1830,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>281</onup>
-                    <ondown>285</ondown>
+                    <ondown>284</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1774,135 +1840,85 @@
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Exclude:</label>
-                    <label2>Seperate with [B],[/B]</label2>
                     <aligny>center</aligny>                   
                 </control>
-                <control type="label" id="284">
-                    <left>400</left>
+                <!-- Media Limit -->
+                <control type="button" id="284">
+                    <left>40</left>
                     <top>225</top>
-                    <width>270</width>
+                    <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <aligny>center</aligny>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                </control> 
+                    <onup>283</onup>
+                    <ondown>285</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
                 <control type="label">
                     <left>47</left>
                     <top>225</top>
-                    <width>200</width>
+                    <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Media Limit:</label>
-                    <aligny>center</aligny>                   
-                </control>      
-                <control type="image">
-                    <left>40</left>
-                    <top>225</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-nofocus.png</texture>        
-                </control>     
-                <control type="image">
-                    <left>40</left>
-                    <top>225</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(285) | Control.HasFocus(286)</visible>                 
-                </control>   
-                <control type="button" id="285">
-                    <left>687</left>
-                    <top>235</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>283</onup>
-                    <ondown>286</ondown>
-                    <onleft>285</onleft>
-                    <onright>286</onright>
-                    <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="286">
-                    <left>720</left>
-                    <top>235</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>285</onup>
-                    <ondown>288</ondown>
-                    <onleft>286</onleft>
-                    <onright>287</onright>
-                    <colordiffuse></colordiffuse>
+                    <aligny>center</aligny>                      
                 </control>
-                <control type="label" id="287">
-                    <left>400</left>
+                <!-- Sort Order -->
+                <control type="button" id="285">
+                    <left>40</left>
                     <top>265</top>
-                    <width>270</width>
+                    <width>720</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <aligny>center</aligny>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                </control> 
+                    <onup>284</onup>
+                    <ondown>114</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
                 <control type="label">
                     <left>47</left>
                     <top>265</top>
-                    <width>200</width>
+                    <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
                     <label>Sort Order:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <control type="label" id="282">
+                    <left>47</left>
+                    <top>305</top>
+                    <width>700</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label></label>
+                    <wrapmultiline>true</wrapmultiline>
                     <aligny>center</aligny>                   
-                </control>      
-                <control type="image">
-                    <left>40</left>
-                    <top>265</top>
-                    <width>720</width>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>345</top>
+                    <width>700</width>
                     <height>40</height>
-                    <texture border="5">ptv_button-nofocus.png</texture>        
-                </control>     
-                <control type="image">
-                    <left>40</left>
-                    <top>265</top>
-                    <width>720</width>
-                    <height>40</height>
-                    <texture border="5">ptv_button-focus2.png</texture>
-                    <visible>Control.HasFocus(288) | Control.HasFocus(289)</visible>                 
-                </control>   
-                <control type="button" id="288">
-                    <left>687</left>
-                    <top>275</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-down-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-down-2.png</texturenofocus>
-                    <onup>286</onup>
-                    <ondown>289</ondown>
-                    <onleft>288</onleft>
-                    <onright>289</onright>
-                    <colordiffuse></colordiffuse>
-                </control>    
-                <control type="button" id="289">
-                    <left>720</left>
-                    <top>275</top>
-                    <width>33</width>
-                    <height>22</height>
-                    <texturefocus>ptv_scroll-up-focus-2.png</texturefocus>
-                    <texturenofocus>ptv_scroll-up-2.png</texturenofocus>
-                    <onup>288</onup>
-                    <ondown>114</ondown>
-                    <onleft>289</onleft>
-                    <onright>288</onright>
-                    <colordiffuse></colordiffuse>
-                </control> 
+                    <textcolor>white</textcolor>
+                    <wrapmultiline>true</wrapmultiline>
+                    <label>Separate Exclusions with [COLOR=blue][B],[/B][/COLOR] eg. Season 01[COLOR=blue][B],[/B][/COLOR]Season 02</label>
+                    <aligny>center</aligny>                   
+                </control>
             </control>
             
-            <!-- Controls for type UPNP -->
+            <!-- Controls for type Playon/UPNP -->
             <control type="group" id="136">
                 <left>240</left>
                 <top>110</top>
                 <width>720</width>
                 <height>455</height>
+                <!-- Plugin Name -->
                 <control type="button" id="290">
                     <left>40</left>
                     <top>105</top>
@@ -1923,9 +1939,10 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Duration:</label>
+                    <label>Plugin:</label>
                     <aligny>center</aligny>                   
                 </control>
+                <!-- Plugin Split Directory -->
                 <control type="button" id="291">
                     <left>40</left>
                     <top>145</top>
@@ -1937,7 +1954,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>290</onup>
-                    <ondown>292</ondown>
+                    <ondown>293</ondown>
                     <colordiffuse></colordiffuse>
                 </control>       
                 <control type="label">
@@ -1946,10 +1963,24 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Source Path:</label>
+                    <label>Click to Browse:</label>
                     <aligny>center</aligny>                   
                 </control>
+                <!-- Hidden: Plugin Setting1 -->
                 <control type="button" id="292">
+                    <left>40</left>
+                    <top>145</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <visible>false</visible>
+                    <colordiffuse></colordiffuse>
+                </control>       
+                <control type="button" id="293">
                     <left>40</left>
                     <top>185</top>
                     <width>720</width>
@@ -1960,7 +1991,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>291</onup>
-                    <ondown>293</ondown>
+                    <ondown>294</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1969,10 +2000,11 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Title:</label>
+                    <label>Exclude:</label>
                     <aligny>center</aligny>                   
                 </control>
-                <control type="button" id="293">
+                <!-- Media Limit -->
+                <control type="button" id="294">
                     <left>40</left>
                     <top>225</top>
                     <width>720</width>
@@ -1982,17 +2014,61 @@
                     <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
-                    <onup>292</onup>
-                    <ondown>114</ondown>
+                    <onup>293</onup>
+                    <ondown>295</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
                     <left>47</left>
                     <top>225</top>
-                    <width>200</width>
+                    <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Description:</label>
+                    <label>Media Limit:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <!-- Sort Order -->
+                <control type="button" id="295">
+                    <left>40</left>
+                    <top>265</top>
+                    <width>720</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <texturefocus border="5">ptv_button-focus2.png</texturefocus>
+                    <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                    <textoffsetx>7</textoffsetx>
+                    <align>right</align>
+                    <onup>294</onup>
+                    <ondown>114</ondown>
+                    <colordiffuse></colordiffuse>
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>265</top>
+                    <width>500</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label>Sort Order:</label>
+                    <aligny>center</aligny>                      
+                </control>
+                <control type="label" id="292">
+                    <left>47</left>
+                    <top>305</top>
+                    <width>700</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <label></label>
+                    <wrapmultiline>true</wrapmultiline>
+                    <aligny>center</aligny>                   
+                </control>
+                <control type="label">
+                    <left>47</left>
+                    <top>345</top>
+                    <width>700</width>
+                    <height>40</height>
+                    <textcolor>white</textcolor>
+                    <wrapmultiline>true</wrapmultiline>
+                    <label>Separate Exclusions with [COLOR=blue][B],[/B][/COLOR] eg. Season 01[COLOR=blue][B],[/B][/COLOR]Season 02</label>
                     <aligny>center</aligny>                   
                 </control>
             </control>

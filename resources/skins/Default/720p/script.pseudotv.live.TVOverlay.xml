@@ -147,6 +147,11 @@
                     <align>center</align>
                     <aspectratio>keep</aspectratio>
                 </control>
+                <control type="button" id="509">
+                    <description>Dynamic art</description>
+                    <label>landscape</label>
+                    <visible>false</visible>
+                </control>
                 <control type="image" id="512">
                     <description>Unaired NEW Icon</description>    
                     <posx>1037</posx>
@@ -396,11 +401,11 @@
             </control>
             <control type="image" id="131">
                 <description>Logo</description>
-                <posx>175</posx>
-                <posy>25</posy>
-                <width>300</width>
-                <height>125</height>
-                <texture></texture>
+                <posx>225</posx>
+                <posy>40</posy>
+                <width>170</width>
+                <height>75</height>
+                <align>center</align>
                 <aspectratio>keep</aspectratio>
                 <visible>Control.IsVisible(130)</visible>
             </control>

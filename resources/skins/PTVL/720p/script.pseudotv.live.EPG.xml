@@ -260,7 +260,7 @@
                 <font>font12</font>  
             </control>   
             <!-- #### Skinners Include Everything for videowindow patch to work #### -->
-            <!-- PATCH START --> <!-- 
+            <!-- PATCH START --> 
             <control type="videowindow">
                 <description>video</description>
                 <posx>-15</posx>
@@ -269,7 +269,7 @@
                 <height>125</height>
                 <aspectratio align="center">scale</aspectratio>
             </control>
-            --> <!-- PATCH END -->
+            <!-- PATCH END -->
             <!-- ################################################################## -->
             <control type="label">      
                 <posx>-15</posx>

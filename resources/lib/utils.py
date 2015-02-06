@@ -28,8 +28,60 @@ from Queue import Queue
 from HTMLParser import HTMLParser
 
 socket.setdefaulttimeout(30)
-# def __init__(self):
+
+# Commoncache plugin import
+try:
+    import StorageServer
+except Exception,e:
+    import storageserverdummy as StorageServer
+      
+FreshInstall = False
+Error = False
+Path = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', '720p')) #Path to Default PTVL skin, location of mod file.
+fle = 'custom_script.pseudotv.live_9506.xml' #mod file, copy to xbmc skin folder
+VWPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, fle))
+flePath = xbmc.translatePath(os.path.join(Path, fle))
+PTVL_SKIN_SELECT_FLE = xbmc.translatePath(os.path.join(PTVL_SKIN_SELECT, 'script.pseudotv.live.EPG.xml'))         
+DSPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, 'DialogSeekBar.xml'))
+
+###############################
+#videowindow
+a = '<!-- PATCH START -->'
+b = '<!-- PATCH START --> <!--'
+c = '<!-- PATCH END -->'
+d = '--> <!-- PATCH END -->'
+#seekbar
+v = ' '
+w = '<visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+y = '</defaultcontrol>'
+z = '</defaultcontrol>\n    <visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+###############################
+
+
+def sendGmail(SUBJECT, text):
+    log("sendGmail")
+    try:
+        import smtplib
+        import string
+         
+        HOST = "alt1.gmail-smtp-in.l.google.com"
+        TO = "pseudotvlive@gmail.com"
+        FROM = "python@mydomain.com"
+        BODY = string.join((
+                "From: %s" % FROM,
+                "To: %s" % TO,
+                "Subject: %s" % SUBJECT ,
+                "",
+                text
+                ), "\r\n")
+        server = smtplib.SMTP(HOST)
+        server.sendmail(FROM, [TO], BODY)
+        server.quit()
+        return True
+    except:
+        return False
     
+
 def sorted_nicely(lst): 
     log('sorted_nicely')
     """ Sort the given iterable in the way that humans expect.""" 
@@ -39,6 +91,23 @@ def sorted_nicely(lst):
     return sorted(list, key = alphanum_key)
     
     
+def splitall(path):
+    log("splitall")
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path: # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
+        
+        
 def infoDialog(str, header=ADDON_NAME):
     try: xbmcgui.Dialog().notification(header, str, THUMB, 3000, sound=False)
     except: xbmc.executebuiltin("Notification(%s,%s, 3000, %s)" % (header, str, THUMB))
@@ -75,17 +144,8 @@ def clearProperty(str):
 def addon_status(id):
     check = xbmcaddon.Addon(id=id).getAddonInfo("name")
     if not check == ADDON_NAME: return True
-    
 
-def requestDownload(url, fle):
-    log('requestDownload')
-    # requests = requests.Session()
-    response = requests.get(url, stream=True)
-    with open(fle, 'wb') as out_file:
-        shutil.copyfileobj(response.raw, out_file)
-    del response
     
-
 def ClearPlaylists():
     log('ClearPlaylists')
     for i in range(999):
@@ -96,7 +156,7 @@ def ClearPlaylists():
     xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", 'Channel Playlists Cleared', 1000, THUMB) )
     return
     
-    
+
 # Compare git version with local version.
 def VersionCompare():
     log('VersionCompare')
@@ -157,6 +217,102 @@ def UpdateFiles():
     return
 
     
+def VideoWindow():
+    log("VideoWindow, VWPath = " + str(VWPath))
+    #Copy VideoWindow Patch file
+    try:
+        if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
+            if not xbmcvfs.exists(VWPath):
+                log("VideoWindow, VWPath not found")
+                FreshInstall = True
+                xbmcvfs.copy(flePath, VWPath)
+                if xbmcvfs.exists(VWPath):
+                    log('custom_script.pseudotv.live_9506.xml Copied')
+                    VideoWindowPatch()         
+                else:
+                    raise
+            else:
+                log("VideoWindow, VWPath found")
+                VideoWindowPatch()
+    except Exception:
+        VideoWindowUninstall()
+        VideoWindowUnpatch()
+        Error = True
+        pass
+
+        
+def VideoWindowPatch():
+    log("VideoWindowPatch")
+    #Patch Videowindow/Seekbar
+    try:
+        f = open(PTVL_SKIN_SELECT_FLE, "r")
+        linesLST = f.readlines()  
+        f.close()
+        
+        for i in range(len(linesLST)):
+            lines = linesLST[i]
+            if b in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,b,a)        
+                log('script.pseudotv.live.EPG.xml Patched b,a')
+            elif d in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,d,c)           
+                log('script.pseudotv.live.EPG.xml Patched d,c') 
+
+        f = open(DSPath, "r")
+        lineLST = f.readlines()            
+        f.close()
+        
+        for i in range(len(lineLST)):
+            line = lineLST[i]
+            if y in line:
+                replaceAll(DSPath,y,z)
+            log('dialogseekbar.xml Patched y,z')
+    except Exception:
+        VideoWindowUninstall()
+        pass
+                            
+        
+def VideoWindowUnpatch():
+    log("VideoWindowUnpatch")
+    #unpatch videowindow
+    try:
+        f = open(PTVL_SKIN_SELECT_FLE, "r")
+        linesLST = f.readlines()    
+        f.close()
+        for i in range(len(linesLST)):
+            lines = linesLST[i]
+            if a in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,a,b)
+                log('script.pseudotv.live.EPG.xml UnPatched a,b')
+            elif c in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,c,d)          
+                log('script.pseudotv.live.EPG.xml UnPatched c,d')
+                
+        #unpatch seekbar
+        f = open(DSPath, "r")
+        lineLST = f.readlines()            
+        f.close()
+        for i in range(len(lineLST)):
+            line = lineLST[i]
+            if w in line:
+                replaceAll(DSPath,w,v)
+                log('dialogseekbar.xml UnPatched w,v')
+    except Exception:
+        Error = True
+        pass
+      
+
+def VideoWindowUninstall():
+    log('VideoWindowUninstall')
+    try:
+        xbmcvfs.delete(VWPath)
+        if not xbmcvfs.exists(VWPath):
+            log('custom_script.pseudotv.live_9506.xml Removed')
+    except Exception:
+        Error = True
+        pass
+
+
 #String replace
 def replaceAll(file,searchExp,replaceExp):
     xbmc.log('script.pseudotv.live-utils: replaceAll')
@@ -208,7 +364,16 @@ def _pbhook(numblocks, blocksize, filesize, dp, start_time):
     if dp.iscanceled(): 
         dp.close() 
        
-       
+
+def requestDownload(url, fle):
+    log('requestDownload')
+    # requests = requests.Session()
+    response = requests.get(url, stream=True)
+    with open(fle, 'wb') as out_file:
+        shutil.copyfileobj(response.raw, out_file)
+    del response
+    
+    
 def Request_URL(url):
     try:
         req=urllib2.Request(url)
@@ -228,8 +393,20 @@ def Open_URL(url):
     except urllib2.URLError as e:
         pass
 
-
+        
 def Open_URL_UP(url, userpass):
+    try:
+        result = daily.cacheFunction(Open_URL_UP_NEW, url, userpass)
+    except:
+        result = Open_URL_UP_NEW(url, userpass)
+        pass
+    if not result:
+        result = []
+    return result                 
+                
+                
+def Open_URL_UP_NEW(url, userpass):
+    print 'Open_URL_UP_NEW'
     try:
         userpass = userpass.split(':')
         username = userpass[0]
@@ -241,7 +418,7 @@ def Open_URL_UP(url, userpass):
         return result.readlines()
     except:
         pass
-        
+                
         
 def Open_URL_Request(url):
     try:
@@ -290,7 +467,7 @@ def allNoProgress(_in, _out):
 
     return True
 
-
+    
 def allWithProgress(_in, _out, dp):
 
     zin = zipfile.ZipFile(_in,  'r')

@@ -71,6 +71,11 @@
                     <height>125</height>
                     <align>center</align>
                     <aspectratio>keep</aspectratio>
+                </control>
+                <control type="button" id="509">
+                    <description>Dynamic art2 type</description>
+                    <label>landscape</label>
+                    <visible>false</visible>
                 </control> 
             </control>            
             <control type="image" id="511">

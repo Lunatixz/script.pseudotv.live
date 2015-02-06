@@ -68,14 +68,10 @@
     <string id="30308">Movie File System</string>
     <string id="30310">Media Limit Per Channel</string>
     <string id="30372">Reserve Channels 501-999 for Autotune</string>
-<string id="30400">PVR</string>  
+<string id="30400">DVR</string>  
 	<string id="30397">Enable XMLTV Service</string>
-    <string id="30398">Show Notification</string>
-    <string id="30399">Run Service Every (hours)</string>
-    <string id="34499">Run During Playback?</string>
 	<string id="30404">XMLTV file location</string>
-    <string id="30219">Enable Dynamic Artwork For LiveTV</string>
-    <string id="30801">Enable PVR (Coming Soon)</string>
+    <string id="30801">Enable DVR (Coming Soon)</string>
     <string id="30802">Record Folder</string>
     <string id="30708">Enable SickBeard</string>
     <string id="30709">Enter IP:Port</string>
@@ -93,7 +89,7 @@
                 <string id="30097">Find HDHomeRun</string>
                 <string id="30098">HDHomeRun Path</string>
                 <string id="30074">Find USTVNOW</string>
-                <string id="30194">Find USIPTV</string>
+                <string id="30194"></string>
                 <string id="30174">Find SmoothStream</string>
                 <string id="30953">Find F.T.V Channel Favourites</string>
                 <string id="30076">LocalTV:</string>
@@ -144,8 +140,9 @@
                             <string id="30817">Find Seasonal Youtube Playlists</string>
                                <!-- <string id="39005">Keep Pre-existing Channels During Autotuning (Experimental)</string> -->
                    
-    <string id="30700">AutoTune filter</string>
-    <string id="30701">From the Recommended (Community/Donor) List, Include the following Genres:</string>
+    <string id="30700">AutoTune Options</string>
+    <string id="30699">Kodi PVR Guide Data from</string>
+    <string id="30701">Include Autotune Channels by genre:</string>
     <string id="30702">TV</string>
     <string id="30703">Movies</string>
     <string id="30704">Episodes</string>

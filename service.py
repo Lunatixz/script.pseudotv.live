@@ -32,6 +32,7 @@ ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 THUMB = (xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/' + 'icon.png')
 xbmc.log("Service Started")
  
+ 
 def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
     icon = ADDON_PATH + '/icon'
     HUB = xbmc.getCondVisibility('System.HasAddon(plugin.program.addoninstaller)') == 1
@@ -49,16 +50,16 @@ def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
                 xbmc.executebuiltin("ReloadSkin()")
             except:
                 pass
-    # else:
-        # xbmc.log('script.pseudotv.live-Service: HubSwap = Master')
-        # REAL_SETTINGS.setSetting("Hub","false")
-        # try:
-            # xbmcvfs.delete(icon + '.png')
-            # xbmcvfs.copy(icon + 'OEM', icon + '.png')
-            # xbmc.executebuiltin("UpdateLocalAddons")
-            # xbmc.executebuiltin("ReloadSkin()")
-        # except:
-            # pass
+    else:
+        xbmc.log('script.pseudotv.live-Service: HubSwap = Master')
+        REAL_SETTINGS.setSetting("Hub","false")
+        try:
+            xbmcvfs.delete(icon + '.png')
+            xbmcvfs.copy(icon + 'OEM', icon + '.png')
+            xbmc.executebuiltin("UpdateLocalAddons")
+            xbmc.executebuiltin("ReloadSkin()")
+        except:
+            pass
 
             
 def donorCHK():
@@ -106,9 +107,10 @@ def autostart():
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
   
   
+donorCHK()
+service()
+
 #Autostart Trigger
 if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
     autostart() 
     
-donorCHK()
-service()
