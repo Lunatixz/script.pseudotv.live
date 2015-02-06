@@ -1,7 +1,7 @@
-#   Copyright (C) 2011 Jason Anderson
+#   Copyright (C) 2015 Jason Anderson, Kevin S. Graer
 #
 #
-# This file is part of PseudoTV.
+# This file is part of PseudoTV Live.
 #
 # PseudoTV is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import random, traceback
 from ChannelList import ChannelList
 from Channel import Channel
 from Globals import *
-from Artdownloader import *
 
 class ChannelListThread(threading.Thread):
     def __init__(self):
@@ -36,7 +35,6 @@ class ChannelListThread(threading.Thread):
         self.chanlist = ChannelList()
         self.paused = False
         self.fullUpdating = True
-        self.Artdownloader = Artdownloader()
 
         
     def log(self, msg, level = xbmc.LOGDEBUG):
@@ -108,10 +106,10 @@ class ChannelListThread(threading.Thread):
 
         if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
             InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
-            self.ArtServiceThread = threading.Timer(float(InfoTimer), self.Artdownloader.ArtService)
-            self.ArtServiceThread.name = "ArtServiceThread"
-            self.ArtServiceThread.start()
-             
+            self.myOverlay.ArtServiceThread = threading.Timer(float(InfoTimer), self.myOverlay.ArtService)
+            self.myOverlay.ArtServiceThread.name = "ArtServiceThread"
+            self.myOverlay.ArtServiceThread.start()
+        
         while True:
             for i in range(self.myOverlay.maxChannels):
                 modified = True

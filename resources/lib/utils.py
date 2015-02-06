@@ -1,4 +1,4 @@
-#   Copyright (C) 2014 Kevin S. Graer
+#   Copyright (C) 2015 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV Live.
@@ -17,70 +17,181 @@
 # along with PseudoTV.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os, re, sys, time, zipfile, threading
-import urllib, urllib2, base64, fileinput
+import os, re, sys, time, zipfile, threading, requests
+import urllib, urllib2, base64, fileinput, shutil, socket
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
-import urlparse, time
+import urlparse, time, string
 
 from Globals import *  
 from FileAccess import FileAccess
 from Queue import Queue
 from HTMLParser import HTMLParser
 
+socket.setdefaulttimeout(30)
+
+# Commoncache plugin import
+try:
+    import StorageServer
+except Exception,e:
+    import storageserverdummy as StorageServer
+      
+FreshInstall = False
+Error = False
+Path = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', '720p')) #Path to Default PTVL skin, location of mod file.
+fle = 'custom_script.pseudotv.live_9506.xml' #mod file, copy to xbmc skin folder
+VWPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, fle))
+flePath = xbmc.translatePath(os.path.join(Path, fle))
+PTVL_SKIN_SELECT_FLE = xbmc.translatePath(os.path.join(PTVL_SKIN_SELECT, 'script.pseudotv.live.EPG.xml'))         
+DSPath = xbmc.translatePath(os.path.join(XBMC_SKIN_LOC, 'DialogSeekBar.xml'))
+
+###############################
+#videowindow
+a = '<!-- PATCH START -->'
+b = '<!-- PATCH START --> <!--'
+c = '<!-- PATCH END -->'
+d = '--> <!-- PATCH END -->'
+#seekbar
+v = ' '
+w = '<visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+y = '</defaultcontrol>'
+z = '</defaultcontrol>\n    <visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(script.pseudotv.TVOverlay.xml) + !Window.IsActive(script.pseudotv.live.TVOverlay.xml)</visible>'
+###############################
+
+
+def sendGmail(SUBJECT, text):
+    log("sendGmail")
+    try:
+        import smtplib
+        import string
+         
+        HOST = "alt1.gmail-smtp-in.l.google.com"
+        TO = "pseudotvlive@gmail.com"
+        FROM = "python@mydomain.com"
+        BODY = string.join((
+                "From: %s" % FROM,
+                "To: %s" % TO,
+                "Subject: %s" % SUBJECT ,
+                "",
+                text
+                ), "\r\n")
+        server = smtplib.SMTP(HOST)
+        server.sendmail(FROM, [TO], BODY)
+        server.quit()
+        return True
+    except:
+        return False
+    
+
+def sorted_nicely(lst): 
+    log('sorted_nicely')
+    """ Sort the given iterable in the way that humans expect.""" 
+    list = set(lst)
+    convert = lambda text: int(text) if text.isdigit() else text 
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+    return sorted(list, key = alphanum_key)
+    
+    
+def splitall(path):
+    log("splitall")
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path: # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
+        
+        
+def infoDialog(str, header=ADDON_NAME):
+    try: xbmcgui.Dialog().notification(header, str, THUMB, 3000, sound=False)
+    except: xbmc.executebuiltin("Notification(%s,%s, 3000, %s)" % (header, str, THUMB))
+
+    
+def okDialog(str1, str2, header=ADDON_NAME):
+    xbmcgui.Dialog().ok(header, str1, str2)
+
+    
+def selectDialog(list, header=ADDON_NAME):
+    log('selectDialog')
+    select = xbmcgui.Dialog().select(header, list)
+    return select
+
+    
+def yesnoDialog(str1, str2, header=ADDON_NAME, str3='', str4=''):
+    answer = xbmcgui.Dialog().yesno(header, str1, str2, '', str4, str3)
+    return answer
+
+    
+def getProperty(str):
+    property = xbmcgui.Window(10000).getProperty(str)
+    return property
+
+    
+def setProperty(str1, str2):
+    xbmcgui.Window(10000).setProperty(str1, str2)
+
+    
+def clearProperty(str):
+    xbmcgui.Window(10000).clearProperty(str)
+
+    
+def addon_status(id):
+    check = xbmcaddon.Addon(id=id).getAddonInfo("name")
+    if not check == ADDON_NAME: return True
+
+    
+def ClearPlaylists():
+    log('ClearPlaylists')
+    for i in range(999):
+        try:
+            xbmcvfs.delete(CHANNELS_LOC + 'channel_' + str(i) + '.m3u')
+        except:
+            pass
+    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", 'Channel Playlists Cleared', 1000, THUMB) )
+    return
+    
 
 # Compare git version with local version.
 def VersionCompare():
     log('VersionCompare')
+    curver = xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
+    source = open(curver, mode = 'r')
+    link = source.read()
+    source.close()
+    match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+    
+    for vernum in match:
+        log("Current Version = " + str(vernum))
     try:
-        log("CheckVersion mode = " + str(REAL_SETTINGS.getSetting("Auto_Version")))
-        curver = xbmc.translatePath(os.path.join(ADDON_PATH,'addon.xml'))    
-        source = open(curver, mode = 'r')
-        link = source.read()
-        source.close()
-        match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
-        
-        for vernum in match:
-            log("Original Version = " + str(vernum))
-            
-        #Master - Stable
-        if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-            link = Request_URL('https://raw.githubusercontent.com/Lunatixz/XBMC_Addons/master/script.pseudotv.live/addon.xml')
-        #Development - Latest
-        elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
-            link = Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/addon.xml')
-                
-        link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
-        match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
-        
-        if len(match) > 0:
-            if vernum != str(match[0]):
-                dialog = xbmcgui.Dialog()
-
-                if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-                    confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to install the PseudoTV Live repository to stay updated?',"Cancel","Update")
-                elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
-                    confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to update now?',"Cancel","Update")
-
-                if confirm:
-                    UpdateFiles()       
-    except Exception: 
-        pass
+        link = Request_URL('https://raw.githubusercontent.com/Lunatixz/XBMC_Addons/master/script.pseudotv.live/addon.xml')               
+    except:
+        link='nill'
+    
+    link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
+    match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
+ 
+    if len(match) > 0:
+        print vernum, str(match)[0]
+        if vernum != str(match[0]):
+            dialog = xbmcgui.Dialog()
+            confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to install the PseudoTV Live repository to stay updated?',"Cancel","Install")
+            if confirm:
+                UpdateFiles()       
     return
     
     
 #autoupdate modified from Blazetamer code.
 def UpdateFiles():
     log('UpdateFiles')
-    
-    if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-        url='https://github.com/Lunatixz/XBMC_Addons/raw/master/zips/repository.lunatixz/repository.lunatixz-1.0.zip'
-        name = 'repository.lunatixz.zip' 
-        MSG = 'Repository Install Complete'    
-    elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
-        url='https://github.com/Lunatixz/script.pseudotv.live/archive/development.zip'
-        name = 'script.pseudotv.live.zip' 
-        MSG = 'Development Build Updated'
-        
+    url='https://github.com/Lunatixz/XBMC_Addons/raw/master/zips/repository.lunatixz/repository.lunatixz-1.0.zip'
+    name = 'repository.lunatixz.zip' 
+    MSG = 'Lunatixz Repository Installed'    
     path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
     addonpath = xbmc.translatePath(os.path.join('special://','home/addons'))
     lib = os.path.join(path,name)
@@ -92,34 +203,116 @@ def UpdateFiles():
         log('deleted old package')
     except: 
         pass
-    
-    # Delete old install folders  
-    try: 
-        xbmcvfs.delete(xbmc.translatePath(os.path.join('special://home/addons','script.pseudotv.live')))
-    except: 
-        pass
-    try: 
-        xbmcvfs.delete(xbmc.translatePath(os.path.join('special://home/addons','script.pseudotv.live-master')))
-    except: 
-        pass
-    try: 
-        xbmcvfs.delete(xbmc.translatePath(os.path.join('special://home/addons','script.pseudotv.live-development')))
-    except: 
-        pass
-     
+        
     try:
         download(url, lib, '')
         log('downloaded new package')
         all(lib,addonpath,'')
         log('extracted new package')
     except: 
-        MSG = 'Update Failed, Try Again Later'
+        MSG = 'Failed to install Lunatixz Repository, Try Again Later'
         pass
-        
-    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 4000, THUMB) )
+    xbmc.executebuiltin("XBMC.UpdateLocalAddons()"); 
+    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", MSG, 1000, THUMB) )
     return
 
     
+def VideoWindow():
+    log("VideoWindow, VWPath = " + str(VWPath))
+    #Copy VideoWindow Patch file
+    try:
+        if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
+            if not xbmcvfs.exists(VWPath):
+                log("VideoWindow, VWPath not found")
+                FreshInstall = True
+                xbmcvfs.copy(flePath, VWPath)
+                if xbmcvfs.exists(VWPath):
+                    log('custom_script.pseudotv.live_9506.xml Copied')
+                    VideoWindowPatch()         
+                else:
+                    raise
+            else:
+                log("VideoWindow, VWPath found")
+                VideoWindowPatch()
+    except Exception:
+        VideoWindowUninstall()
+        VideoWindowUnpatch()
+        Error = True
+        pass
+
+        
+def VideoWindowPatch():
+    log("VideoWindowPatch")
+    #Patch Videowindow/Seekbar
+    try:
+        f = open(PTVL_SKIN_SELECT_FLE, "r")
+        linesLST = f.readlines()  
+        f.close()
+        
+        for i in range(len(linesLST)):
+            lines = linesLST[i]
+            if b in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,b,a)        
+                log('script.pseudotv.live.EPG.xml Patched b,a')
+            elif d in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,d,c)           
+                log('script.pseudotv.live.EPG.xml Patched d,c') 
+
+        f = open(DSPath, "r")
+        lineLST = f.readlines()            
+        f.close()
+        
+        for i in range(len(lineLST)):
+            line = lineLST[i]
+            if y in line:
+                replaceAll(DSPath,y,z)
+            log('dialogseekbar.xml Patched y,z')
+    except Exception:
+        VideoWindowUninstall()
+        pass
+                            
+        
+def VideoWindowUnpatch():
+    log("VideoWindowUnpatch")
+    #unpatch videowindow
+    try:
+        f = open(PTVL_SKIN_SELECT_FLE, "r")
+        linesLST = f.readlines()    
+        f.close()
+        for i in range(len(linesLST)):
+            lines = linesLST[i]
+            if a in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,a,b)
+                log('script.pseudotv.live.EPG.xml UnPatched a,b')
+            elif c in lines:
+                replaceAll(PTVL_SKIN_SELECT_FLE,c,d)          
+                log('script.pseudotv.live.EPG.xml UnPatched c,d')
+                
+        #unpatch seekbar
+        f = open(DSPath, "r")
+        lineLST = f.readlines()            
+        f.close()
+        for i in range(len(lineLST)):
+            line = lineLST[i]
+            if w in line:
+                replaceAll(DSPath,w,v)
+                log('dialogseekbar.xml UnPatched w,v')
+    except Exception:
+        Error = True
+        pass
+      
+
+def VideoWindowUninstall():
+    log('VideoWindowUninstall')
+    try:
+        xbmcvfs.delete(VWPath)
+        if not xbmcvfs.exists(VWPath):
+            log('custom_script.pseudotv.live_9506.xml Removed')
+    except Exception:
+        Error = True
+        pass
+
+
 #String replace
 def replaceAll(file,searchExp,replaceExp):
     xbmc.log('script.pseudotv.live-utils: replaceAll')
@@ -171,7 +364,16 @@ def _pbhook(numblocks, blocksize, filesize, dp, start_time):
     if dp.iscanceled(): 
         dp.close() 
        
-       
+
+def requestDownload(url, fle):
+    log('requestDownload')
+    # requests = requests.Session()
+    response = requests.get(url, stream=True)
+    with open(fle, 'wb') as out_file:
+        shutil.copyfileobj(response.raw, out_file)
+    del response
+    
+    
 def Request_URL(url):
     try:
         req=urllib2.Request(url)
@@ -191,8 +393,20 @@ def Open_URL(url):
     except urllib2.URLError as e:
         pass
 
-
+        
 def Open_URL_UP(url, userpass):
+    try:
+        result = daily.cacheFunction(Open_URL_UP_NEW, url, userpass)
+    except:
+        result = Open_URL_UP_NEW(url, userpass)
+        pass
+    if not result:
+        result = []
+    return result                 
+                
+                
+def Open_URL_UP_NEW(url, userpass):
+    print 'Open_URL_UP_NEW'
     try:
         userpass = userpass.split(':')
         username = userpass[0]
@@ -204,7 +418,7 @@ def Open_URL_UP(url, userpass):
         return result.readlines()
     except:
         pass
-        
+                
         
 def Open_URL_Request(url):
     try:
@@ -253,7 +467,7 @@ def allNoProgress(_in, _out):
 
     return True
 
-
+    
 def allWithProgress(_in, _out, dp):
 
     zin = zipfile.ZipFile(_in,  'r')
@@ -274,57 +488,19 @@ def allWithProgress(_in, _out, dp):
     return True
  
  
-#TEXTBOX   
-class TextBox:
-    # constants
-    WINDOW = 10147
-    CONTROL_LABEL = 1
-    CONTROL_TEXTBOX = 5
-
-    def __init__(self, *args, **kwargs):
-        # activate the text viewer window
-        xbmc.executebuiltin("ActivateWindow(%d)" % ( self.WINDOW, ))
-        # get window
-        self.win = xbmcgui.Window(self.WINDOW)
-        # give window time to initialize
-        xbmc.sleep(4000)
-        self.setControls()
-
-    def setControls(self):
-        # set heading
-        heading = "Changelog - PseudoTV Live"
-        self.win.getControl(self.CONTROL_LABEL).setLabel(heading)
-        
-        # set text
-        faq_path =(os.path.join(ADDON_PATH, 'changelog.txt'))
-        f = open(faq_path)
-        text = f.read()
-        self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
-        
-        # if REAL_SETTINGS.getSetting("Auto_Version") == "1":
-            # link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/master/changelog.txt')
-        # elif REAL_SETTINGS.getSetting("Auto_Version") == "2":
-            # link=Request_URL('https://raw.githubusercontent.com/Lunatixz/script.pseudotv.live/development/changelog.txt')
-        
-        # try:
-            # f = urllib2.urlopen(link)
-            # text = f.read()
-            # self.win.getControl(self.CONTROL_TEXTBOX).setText(text)
-        # except:
-            # pass
-            
-        
 #logo parser
 class lsHTMLParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self.icon_rel_url_list=[]
 
+        
     def handle_starttag(self, tag, attrs):
         if tag == "img":
             for pair in attrs:
                 if pair[0]=="src" and pair[1].find("/logo/")!=-1:
                     self.icon_rel_url_list.append(pair[1])
+                    
                     
     def retrieve_icons_avail(self, region='us'):
         if Cache_Enabled:
@@ -359,4 +535,23 @@ class lsHTMLParser(HTMLParser):
                 icon_name=os.path.splitext(os.path.basename(icon_abs_url))[0].upper()
                 results[icon_name]=icon_abs_url
         return results   
-       
+
+
+class FileCache:
+	'''Caches the contents of a set of files.
+	Avoids reading files repeatedly from disk by holding onto the
+	contents of each file as a list of strings.
+	'''
+
+	def __init__(self):
+		self.filecache = {}
+		
+	def grabFile(self, filename):
+		'''Return the contents of a file as a list of strings.
+		New line characters are removed.
+		'''
+		if not self.filecache.has_key(filename):
+			f = open(filename, "r")
+			self.filecache[filename] = string.split(f.read(), '\n')
+			f.close()
+		return self.filecache[filename]

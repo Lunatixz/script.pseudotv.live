@@ -1,7 +1,7 @@
-#   Copyright (C) 2011 Jason Anderson
+#   Copyright (C) 2015 Jason Anderson, Kevin S. Graer
 #
 #
-# This file is part of PseudoTV.
+# This file is part of PseudoTV Live.
 #
 # PseudoTV is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ class AdvancedConfig(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.log("__init__")
         xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
-
         self.ruleList = []
         self.allRules = RulesList()
 

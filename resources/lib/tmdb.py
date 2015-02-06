@@ -35,7 +35,6 @@ else:
 
 # import libraries
 from urllib2 import HTTPError, URLError
-from language import *
 
 # import libraries
 from operator import itemgetter
@@ -61,7 +60,22 @@ class TMDB(object):
 
     # def __repr__(self):
         # return 'TMDB(apikey=%s, baseurl=%s, imagebaseurl=%s)' % (self.apikey,self.baseurl,self.imagebaseurl)
-
+        
+    def get_language(abbrev):
+        try:
+            lang_string = xbmc.convertLanguage(abbrev, xbmc.ENGLISH_NAME)
+        except:
+            lang_string = 'n/a'
+        return lang_string
+        
+        
+    def get_abbrev(lang_string):
+        try:
+            language_abbrev = xbmc.convertLanguage(lang_string, xbmc.ISO_639_1)
+        except:
+            language_abbrev = 'en' ### Default to English if conversion fails
+        return language_abbrev
+    
     def _buildUrl(self, cmd, parms={}):
         # try:
         parmsCopy = parms.copy()
@@ -175,8 +189,11 @@ class TMDB(object):
                                        'language': item.get('iso_639_1','n/a'),
                                        'rating': rating,
                                        'votes': votes,
-                                       'generalinfo': ('%s: %s' 
-                                                       %( 'Language', get_language(item.get('iso_639_1','n/a')).capitalize()))})
+                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  ' 
+                                                        %( "Language", get_language(item.get('iso_639_1','n/a')).capitalize(),
+                                                           "Rating", rating,
+                                                           "Votes", votes,
+                                                           "Size", item.get('width'), item.get('height')))})
             except Exception, e:
                 xbmc.log( 'Problem report: %s' %str( e ), xbmc.LOGNOTICE )
             # Get thumbs
@@ -198,8 +215,11 @@ class TMDB(object):
                                        'language': item.get('iso_639_1','n/a'),
                                        'rating': rating,
                                        'votes': votes,
-                                       'generalinfo': ('%s: %s' 
-                                                       %( 'Language', get_language(item.get('iso_639_1','n/a')).capitalize()))})
+                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  ' 
+                                                       %( "Language", get_language(item.get('iso_639_1','n/a')).capitalize(),
+                                                          "Rating", rating,
+                                                          "Votes", votes,
+                                                          "Size", item.get('width'), item.get('height')))})
             except Exception, e:
                 xbmc.log( 'Problem report: %s' %str( e ), xbmc.LOGNOTICE )
             # Get posters
@@ -221,8 +241,11 @@ class TMDB(object):
                                        'language': item.get('iso_639_1','n/a'),
                                        'rating': rating,
                                        'votes': votes,
-                                       'generalinfo': ('%s: %s' 
-                                                       %( 'Language', get_language(item.get('iso_639_1','n/a')).capitalize().capitalize()))})
+                                       'generalinfo': ('%s: %s  |  %s: %s  |  %s: %s  |  %s: %sx%s  |  ' 
+                                                       %( "Language", get_language(item.get('iso_639_1','n/a')).capitalize(),
+                                                          "Rating", rating,
+                                                          "Votes", votes,
+                                                          "Size", item.get('width'), item.get('height')))})
             except Exception, e:
                 xbmc.log( 'Problem report: %s' %str( e ), xbmc.LOGNOTICE )
             if image_list == []:

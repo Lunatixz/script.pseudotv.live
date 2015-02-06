@@ -1,4 +1,4 @@
-#   Copyright (C) 2014 Lunatixz
+#   Copyright (C) 2015 Kevin S. Graer
 #
 #
 # This file is part of PseudoTV.
@@ -27,7 +27,7 @@ from xml.dom.minidom import parse, parseString
 
 class STRMParser:
     def log(self, msg, level = xbmc.LOGDEBUG):
-        xbmc.log('script.pseudotv-STRMParser: ' + ascii(msg), level)
+        xbmc.log('STRMParser: ' + ascii(msg), level)
 
 
     def determineLength(self, filename):
@@ -56,6 +56,7 @@ class STRMParser:
                     duration = runtime * 60
                 except Exception,e:
                     duration = 0
-                
+                    
+        file.close()
         return duration
         self.log('script.pseudotv-STRMParser: duration = ' + str(duration))

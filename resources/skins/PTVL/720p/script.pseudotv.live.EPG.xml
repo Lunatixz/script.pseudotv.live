@@ -12,18 +12,18 @@
     <animation effect="fade" time="700">WindowOpen</animation>
     <animation effect="fade" time="700">WindowClose</animation>
     <controls>
-        <!--focused text color-->
         <control type="button" id="99">
+            <description>focused text color</description>
             <visible>false</visible>
             <label>0xFFFFFFFF</label>
         </control>
-        <!--text color-->
         <control type="button" id="100">
+            <description>text color</description>
             <visible>false</visible>
             <label>0xFFFFFFFF</label>
         </control>
-        <!--text font-->
         <control type="button" id="105">
+            <description>text font</description>
             <visible>false</visible>
             <label>font14</label>
         </control> 
@@ -260,7 +260,7 @@
                 <font>font12</font>  
             </control>   
             <!-- #### Skinners Include Everything for videowindow patch to work #### -->
-            <!-- PATCH START --> <!-- 
+            <!-- PATCH START --> 
             <control type="videowindow">
                 <description>video</description>
                 <posx>-15</posx>
@@ -269,7 +269,7 @@
                 <height>125</height>
                 <aspectratio align="center">scale</aspectratio>
             </control>
-            --> <!-- PATCH END -->
+            <!-- PATCH END -->
             <!-- ################################################################## -->
             <control type="label">      
                 <posx>-15</posx>

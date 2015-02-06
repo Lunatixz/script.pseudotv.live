@@ -51,7 +51,20 @@ class TVDB(object):
     def __init__(self, api_key='9c47d05a3f5f3a00104f6586412306af'):
         self.apikey = api_key
         self.baseurl = 'http://thetvdb.com'
+    
+    def get_language(abbrev):
+        try:
+            lang_string = xbmc.convertLanguage(abbrev, xbmc.ENGLISH_NAME)
+        except:
+            lang_string = 'n/a'
+        return lang_string
 
+    def get_abbrev(lang_string):
+        try:
+            language_abbrev = xbmc.convertLanguage(lang_string, xbmc.ISO_639_1)
+        except:
+            language_abbrev = 'en' ### Default to English if conversion fails
+        return language_abbrev
     def __repr__(self):
         return 'TVDB(baseurl=%s, apikey=%s)' % (self.baseurl, self.apikey)
 
@@ -295,12 +308,12 @@ class TVDB(object):
                         info['season'] = 'n/a'
 
                     # Create Gui string to display
-                    info['generalinfo'] = '%s: %s  |  ' %( __localize__(32141), get_language(info['language']).capitalize())
+                    info['generalinfo'] = '%s: %s  |  ' %( 'Language', get_language(info['language']).capitalize())
                     if info['season'] != 'n/a':
-                        info['generalinfo'] += '%s: %s  |  ' %( __localize__(32144), info['season'] )
+                        info['generalinfo'] += '%s: %s  |  ' %( 'Season', info['season'] )
                     if 'height' in info:
-                        info['generalinfo'] += '%s: %sx%s  |  ' %( __localize__(32145), info['height'], info['width'] )
-                    info['generalinfo'] += '%s: %s  |  %s: %s  |  ' %( __localize__(32142), info['rating'], __localize__(32143), info['votes'] )
+                        info['generalinfo'] += '%s: %sx%s  |  ' %( 'Size', info['height'], info['width'] )
+                    info['generalinfo'] += '%s: %s  |  %s: %s  |  ' %( 'Rating', info['rating'], 'Votes', info['votes'] )
 
                 if info:
                     image_list.append(info)

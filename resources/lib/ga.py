@@ -15,7 +15,6 @@ from urlparse import urlunparse
 from hashlib import sha1
 from os import environ
 
-
 # Set your proprty id via the environment or simply type it
 # below
 PROPERTY_ID = environ.get("GA_PROPERTY_ID", "UA-45979766-1")
@@ -24,56 +23,38 @@ PROPERTY_ID = environ.get("GA_PROPERTY_ID", "UA-45979766-1")
 # environment, calculate the SHA1 sum of it, convert this from base 16
 # to base 10 and get first 10 digits of this number.
 
-bcts = 'BCT:/'
+bcts = ''
 if REAL_SETTINGS.getSetting('bumpers') == '1':
-    bcts += 'BL/'
+    bcts += 'BL+'
 elif REAL_SETTINGS.getSetting('bumpers') == '2':
-    bcts += 'BI/'
+    bcts += 'BI+'
     
 if REAL_SETTINGS.getSetting('bumperratings') == 'true':
-    bcts += 'R/'
+    bcts += 'R+'
     
 if REAL_SETTINGS.getSetting('commercials') == '1':
-    bcts += 'CL/'
+    bcts += 'CL+'
 elif REAL_SETTINGS.getSetting('commercials') == '2':
-    bcts += 'CY/'
+    bcts += 'CY+'
 elif REAL_SETTINGS.getSetting('commercials') == '3':
-    bcts += 'CI/'
+    bcts += 'CI+'
     
 if REAL_SETTINGS.getSetting('AsSeenOn') == 'true':
-    bcts += 'A/'
+    bcts += 'A+'
     
 if REAL_SETTINGS.getSetting('trailers') == '1':
-    bcts += 'TL/'
+    bcts += 'TL+'
 elif REAL_SETTINGS.getSetting('trailers') == '2':
-    bcts += 'TX/'
+    bcts += 'TX+'
 elif REAL_SETTINGS.getSetting('trailers') == '3':
-    bcts += 'TY/'
+    bcts += 'TY+'
 elif REAL_SETTINGS.getSetting('trailers') == '4':
-    bcts += 'TI/'
-    
-# cn_genre = 'CN:/'
-# if REAL_SETTINGS.getSetting('CN_TV') == 'true':
-    # cn_genre += 'T'
-# if REAL_SETTINGS.getSetting('CN_Movies') == 'true':
-    # cn_genre += 'M'
-# if REAL_SETTINGS.getSetting('CN_Episodes') == 'true':
-    # cn_genre += 'E'
-# if REAL_SETTINGS.getSetting('CN_Sports') == 'true':
-    # cn_genre += 'S'
-# if REAL_SETTINGS.getSetting('CN_News') == 'true':
-    # cn_genre += 'N'
-# if REAL_SETTINGS.getSetting('CN_Kids') == 'true':
-    # cn_genre += 'K'
-# if REAL_SETTINGS.getSetting('CN_Other') == 'true':
-    # cn_genre += 'O'
-# cn_genre = (cn_genre + '/').replace('//','')
-
-# share = 'CH:/'
-# if REAL_SETTINGS.getSetting('ChannelSharing') == 'true':
-    # share += 'CS/'
-# if REAL_SETTINGS.getSetting('UPNP1') == 'true' or REAL_SETTINGS.getSetting('UPNP2') == 'true' or REAL_SETTINGS.getSetting('UPNP3') == 'true':
-    # share += 'CU/'
+    bcts += 'TI+'
+ 
+if REAL_SETTINGS.getSetting('Hub') == 'false':  
+    HubEdition = 'False'
+else:
+    HubEdition = 'True'
     
 if REAL_SETTINGS.getSetting('Donor_Enabled') == 'true':
     try:
@@ -91,7 +72,7 @@ if REAL_SETTINGS.getSetting('Visitor_GA') == '':
 VISITOR = str(REAL_SETTINGS.getSetting("Visitor_GA"))
 
 # The path to visit
-PATH = ("PTVL/" + str(VISITOR) + '/' + str(donor) + '/' + str(ADDON_VERSION) + '/' + str(Skin_Select) + '/' + bcts)
+PATH = ("PTVL:"+ str(ADDON_VERSION) + "/" + str(VISITOR) + '/' + str(donor) + '/Hub:' + str(HubEdition)+ '/Skin:' + str(Skin_Select) + '/BCT:' + bcts)
  
 # Collect everything in a dictionary
 DATA = {"utmwv": "5.2.2d",

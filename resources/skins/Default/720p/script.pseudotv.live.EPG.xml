@@ -11,14 +11,14 @@
     <animation effect="fade" time="700">WindowClose</animation>
     <controls>            
         <!-- #### Skinners Include Everything for videowindow patch to work #### -->
-        <!-- PATCH START --> <!--
+        <!-- PATCH START -->
         <control type="videowindow">
             <description>video</description>
             <width>1280</width>
             <height>720</height>
             <aspectratio>stretch</aspectratio>
         </control>
-        --> <!-- PATCH END -->
+        <!-- PATCH END -->
         <!-- ################################################################## -->
         <control type="button" id="99">
             <visible>false</visible>			

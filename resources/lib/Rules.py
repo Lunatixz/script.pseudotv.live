@@ -1,7 +1,7 @@
-#   Copyright (C) 2011 Jason Anderson
+#   Copyright (C) 2015 Kevin S. Graer
 #
 #
-# This file is part of PseudoTV.
+# This file is part of PseudoTV Live.
 #
 # PseudoTV is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -377,7 +377,7 @@ class RenameRule(BaseRule):
     def __init__(self):
         self.name = "Set Channel Name"
         self.optionLabels = ['New Channel Name']
-        self.optionValues = ['']
+        self.optionValues = [' ']
         self.myId = 1
         self.actions = RULES_ACTION_FINAL_MADE | RULES_ACTION_FINAL_LOADED
 
@@ -416,7 +416,7 @@ class NoShowRule(BaseRule):
     def __init__(self):
         self.name = "Don't Include a Show"
         self.optionLabels = ['Show Name']
-        self.optionValues = ['']
+        self.optionValues = [' ']
         self.myId = 2
         self.actions = RULES_ACTION_LIST
 
@@ -1501,6 +1501,7 @@ class HandleBCT(BaseRule):
 
            
 class HandlePOP(BaseRule):
+    print 'HandlePOP temp disabled'
     def __init__(self):
         self.name = 'Ignore "Coming up" popup'
         self.optionLabels = ['Display Coming Up Next']
