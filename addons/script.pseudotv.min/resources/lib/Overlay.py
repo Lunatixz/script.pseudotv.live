@@ -1961,7 +1961,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
         self.log('onControl ' + str(controlId))
         pass
         
-    def ShowEPG(self):
+    def ShowEPG(self): #
         if self.channelThread.isAlive():
             self.channelThread.pause()
 
@@ -2071,13 +2071,13 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             else:
                 self.showMenu(self.InfTimer)
                 
-        elif action == ACTION_MOVE_LEFT or action == ACTION_GESTURE_SWIPE_RIGHT:
+        elif action == ACTION_MOVE_LEFT or action == ACTION_GESTURE_SWIPE_RIGHT: #
             self.logDebug('ACTION_MOVE_LEFT || ACTION_GESTURE_SWIPE_RIGHT')
             if self.showingMenuAlt:
                 self.hideMenuAlt()
             elif self.showingMenu:
                 self.hideMenu()
-            elif self.showingInfo or action == ACTION_GESTURE_SWIPE_RIGHT:
+            elif self.showingInfo or action == ACTION_GESTURE_SWIPE_RIGHT: #
                 self.infoOffset -= 1  
                 
                 if self.infoOffset < 0:
@@ -2089,20 +2089,20 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                 xbmc.executebuiltin("PlayerControl(SmallSkipBackward)")
                 self.log("SmallSkipBackward")
         
-        elif action == ACTION_MOVE_RIGHT or action == ACTION_GESTURE_SWIPE_LEFT:
+        elif action == ACTION_MOVE_RIGHT or action == ACTION_GESTURE_SWIPE_LEFT: #
             self.logDebug('ACTION_MOVE_RIGHT || ACTION_GESTURE_SWIPE_LEFT')
             if self.showingMenuAlt:
                 self.hideMenuAlt()
             elif self.showingMenu:
                 self.hideMenu()
-            elif self.showingInfo or action == ACTION_GESTURE_SWIPE_LEFT:
+            elif self.showingInfo or action == ACTION_GESTURE_SWIPE_LEFT: #
                 self.infoOffset += 1
                 self.showInfo(self.InfTimer)
             else:
                 xbmc.executebuiltin("PlayerControl(SmallSkipForward)")
                 self.log("SmallSkipForward")
                     
-        elif action in ACTION_PREVIOUS_MENU or action == ACTION_GESTURE_SWIPE_DOWN:
+        elif action in ACTION_PREVIOUS_MENU or action == ACTION_GESTURE_SWIPE_DOWN: #
             self.logDebug('ACTION_PREVIOUS_MENU || ACTION_GESTURE_SWIPE_DOWN')
             if self.showingInfo:
                 self.hideInfo()
@@ -2125,7 +2125,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
                         self.startSleepTimer()
                     del dlg
         
-        elif action == ACTION_SHOW_INFO or action == ACTION_GESTURE_SWIPE_UP:
+        elif action == ACTION_SHOW_INFO or action == ACTION_GESTURE_SWIPE_UP: #
             self.logDebug('ACTION_SHOW_INFO || ACTION_GESTURE_SWIPE_UP')
             if self.ignoreInfoAction:
                 self.ignoreInfoAction = False
@@ -2171,7 +2171,7 @@ class TVOverlay(xbmcgui.WindowXMLDialog):
             self.LastChannelJump()
             self.setChannel(self.LastChannel)
             
-        elif action == ACTION_CLICK_LEFT:
+        elif action == ACTION_CLICK_LEFT: # also tap
             self.logDebug('ACTION_CLICK_LEFT')
             if not self.showingEPG:
                 if not self.showingMenu:

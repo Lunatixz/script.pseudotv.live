@@ -605,13 +605,13 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 if self.showingInfo: 
                     self.infoOffsetV += 1
 
-            elif action == ACTION_MOVE_LEFT or action == ACTION_GESTURE_SWIPE_RIGHT:
+            elif action == ACTION_MOVE_LEFT or action == ACTION_GESTURE_SWIPE_RIGHT: #
                 self.logDebug('ACTION_MOVE_LEFT || ACTION_GESTURE_SWIPE_RIGHT')
                 self.GoLeft()           
                 if self.showingInfo:
                     self.infoOffset -= 1
             
-            elif action == ACTION_MOVE_RIGHT or action == ACTION_GESTURE_SWIPE_LEFT:
+            elif action == ACTION_MOVE_RIGHT or action == ACTION_GESTURE_SWIPE_LEFT: #
                 self.logDebug('ACTION_MOVE_RIGHT || ACTION_GESTURE_SWIPE_LEFT')
                 self.GoRight()           
                 if self.showingInfo:
@@ -642,7 +642,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 if self.showingInfo:
                     self.infoOffsetV -= 1
             
-            elif action == ACTION_PAGEDOWN or action == ACTION_GESTURE_SWIPE_UP:
+            elif action == ACTION_PAGEDOWN or action == ACTION_GESTURE_SWIPE_UP: #
                 self.logDebug('ACTION_PAGEDOWN || ACTION_GESTURE_SWIPE_UP')
                 self.GoPgDown()  
                 if self.showingInfo:  
@@ -653,7 +653,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 if self.showingInfo:
                     self.infoOffsetV += 1
                     
-            elif action == ACTION_PAGEUP or action == ACTION_GESTURE_SWIPE_DOWN:
+            elif action == ACTION_PAGEUP or action == ACTION_GESTURE_SWIPE_DOWN: #
                 self.logDebug('ACTION_PAGEUP || ACTION_GESTURE_SWIPE_DOWN')
                 self.GoPgUp()           
                 if self.showingInfo:
