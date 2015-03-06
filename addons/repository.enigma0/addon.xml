@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <addon id="repository.enigma0" version="0.0.3" name="Enigma0 Repo" provider-name="Enigma0">
+	
+    <extension point="xbmc.addon.repository" name="Official PseudoTV Min Repository">
+		<info compressed="true">http://raw.github.com/Enigma0/script.pseudotv.min/master/addons/addons.xml</info>
+		<checksum>http://raw.github.com/Enigma0/script.pseudotv.min/master/addons/addons.xml.md5</checksum>
+		<datadir zip="true">http://raw.github.com/Enigma0/script.pseudotv.min/master/zips</datadir>
+	</extension>
+	
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="en">Repository containing PseudoTV Min</summary>
+        <description lang="en">PseudoTV Min acts similar to normal broadcast or cable TV, complete with multiple preset and user-defined channels and an EPG. Original work done by Jason102, Lunatixz and others.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <website>https://github.com/Enigma0/script.pseudotv.min</website>
+		<source>https://github.com/Enigma0/script.pseudotv.min</source>
+    </extension>
+    
+</addon>
