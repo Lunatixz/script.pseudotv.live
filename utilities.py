@@ -91,7 +91,6 @@ def DDautopatch():
             REAL_SETTINGS.setSetting("COM_Donor", "true")
             REAL_SETTINGS.setSetting("TRL_Donor", "true")
             REAL_SETTINGS.setSetting("CAT_Donor", "true")
-            xbmc.executebuiltin("UpdateLocalAddons")
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Donor Autoupdate Complete", 4000, THUMB) ) 
     except Exception:
         pass
@@ -148,7 +147,7 @@ def LogoDownloader():
     log('LogoDownloader')
     LogoPath = xbmc.translatePath(os.path.join(SETTINGS_LOC))
     
-    if dlg.yesno("PseudoTV Live", "Download Color Logos or No, Download Mono Logos", ""):
+    if dlg.yesno("PseudoTV Live", "Download Color Logos or No, Download Mono Logos"):
         LogoDEST = LogoPath + '/PTVL_Color.zip'
         i = 0
     else:

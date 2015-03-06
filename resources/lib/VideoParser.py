@@ -30,12 +30,6 @@ import parsers.STRMParser  as STRMParser
 from Globals import *
 from FileAccess import FileAccess
 
-# Commoncache plugin import
-try:
-    import StorageServer
-except Exception,e:
-    import storageserverdummy as StorageServer
-    
 class VideoParser:
     def __init__(self):
         self.AVIExts = ['.avi']
@@ -49,24 +43,9 @@ class VideoParser:
     def log(self, msg, level = xbmc.LOGDEBUG):
         log('VideoParser: ' + msg, level)
 
-        
-    def getVideoLength(self, filename):
-        self.log("getVideoLength Cache")
-        if Cache_Enabled == True:  
-            try:
-                result = parsers.cacheFunction(self.getVideoLength_NEW, filename)
-            except:
-                result = self.getVideoLength_NEW(filename)
-                pass
-        else:
-            result = self.getVideoLength_NEW(filename)
-        if not result:
-            result = 0
-        return result 
 
-        
-    def getVideoLength_NEW(self, filename):
-        self.log("getVideoLength_NEW " + filename)
+    def getVideoLength(self, filename):
+        self.log("getVideoLength" + filename)
         if len(filename) == 0:
             self.log("No file name specified")
             return 0

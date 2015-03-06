@@ -20,7 +20,7 @@
 import os, re, sys, time, zipfile, threading, requests
 import urllib, urllib2, base64, fileinput, shutil, socket
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
-import urlparse, time, string
+import urlparse, time, string, datetime, ftplib, hashlib
 
 from Globals import *  
 from FileAccess import FileAccess
@@ -35,7 +35,6 @@ try:
 except Exception,e:
     import storageserverdummy as StorageServer
       
-FreshInstall = False
 Error = False
 Path = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', '720p')) #Path to Default PTVL skin, location of mod file.
 fle = 'custom_script.pseudotv.live_9506.xml' #mod file, copy to xbmc skin folder
@@ -58,6 +57,98 @@ z = '</defaultcontrol>\n    <visible>Window.IsActive(fullscreenvideo) + !Window.
 ###############################
 
 
+def hashfile(afile, hasher, blocksize=65536):
+    buf = afile.read(blocksize)
+    while len(buf) > 0:
+        hasher.update(buf)
+        buf = afile.read(blocksize)
+    return hasher.digest()
+    
+    
+def remove_duplicates(values):
+    output = []
+    seen = set()
+    for value in values:
+        # If value has not been encountered yet,
+        # ... add it to both list and set.
+        if value not in seen:
+            output.append(value)
+            seen.add(value)
+    return output
+
+    
+def EXTtype(arttype): 
+    log('EXTtype')
+    JPG = ['banner', 'fanart', 'folder', 'landscape', 'poster']
+    PNG = ['character', 'clearart', 'logo', 'disc']
+    
+    if arttype in JPG:
+        arttypeEXT = (arttype + '.jpg')
+    else:
+        arttypeEXT = (arttype + '.png')
+    log('EXTtype = ' + str(arttypeEXT))
+    return arttypeEXT
+        
+
+def anonFTPDownload(filename, DL_LOC):
+    log('anonFTPDownload, ' + filename + ' - ' + DL_LOC)
+    try:
+        ftp = ftplib.FTP("ftp.pseudotvlive.com", "anonymous@pseudotvlive.com", "anonymous@pseudotvlive.com")
+        ftp.cwd("/ptvl")
+        file = FileAccess.open(DL_LOC, 'w')
+        ftp.retrbinary('RETR %s' % filename, file.write)
+        file.close()
+        ftp.quit()
+    except:
+        pass
+        
+        
+def modification_date(filename):
+    t = os.path.getmtime(filename)
+    return datetime.datetime.fromtimestamp(t)
+
+    
+def getSize(file):
+    if FileAccess.exists(file):
+        fileobject = FileAccess.open(file, "r")
+        fileobject.seek(0,2) # move the cursor to the end of the file
+        size = fileobject.tell()
+        fileobject.close()
+        return size
+    
+           
+def Backup(org, bak):
+    log('Backup ' + str(org) + ' - ' + str(bak))
+    if FileAccess.exists(org):
+        if FileAccess.exists(bak):
+            try:
+                xbmcvfs.delete(bak)
+            except:
+                pass
+        FileAccess.copy(org, bak)
+    
+    if DEBUG == 'true':
+        xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Backup Complete", 1000, THUMB) )
+        
+            
+def Restore(bak, org):
+    log('Restore ' + str(bak) + ' - ' + str(org))
+    if FileAccess.exists(bak):
+        if FileAccess.exists(org):
+            try:
+                xbmcvfs.delete(org)
+            except:
+                pass
+        FileAccess.rename(bak, org)
+    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Restore Complete, Restarting...", 1000, THUMB) )
+
+
+def Error(header, line1= '', line2= '', line3= ''):
+    dlg = xbmcgui.Dialog()
+    dlg.ok(header, line1, line2, line3)
+    del dlg
+    
+    
 def sendGmail(SUBJECT, text):
     log("sendGmail")
     try:
@@ -106,8 +197,26 @@ def splitall(path):
             path = parts[0]
             allparts.insert(0, parts[1])
     return allparts
-        
-        
+     
+
+def showText(heading, text):
+    log("showText")
+    id = 10147
+    xbmc.executebuiltin('ActivateWindow(%d)' % id)
+    xbmc.sleep(100)
+    win = xbmcgui.Window(id)
+    retry = 50
+    while (retry > 0):
+        try:
+            xbmc.sleep(10)
+            retry -= 1
+            win.getControl(1).setLabel(heading)
+            win.getControl(5).setText(text)
+            return
+        except:
+            pass
+
+            
 def infoDialog(str, header=ADDON_NAME):
     try: xbmcgui.Dialog().notification(header, str, THUMB, 3000, sound=False)
     except: xbmc.executebuiltin("Notification(%s,%s, 3000, %s)" % (header, str, THUMB))
@@ -119,8 +228,9 @@ def okDialog(str1, str2, header=ADDON_NAME):
     
 def selectDialog(list, header=ADDON_NAME):
     log('selectDialog')
-    select = xbmcgui.Dialog().select(header, list)
-    return select
+    if len(list) > 0:
+        select = xbmcgui.Dialog().select(header, list)
+        return select
 
     
 def yesnoDialog(str1, str2, header=ADDON_NAME, str3='', str4=''):
@@ -169,20 +279,22 @@ def VersionCompare():
     for vernum in match:
         log("Current Version = " + str(vernum))
     try:
-        link = Request_URL('https://raw.githubusercontent.com/Lunatixz/XBMC_Addons/master/script.pseudotv.live/addon.xml')               
+        link = Request_URL('https://raw.githubusercontent.com/Lunatixz/XBMC_Addons/master/script.pseudotv.live/addon.xml')  
+        link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
+        match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
     except:
-        link='nill'
-    
-    link = link.replace('\r','').replace('\n','').replace('\t','').replace('&nbsp;','')
-    match = re.compile('" version="(.+?)" name="PseudoTV Live"').findall(link)
- 
+        pass   
+        
     if len(match) > 0:
         print vernum, str(match)[0]
         if vernum != str(match[0]):
+            xbmcgui.Window(10000).setProperty("PseudoTVOutdated", "True")
             dialog = xbmcgui.Dialog()
             confirm = xbmcgui.Dialog().yesno('[B]PseudoTV Live Update Available![/B]', "Your version is outdated." ,'The current available version is '+str(match[0]),'Would you like to install the PseudoTV Live repository to stay updated?',"Cancel","Install")
             if confirm:
-                UpdateFiles()       
+                UpdateFiles()     
+        else:
+            xbmcgui.Window(10000).setProperty("PseudoTVOutdated", "False")
     return
     
     
@@ -219,6 +331,7 @@ def UpdateFiles():
     
 def VideoWindow():
     log("VideoWindow, VWPath = " + str(VWPath))
+    FreshInstall = False
     #Copy VideoWindow Patch file
     try:
         if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
@@ -228,7 +341,10 @@ def VideoWindow():
                 xbmcvfs.copy(flePath, VWPath)
                 if xbmcvfs.exists(VWPath):
                     log('custom_script.pseudotv.live_9506.xml Copied')
-                    VideoWindowPatch()         
+                    VideoWindowPatch()   
+                    if FreshInstall == True:
+                        if dlg.yesno("PseudoTV Live", "Installed Videowindow patch, reboot required! Exit XBMC?"):
+                            xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),%d,true)" % ( 0.5, ) )
                 else:
                     raise
             else:
@@ -385,15 +501,54 @@ def Request_URL(url):
     except:
         pass
            
-    
+           
+def Open_URL_CACHE(url):
+    try:
+        result = daily.cacheFunction(Open_URL, url)
+    except:
+        result = Open_URL(url)
+        pass
+    if not result:
+        result = []
+    return result                 
+                
+                  
 def Open_URL(url):        
     try:
         f = urllib2.urlopen(url)
         return f
     except urllib2.URLError as e:
         pass
+    
+    
+def Read_URL(url):        
+    try:
+        f = urllib2.urlopen(url)
+        return f.readlines()
+    except urllib2.URLError as e:
+        pass
 
         
+def Force_URL(url):
+    Con = True
+    Count = 0
+    while Con:
+        if Count > 3:
+            Con = False
+        try:
+            req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"})
+            return urllib2.urlopen(req)
+            Con = False
+        except URLError, e:
+            print "Oops, timed out?"
+            Con = True
+        except socket.timeout:
+            print "Timed out!"
+            Con = True
+            pass 
+        Count += 1
+            
+            
 def Open_URL_UP(url, userpass):
     try:
         result = daily.cacheFunction(Open_URL_UP_NEW, url, userpass)
@@ -486,72 +641,12 @@ def allWithProgress(_in, _out, dp):
         return False
 
     return True
- 
- 
-#logo parser
-class lsHTMLParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.icon_rel_url_list=[]
-
-        
-    def handle_starttag(self, tag, attrs):
-        if tag == "img":
-            for pair in attrs:
-                if pair[0]=="src" and pair[1].find("/logo/")!=-1:
-                    self.icon_rel_url_list.append(pair[1])
-                    
-                    
-    def retrieve_icons_avail(self, region='us'):
-        if Cache_Enabled:
-            print ("retrieve_icons_avail Cache")
-            try:
-                result = parsers.cacheFunction(self.retrieve_icons_avail_NEW, region)
-            except:
-                print ("retrieve_icons_avail Cache Failed Forwarding to retrieve_icons_avail_NEW")
-                result = self.retrieve_icons_avail_NEW(region)
-                pass
-        else:
-            print ("retrieve_icons_avail Cache Disabled")
-            result = self.retrieve_icons_avail_NEW(region)
-        if not result:
-            result = 0
-        return result
-         
-            
-    def retrieve_icons_avail_NEW(self, region='us'):
-        print 'retrieve_icons_avail'
-        lyngsat_sub_page="http://www.lyngsat-logo.com/tvcountry/%s_%d.html"
-        results={}
-        URL = 'http://www.lyngsat-logo.com/tvcountry/%s.html' % region
-        opener = urllib.FancyURLopener({})
-        f = opener.open(URL)
-        page_contents=f.read()
-        f.close()
-        parser=lsHTMLParser()
-        parser.feed(page_contents)
-        for icon_rel_url in parser.icon_rel_url_list:
-                icon_abs_url=urlparse.urljoin(lyngsat_sub_page, icon_rel_url)
-                icon_name=os.path.splitext(os.path.basename(icon_abs_url))[0].upper()
-                results[icon_name]=icon_abs_url
-        return results   
-
-
-class FileCache:
-	'''Caches the contents of a set of files.
-	Avoids reading files repeatedly from disk by holding onto the
-	contents of each file as a list of strings.
-	'''
-
-	def __init__(self):
-		self.filecache = {}
-		
-	def grabFile(self, filename):
-		'''Return the contents of a file as a list of strings.
-		New line characters are removed.
-		'''
-		if not self.filecache.has_key(filename):
-			f = open(filename, "r")
-			self.filecache[filename] = string.split(f.read(), '\n')
-			f.close()
-		return self.filecache[filename]
+     
+     
+def copyanything(src, dst):
+    try:
+        shutil.copytree(src, dst)
+    except OSError as exc:
+        if exc.errno == errno.ENOTDIR:
+            shutil.copy(src, dst)
+        else: raise

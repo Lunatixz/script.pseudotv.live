@@ -20,7 +20,6 @@
 #import modules
 import urllib, urllib2
 import xbmc, sys, re
-
 #import modules
 import socket
 import xbmc
@@ -35,7 +34,7 @@ else:
 
 # import libraries
 from urllib2 import HTTPError, URLError
-
+from language import *
 # import libraries
 from operator import itemgetter
 from Globals import *
@@ -58,24 +57,9 @@ class TMDB(object):
         except Exception,e:
             pass
 
-    # def __repr__(self):
-        # return 'TMDB(apikey=%s, baseurl=%s, imagebaseurl=%s)' % (self.apikey,self.baseurl,self.imagebaseurl)
+    def __repr__(self):
+        return 'TMDB(apikey=%s, baseurl=%s, imagebaseurl=%s)' % (self.apikey,self.baseurl,self.imagebaseurl)
         
-    def get_language(abbrev):
-        try:
-            lang_string = xbmc.convertLanguage(abbrev, xbmc.ENGLISH_NAME)
-        except:
-            lang_string = 'n/a'
-        return lang_string
-        
-        
-    def get_abbrev(lang_string):
-        try:
-            language_abbrev = xbmc.convertLanguage(lang_string, xbmc.ISO_639_1)
-        except:
-            language_abbrev = 'en' ### Default to English if conversion fails
-        return language_abbrev
-    
     def _buildUrl(self, cmd, parms={}):
         # try:
         parmsCopy = parms.copy()

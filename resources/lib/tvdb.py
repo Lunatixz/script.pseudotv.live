@@ -28,7 +28,7 @@ import xbmcgui
 import unicodedata
 # import libraries
 from urllib2 import HTTPError, URLError
-
+from language import *
 # Use json instead of simplejson when python v2.7 or greater
 if sys.version_info < (2, 7):
     import simplejson as json
@@ -52,19 +52,6 @@ class TVDB(object):
         self.apikey = api_key
         self.baseurl = 'http://thetvdb.com'
     
-    def get_language(abbrev):
-        try:
-            lang_string = xbmc.convertLanguage(abbrev, xbmc.ENGLISH_NAME)
-        except:
-            lang_string = 'n/a'
-        return lang_string
-
-    def get_abbrev(lang_string):
-        try:
-            language_abbrev = xbmc.convertLanguage(lang_string, xbmc.ISO_639_1)
-        except:
-            language_abbrev = 'en' ### Default to English if conversion fails
-        return language_abbrev
     def __repr__(self):
         return 'TVDB(baseurl=%s, apikey=%s)' % (self.baseurl, self.apikey)
 

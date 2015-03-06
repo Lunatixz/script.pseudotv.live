@@ -4,8 +4,7 @@
     <string id="30002">Open Channel Configuration</string>    
     <string id="30003">General Options:</string>
         <string id="30044">Enable Autostart</string>
-        <string id="30046">Show Notifications</string>
-        <string id="30045">Delay Service (seconds)</string>
+        <string id="30045">Delay Startup (seconds)</string>
         <string id="30004">Auto-off Timer (minutes)</string>
         <string id="30009">Auto-off Mode</string>
         <string id="29999">Enable Idle ScreenSaver</string>
@@ -13,6 +12,25 @@
         <string id="30006">Time between channel resets</string>
         <string id="30007">Default channel times at startup</string>
         <string id="30008">Background Updating</string>  
+        <string id="30998">Enable Settop Box Mode</string>
+        <string id="31000">Refresh Interval (Hours)</string>
+        <string id="30046">Show Notifications</string>
+
+<string id="30300">Tweaks</string>
+    <string id="30401">Operating System</string>  
+    <string id="32055">Preferred Language</string>  
+    <string id="30302">Channel Change Delay (seconds)</string>
+    <string id="30303">Startup Channel</string> 
+    <string id="30304">Enter Preferred Channel</string>
+    <string id="30311">Disable Watch Flagging</string>
+	<string id="30405">Find Missing GuideData (Art/Info)</string>
+    <string id="30408">Jump to Channel on Reminder</string>
+    <string id="30215">Hide very short videos</string>
+    <string id="30216">Duration of "short" videos (seconds)</string>  
+    <string id="30310">Media Limit Per Channel</string>
+    <string id="30372">Reserve Channels 501-999 for Autotune</string>
+    <string id="30373">Mute between channel change</string>
+    
 <string id="30100">Sharing</string>
     <string id="30101">Channel Sharing:</string>
         <string id="30789">Enable Channel Sharing</string>
@@ -23,7 +41,10 @@
     <string id="30104">Enable UPNP2</string>   
     <string id="30105">Enable UPNP3</string>    
     <string id="30106">Playback Offset (milliseconds)</string>  
+    
 <string id="30200">Visuals</string>
+    <string id="30301">Use (S01E01), Instead of (01x01)</string>
+    <string id="30309">Playback timeout (seconds)</string>
     <string id="30201">Enable Dynamic Artwork (Incl. Service)</string>
     <string id="34046">Show Notification</string>
     <string id="34045">Run Service Every (hours)</string>
@@ -34,13 +55,9 @@
     <string id="30210">EPG Options:</string> 
         <string id="30211">Clock Mode</string>
         <string id="30212">EPG Color by</string>
-        <string id="30255">Use Banner Artwork on Highlight</string>
         <string id="30213">Include Movie Genres</string>
         <string id="30214">Menu uses Channel</string>
         <string id="30229">Displays Extra Info "(Watched)(Rating)"</string>
-        <string id="30215">Hide very short videos</string>
-        <string id="30216">Duration of "short" videos</string>  
-        <string id="30217">VideoWindow Patcher</string>  
     <string id="30220">Overlay Options:</string>
         <string id="30203">Select Overlay Number Color</string>
         <string id="30221">Show info when changing channels</string>
@@ -50,24 +67,6 @@
         <string id="30226">Show Coming Up Next box</string>
         <string id="30229">Use Classic Coming Up Next box</string>
         <string id="30227">Coming Up Artwork Type</string>
-<string id="30300">Tweaks</string>
-    <string id="30401">Operating System</string>  
-    <string id="32055">Preferred Language</string>  
-    <string id="30301">Use (S01E01), Instead of (01x01)</string>
-	<string id="30405">Find Missing GuideData (Art/Info)</string>
-    <string id="30408">Jump to Channel on Reminder</string>
-    <string id="30409">Default Select Action</string>
-    <string id="30302">Channel Change Delay (seconds)</string>
-    <string id="30309">Playback timeout (seconds)</string>
-    <string id="30303">Choose Startup Channel</string> 
-    <string id="30304">Enter Preferred Channel</string>
-    <string id="30311">Disable Watch Flagging</string>
-    <string id="30305">Enable Artwork Download, Select Source</string>
-    <string id="30306">Download Silently</string>
-    <string id="30307">TV File System</string>
-    <string id="30308">Movie File System</string>
-    <string id="30310">Media Limit Per Channel</string>
-    <string id="30372">Reserve Channels 501-999 for Autotune</string>
 <string id="30400">DVR</string>  
 	<string id="30397">Enable XMLTV Service</string>
 	<string id="30404">XMLTV file location</string>
@@ -204,7 +203,5 @@
     <string id="39997">Include BCT Files</string>
     <string id="30994">Plugin Validation Level</string>
     <string id="30992">Disable Google Analytics</string>
-    <string id="30998">Enable Settop Box Mode</string>
-    <string id="31000">Refresh Interval (Hours)</string>
     <string id="30999">Optimize Configurations (Coming Soon)</string>    
 </strings>

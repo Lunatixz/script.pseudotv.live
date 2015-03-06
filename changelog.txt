@@ -1,3 +1,28 @@
+[*] NEW! Mute between channel change option under "Tweaks".
+[*] Any media for chtype >= 10 that is under 15mins will be "Stacked".
+[*] NEW! Universal xmltv file "ptvlguide", This xmltv file provides guidedata for PTVL compatible source (ie. Filmon,Pluto.tv,USTVnow, and more).
+[*] Three new skins Concast/Maverick/Z81. (Mavrick and Z81 originally skinned codemonkeyzero).
+[*] IPTV M3U/LiveStream XML/Navi-X PLX in-app channel configuration & Autotuning (Donor & Hub users only).
+[*] Autostart/Directory Channel/EPG Genre Fix
+[*] Donor lists (Plugins/InternetTV) updated.
+[*] Improved automatic settings2 backup and restore?
+[*] EPG Artwork disabled until Art Spooler is finished.
+[*] Trimmed initial autotuning for faster parsing.
+[*] Tweaked Playback failed, Playback timeout timer.
+[*] Changed Eventghost broadcasts.
+[*] "Enhanced Guide Data" aka "Find Missing Info" tweaked, Faster LiveTV Parsing?
+[*] Playon & Upnp channel building tweaked.
+[*] Pause Playback while browsing "OnDemand" & "Search". Search requires un-pausing playback, OnDemand is automatic.
+[*] Centralized folders when channel sharing (ie. Artwork Cache).
+[*] Fixed Autotuning bug.
+[*] Tweaked Error handling, Playback timer.
+[*] TV Network Autotuning sorts using "Show Ordering".
+[*] Fixed Artwork Download bug, improved sluggish EPG?
+[*] Global Search sidebar option, tweaked "OnDemand" functions.
+[*] Tweaked artwork downloader.
+[*] EPG "Dynamic Artwork" disabled for lowpower hardware.
+[*] Various tweaks & bug corrections
+[*] [COLOR=blue][B]^ v.0.5.9 ^[/B][/COLOR]
 [*] Videowindow patch automatically applied.
 [*] TV Listings from PVR backend; chtype 8, "xmltv name" (ie.setting3) needs to be 'pvr'.
 [*] Concast skin removed, now being maintained by Marshall. Time Whorner Skin dropped. 

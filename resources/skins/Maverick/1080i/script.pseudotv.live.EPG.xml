@@ -1,0 +1,921 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<window>
+   <allowoverlay>no</allowoverlay>
+   <onload>ActivateWindow(9506)</onload>
+   <onunload>ActivateWindow(12005)</onunload>
+   <onload condition="System.HasAddon(script.extendedinfo)">RunScript(script.extendedinfo,info=trendingshows)</onload>
+   <onload condition="System.HasAddon(script.tv.show.next.aired)">RunScript(script.tv.show.next.aired,backend=True)</onload>
+   <coordinates>
+      <system>1</system>
+      <posx>0</posx>
+      <posy>0</posy>
+   </coordinates>
+   <animation effect="fade" time="700">WindowOpen</animation>
+   <animation effect="fade" time="700">WindowClose</animation>
+   <controls>
+      <control type="button" id="99">
+         <description>FOCUSED TEXT COLOR</description>
+         <visible>false</visible>
+         <label>0xFFFFFFFF</label>
+      </control>
+      <control type="button" id="100">
+         <description>TEXT COLOR</description>
+         <visible>false</visible>
+         <label>0xFFFFFFFF</label>
+      </control>
+      <control type="button" id="105">
+         <description>TEXT FONT</description>
+         <visible>false</visible>
+         <label>font14</label>
+      </control>
+      <!--EPG BACKGROUND-->
+      <control type="image">
+         <description>INFO BACKGROUND</description>
+         <posx>0</posx>
+         <posy>0</posy>
+         <width>1920</width>
+         <height>1080</height>
+         <texture>epgmain.png</texture>
+         <colordiffuse>FFFFFFFF</colordiffuse>
+      </control>
+      <!-- TODAY NEXT AIRED -->
+      <!-- PANEL 1 -->
+      <control type="label">
+         <posx>330</posx>
+         <posy>236</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.1.Label)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.1.Art(fanart)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.1.Art(landscape)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+      </control>
+      <control type="label">
+         <posx>330</posx>
+         <posy>406</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.1.Airtime)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <!-- PANEL 2 -->
+      <control type="label">
+         <posx>330</posx>
+         <posy>236</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.2.Label)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.2.Art(fanart)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.2.Art(landscape)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+      </control>
+      <control type="label">
+         <posx>330</posx>
+         <posy>406</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.2.Airtime)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <!-- PANEL 3 -->
+      <control type="label">
+         <posx>1290</posx>
+         <posy>236</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.3.Label)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <control type="image">
+         <posx>1290</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.3.Art(fanart)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+      </control>
+      <control type="image">
+         <posx>1290</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.3.Art(landscape)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+      </control>
+      <control type="label">
+         <posx>1290</posx>
+         <posy>406</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.3.Airtime)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <!-- PANEL 4 -->
+      <control type="label">
+         <posx>1290</posx>
+         <posy>236</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.4.Label)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <control type="image">
+         <posx>1290</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.4.Art(fanart)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+      </control>
+      <control type="image">
+         <posx>1290</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(NextAired.4.Art(landscape)]</texture>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+      </control>
+      <control type="label">
+         <posx>1290</posx>
+         <posy>406</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(NextAired.4.Airtime)]</label>
+         <visible>!IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <!-- TRENDING BOX 1 -->
+      <control type="label">
+         <posx>330</posx>
+         <posy>236</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(TrendingShows.1.Title)]</label>
+         <visible>IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(TrendingShows.1.Art(fanart))]</texture>
+         <visible>IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(TrendingShows.1.Art(landscape))]</texture>
+         <visible>IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+      </control>
+      <control type="label">
+         <posx>330</posx>
+         <posy>406</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="-315,0" time="700" delay="200">WindowOpen</animation>
+         <label>Trending Now</label>
+         <visible>IsEmpty(Window(Home).Property(NextAired.1.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <!-- TRENDING BOX 2 -->
+      <control type="label">
+         <posx>330</posx>
+         <posy>236</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <label>$INFO[Window(Home).Property(TrendingShows.2.Title)]</label>
+         <visible>IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(TrendingShows.2.Art(fanart))]</texture>
+         <visible>IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+      </control>
+      <control type="image">
+         <posx>330</posx>
+         <posy>276</posy>
+         <width>300</width>
+         <height>125</height>
+         <align>center</align>
+         <aspectratio align="center">keep</aspectratio>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <texture>$INFO[Window(Home).Property(TrendingShows.2.Art(landscape))]</texture>
+         <visible>IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+      </control>
+      <control type="label">
+         <posx>330</posx>
+         <posy>406</posy>
+         <width>300</width>
+         <height>30</height>
+         <align>center</align>
+         <label>Trending Now</label>
+         <animation effect="slide" end="-30,0" time="800" delay="200">WindowOpen</animation>
+         <visible>IsEmpty(Window(Home).Property(NextAired.2.Label))</visible>
+         <textcolor>C0C0C0C0</textcolor>
+         <font>font12</font>
+      </control>
+      <!-- TRENDING BOX 3 -->
+      <control type="group">
+         <control type="label">
+            <posx>1290</posx>
+            <posy>236</posy>
+            <align>center</align>
+            <width>300</width>
+            <height>30</height>
+            <textcolor>C0C0C0C0</textcolor>
+            <font>font12</font>
+            <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+            <label>$INFO[Window(Home).Property(TrendingShows.3.Title)]</label>
+            <visible>IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+         </control>
+         <control type="image">
+            <posx>1290</posx>
+            <posy>276</posy>
+            <width>300</width>
+            <height>125</height>
+            <aspectratio align="center">keep</aspectratio>
+            <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+            <texture>$INFO[Window(Home).Property(TrendingShows.3.Art(fanart))]</texture>
+            <visible>IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+         </control>
+         <control type="image">
+            <posx>1290</posx>
+            <posy>276</posy>
+            <width>300</width>
+            <height>125</height>
+            <aspectratio align="center">keep</aspectratio>
+            <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+            <texture>$INFO[Window(Home).Property(TrendingShows.3.Art(landscape))]</texture>
+            <visible>IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+         </control>
+         <control type="label" id="522">
+            <posx>1290</posx>
+            <posy>406</posy>
+            <align>center</align>
+            <width>300</width>
+            <height>30</height>
+            <fadetime>250</fadetime>
+            <textcolor>C0C0C0C0</textcolor>
+            <font>font12</font>
+            <label>Trending Now</label>
+            <animation effect="slide" end="30,0" time="800" delay="200">WindowOpen</animation>
+            <visible>IsEmpty(Window(Home).Property(NextAired.3.Label))</visible>
+         </control>
+      </control>
+      <!-- TRENDING BOX 4 -->
+      <control type="group">
+         <control type="label">
+            <posx>1290</posx>
+            <posy>236</posy>
+            <align>center</align>
+            <width>300</width>
+            <height>30</height>
+            <textcolor>C0C0C0C0</textcolor>
+            <font>font12</font>
+            <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+            <label>$INFO[Window(Home).Property(TrendingShows.4.Title)]</label>
+            <visible>IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+         </control>
+         <control type="image">
+            <posx>1290</posx>
+            <posy>276</posy>
+            <width>300</width>
+            <height>125</height>
+            <aspectratio align="center">keep</aspectratio>
+            <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+            <texture>$INFO[Window(Home).Property(TrendingShows.4.Art(fanart))]</texture>
+            <visible>IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+         </control>
+         <control type="image">
+            <posx>1290</posx>
+            <posy>276</posy>
+            <width>300</width>
+            <height>125</height>
+            <aspectratio align="center">keep</aspectratio>
+            <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+            <texture>$INFO[Window(Home).Property(TrendingShows.4.Art(landscape))]</texture>
+            <visible>IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+         </control>
+         <control type="label" id="522">
+            <posx>1290</posx>
+            <posy>406</posy>
+            <align>center</align>
+            <width>300</width>
+            <height>30</height>
+            <fadetime>250</fadetime>
+            <textcolor>C0C0C0C0</textcolor>
+            <font>font12</font>
+            <label>Trending Now</label>
+            <animation effect="slide" end="315,0" time="700" delay="200">WindowOpen</animation>
+            <visible>IsEmpty(Window(Home).Property(NextAired.4.Label))</visible>
+         </control>
+      </control>
+      <!-- // TODAY NEXT AIRED -->
+      <!--DATE-->
+      <control type="label" id="104">
+         <description>DATE LABEL</description>
+         <posx>0</posx>
+         <posy>444</posy>
+         <width>410</width>
+         <height>42</height>
+         <align>center</align>
+         <aligny>center</aligny>
+         <label>Current Date</label>
+         <font>font12</font>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <!--TIME BAR 1/3-->
+      <control type="label" id="101">
+         <description>TIME LEFT LABEL</description>
+         <posx>412</posx>
+         <posy>444</posy>
+         <width>270</width>
+         <height>42</height>
+         <label>Time 1</label>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <!--TIME BAR 2/3-->
+      <control type="label" id="102">
+         <description>TIME MID LABEL</description>
+         <posx>915</posx>
+         <posy>444</posy>
+         <width>270</width>
+         <height>42</height>
+         <label>Time 2</label>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <!--TIME BAR 3/3-->
+      <control type="label" id="103">
+         <description>TIME RIGHT LABEL</description>
+         <posx>1418</posx>
+         <posy>444</posy>
+         <width>270</width>
+         <height>42</height>
+         <label>Time 3</label>
+         <font>font12</font>
+         <align>left</align>
+         <aligny>center</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <!--CH NUMBER-->
+      <control type="grouplist">
+         <posx>10</posx>
+         <posy>497</posy>
+         <itemgap>0</itemgap>
+         <orientation>vertical</orientation>
+         <control type="label" id="311">
+            <description>CH 1 NUMBER</description>
+            <width>75</width>
+            <height>75</height>
+            <font>font14</font>
+            <align>right</align>
+            <aligny>center</aligny>
+            <textcolor>FFFFFFFF</textcolor>
+         </control>
+         <control type="label" id="312">
+            <description>CH 2 NUMBER</description>
+            <width>75</width>
+            <height>75</height>
+            <font>font14</font>
+            <align>right</align>
+            <aligny>center</aligny>
+            <textcolor>FFFFFFFF</textcolor>
+         </control>
+         <control type="label" id="313">
+            <description>CH 3 NUMBER</description>
+            <width>75</width>
+            <height>75</height>
+            <font>font14</font>
+            <align>right</align>
+            <aligny>center</aligny>
+            <textcolor>FFFFFFFF</textcolor>
+         </control>
+         <control type="label" id="314">
+            <description>CH 4 NUMBER</description>
+            <width>75</width>
+            <height>75</height>
+            <font>font14</font>
+            <align>right</align>
+            <aligny>center</aligny>
+            <textcolor>FFFFFFFF</textcolor>
+         </control>
+         <control type="label" id="315">
+            <description>CH 5 NUMBER</description>
+            <width>75</width>
+            <height>75</height>
+            <font>font14</font>
+            <align>right</align>
+            <aligny>center</aligny>
+            <textcolor>FFFFFFFF</textcolor>
+         </control>
+         <control type="label" id="316">
+            <description>CH 6 NUMBER</description>
+            <width>75</width>
+            <height>75</height>
+            <font>font14</font>
+            <align>right</align>
+            <aligny>center</aligny>
+            <textcolor>FFFFFFFF</textcolor>
+         </control>
+      </control>
+      <!--CH LIST-->
+      <control type="grouplist">
+         <posx>85</posx>
+         <posy>502</posy>
+         <itemgap>10</itemgap>
+         <orientation>vertical</orientation>
+         <!--CH NAME/ICON-->
+         <control type="label" id="301">
+            <description>CH 1 NAME</description>
+            <width>325</width>
+            <height>65</height>
+            <font>font14</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF0297eb</textcolor>
+            <visible>StringCompare(Control.GetLabel(321),)</visible>
+         </control>
+         <control type="image" id="321">
+            <description>CH 1 ICON</description>
+            <width>325</width>
+            <height>65</height>
+            <align>left</align>
+            <aligny>center</aligny>
+            <aspectratio>keep</aspectratio>
+            <visible>!StringCompare(Control.GetLabel(321),)</visible>
+         </control>
+         <control type="label" id="302">
+            <description>CH 2 NAME</description>
+            <width>325</width>
+            <height>65</height>
+            <font>font14</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF0297eb</textcolor>
+            <visible>StringCompare(Control.GetLabel(322),)</visible>
+         </control>
+         <control type="image" id="322">
+            <description>CH 2 ICON</description>
+            <width>325</width>
+            <height>65</height>
+            <align>left</align>
+            <aligny>center</aligny>
+            <aspectratio>keep</aspectratio>
+            <visible>!StringCompare(Control.GetLabel(322),)</visible>
+         </control>
+         <control type="label" id="303">
+            <description>CH 3 NAME</description>
+            <width>325</width>
+            <height>65</height>
+            <font>font14</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF0297eb</textcolor>
+            <visible>StringCompare(Control.GetLabel(323),)</visible>
+         </control>
+         <control type="image" id="323">
+            <description>CH 3 ICON</description>
+            <width>325</width>
+            <height>65</height>
+            <align>left</align>
+            <aligny>center</aligny>
+            <aspectratio>keep</aspectratio>
+            <visible>!StringCompare(Control.GetLabel(323),)</visible>
+         </control>
+         <control type="label" id="304">
+            <description>CH 4 NAME</description>
+            <width>325</width>
+            <height>65</height>
+            <font>font14</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF0297eb</textcolor>
+            <visible>StringCompare(Control.GetLabel(324),)</visible>
+         </control>
+         <control type="image" id="324">
+            <description>CH 4 ICON</description>
+            <width>325</width>
+            <height>65</height>
+            <align>left</align>
+            <aligny>center</aligny>
+            <aspectratio>keep</aspectratio>
+            <visible>!StringCompare(Control.GetLabel(324),)</visible>
+         </control>
+         <control type="label" id="305">
+            <description>CH 5 NAME</description>
+            <width>325</width>
+            <height>65</height>
+            <font>font14</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF0297eb</textcolor>
+            <visible>StringCompare(Control.GetLabel(325),)</visible>
+         </control>
+         <control type="image" id="325">
+            <description>CH 5 ICON</description>
+            <width>325</width>
+            <height>65</height>
+            <align>left</align>
+            <aligny>center</aligny>
+            <aspectratio>keep</aspectratio>
+            <visible>!StringCompare(Control.GetLabel(325),)</visible>
+         </control>
+         <control type="label" id="306">
+            <description>CH 6 NAME</description>
+            <width>325</width>
+            <height>65</height>
+            <font>font14</font>
+            <align>left</align>
+            <aligny>center</aligny>
+            <textcolor>FF0297eb</textcolor>
+            <visible>StringCompare(Control.GetLabel(326),)</visible>
+         </control>
+         <control type="image" id="326">
+            <description>CH 6 ICON</description>
+            <width>325</width>
+            <height>65</height>
+            <align>left</align>
+            <aligny>center</aligny>
+            <aspectratio>keep</aspectratio>
+            <visible>!StringCompare(Control.GetLabel(326),)</visible>
+         </control>
+      </control>
+      <!--SHOW LISTINGS-->
+      <control type="image">
+         <description>CH BACKGROUND</description>
+         <posx>410</posx>
+         <posy>498</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="group" id="111">
+         <posx>410</posx>
+         <posy>498</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="image">
+         <description>CH BACKGROUND</description>
+         <posx>410</posx>
+         <posy>573</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="group" id="112">
+         <posx>410</posx>
+         <posy>573</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="image">
+         <description>CH BACKGROUND</description>
+         <posx>410</posx>
+         <posy>648</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="group" id="113">
+         <posx>410</posx>
+         <posy>648</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="image">
+         <description>CH BACKGROUND</description>
+         <posx>4110</posx>
+         <posy>723</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="group" id="114">
+         <posx>410</posx>
+         <posy>723</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="image">
+         <description>CH BACKGROUND</description>
+         <posx>410</posx>
+         <posy>798</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="group" id="115">
+         <posx>410</posx>
+         <posy>798</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="image">
+         <description>CH BACKGROUND</description>
+         <posx>410</posx>
+         <posy>873</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <control type="group" id="116">
+         <posx>410</posx>
+         <posy>873</posy>
+         <width>1509</width>
+         <height>75</height>
+      </control>
+      <!-- TIMEBAR -->
+      <control type="image" id="120">
+         <posx>411</posx>
+         <posy>497</posy>
+         <width>15</width>
+         <height>450</height>
+         <aspectratio>keep</aspectratio>
+      </control>
+      <!-- DYNAMIC ARTWORK 508 -->
+      <control type="group">
+         <posx>635</posx>
+         <posy>84</posy>
+         <control type="button" id="507">
+            <description>DYNAMIC ART</description>
+            <label>landscape</label>
+            <visible>false</visible>
+            <width>150</width>
+            <height>150</height>
+         </control>
+         <control type="image" id="508">
+            <description>DYNAMIC ART</description>
+            <width>650</width>
+            <height>360</height>
+            <align>center</align>
+            <aspectratio>stretch</aspectratio>
+         </control>
+         <control type="image" id="510">
+            <visible>false</visible>
+         </control>
+      </control>
+      <control type="group" id="515" />
+      <!-- VIDEOWINDOW BOX -->
+      <control type="group" id="523">
+         <control type="image">
+            <description>INFO BACKGROUND</description>
+            <posx>0</posx>
+            <posy>0</posy>
+            <width>1920</width>
+            <height>1080</height>
+            <texture>videomask.png</texture>
+            <visible>Control.IsVisible(2)</visible>
+         </control>
+         <control type="label" id="524">
+            <description>VIDEO LABEL</description>
+            <posx>645</posx>
+            <posy>90</posy>
+            <width>600</width>
+            <height>50</height>
+            <align>center</align>
+            <font>font12</font>
+            <textcolor>C0C0C0C0</textcolor>
+            <label>True</label>
+            <visible>Control.IsVisible(2)</visible>
+         </control>
+         <!-- #### Skinners Include Everything for videowindow patch to work #### -->
+         <!-- PATCH START -->
+<!--          <control type="videowindow" id="2">
+            <description>VIDEO</description>
+            <posx>635</posx>
+            <posy>84</posy>
+            <width>650</width>
+            <height>360</height>
+            <aspectratio align="center" aligny="center">scale</aspectratio>
+         </control> -->
+         <!-- PATCH END -->
+         <!-- ################################################################## -->
+      </control>
+      <!-- SICK/COUCH/NEW ICONS -->
+      <control type="image" id="511">
+         <description>SICKBEARD/COUCHPOTATO ICON</description>
+         <posx>660</posx>
+         <posy>100</posy>
+         <width>128</width>
+         <height>128</height>
+         <aspectratio>keep</aspectratio>
+         <visible>!Control.IsVisible(2)</visible>
+      </control>
+      <control type="image" id="512">
+         <description>NEW ICON</description>
+         <posx>631</posx>
+         <posy>80</posy>
+         <width>143</width>
+         <height>145</height>
+         <visible>!Control.IsVisible(2)</visible>
+      </control>
+      <!-- DESCRIPTION INFO PANEL -->
+      <control type="label" id="500">
+         <posx>15</posx>
+         <posy>90</posy>
+         <description>SHOW NAME LABEL</description>
+         <width>550</width>
+         <height>50</height>
+         <align>center</align>
+         <font>font24_title</font>
+         <textcolor>FFFFFFFF</textcolor>
+         <scroll>true</scroll>
+         <wrapmultiline>false</wrapmultiline>
+         <scrollspeed>50</scrollspeed>
+         <scrollsuffix>-</scrollsuffix>
+      </control>
+      <control type="label" id="501">
+         <posx>15</posx>
+         <posy>133</posy>
+         <description>SHOW TITLE LABEL</description>
+         <width>550</width>
+         <height>50</height>
+         <align>center</align>
+         <font>font14</font>
+         <textcolor>FFFFFFFF</textcolor>
+         <scroll>true</scroll>
+         <wrapmultiline>false</wrapmultiline>
+         <scrollspeed>50</scrollspeed>
+         <scrollsuffix>-</scrollsuffix>
+      </control>
+      <control type="label">
+         <posx>15</posx>
+         <posy>172</posy>
+         <description>MPAA LABEL</description>
+         <width>550</width>
+         <height>50</height>
+         <label>$INFO[ListItem.Mpaa ,,  ] $INFO[ListItem.Rating,,  ]</label>
+         <align>center</align>
+         <font>font14</font>
+         <textcolor>FFFFFFFF</textcolor>
+      </control>
+      <control type="label" id="502">
+         <description>SHOW DESCRIPTION</description>
+         <posx>1345</posx>
+         <posy>90</posy>
+         <width>560</width>
+         <height>115</height>
+         <align>left</align>
+         <aligny>top</aligny>
+         <textcolor>FFFFFFFF</textcolor>
+         <font>font12</font>
+         <wrapmultiline>true</wrapmultiline>
+      </control>
+      <control type="grouplist">
+         <posx>18</posx>
+         <posy>52r</posy>
+         <align>left</align>
+         <orientation>horizontal</orientation>
+         <itemgap>8</itemgap>
+         <!--Selected Channel Logo-->
+         <control type="image" id="503">
+            <description>SHOW CH ICON</description>
+            <posx>-40</posx>
+            <posy>680</posy>
+            <width>180</width>
+            <height>40</height>
+            <aspectratio>keep</aspectratio>
+            <align>left</align>
+            <aligny>center</aligny>
+            <visible>False</visible>
+         </control>
+      </control>
+      <!-- WEATHER -->
+      <control type="label">
+         <description>WEATHER TEMPERATURE</description>
+         <posx>0</posx>
+         <posy>956</posy>
+         <width>1600</width>
+         <height>80</height>
+         <textcolor>C0C0C0C0</textcolor>
+         <scroll>True</scroll>
+         <autoscroll time="1000" delay="1000" repeat="2000">True</autoscroll>
+         <scrollsuffix>   • • • • •   </scrollsuffix>
+         <label>[COLOR=FFFFFFFF][B]$INFO[Window(weather).Property(Current.Location)] Current Conditions[/B][/COLOR]   $INFO[Window(weather).Property(Current.Condition)]  $INFO[Window(weather).Property(Current.Temperature)]$INFO[System.TemperatureUnits]   Feels Like $INFO[Window(weather).Property(Current.FeelsLike)]   Wind $INFO[Window(weather).Property(Current.Wind)]   Wind chill $INFO[Window(weather).Property(Current.WindChill)]$INFO[System.TemperatureUnits]   Humidity $INFO[Window(weather).Property(Current.Humidity)]   Visibility $INFO[Window(weather).Property(Current.Visibility)]   Sunrise $INFO[Window(weather).Property(Today.Sunrise)]   Sunset $INFO[Window(weather).Property(Today.Sunset)]   •  [COLOR=FFFFFFFF][B]3 Day Extended Forecast[/B][/COLOR]   •  [COLOR=FFFFFFFF][B]$INFO[Window(weather).Property(Day1.Title)][/B][/COLOR]   High $INFO[Window(weather).Property(Day1.HighTemp)]$INFO[System.TemperatureUnits]   Low $INFO[Window(weather).Property(Day1.LowTemp)]$INFO[System.TemperatureUnits]   $INFO[Window(weather).Property(Day1.Outlook)]   •  [COLOR=FFFFFFFF][B]$INFO[Window(weather).Property(Day2.Title)][/B][/COLOR]   High $INFO[Window(weather).Property(Day2.HighTemp)]$INFO[System.TemperatureUnits]   Low $INFO[Window(weather).Property(Day2.LowTemp)]$INFO[System.TemperatureUnits]   $INFO[Window(weather).Property(Day2.Outlook)]   •  [COLOR=FFFFFFFF][B]$INFO[Window(weather).Property(Day3.Title)][/B][/COLOR]   High $INFO[Window(weather).Property(Day3.HighTemp)]$INFO[System.TemperatureUnits]   Low $INFO[Window(weather).Property(Day3.LowTemp)]$INFO[System.TemperatureUnits]   $INFO[Window(weather).Property(Day3.Outlook)]</label>
+         <font>font13</font>
+         <align>center</align>
+         <aligny>center</aligny>
+         <visible>Weather.IsFetched</visible>
+      </control>
+      <control type="label">
+         <description>SYSTEM TIME</description>
+         <posx>1610</posx>
+         <posy>956</posy>
+         <width>300</width>
+         <height>80</height>
+         <textcolor>FFFFFFFF</textcolor>
+         <label>$INFO[System.Time]</label>
+         <font>font24_title</font>
+         <align>center</align>
+         <aligny>center</aligny>
+      </control>
+   </controls>
+</window>
