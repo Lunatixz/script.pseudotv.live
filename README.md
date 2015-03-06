@@ -15,15 +15,12 @@ Additional Features:
 - Random channel on launch option
 - Random channel button in side menu
 - Small channel bug option
-- Enhanced logging for debugging + optional notifications for ERROR/FATAL
+- Enhanced logging for debugging + optional notifications for ERROR/FATAL (so you can know right away if something went wrong)
 - more to come
 
 ------------------
 Original readme for PseudoTV Live:
 ------------------
-
-PseudoTV Live
-==================
 
 - Channel surfing for your Video, LiveTV, InternetTV and Plugin sources
  
