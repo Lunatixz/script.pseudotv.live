@@ -19,6 +19,21 @@ Additional Features:
 - more to come
 
 ------------------
+Controls:
+------------------
+
+- Same as your used to (down below)
+- Tapping or clicking on the screen will open/close the EPG
+- Default Overlay specific:
+ - Swipping up will open info
+ - Swipping right will open the side menu
+ - Swipping down will go back
+- EPG specific:
+ - Swipping up will page up on EPG display (careful not to touch other buttons)
+ - Swipping down will page down
+ - Swipping left/right will nav 1 space like arrow keys so you can see whats on in the future
+
+------------------
 Original readme for PseudoTV Live:
 ------------------
 
