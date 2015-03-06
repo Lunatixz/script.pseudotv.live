@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <addon id="script.pseudotv.min" version="0.3.2" name="PseudoTV Min" provider-name="Enigma0">
+    
+    <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.globalsearch" version="2.0.8"/>
+        <import addon="script.module.requests" version="2.4.3"/>
+        <import addon="script.module.feedparser" version="5.1.3"/>
+        <import addon="script.module.simplejson" version="3.3.0"/>
+        <import addon="script.common.plugin.cache" version="2.5.5"/>
+        <import addon="script.module.addon.common" version="2.0.0"/>
+        <import addon="script.artwork.downloader" version="12.0.27"/>
+        <import addon="script.module.metahandler" version="2.7.0"/>
+        <import addon="script.module.beautifulsoup" version="3.2.1"/>
+        <import addon="script.module.simple.downloader" version="1.9.5"/>
+        <import addon="script.extendedinfo" optional="true"/>
+        <import addon="script.module.pil" version="1.1.7"/>
+    </requires>
+    
+    <extension point="xbmc.python.script" defaultresolution="720p" defaultresolutionwide="720p" library="default.py"/>
+        
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="en">Channel surfing for your video library</summary>
+        <description lang="en">PseudoTV Min acts similar to normal broadcast or cable TV, complete with multiple preset and user-defined channels and an EPG. Original work done by Jason102, Lunatixz and others.</description>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
+        <website>https://github.com/Enigma0/script.pseudotv.min</website>
+		<source>https://github.com/Enigma0/script.pseudotv.min</source>
+    </extension>
+    
+</addon>

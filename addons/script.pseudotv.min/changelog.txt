@@ -1,0 +1,90 @@
+-----
+adds:
+-----
+
+-|- full android/touchscreen support via swipe gesture input
+-|-|-|- 0.3.1
+-|- added small channel bug option
+-|- click/tap detection for EPG menu show/hide (compatibility for android)
+-|- added Random Channel button to side menu
+-|-|-|- 0.3.0
+-|- overhauled global logging - config switch to toggle DEBUG to NOTICE
+-|- channel 1/2 are recently added tv/movies as it is often the drop in point
+-|- random channel on startup option - new default
+
+-----
+help:
+-----
+
+-|- verify tv shows/movies are properly scraped
+-|-|- any that aren't won't be be populated in channel lists
+-|- 'i' + 'left' for side menu
+-|- ERROR/FATAL popups can be turned off via this addons Debug menu
+-|- if a format isn't supported for parsing, you'll need to convert it
+
+-----
+bugs:
+-----
+
+-|- control 510 missing in EPG XML - PTVL skin
+-|-|- artwork2 missing
+-|- control 524 & 515 & 510 missing - Default skin
+-|-|- seek bar missing (515)
+-|- desynchronised channel line-up when starting at a channel > 1 ie 40
+-|-|- EPG will display content that is no longer playing
+-|-|-|- generate bidirectionally from initial channel
+-|- pseudotv logo bug not displaying
+-|- control 997 not getting called right sometimes
+-|- if channel generated based on tv meta information but no scraped files,
+-|-|- channel wont be accessible
+-|- side menu doesnt load transparency on android
+-|-
+-|- refer to https://sourceforge.net/p/pseudotv-lite/tickets/ for more info
+
+-----
+next:
+-----
+
+-|-|- control/experience
+-|-
+-|- page up/page down for EPG (android compatibility controls)
+-|-
+-|-|- ui enhancements
+-|-
+-|- lighten epg colors - whitewash and or blackwash but softer color
+-|-|- implement customizable color tables?
+-|- 'm'/menu brings up side menu
+-|- def showMenu() optimizations - 1600 overlay
+-|- def onAction() optimizations - 1900 overlay
+-|- set own background images?
+-|- could use upper right space on EPG for something, togglable
+-|- re-evaluate config section labels
+-|- maybe change default skin to black/transparent w/ white trim
+-|- show chanbug only when near a transition +/- 5-10 minutes
+-|-|- or even easier, just have it on a timer,
+-|-|- or start of every file for x amount of time
+-|- color EPG legend option in upper area?
+-|-
+-|-|- autotune enhancements
+-|-
+-|- bring forward more autotune options in config
+-|- maybe shuffle channel option
+-|-|- option to disperse tv between movie blocks
+-|- add more of channels with an amount over specific thresholds
+-|-|- more movie/studio channel variety
+-|- verify/optimize chan list generators;
+-|-|-| 4 episodes (in a row) in series max or scalable
+-|- remember most frequently watched channels for something?
+-|-|- additional autotune channel type for watch frequency?
+-|-|-|- im feeling lucky channel type
+-|-
+-|-|- misc
+-|-
+-|- maybe add install repo link in MISC menu for this and maybe also Live
+-|- various other #todo's in code
+-|- potentially integrate random trailers as a screensaver option for this
+-|-|- small incompatibility - the configure overlay remains over the playing trailers
+
+------------------------------------------------
+https://sourceforge.net/projects/pseudotv-lite/
+------------------------------------------------
