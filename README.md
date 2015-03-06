@@ -1,3 +1,27 @@
+PseudoTV Min
+==================
+
+- Min is for minimalistic and provides and EPG and AutoTune for locally scraped tv and movies
+- Min has all plugin support removed as well as PTV integration
+- Min has BCT integration removed, and anything other than locally scraped tv and movies
+- Min has a simplified and straight forward config that could ultimately be ignored for an enjoyable experience
+- Min will have more features/optimizations centered around this basic functionality
+
+------------------
+Additional Features:
+------------------
+
+- Full android touch/swipe support
+- Random channel on launch option
+- Random channel button in side menu
+- Small channel bug option
+- Enhanced logging for debugging + optional notifications for ERROR/FATAL
+- more to come
+
+------------------
+Original readme for PseudoTV Live:
+------------------
+
 PseudoTV Live
 ==================
 
