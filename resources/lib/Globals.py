@@ -69,15 +69,14 @@ xbmc.log(ADDON_ID +' '+ ADDON_NAME +' '+ ADDON_PATH +' '+ ADDON_VERSION)
 TVDB_API_KEY = '078845CE15BC08A7'
 TMDB_API_KEY = '9c47d05a3f5f3a00104f6586412306af'
 FANARTTV_API_KEY = '7bc4161cc4add99b14e51eddcdd5b985'
-YOUTUBE_API_KEY = "MTQ1MTU3cHJvdGVjdERPTk9SS0VZMTAxNzIwMTQxNTAw"
 
 # Timers
 AUTOSTART_TIMER = [0,5,10,15,20]#in seconds
 ART_TIMER = [6,12,24,48,72]
-SHORT_CLIP_ENUM = [15,30,60,90,120,180,240,300,360,420,460]#in seconds
+SHORT_CLIP_ENUM = [15,30,60,90,120,240,360,480]#in seconds
 INFOBAR_TIMER = [3,5,10,15,20,25]#in seconds
 MEDIA_LIMIT = [25,50,100,250,500,1000,0]#Media Per/Channel, 0 = Unlimited
-REFRESH_INT = [14520,28920,43320,86520]#in seconds (4|8|12|24hrs) + 2min offset
+REFRESH_INT = [14400,28800,43200,86400]#in seconds (4|8|12|24hrs)
 TIMEOUT = 15 * 1000
 TOTAL_FILL_CHANNELS = 20
 PREP_CHANNEL_TIME = 60 * 60 * 24 * 5
@@ -117,21 +116,11 @@ SETTINGS_LOC = REAL_SETTINGS.getAddonInfo('profile') #LOCKED
 CHANNELS_LOC = os.path.join(SETTINGS_LOC, 'cache') + '/' #LOCKED
 MADE_CHAN_LOC = os.path.join(CHANNELS_LOC, 'stored') + '/' #LOCKED
 GEN_CHAN_LOC = os.path.join(CHANNELS_LOC, 'generated') + '/' #LOCKED
-LOCK_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache')) + '/' #LOCKED
 PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder'))) #PVR Download location
-ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/' #Missing Artwork cache location
 LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location
-EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
 IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
 XMLTV_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'))) + '/'
-XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/'
-STRM_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'strm','')) 
 PTVL_SKIN_LOC = os.path.join(ADDON_PATH, 'resources', 'skins') #Path to PTVL Skin folder
-
-#XMLTV FILENAMES
-USTVnowXML = (os.path.join(XMLTV_CACHE_LOC, 'ustvnow.xml'))
-SSTVXML = (os.path.join(XMLTV_CACHE_LOC, 'smoothstreams.xml'))
-FTVXML = (os.path.join(XMLTV_CACHE_LOC, 'ftvguide.xml'))
 
 #BASEURL
 USERPASS = REAL_SETTINGS.getSetting('Donor_UP')
@@ -154,37 +143,63 @@ THUMB = (IMAGES_LOC + 'icon.png')
 if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
     CHANNEL_SHARING = True
     LOCK_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache')) + '/'
+    XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'xmltv')) + '/'
+    STRM_CACHE_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'strm','')) 
+    EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
+    ART_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'artwork')) + '/' #Missing Artwork cache location
 else:
-    CHANNEL_SHARING = False
+    CHANNEL_SHARING = False  
+    LOCK_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache')) + '/'
+    XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/'
+    STRM_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'strm','')) 
+    EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
+    ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/' #Missing Artwork cache location
+      
+#XMLTV FILENAMES
+USTVnowXML = (os.path.join(XMLTV_CACHE_LOC, 'ustvnow.xml'))
+SSTVXML = (os.path.join(XMLTV_CACHE_LOC, 'smoothstreams.xml'))
+PTVXML = (os.path.join(XMLTV_CACHE_LOC, 'ptvlguide.xml'))
       
 # SKIN SELECT
-if int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
-        Skin_Select = 'PTVL'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
 # Custom skin downloader todo.    
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
+if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
+    #Use XBMC's included PTVL skin, else Default.
+    if os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.lite/')):
+        Skin_Select = 'special://skin/media/'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv.lite')) + '/'
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
+    else:
         Skin_Select = 'Custom' 
         MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'
-else: 
-    #Use XBMC's included PTVL skin, else Default.
-    if os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.live/')):
-        Skin_Select = 'special://skin/media/'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv.live')) + '/'
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-    else:
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
         Skin_Select = 'Default'
         MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
         EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
-          
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
+        Skin_Select = 'PTVL'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
+        Skin_Select = 'Concast'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
+        Skin_Select = 'Maverick'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
+elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
+        Skin_Select = 'Z81'
+        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
+
 #Double check core image folders
 if not xbmcvfs.exists(MEDIA_LOC):
     print 'forcing default DEFAULT_MEDIA_LOC'
     MEDIA_LOC = DEFAULT_MEDIA_LOC 
 if not xbmcvfs.exists(EPGGENRE_LOC):
     print 'forcing default DEFAULT_EPGGENRE_LOC'
-    EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC         
+    EPGGENRE_LOC = DEFAULT_EPGGENRE_LOC               
            
 # Find XBMC Skin path
 if xbmcvfs.exists(xbmc.translatePath(os.path.join('special://','skin','720p',''))):
@@ -216,30 +231,33 @@ SILENT = REAL_SETTINGS.getSetting('silent')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop") == "true"
 OS_SET = int(REAL_SETTINGS.getSetting("os"))   
-FILTER_3D = ['3d','sbs','fsbs','ftab','hsbs','h.sbs','h-sbs','htab','sbs3d','3dbd','halfsbs','half.sbs','half-sbs','fullsbs','full.sbs','full-sbs','3dsbs','3d.sbs']
-SETTOP_REFRESH = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))]  
+
+if REAL_SETTINGS.getSetting('EnableSettop') == 'true': 
+    SETTOP_REFRESH = REFRESH_INT[int(REAL_SETTINGS.getSetting('REFRESH_INT'))] 
+else:
+    SETTOP_REFRESH = 72000
 
 if (OS_SET <= 5 or OS_SET == 10 or OS_SET == 12) and REAL_SETTINGS.getSetting("OS_SET_OVERRIDE") != "true":
     LOWPOWER = True
 else:
     LOWPOWER = False
 
-# Common Cache types, Stacked and sorted for read performance... Todo convert to local db, mysql? 22Hr daily clock
+# Common Cache types, Stacked and sorted for read performance... Todo convert to local db, mysql? 
 #General
 quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge, AutoUpdate
 bidaily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bidaily",12)                     #System Purge, AutoUpdate
-daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",22)                         #System Purge, AutoUpdate
-weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",22 * 7)                   #System Purge, AutoUpdate
-seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "seasonal",((22 * 7) * 3))       #System Purge, AutoUpdate
-monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((22 * 7) * 4))         #System Purge, AutoUpdate
+daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge, AutoUpdate
+weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge, AutoUpdate
+seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "seasonal",((24 * 7) * 3))       #System Purge, AutoUpdate
+monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge, AutoUpdate
 #FileLists
-localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",(SETTOP_REFRESH - 2))   #System Purge, AutoUpdate
-liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",22)                       #System Purge, AutoUpdate
-YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",22)                 #System Purge, AutoUpdate
-RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",22)                         #System Purge, AutoUpdate
-pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",22)                   #System Purge, AutoUpdate
+localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",(((SETTOP_REFRESH / 60) / 60) - 3600))#ForceReset
+liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge, AutoUpdate
+YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",48)                 #System Purge, AutoUpdate
+RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",48)                         #System Purge, AutoUpdate
+pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",72)                   #System Purge, AutoUpdate
 upnpTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",2)                      #System Purge, AutoUpdate
-lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",22)                       #System Purge, AutoUpdate
+lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",48)                       #System Purge, AutoUpdate
 #BCTs
 bumpers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bumpers",((24 * 7) * 4))         #BCT Purge
 ratings = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "ratings",((24 * 7) * 4))         #BCT Purge
@@ -365,7 +383,7 @@ ACTION_TELETEXT_BLUE = 218
 #define ACTION_TOGGLE_DIGITAL_ANALOG  202 // switch digital <-> analog
 
 #UTC XMLTV - XMLTV that uses UTC w/ Offset timing (not local time).
-UTC_XMLTV = ['ustvnow', 'ftvguide', 'smoothstreams']
+UTC_XMLTV = ['ustvnow', 'smoothstreams']
 
 #Dynamic Artwork plugins - #Title format must be "Title (Year)" or "Title" or "Title - Episode"
 DYNAMIC_PLUGIN_TV = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'UPNP', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']

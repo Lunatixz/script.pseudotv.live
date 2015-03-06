@@ -48,7 +48,7 @@
                 <label>Channel</label>
             </control>
             <control type="label">
-                <left>690</left>                
+                <left>680</left>                
                 <top>0</top>
                 <width>100</width>
                 <height>35</height>
@@ -255,7 +255,7 @@
                 <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
                 <textcolor>gray</textcolor>
                 <focusedcolor>white</focusedcolor>
-                <onup>115</onup>
+                <onup>110</onup>
                 <ondown>112</ondown>
                 <colordiffuse></colordiffuse>
             </control>
@@ -291,6 +291,24 @@
                 <focusedcolor>white</focusedcolor>
                 <onup>114</onup>
                 <onleft>112</onleft>
+                <onright>555</onright>
+                <align>center</align>
+                <colordiffuse></colordiffuse>
+            </control>
+            
+            <!-- HELP -->
+            <control type="button" id="555">
+                <left>615</left>
+                <top>485</top>
+                <width>40</width>
+				<height>40</height>
+                <label>?</label>
+                <texturefocus border="5">ptv_button-focus.png</texturefocus>
+                <texturenofocus border="5">ptv_button-nofocus.png</texturenofocus>
+                <textcolor>gray</textcolor>
+                <focusedcolor>white</focusedcolor>
+                <onup>114</onup>
+                <onleft>113</onleft>
                 <onright>112</onright>
                 <align>center</align>
                 <colordiffuse></colordiffuse>
@@ -977,7 +995,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>213</onup>
-                    <ondown>114</ondown>
+                    <ondown>115</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1143,7 +1161,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>222</onup>
-                    <ondown>114</ondown>
+                    <ondown>115</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1315,7 +1333,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>235</onup>
-                    <ondown>114</ondown>
+                    <ondown>115</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1427,7 +1445,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>242</onup>
-                    <ondown>114</ondown>
+                    <ondown>115</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1878,7 +1896,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>284</onup>
-                    <ondown>114</ondown>
+                    <ondown>115</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">
@@ -1918,7 +1936,7 @@
                 <top>110</top>
                 <width>720</width>
                 <height>455</height>
-                <!-- Plugin Name -->
+                <!-- UPNP Name -->
                 <control type="button" id="290">
                     <left>40</left>
                     <top>105</top>
@@ -1942,7 +1960,7 @@
                     <label>Plugin:</label>
                     <aligny>center</aligny>                   
                 </control>
-                <!-- Plugin Split Directory -->
+                <!-- UPNP Split Directory -->
                 <control type="button" id="291">
                     <left>40</left>
                     <top>145</top>
@@ -1966,7 +1984,7 @@
                     <label>Click to Browse:</label>
                     <aligny>center</aligny>                   
                 </control>
-                <!-- Hidden: Plugin Setting1 -->
+                <!-- Hidden: UPNP Setting1 -->
                 <control type="button" id="292">
                     <left>40</left>
                     <top>145</top>
@@ -2039,7 +2057,7 @@
                     <textoffsetx>7</textoffsetx>
                     <align>right</align>
                     <onup>294</onup>
-                    <ondown>114</ondown>
+                    <ondown>115</ondown>
                     <colordiffuse></colordiffuse>
                 </control>
                 <control type="label">

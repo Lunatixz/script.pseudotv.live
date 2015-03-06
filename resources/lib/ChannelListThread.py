@@ -45,7 +45,7 @@ class ChannelListThread(threading.Thread):
         self.log("Starting")
         self.chanlist.exitThread = False
         self.chanlist.readConfig()
-        self.chanlist.sleepTime = 0.1
+        self.chanlist.sleepTime = 1
 
         if self.myOverlay == None:
             self.log("Overlay not defined. Exiting.")
@@ -102,7 +102,7 @@ class ChannelListThread(threading.Thread):
                         return
 
         REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
-        self.chanlist.sleepTime = 0.3
+        self.chanlist.sleepTime = 3
 
         if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
             InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]

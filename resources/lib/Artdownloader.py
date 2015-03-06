@@ -38,7 +38,7 @@ from utils import *
 
 try:
     import buggalo
-    buggalo.SUBMIT_URL = 'http://pseudotvlive.com/buggalo/submit.php'
+    buggalo.SUBMIT_URL = 'http://pseudotvlive.com/buggalo-web/submit.php'
 except:
     pass
     
@@ -123,10 +123,11 @@ class Artdownloader:
         try:
             if not FileAccess.exists(path):
                 FileAccess.makedirs(path)
-                
             org =  xbmc.translatePath(org)
             original = Image.open(org)                  
-            converted_img = original.convert('LA')
+            converted_img = original.convert('LA')  
+            img_bright = ImageEnhance.Brightness(converted_img)
+            converted_img = img_bright.enhance(2.0)
             converted_img.save(mod)
             return mod
         except Exception,e:
@@ -135,15 +136,14 @@ class Artdownloader:
         
         
     #Find ChannelBug, then Convert if enabled.
-    def FindBug(self, chtype, chname, mediapath):
-        self.log("FindBug")
+    def FindBug(self, chtype, chname):
+        self.logDebug("FindBug, chname = " + chname)
         setImage = ''
         BugName = (chname[0:18] + '.png')
         DefaultBug = os.path.join(IMAGES_LOC,'Default.png')
         BugFLE = xbmc.translatePath(os.path.join(LOGO_LOC,BugName))
         cachedthumb = xbmc.getCacheThumbName(BugFLE)
         cachefile = xbmc.translatePath(os.path.join(ART_LOC, cachedthumb[0], cachedthumb[:-4] + ".png")).replace("\\", "/")
-        
         if REAL_SETTINGS.getSetting('UNAlter_ChanBug') == 'true':
             if not FileAccess.exists(BugFLE):
                 BugFLE = DefaultBug
@@ -159,7 +159,7 @@ class Artdownloader:
         
 
     def FindLogo(self, chtype, chname, mediapath):
-        self.log("FindLogo")
+        self.logDebug("FindLogo")
         found = False
         setImage = ''
         LogoName = (chname[0:18] + '.png')
@@ -168,6 +168,7 @@ class Artdownloader:
         
         if FileAccess.exists(LogoFolder):
             setImage = LogoFolder
+        # else:
         #if chtype 0, 9 check chname to fanart.tv for logo match.
         # elif REAL_SETTINGS.getSetting('FindLogos_Enabled') == 'true':
             # file_detail = str(self.logoParser.retrieve_icons_avail())
@@ -225,15 +226,15 @@ class Artdownloader:
         if Cache_Enabled == True: 
             self.log("FindArtwork Cache") 
             try: #stagger artwork cache by chtype
-                if int(chtype) <= 3:
+                if chtype <= 3:
                     result = artwork1.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, dbid, mpath, arttypeEXT)
-                elif int(chtype) > 3 and int(chtype) <= 6:
+                elif chtype > 3 and chtype <= 6:
                     result = artwork2.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, dbid, mpath, arttypeEXT)
-                elif int(chtype) > 6 and int(chtype) <= 9:
+                elif chtype > 6 and chtype <= 9:
                     result = artwork3.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, dbid, mpath, arttypeEXT)
-                elif int(chtype) > 9 and int(chtype) <= 12:
+                elif chtype > 9 and chtype <= 12:
                     result = artwork4.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, dbid, mpath, arttypeEXT)
-                elif int(chtype) > 9 and int(chtype) <= 15:
+                elif chtype > 9 and chtype <= 15:
                     result = artwork5.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, dbid, mpath, arttypeEXT)
                 else:
                     result = artwork6.cacheFunction(self.FindArtwork_NEW, type, chtype, chname, id, dbid, mpath, arttypeEXT)
@@ -250,7 +251,7 @@ class Artdownloader:
         
         
     def FindArtwork_NEW(self, type, chtype, chname, id, dbid, mpath, arttypeEXT):
-        self.log("FindArtwork_NEW, type = " + type + ' :chtype = ' + str(chtype) + ' :chname = ' + chname + ' :id = ' + str(id) + ' :dbid = ' + str(dbid) + ' :mpath = ' + mpath + ' :arttypeEXT = ' + arttypeEXT)
+        self.logDebug("FindArtwork_NEW, type = " + type + ', chtype = ' + str(chtype) + ', chname = ' + chname + ', id = ' + str(id) + ', dbid = ' + str(dbid) + ',arttypeEXT = ' + arttypeEXT)
         setImage = ''
         CacheArt = False
         DefaultArt = False
@@ -258,7 +259,7 @@ class Artdownloader:
         arttypeEXT_fallback = arttypeEXT.replace('landscape','fanart').replace('clearart','logo').replace('character','logo').replace('folder','poster')
         arttype_fallback = arttypeEXT_fallback.split(".")[0]
         
-        if int(chtype) <= 7:
+        if chtype <= 7:
             self.logDebug('FindArtwork_NEW, Infolder Artwork')
             smpath = mpath.rsplit('/',2)[0] #Path Above mpath ie Series folder
             artSeries = xbmc.translatePath(os.path.join(smpath, arttypeEXT))
@@ -277,7 +278,7 @@ class Artdownloader:
             else:
                 return self.dbidArt(type, chname, mpath, dbid, arttypeEXT)
         else:
-            if id == '0' or id == 0:
+            if id == '0':
                 if type == 'youtube':
                     self.logDebug('FindArtwork_NEW, Youtube')
                     return "http://img.youtube.com/vi/"+dbid+"/0.jpg"
@@ -303,23 +304,39 @@ class Artdownloader:
                 if FileAccess.exists(cachefile):
                     return cachefile
                 else:
-                    self.logDebug('FindArtwork_NEW, Artwork Download')
-                    setImage = self.DownloadArt(type, id, arttype, cachefile)
+                    if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true': 
+                        self.logDebug('FindArtwork_NEW, Artwork Download')
+                        setImage = self.DownloadArt(type, id, arttype, cachefile)
+                         
+                        if not FileAccess.exists(setImage):
+                            self.logDebug('FindArtwork_NEW, Artwork Download - Fallback')
+                            setImage = self.DownloadArt(type, id, arttype_fallback, cachefile)
                     
                     if not FileAccess.exists(setImage):
-                        self.logDebug('FindArtwork_NEW, Artwork Download - Fallback')
-                        setImage = self.DownloadArt(type, id, arttype_fallback, cachefile)
+                        self.logDebug('FindArtwork_NEW, Artwork Download - Default')
+                        setImage = self.SetDefaultArt(chname, mpath, arttypeEXT)
                         
-                        if not FileAccess.exists(setImage):
-                            self.logDebug('FindArtwork_NEW, Artwork Download - Default')
-                            setImage = self.SetDefaultArt(chname, mpath, arttypeEXT)
-                    
                     self.log("FindArtwork_NEW, setImage = " + setImage)
                     return setImage
+            
                 
-                    
     def SetDefaultArt(self, chname, mpath, arttypeEXT):
-        self.log('SetDefaultArt')
+        self.logDebug("SetDefaultArt Cache")
+        if Cache_Enabled == True: 
+            try:
+                result = artwork.cacheFunction(self.SetDefaultArt_NEW, chname, mpath, arttypeEXT)
+            except:
+                result = self.SetDefaultArt_NEW(chname, mpath, arttypeEXT)
+                pass
+        else:
+            result = self.SetDefaultArt_NEW(chname, mpath, arttypeEXT)
+        if not result:
+            result = THUMB
+        return result  
+
+        
+    def SetDefaultArt_NEW(self, chname, mpath, arttypeEXT):
+        self.logDebug('SetDefaultArt_NEW, chname = ' + chname + ', arttypeEXT = ' + arttypeEXT)
         setImage = ''
         arttype = arttypeEXT.split(".")[0]
         MediaImage = os.path.join(MEDIA_LOC, (arttype + '.png'))
@@ -377,13 +394,12 @@ class Artdownloader:
         setImage = ''
         tvdbAPI = TVDB(TVDB_API_KEY)
         tmdbAPI = TMDB(TMDB_API_KEY)  
+        drive, Dpath = os.path.splitdrive(cachefile)
+        path, filename = os.path.split(Dpath)
         
-        drive, path = os.path.splitdrive(cachefile)
-        path, filename = os.path.split(path)
-        
-        if not FileAccess.exists(path):
-            FileAccess.makedirs(path)
-        
+        if not FileAccess.exists(os.path.join(drive,path)):
+            FileAccess.makedirs(os.path.join(drive,path))   
+                
         if type == 'tvshow':
             self.logDebug('DownloadArt, tvshow')
             FanTVDownload = True
@@ -400,7 +416,7 @@ class Artdownloader:
                         requestDownload(tvdbPath,TVFilePath)
                         FanTVDownload = False
             except Exception,e:
-                print ('DownloadArt, tvdbAPI Failed!') 
+                self.log('DownloadArt, tvdbAPI Failed!')
                 pass
                 
             if FanTVDownload == True:
@@ -496,3 +512,52 @@ class Artdownloader:
             # else:
                 # self.DownloadThread.start()
             return MovieFilePath
+            
+            
+#logo parser
+class lsHTMLParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.icon_rel_url_list=[]
+
+        
+    def handle_starttag(self, tag, attrs):
+        if tag == "img":
+            for pair in attrs:
+                if pair[0]=="src" and pair[1].find("/logo/")!=-1:
+                    self.icon_rel_url_list.append(pair[1])
+                    
+                    
+    def retrieve_icons_avail(self, region='us'):
+        if Cache_Enabled:
+            print ("retrieve_icons_avail Cache")
+            try:
+                result = parsers.cacheFunction(self.retrieve_icons_avail_NEW, region)
+            except:
+                print ("retrieve_icons_avail Cache Failed Forwarding to retrieve_icons_avail_NEW")
+                result = self.retrieve_icons_avail_NEW(region)
+                pass
+        else:
+            print ("retrieve_icons_avail Cache Disabled")
+            result = self.retrieve_icons_avail_NEW(region)
+        if not result:
+            result = 0
+        return result
+         
+            
+    def retrieve_icons_avail_NEW(self, region='us'):
+        print 'retrieve_icons_avail'
+        lyngsat_sub_page="http://www.lyngsat-logo.com/tvcountry/%s_%d.html"
+        results={}
+        URL = 'http://www.lyngsat-logo.com/tvcountry/%s.html' % region
+        opener = urllib.FancyURLopener({})
+        f = opener.open(URL)
+        page_contents=f.read()
+        f.close()
+        parser=lsHTMLParser()
+        parser.feed(page_contents)
+        for icon_rel_url in parser.icon_rel_url_list:
+                icon_abs_url=urlparse.urljoin(lyngsat_sub_page, icon_rel_url)
+                icon_name=os.path.splitext(os.path.basename(icon_abs_url))[0].upper()
+                results[icon_name]=icon_abs_url
+        return results   
