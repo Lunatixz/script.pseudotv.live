@@ -17,14 +17,10 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-#import modules
-import urllib, urllib2
-import xbmc, sys, re
-#import modules
-import socket
-import xbmc
-import xbmcgui
-import unicodedata
+import urllib, urllib2, socket
+import unicodedata, sys, re
+import xbmc, xbmcgui
+import resources.lib.Globals
 
 # Use json instead of simplejson when python v2.7 or greater
 if sys.version_info < (2, 7):
@@ -32,18 +28,16 @@ if sys.version_info < (2, 7):
 else:
     import json
 
-# import libraries
 from urllib2 import HTTPError, URLError
 from language import *
-# import libraries
 from operator import itemgetter
-from Globals import *
+from resources.lib.Globals import *
 
 # Commoncache plugin import
 try:
     import StorageServer
 except Exception,e:
-    import storageserverdummy as StorageServer
+    import resources.lib.storageserverdummy as StorageServer
 
 ### Cache bool
 CACHE_ON = True
@@ -145,13 +139,16 @@ class TMDB(object):
     def get_image_list(self, media_id):
         log('Downloader: get_image_list, ' + str(media_id))
         API_KEY = TMDB_API_KEY
-        API_URL = 'http://api.themoviedb.org/3/movie/'+media_id+'/images?api_key='+API_KEY
+        API_CFG = 'http://api.themoviedb.org/3/configuration?api_key=%s'
+        API_URL = 'http://api.themoviedb.org/3/movie/%s/images?api_key=%s'
         log('Downloader: API_URL = ' + str(API_URL))
-        BASE_IMAGEURL = "http://d3gtl9l2a4fn1j.cloudfront.net/t/p/"
-
-        data = self.get_data(API_URL, 'json')
-        log('Downloader: data = ' + str(data))
         image_list = []
+        api_cfg = self.get_data(API_CFG%(API_KEY), 'json')
+        if api_cfg == "Empty" or not api_cfg:
+            return image_list
+        BASE_IMAGEURL = api_cfg['images'].get('base_url')
+        data = self.get_data(API_URL%(media_id, API_KEY), 'json')
+        log('Downloader: data = ' + str(data))
         if data == "Empty" or not data:
             return image_list
         else:
@@ -252,7 +249,7 @@ class TMDB(object):
         tmdb_id = ''
         xbmc.log('TMDB API search:   %s ' % search_url)
         try:
-            data = get_data(search_url, 'json')
+            data = self.get_data(search_url, 'json')
             if data == "Empty":
                 tmdb_id = ''
             else:

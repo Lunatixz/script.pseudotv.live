@@ -20,7 +20,7 @@
 import os, sys, re, shutil, threading
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
-from resources.lib.ga import *
+from resources.lib.GA import *
 from resources.lib.Globals import *
 from resources.lib.FileAccess import *
 from resources.lib.utils import *
@@ -53,9 +53,7 @@ def PseudoTV():
     try:
         MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.live.TVOverlay.xml", __cwd__, Skin_Select)
     except Exception: 
-        buggalo.addExtraData("Skin_Select = ", str(Skin_Select))
-        buggalo.onExceptionRaised()
-        Error('PseudoTV Live','Error loading "' + Skin_Select + '" skin!','Verify selected skin in settings') 
+        Error('PseudoTV Live','Error loading "' + Skin_Select + '" skin!','Verify selected skin.') 
         return
         
     for curthread in threading.enumerate():
@@ -75,9 +73,11 @@ def PseudoTV():
 
     
 # Adapting a solution from ronie (http://forum.xbmc.org/showthread.php?t=97353)
-if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":    
+if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":   
     try:
         PTVL_Version = REAL_SETTINGS.getSetting("PTVL_Version")
+        if not PTVL_Version:
+            raise
     except:
         REAL_SETTINGS.setSetting("PTVL_Version", __version__)
         PTVL_Version = REAL_SETTINGS.getSetting("PTVL_Version") 
@@ -89,13 +89,12 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
         
         # Donor Download
         xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-DDautopatch)")
+        
         # Auto VideoWindow Patch.
         VideoWindow()
-        #call showChangeLog like this to workaround bug in openElec, *Thanks spoyser
-        xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-showChangelog)")
         
-        if dlg.yesno("PseudoTV Live", "System Reboot recommend after update, Exit XBMC?"):
-            xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),%d,true)" % ( 0.5, ) )         
+        #call showChangeLog like this to workaround bug in openElec, *Thanks spoyser
+        xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-showChangelog)")  
     else:
         #Check if Outdated/Install Repo
         VersionCompare()
@@ -105,10 +104,7 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
 
         # Auto VideoWindow Patch.
         VideoWindow()
-        
-        # Temp Force setting.
-        REAL_SETTINGS.setSetting('ClipLength', '7')
-        
+                
         # Clear filelist Caches    
         if REAL_SETTINGS.getSetting("ClearCache") == "true":
             log('ClearCache')  
@@ -179,25 +175,26 @@ if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
             Normal_Shutdown = REAL_SETTINGS.getSetting('Normal_Shutdown') == "true"
                 
         if REAL_SETTINGS.getSetting("ATRestore") == "true" and REAL_SETTINGS.getSetting("Warning2") == "true":
-            log('Setting2 ATRestore onInit') 
+            log('Setting2 ATRestore') 
             if getSize(atsettingsFile) > 100:
                 REAL_SETTINGS.setSetting("ATRestore","false")
                 REAL_SETTINGS.setSetting("Warning2","false")
                 REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
                 Restore(atsettingsFile, settingsFile)   
         elif Normal_Shutdown == False:
-            log('Setting2 Restore onInit') 
+            log('Setting2 Restore') 
             if getSize(settingsFile) < 100 and getSize(nsettingsFile) > 100:
                 Restore(nsettingsFile, settingsFile)
         else:
-            log('Setting2 Backup onInit') 
+            log('Setting2 Backup') 
             if getSize(settingsFile) > 100:
                 Backup(settingsFile, nsettingsFile)
 
         REAL_SETTINGS.setSetting("ArtService_onInit","false")
         REAL_SETTINGS.setSetting("ArtService_Running","false")
+        
         #Start PseudoTV
         PseudoTV()
 else:
     log('script.pseudotv.live - Already running, exiting', xbmc.LOGERROR)
-    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Already running, Please Wait...", 1000, THUMB) )
+    xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Already running please wait and try again...", 4000, THUMB) )

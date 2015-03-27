@@ -51,10 +51,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.actionSemaphore = threading.BoundedSemaphore()
         self.lastActionTime = time.time()
         self.channelLogos = ''
-        self.textcolor = "FFFFFFFF"
-        self.focusedcolor = "FF7d7d7d"
         self.clockMode = 0
-        self.textfont  = "font14"
         self.startup = time.time()
         self.showingInfo = False
         self.infoOffset = 0
@@ -120,25 +117,21 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         
         try:
             textcolor = int(self.getControl(100).getLabel(), 16)            
-
-            if textcolor > 0:
-                self.textcolor = hex(textcolor)[2:]
+            self.textcolor = hex(textcolor)[2:]
         except:
-            pass
+            self.textcolor = "FFFFFFFF"
         
         try:
             focusedcolor = int(self.getControl(99).getLabel(), 16)
-
-            if focusedcolor > 0:
-                self.focusedcolor = hex(focusedcolor)[2:]
+            self.focusedcolor = hex(focusedcolor)[2:]
         except:
-            pass
-        
+            self.focusedcolor = "FF7d7d7d"
+
         try:
             self.textfont = self.getControl(105).getLabel()
         except:
-            pass
-        
+            self.textfont  = "font14"
+
         try:
             if self.setChannelButtons(time.time(), self.MyOverlayWindow.currentChannel) == False:
                 self.log('Unable to add channel buttons')
@@ -233,7 +226,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             if singlerow == -1 or singlerow == i:
                 self.setButtons(starttime, basecur, i)
                 myadds.extend(self.channelButtons[i])
-                
             basecur = self.MyOverlayWindow.fixChannel(basecur + 1)
 
         basecur = curchannel
@@ -253,12 +245,14 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     try:
                         chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
                     except:
-                        chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
-                        pass
+                        self.log("Unknown EPG Chtype Exception", xbmc.LOGERROR)
+                        chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
+                        pass  
                     chname = (self.MyOverlayWindow.channels[curchannel - 1].name)
                     plpos = self.determinePlaylistPosAtTime(starttime, (curchannel - 1))
                     mediapath = ascii(self.MyOverlayWindow.channels[curchannel - 1].getItemFilename(plpos))
-                    setImage = self.Artdownloader.FindLogo(chtype, chname, mediapath)
+                    mpath = self.MyOverlayWindow.GetMpath(mediapath)
+                    setImage = self.Artdownloader.FindLogo(chtype, chname, mpath)
                     self.getControl(321 + i).setImage(setImage)
                 else:
                     self.getControl(321 + i).setImage('NA.png')
@@ -310,7 +304,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
 
         
     def GetEPGtype(self, genre):
-        #rewrite as option switch, dict? faster? todo
+        #rewrite as option switch, dict? faster? time function todo?
         if genre in COLOR_RED_TYPE:
             return (EPGGENRE_LOC + 'COLOR_RED.png')
         elif genre in COLOR_GREEN_TYPE:
@@ -351,7 +345,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:
                 chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
             except:
-                chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
+                self.log("Unknown EPG Chtype Exception", xbmc.LOGERROR)
+                chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
                 pass
 
             chname = ascii(self.MyOverlayWindow.channels[curchannel - 1].name)
@@ -370,7 +365,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                         
 
-            if self.MyOverlayWindow.channels[curchannel - 1].isPaused:
+            if self.MyOverlayWindow.channels[curchannel - 1].isPaused and (chtype != 8 or chtype != 9):
                 self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].getCurrentTitle() + " (paused)", focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
             elif chname in BYPASS_EPG:
                 self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
@@ -384,7 +379,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 # it could have been fast forwarded or rewinded (rewound)?
                 if curchannel == self.MyOverlayWindow.currentChannel:
                     #Live TV pull date from the playlist entry
-                    if chtype == 8:
+                    if chtype == 8 and len(self.MyOverlayWindow.channels[curchannel - 1].getItemtimestamp(playlistpos)) > 0:
                         #episodetitle is actually the start time of each show that the playlist gets from channellist.py
                         tmpDate = self.MyOverlayWindow.channels[curchannel - 1].getItemtimestamp(playlistpos)
                         
@@ -404,7 +399,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
 
                 else:
                     #Live TV pull date from the playlist entry
-                    if chtype == 8:
+                    if chtype == 8 and len(self.MyOverlayWindow.channels[curchannel - 1].getItemtimestamp(playlistpos)) > 0:
                         playlistpos = self.MyOverlayWindow.channels[curchannel - 1].playlistPosition
                         #episodetitle is actually the start time of each show that the playlist gets from channellist.py
                         tmpDate = self.MyOverlayWindow.channels[curchannel - 1].getItemtimestamp(playlistpos)
@@ -934,7 +929,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try:
             chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
         except:
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
+            self.log("Unknown EPG Chtype Exception", xbmc.LOGERROR)
+            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
             pass
             
         #Check if VideoWindow Patch found, Toggle Visible.
@@ -1024,17 +1020,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.PTVChanNum = newchan
         self.PVRtype = type
         self.PVRdbid = dbid
+        mpath = self.MyOverlayWindow.GetMpath(mediapath)
         
-        if mediapath[0:5] == 'stack':
-            smpath = (mediapath.split(' , ')[0]).replace('stack://','').replace('rar://','')
-            mpath = (os.path.split(smpath)[0]) + '/'
-        elif mediapath[0:6] == 'plugin':
-            mpath = 'plugin://' + mediapath.split('/')[2] + '/'
-        elif mediapath[0:4] == 'upnp':
-            mpath = 'upnp://' + mediapath.split('/')[2] + '/'
-        else:
-            mpath = (os.path.split(mediapath)[0]) + '/'
- 
         #Sickbeard/Couchpotato
         try:
             if Managed == 'True':
@@ -1146,7 +1133,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             try:
                 chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
             except:
-                chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
+                self.log("Unknown EPG Chtype Exception", xbmc.LOGERROR)
+                chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(newchan) + '_type'))
                 pass
                 
             if plpos == -1:
@@ -1163,7 +1151,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             #Start at the beginning of the playlist get the first epoch date
             #position pos of the playlist convert the string add until we get to the current item in the playlist
 
-            if chtype == 8:
+            if chtype == 8 and len(self.MyOverlayWindow.channels[newchan - 1].getItemtimestamp(pos)) > 0:
                 tmpDate = self.MyOverlayWindow.channels[newchan - 1].getItemtimestamp(pos)
                 self.log("selectshow tmpdate " + str(tmpDate))
                 
@@ -1196,7 +1184,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     self.log('selectShow return current show')
                     return
 
-                if chtype == 8:
+                if chtype == 8 and len(self.MyOverlayWindow.channels[newchan - 1].getItemtimestamp(pos)) > 0:
                     tmpDate = self.PVRtimestamp
                     try:#sloppy fix, for threading issue with strptime.
                         t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
@@ -1211,7 +1199,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     return
             
             if pos != plpos:
-                if chtype == 8:
+                if chtype == 8 and len(self.MyOverlayWindow.channels[newchan - 1].getItemtimestamp(pos)) > 0:
                     tmpDate = self.PVRtimestamp
                     try:#sloppy fix, for threading issue with strptime.
                         t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
@@ -1257,8 +1245,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try:
             chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
         except:
-            chtype = int(ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
+            self.log("Unknown EPG Chtype Exception", xbmc.LOGERROR)
+            chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(channel) + '_type'))
             pass
+
         self.lastExitTime = ADDON_SETTINGS.getSetting("LastExitTime")     
         
         try:
@@ -1275,7 +1265,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 if channel == self.MyOverlayWindow.currentChannel: #currentchannel epg
                     playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition())
                     #Live TV pull date from the playlist entry
-                    if chtype == 8:
+                    if chtype == 8 and len(self.MyOverlayWindow.channels[channel - 1].getItemtimestamp(playlistpos)) > 0:
                         tmpDate = self.MyOverlayWindow.channels[channel - 1].getItemtimestamp(playlistpos)
                         self.logDebug("setbuttonnowtime2 " + str(tmpDate))
                        
@@ -1298,7 +1288,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 else:
                     playlistpos = self.MyOverlayWindow.channels[channel - 1].playlistPosition
                     #Live TV pull date from the playlist entry
-                    if chtype == 8:
+                    if chtype == 8 and len(self.MyOverlayWindow.channels[channel - 1].getItemtimestamp(playlistpos)) > 0:
                         tmpDate = self.MyOverlayWindow.channels[channel - 1].getItemtimestamp(playlistpos)
                         self.logDebug("setbuttonnowtime2 " + str(tmpDate))
                            

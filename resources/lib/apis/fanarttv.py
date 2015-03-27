@@ -17,18 +17,9 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-#import modules
-import sys
-import urllib
-from operator import itemgetter
-from Globals import *
-
-#import modules
-import socket
-import xbmc
-import xbmcgui
-import unicodedata
-import urllib2
+import resources.lib.Globals
+import sys, xbmc, xbmcgui
+import unicodedata, urllib, urllib2, socket
 
 # Use json instead of simplejson when python v2.7 or greater
 if sys.version_info < (2, 7):
@@ -39,55 +30,57 @@ else:
 # Commoncache plugin import
 try:
     import StorageServer
-except Exception,e:
-    import storageserverdummy as StorageServer
+except Exception,e: 
+    import resources.lib.storageserverdummy as StorageServer
 
-# import libraries
+from operator import itemgetter
+from resources.lib.Globals import *
 from urllib2 import HTTPError, URLError
 
-# Cache bool
-CACHE_ON = True
+class fanarttv:
+    def __init__(self):
+        # Cache bool
+        CACHE_ON = True
+        self.API_KEY = FANARTTV_API_KEY
+        self.API_URL_TV = 'http://webservice.fanart.tv/v3/tv/%s?api_key=%s'
+        self.API_URL_MOVIE = 'http://webservice.fanart.tv/v3/movies/%s?api_key=%s'
 
-API_KEY = FANARTTV_API_KEY
-API_URL_TV = 'http://webservice.fanart.tv/v3/tv/%s?api_key=%s'
-API_URL_MOVIE = 'http://webservice.fanart.tv/v3/movies/%s?api_key=%s'
+        self.IMAGE_TYPES_MOVIES = ['clearlogo',
+                              'clearart',
+                              'hdclearart',
+                              'movielogo',
+                              'hdmovielogo',
+                              'movieart',
+                              'moviedisc',
+                              'hdmovieclearart',
+                              'moviethumb',
+                              'moviebanner']
 
-IMAGE_TYPES_MOVIES = ['clearlogo',
-                      'clearart',
-                      'hdclearart',
-                      'movielogo',
-                      'hdmovielogo',
-                      'movieart',
-                      'moviedisc',
-                      'hdmovieclearart',
-                      'moviethumb',
-                      'moviebanner']
-
-IMAGE_TYPES_SERIES = ['clearlogo',
-                      'hdtvlogo',
-                      'clearart',
-                      'hdclearart',
-                      'tvthumb',
-                      'seasonthumb',
-                      'characterart',
-                      'tvbanner',
-                      'seasonbanner']
+        self.IMAGE_TYPES_SERIES = ['clearlogo',
+                              'hdtvlogo',
+                              'clearart',
+                              'hdclearart',
+                              'tvthumb',
+                              'seasonthumb',
+                              'characterart',
+                              'tvbanner',
+                              'seasonbanner']
 
                
 # Retrieve JSON data from cache function
-def get_data(url, data_type ='json'):
-    xbmc.log('script.pseudotv.live-fanarttv: get_data')
+def get_data(self, url, data_type ='json'):
+    xbmc.log('script.pseudotv.live-fanarttv: self.get_data')
     if CACHE_ON:
-        result = parserFANTV.cacheFunction(get_data_new, url, data_type)
+        result = parserFANTV.cacheFunction(self.get_data_new, url, data_type)
     else:
-        result = get_data_new(url, data_type)
+        result = self.get_data_new(url, data_type)
     if not result:
         result = 'Empty'
     return result
 
 
 # Retrieve JSON data from site
-def get_data_new(url, data_type):
+def get_data_new(self, url, data_type):
     #log('Cache expired. Retrieving new data')
     data = []
     try:
@@ -121,7 +114,7 @@ def get_data_new(url, data_type):
     return data
     
     
-def get_language(abbrev):
+def get_language(self, abbrev):
     try:
         lang_string = xbmc.convertLanguage(abbrev, xbmc.ENGLISH_NAME)
     except:
@@ -129,7 +122,7 @@ def get_language(abbrev):
     return lang_string
     
     
-def get_abbrev(lang_string):
+def get_abbrev(self, lang_string):
     try:
         language_abbrev = xbmc.convertLanguage(lang_string, xbmc.ISO_639_1)
     except:
@@ -137,16 +130,16 @@ def get_abbrev(lang_string):
     return language_abbrev
     
     
-def get_image_list_TV(media_id):
+def get_image_list_TV(self, media_id):
     xbmc.log('script.pseudotv.live-fanarttv: get_image_list_TV')
     try:
-        data = get_data(API_URL_TV%(media_id, API_KEY), 'json')
+        data = self.get_data(self.API_URL_TV%(media_id, self.API_KEY), 'json')
         image_list = []
         if data == 'Empty' or not data:
             return image_list
         else:
             for value in data.iteritems():
-                for art in IMAGE_TYPES_SERIES:
+                for art in self.IMAGE_TYPES_SERIES:
                     if art == value[0]:
                         for item in value[1]:
                             # Check on what type and use the general tag
@@ -167,7 +160,7 @@ def get_image_list_TV(media_id):
                             else:
                                 size = ''
                             # Create GUI info tag
-                            generalinfo = '%s: %s  |  ' %( 'Language', get_language(item.get('lang')).capitalize())
+                            generalinfo = '%s: %s  |  ' %( 'Language', self.get_language(item.get('lang')).capitalize())
                             if item.get('season'):
                                 generalinfo += '%s: %s  |  ' %( 'Season', item.get('season'))
                             generalinfo += '%s: %s  |  ' %( 'Votes', item.get('likes'))
@@ -194,16 +187,16 @@ def get_image_list_TV(media_id):
     except:
         pass
 
-def get_image_list_Movie( media_id):
+def get_image_list_Movie(self, media_id):
     xbmc.log('script.pseudotv.live-fanarttv: get_image_list_Movie')
     try:
-        data = get_data(API_URL_MOVIE%(API_KEY, media_id), 'json')
+        data = self.get_data(self.API_URL_MOVIE%(self.API_KEY, media_id), 'json')
         image_list = []
         if data == 'Empty' or not data:
             return image_list
         else:
             for value in data.iteritems():
-                for art in IMAGE_TYPES_MOVIES:
+                for art in self.IMAGE_TYPES_MOVIES:
                     if art == value[0]:
                         for item in value[1]:
                             # Check on what type and use the general tag
@@ -220,7 +213,7 @@ def get_image_list_Movie( media_id):
                                 size = 'SD'
                             else:
                                 size = ''
-                            generalinfo = '%s: %s  |  ' %( 'Language', get_language(item.get('lang')).capitalize())
+                            generalinfo = '%s: %s  |  ' %( 'Language', self.get_language(item.get('lang')).capitalize())
                             if item.get('disc_type'):
                                 generalinfo += '%s: %s (%s)  |  ' %( 'Disc', item.get('disc'), item.get('disc_type'))
                             if art in ['hdmovielogo', 'hdmovieclearart', 'movielogo', 'movieclearart']:

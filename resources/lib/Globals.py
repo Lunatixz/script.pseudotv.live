@@ -116,16 +116,16 @@ SETTINGS_LOC = REAL_SETTINGS.getAddonInfo('profile') #LOCKED
 CHANNELS_LOC = os.path.join(SETTINGS_LOC, 'cache') + '/' #LOCKED
 MADE_CHAN_LOC = os.path.join(CHANNELS_LOC, 'stored') + '/' #LOCKED
 GEN_CHAN_LOC = os.path.join(CHANNELS_LOC, 'generated') + '/' #LOCKED
-PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder'))) #PVR Download location
-LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location
 IMAGES_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/'
-XMLTV_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'))) + '/'
 PTVL_SKIN_LOC = os.path.join(ADDON_PATH, 'resources', 'skins') #Path to PTVL Skin folder
+LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location   
+PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder'))) #PVR Download location
+XMLTV_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'))) + '/'
 
 #BASEURL
 USERPASS = REAL_SETTINGS.getSetting('Donor_UP')
-BASEURL = 'http://ptvl.comeze.com/PTVL/'
-PTVLURL = 'http://'+USERPASS+'@ptvl.comeze.com/PTVL/'
+BASEURL = 'http://pseudotvlive.com/ptvl/'
+PTVLURL = 'http://'+USERPASS+'@pseudotvlive.com/ptvl/'
 
 # Core Default Image Locations
 DEFAULT_MEDIA_LOC =  xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', 'media')) + '/'
@@ -154,12 +154,11 @@ else:
     STRM_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'strm','')) 
     EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
     ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/' #Missing Artwork cache location
-      
-#XMLTV FILENAMES
-USTVnowXML = (os.path.join(XMLTV_CACHE_LOC, 'ustvnow.xml'))
-SSTVXML = (os.path.join(XMLTV_CACHE_LOC, 'smoothstreams.xml'))
-PTVXML = (os.path.join(XMLTV_CACHE_LOC, 'ptvlguide.xml'))
-      
+
+#XMLTV FILENAME
+PTVLXML = (os.path.join(XMLTV_CACHE_LOC, 'ptvlguide.xml'))
+PTVLXMLZIP = (os.path.join(LOCK_LOC, 'ptvlguide.zip'))
+
 # SKIN SELECT
 # Custom skin downloader todo.    
 if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
@@ -226,7 +225,7 @@ dlg = xbmcgui.Dialog()
 ADDON_SETTINGS = Settings.Settings()
 GlobalFileLock = FileLock()
 Donor_Downloaded = False
-NOTIFY = REAL_SETTINGS.getSetting('notify')
+NOTIFY = REAL_SETTINGS.getSetting('notify') == "true"
 SILENT = REAL_SETTINGS.getSetting('silent')
 DEBUG = REAL_SETTINGS.getSetting('enable_Debug')   
 SETTOP = REAL_SETTINGS.getSetting("EnableSettop") == "true"
@@ -383,7 +382,7 @@ ACTION_TELETEXT_BLUE = 218
 #define ACTION_TOGGLE_DIGITAL_ANALOG  202 // switch digital <-> analog
 
 #UTC XMLTV - XMLTV that uses UTC w/ Offset timing (not local time).
-UTC_XMLTV = ['ustvnow', 'smoothstreams']
+UTC_XMLTV = []
 
 #Dynamic Artwork plugins - #Title format must be "Title (Year)" or "Title" or "Title - Episode"
 DYNAMIC_PLUGIN_TV = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'UPNP', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']

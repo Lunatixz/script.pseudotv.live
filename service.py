@@ -17,8 +17,7 @@
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os, shutil, datetime, time, random
-import xbmc, xbmcgui, xbmcaddon, xbmcvfs
+import os, xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 from time import sleep
 
@@ -32,49 +31,22 @@ ADDON_VERSION = REAL_SETTINGS.getAddonInfo('version')
 THUMB = (xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'images')) + '/' + 'icon.png')
 
 
-# def SetOS():
-    # osWin = xbmc.getCondVisibility('system.platform.windows')
-    # osOsx = xbmc.getCondVisibility('system.platform.osx')
-    # osLinux = xbmc.getCondVisibility('system.platform.linux')
-    # osAndroid = xbmc.getCondVisibility('system.platform.android')
-
-    # if osWin:
-        # REAL_SETTINGS.setSetting("os","11")
-    # elif osOsx:
-        # REAL_SETTINGS.setSetting("os","8")
-    # elif osLinux:
-        # REAL_SETTINGS.setSetting("os","1")
-    # elif osLinux:
-        # REAL_SETTINGS.setSetting("os","1")
-    # else:
-        # REAL_SETTINGS.setSetting("os","1")
-
-        
-def HubSwap(): # Swap Org/Hub versions if 'Hub Installer' found.
+# Swap Org/Hub versions if 'Hub Installer' found.
+def HubSwap():
     icon = ADDON_PATH + '/icon'
     HUB = xbmc.getCondVisibility('System.HasAddon(plugin.program.addoninstaller)') == 1
     
     if HUB == True:
         xbmc.log('script.pseudotv.live-Service: HubSwap = Hub Edition')
-        
         if REAL_SETTINGS.getSetting('Hub') == 'false':
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live","Hub-Edition Activated", 4000, THUMB) )
             REAL_SETTINGS.setSetting("Hub","true")
-            try:
-                xbmcvfs.delete(icon + '.png')
-                xbmcvfs.copy(icon + 'HUB', icon + '.png')
-            except:
-                pass
     else:
         xbmc.log('script.pseudotv.live-Service: HubSwap = Master')
         REAL_SETTINGS.setSetting("Hub","false")
-        try:
-            xbmcvfs.delete(icon + '.png')
-            xbmcvfs.copy(icon + 'OEM', icon + '.png')
-        except:
-            pass
+    return          
 
-            
+
 def donorCHK():
     DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
     DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
@@ -93,22 +65,24 @@ def donorCHK():
         REAL_SETTINGS.setSetting("TRL_Donor", "false")
         REAL_SETTINGS.setSetting("CAT_Donor", "false")
         # REAL_SETTINGS.setSetting("autoFindCommunity_Source", "0")
-    
+    return
         
+        
+# execute service functions
 def service():
     xbmc.log('script.pseudotv.live-Service: Init')
     try:
         while (not xbmc.abortRequested):
-            xbmc.log("script.pseudotv.live-Service: Started")
             if xbmcgui.Window(10000).getProperty("PseudoTVRunning") != "True":
-                xbmc.log('script.pseudotv.live-Service: Running')
+                xbmc.log("script.pseudotv.live-Service: Started")
                 donorCHK()
                 HubSwap()
                 
-                #Autostart Trigger
-                if REAL_SETTINGS.getSetting("Auto_Start") == "true": 
-                    autostart() 
-                    
+                # if autostart enabled, and first boot. Start PTVL!
+                if REAL_SETTINGS.getSetting("Auto_Start") == "true" and xbmcgui.Window(10000).getProperty("Auto_Start_Exit") != "True":
+                    xbmcgui.Window(10000).setProperty("Auto_Start_Exit", "True")
+                    autostart()
+                
             xbmc.log('script.pseudotv.live-Service: Idle')
             xbmc.sleep(100000)
     except:
@@ -122,5 +96,6 @@ def autostart():
     IDLE_TIME = AUTOSTART_TIMER[int(REAL_SETTINGS.getSetting('timer_amount'))] 
     sleep(IDLE_TIME)
     xbmc.executebuiltin('RunScript("' + ADDON_PATH + '/default.py' + '")')
-
+    return
+    
 service()

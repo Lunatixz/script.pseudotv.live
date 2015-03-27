@@ -17,18 +17,13 @@ u'Cabin Fever'
 __author__ = "dbr/Ben"
 __version__ = "1.9"
 
-import os
-import time
-import urllib
-import urllib2
-import getpass
-import StringIO
-import tempfile
-import warnings
-import logging
-import datetime
-import zipfile
+import os, time, datetime
+import StringIO, tempfile, warnings
+import urllib, urllib2, getpass
+import logging, zipfile
 import xbmcaddon, xbmc, xbmcgui, xbmcvfs
+import resources.lib.Globals
+
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
@@ -39,13 +34,10 @@ try:
 except ImportError:
     gzip = None
 
-
+from resources.lib.Globals import *
 from tvdb_cache import CacheHandler
-from Globals import *
 from tvdb_ui import BaseUI, ConsoleUI
 from tvdb_exceptions import (tvdb_error, tvdb_userabort, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_attributenotfound)
-
-
 
 lastTimeout = None
 

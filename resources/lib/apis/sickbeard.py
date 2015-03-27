@@ -17,19 +17,18 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
-import urllib
-import urllib2
-import json
-from Globals import *
+import urllib, urllib2, json
+import resources.lib.Globals
 
 # Commoncache plugin import
 try:
     import StorageServer
 except:
-    import storageserverdummy as StorageServer
+    import resources.lib.storageserverdummy as StorageServer
 
 # import libraries
 from urllib2 import HTTPError, URLError
+from resources.lib.Globals import *
 
 # Cache bool
 CACHE_ON = True

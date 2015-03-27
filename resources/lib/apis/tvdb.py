@@ -17,16 +17,14 @@
 #  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  http://www.gnu.org/copyleft/gpl.html
 #
-#import modules
+
+
 import sys, re
 import urllib, urllib2
+import socket, unicodedata
+import xbmc, xbmcgui
+import resources.lib.Globals
 
-#import modules
-import socket
-import xbmc
-import xbmcgui
-import unicodedata
-# import libraries
 from urllib2 import HTTPError, URLError
 from language import *
 # Use json instead of simplejson when python v2.7 or greater
@@ -34,15 +32,15 @@ if sys.version_info < (2, 7):
     import simplejson as json
 else:
     import json
-    
-from Globals import *
+
 from xml.etree import ElementTree as ET
+from resources.lib.Globals import *
 
 # Commoncache plugin import
 try:
     import StorageServer
 except Exception,e:
-    import storageserverdummy as StorageServer
+    import resources.lib.storageserverdummy as StorageServer
 
 ### Cache bool
 CACHE_ON = True
