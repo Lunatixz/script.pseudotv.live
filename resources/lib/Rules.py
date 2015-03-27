@@ -1503,8 +1503,8 @@ class HandleBCT(BaseRule):
 class HandlePOP(BaseRule):
     print 'HandlePOP temp disabled'
     def __init__(self):
-        self.name = 'Ignore "Coming up" popup'
-        self.optionLabels = ['Display Coming Up Next']
+        self.name = 'ComingUp Popup'
+        self.optionLabels = ['Display ComingUp Next']
         self.optionValues = ['Yes']
         self.myId = 18
         self.actions = RULES_ACTION_OVERLAY_SET_CHANNEL | RULES_ACTION_OVERLAY_SET_CHANNEL_END
@@ -1517,9 +1517,9 @@ class HandlePOP(BaseRule):
 
     def getTitle(self):
         if self.optionValues[0] == 'Yes':
-            return 'Display Coming Up Next'
+            return 'Display ComingUp Next'
         else:
-            return 'Hide Coming Up Next'
+            return 'Hide ComingUp Next'
 
 
     def onAction(self, act, optionindex):
@@ -1533,7 +1533,7 @@ class HandlePOP(BaseRule):
 
             if self.optionValues[0] == 'Yes':
                 overlay.showNextItem = True
-                self.log("setting popup to true")
+                self.log("setting comingup next to true")
             else:
                 overlay.showNextItem = False
         elif actionid == RULES_ACTION_OVERLAY_SET_CHANNEL_END:
@@ -1636,7 +1636,7 @@ class EvenShowsRule(BaseRule):
                             showname = item[loc + 1:loc2]
                             showname = showname.lower()
 
-                            if showname == lastshow:
+                            if showname != lastshow.lower():
                                 inarow += 1
                                 self.log("same show now at " + str(inarow))
                                 
@@ -1673,7 +1673,7 @@ class EvenShowsRule(BaseRule):
                     showname = item[loc + 1:loc2]
                     showname = showname.lower()
 
-                    if showname != lastshow:
+                    if showname != lastshow.lower():
                         self.log("insertNewShow found " + showname)
                         filelist.pop(index)
                         return item

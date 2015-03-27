@@ -23,9 +23,6 @@ import xbmcaddon, xbmc, xbmcgui, xbmcvfs
 from BeautifulSoup import BeautifulSoup
 from urllib2 import HTTPError, URLError
 
-# Cache bool
-CACHE_ON = True
-
 MAIN_URL = 'http://www.hd-trailers.net/'
 NEXT_IMG = 'http://static.hd-trailers.net/images/mobile/next.png'
 PREV_IMG = 'http://static.hd-trailers.net/images/mobile/prev.png'

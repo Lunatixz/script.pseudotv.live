@@ -14,12 +14,9 @@ from __future__ import with_statement
 __author__ = "dbr/Ben"
 __version__ = "1.9"
 
-import os
-import time
-import errno
-import httplib
-import urllib2
-import StringIO
+import os, time
+import httplib, urllib2
+import errno, StringIO
 from hashlib import md5
 from threading import RLock
 

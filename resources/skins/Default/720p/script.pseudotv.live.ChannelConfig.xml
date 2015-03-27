@@ -1294,7 +1294,7 @@
                     <width>500</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Channel ID:</label>
+                    <label>Youtube ID:</label>
                     <aligny>center</aligny>                      
                 </control>
                 <!-- Media Limit -->
@@ -1957,7 +1957,7 @@
                     <width>200</width>
                     <height>40</height>
                     <textcolor>white</textcolor>
-                    <label>Plugin:</label>
+                    <label>Source:</label>
                     <aligny>center</aligny>                   
                 </control>
                 <!-- UPNP Split Directory -->

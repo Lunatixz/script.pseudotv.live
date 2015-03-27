@@ -87,12 +87,12 @@
             <setting id="autoFindSuperFav" type="bool" label="30093" subsetting="true" visible="eq(-3,true)" default="false"/>
         <setting type="lsep" label="30073" visible="eq(-4,true)"/>
             <setting id="autoFindLivePVR" type="bool" label="30075" subsetting="true" visible="eq(-5,true)" default="false"/>
-            <setting id="autoFindLiveHD" type="enum" label="30097" subsetting="true" visible="eq(-6,true)" values=" |Dual -Strms|Prime - UPNP" default="0" />
-            <setting id="autoFindLiveHDPath" type="folder" source="auto" label="30098" subsetting="true" visible="!eq(-1,0) + eq(-7,true)"default=""/>
+            <setting id="autoFindLiveHD" type="enum" label="30097" subsetting="true" visible="eq(-6,true)" values=" |Dual - Strms|Prime/Extend - Favourites" default="0" />
+            <setting id="autoFindLiveHDPath" type="folder" source="auto" label="30098" subsetting="true" visible="!eq(-1,0) + !eq(-1,2)"default=""/>
             <setting id="autoFindUSTVNOW" type="bool" label="30074" subsetting="true" visible="eq(-8,true)" default="false"/>
             <setting id="autoFindUSIPTV" type="bool" label="30194" subsetting="true" visible="false" default="false"/>
-            <setting id="autoFindSmoothStreams" type="bool" label="30174" subsetting="true" visible="eq(-13,true) + eq(-10,true)" default="false"/>
-            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="eq(-14,true) + eq(-11,true)" default="false"/>
+            <setting id="autoFindSmoothStreams" type="bool" label="30174" subsetting="true" visible="false" default="false"/>
+            <setting id="autoFindFilmonFavourites" type="bool" label="30953" subsetting="true" visible="false" default="false"/>
         <setting type="lsep" label="30076" visible="eq(-12,true)"/>
             <setting id="autoFindNetworks" type="bool" label="30078" subsetting="true" visible="eq(-13,true)" default="false"/>
             <setting id="autoFindStudios" type="bool" label="30079" subsetting="true" visible="eq(-14,true)" default="false"/>

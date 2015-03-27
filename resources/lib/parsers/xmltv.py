@@ -16,9 +16,7 @@ You should have received a copy of the GNU Lesser General Public License along
 with this software; if not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
-import sys
-import types
+import re, sys, types
 
 if sys.hexversion >= 0x2050000:
     from xml.etree.cElementTree import ElementTree, Element, SubElement, tostring
