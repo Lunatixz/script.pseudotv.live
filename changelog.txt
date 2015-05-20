@@ -1,3 +1,23 @@
+[*] NEW! Direct EPG navigation via channel number. [Experimental]
+[*] NEW! "Quickflip" [Experimental] feature under "Tweaks". When enabled, On startup and while flipping thru channels PTVL will ignore .strms & plugin sources and skip to the 
+    next available channel. Effectively bypassing slow channel loading... creating a smoother surfing experience. Strms & Plugins can still be loaded via EPG.
+[*] Heavy "PTVL" skin tweaking and added enhancements.
+[*] NEW! "Dynamic" EPG Timebar and past event fading...
+[*] Initial (WIP) code for new overlay menu "MoreInfo". Activate while the Info Overlay is displaying; click "Down". Click "Up", "Back" or "Close" to exit.
+[*] Various tweaks & bug corrections.
+[*] EPG/Overlay/Artwork parallel multi-threading, should improve performance. 
+[*] Youtube fixed, but not 100% of all features restored... 
+    Not working: Search, RawGdata, User Subs&Favs and Last.FM
+    Unknown Issues: Some videos found may not be playable in your region.
+[*] Default skin changed to "PTVL" and upgraded to 1080i.
+[*] All Skins temporarily removed, include "Custom" Option.
+[*] [COLOR=blue][B]^ v.0.6.2 ^[/B][/COLOR]
+[*] In-app Custom "Community Playlists" option. Preconfigured collection of Kodi smartplaylists (local media required).
+[*] Anonymous "Community List" channel submission is now available using in-app submit button. Available for LiveTV/InternetTV/Youtube/RSS/Plugin Chtypes.
+[*] Improved Donor features: "BringthePopcorn" parsing, various tweaks and added Superbowl 2015 commercials.
+[*] Easy in-app channel number changing ('i' or info button) and Easy remove channel ('Del' or remove/delete button).
+[*] Added clear all channel configurations button(remove settings2.xml) under "Misc" settings.
+[*] Improved "OnNow" load times and LiveTV Parsing.
 [*] Tweaked Plugin and UPNP parsing and Video Mirroring.
 [*] HDhomerun in-app configuration and improved HDHomeRun auto-tuning *Thanks ruuk
 [*] Kodi PVR backend in-app configuration, improved XMLTV matching.
@@ -64,7 +84,7 @@
 [*] Increased Kodi Helix Support, Automated VideoWindow "Re-patching", Updated Bromix Youtube paths.
 [*] Seasonal Channel, Channel based on Monthly Youtube Community Playlist, No Playlist = No Channel.
 [*] Idle timer, and ScreenSaver. *Thanks Anisan.
-[*] Sidebar Menu, Activated while the Info Overlay is displaying; click Left. Click Right, Back or Close to exit.
+[*] Sidebar Menu, Activated while the Info Overlay is displaying; click "Left". Click "Right", "Back" or "Close" to exit.
 [*] IPTV/LiveStream/NaviX parsing improvements.
 [*] [COLOR=blue][B]^ v.0.5.7 ^[/B][/COLOR] 
 [*] Full XMLTV Listings for SmoothStream LiveTV EPG.

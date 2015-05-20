@@ -39,7 +39,12 @@ def log(msg, level = xbmc.LOGDEBUG):
 def uni(string, encoding = 'utf-8'):
     if isinstance(string, basestring):
         if not isinstance(string, unicode):
-            string = unicode(string, encoding, errors='ignore')
+            string = unicode(string, encoding, 'ignore')
+    return string
+    
+    
+def ConStr(string, encoding = 'utf-8'):
+    string = string.encode(encoding, 'ignore')
     return string
 
     
@@ -69,6 +74,7 @@ xbmc.log(ADDON_ID +' '+ ADDON_NAME +' '+ ADDON_PATH +' '+ ADDON_VERSION)
 TVDB_API_KEY = '078845CE15BC08A7'
 TMDB_API_KEY = '9c47d05a3f5f3a00104f6586412306af'
 FANARTTV_API_KEY = '7bc4161cc4add99b14e51eddcdd5b985'
+YT_API_KEY = 'AIzaSyAnwpqhAmdRShnEHnxLiOUjymHlG4ecE7c'
 
 # Timers
 AUTOSTART_TIMER = [0,5,10,15,20]#in seconds
@@ -121,6 +127,7 @@ PTVL_SKIN_LOC = os.path.join(ADDON_PATH, 'resources', 'skins') #Path to PTVL Ski
 LOGO_LOC = xbmc.translatePath(REAL_SETTINGS.getSetting('ChannelLogoFolder')) #Channel Logo location   
 PVR_DOWNLOAD_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('PVR_Folder'))) #PVR Download location
 XMLTV_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'))) + '/'
+XSP_LOC = xbmc.translatePath("special://profile/playlists/video/")
 
 #BASEURL
 USERPASS = REAL_SETTINGS.getSetting('Donor_UP')
@@ -134,8 +141,9 @@ DEFAULT_LOGO_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'logos')) + '/'
 
 #CORE IMG FILENAMES
 TIME_BAR = 'pstvTimeBar.png'
+TIME_BUTTON = 'pstvTimeButton.png'
 BUTTON_FOCUS = 'pstvButtonFocus.png'
-BUTTON_NO_FOCUS = 'pstvButtonNoFocus.png'
+BUTTON_NO_FOCUS = 'pstvButtonNoFocusn.png'
 BUTTON_NO_FOCUS_ALT = 'pstvButtonNoFocusAlt.png'
 THUMB = (IMAGES_LOC + 'icon.png')
 
@@ -160,37 +168,9 @@ PTVLXML = (os.path.join(XMLTV_CACHE_LOC, 'ptvlguide.xml'))
 PTVLXMLZIP = (os.path.join(LOCK_LOC, 'ptvlguide.zip'))
 
 # SKIN SELECT
-# Custom skin downloader todo.    
-if int(REAL_SETTINGS.getSetting('SkinSelector')) == 0:
-    #Use XBMC's included PTVL skin, else Default.
-    if os.path.exists(xbmc.translatePath('special://skin/media/script.pseudotv.lite/')):
-        Skin_Select = 'special://skin/media/'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(Skin_Select, 'script.pseudotv.lite')) + '/'
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'epg-genres')) + '/'
-    else:
-        Skin_Select = 'Custom' 
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 1:
-        Skin_Select = 'Default'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 2:
-        Skin_Select = 'PTVL'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 3:
-        Skin_Select = 'Concast'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 4:
-        Skin_Select = 'Maverick'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
-elif int(REAL_SETTINGS.getSetting('SkinSelector')) == 5:
-        Skin_Select = 'Z81'
-        MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
-        EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'    
+Skin_Select = 'Default'
+MEDIA_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media')) + '/'       
+EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', Skin_Select, 'media', 'epg-genres')) + '/'  
 
 #Double check core image folders
 if not xbmcvfs.exists(MEDIA_LOC):
@@ -236,27 +216,24 @@ if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
 else:
     SETTOP_REFRESH = 72000
 
-if (OS_SET <= 5 or OS_SET == 10 or OS_SET == 12) and REAL_SETTINGS.getSetting("OS_SET_OVERRIDE") != "true":
-    LOWPOWER = True
-else:
-    LOWPOWER = False
+# Common Cache types, Stacked and sorted for read performance?... Todo convert to DB (local sqlite, mysql)? 
+# Cache is redundant to m3u's, but eliminates repetitive off-site parsing. 
 
-# Common Cache types, Stacked and sorted for read performance... Todo convert to local db, mysql? 
 #General
-quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge, AutoUpdate
-bidaily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bidaily",12)                     #System Purge, AutoUpdate
-daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge, AutoUpdate
-weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge, AutoUpdate
-seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "seasonal",((24 * 7) * 3))       #System Purge, AutoUpdate
-monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge, AutoUpdate
+quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge, ForceReset
+bidaily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bidaily",12)                     #System Purge, ForceReset
+daily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "daily",24)                         #System Purge, ForceReset
+weekly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "weekly",24 * 7)                   #System Purge, ForceReset
+seasonal = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "seasonal",((24 * 7) * 3))       #System Purge, ForceReset
+monthly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "monthly",((24 * 7) * 4))         #System Purge, ForceReset
 #FileLists
 localTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "localTV",(((SETTOP_REFRESH / 60) / 60) - 3600))#ForceReset
-liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge, AutoUpdate
-YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",48)                 #System Purge, AutoUpdate
-RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",48)                         #System Purge, AutoUpdate
-pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",72)                   #System Purge, AutoUpdate
-upnpTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",2)                      #System Purge, AutoUpdate
-lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",48)                       #System Purge, AutoUpdate
+liveTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "liveTV",24)                       #System Purge, ForceReset
+YoutubeTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "YoutubeTV",48)                 #System Purge, ForceReset
+RSSTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "RSSTV",48)                         #System Purge, ForceReset
+pluginTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "pluginTV",72)                   #System Purge, ForceReset
+upnpTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "playonTV",2)                      #System Purge, ForceReset
+lastfm = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "lastfm",48)                       #System Purge, ForceReset
 #BCTs
 bumpers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bumpers",((24 * 7) * 4))         #BCT Purge
 ratings = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "ratings",((24 * 7) * 4))         #BCT Purge
@@ -267,6 +244,7 @@ parsers = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parser
 parserFANTV = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserFANTV",((24 * 7) * 4)) #No Purge (FANART Queries)
 parserTVDB = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserTVDB",((24 * 7) * 4))   #No Purge (TVDB Queries)
 parserTMDB = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserTMDB",((24 * 7) * 4))   #No Purge (TMDB Queries)
+parserYT = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "parserYT",((24 * 7) * 4))       #No Purge (Youtube Queries)
 #Artwork
 artwork = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork",((24 * 7) * 4))         #Artwork Purge
 artwork1 = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "artwork1",((24 * 7) * 4))       #Artwork Purge
@@ -299,18 +277,18 @@ COLOR_HOLO = 'FF0297eb'
 COLOR_SMOKE = '#F5F5F5'
 
 # EPG Chtype/Genre COLOR TYPES
-COLOR_RED_TYPE = ['10', '17', 'TV-MA', 'R', 'NC-17', 'Youtube', 'Sport', 'Sports Event', 'Sports Talk', 'Archery', 'Rodeo', 'Card Games', 'Martial Arts', 'Basketball', 'Baseball', 'Hockey', 'Football', 'Boxing', 'Golf', 'Auto Racing', 'Playoff Sports', 'Hunting', 'Gymnastics', 'Shooting', 'Sports non-event']
+COLOR_RED_TYPE = ['10', '17', 'TV-MA', 'R', 'NC-17', 'Youtube', 'Gaming', 'Sports', 'Sport', 'Sports Event', 'Sports Talk', 'Archery', 'Rodeo', 'Card Games', 'Martial Arts', 'Basketball', 'Baseball', 'Hockey', 'Football', 'Boxing', 'Golf', 'Auto Racing', 'Playoff Sports', 'Hunting', 'Gymnastics', 'Shooting', 'Sports non-event']
 COLOR_GREEN_TYPE = ['5', 'News', 'Public Affairs', 'Newsmagazine', 'Politics', 'Entertainment', 'Community', 'Talk', 'Interview', 'Weather']
 COLOR_mdGREEN_TYPE = ['9', 'Suspense', 'Horror', 'Horror Suspense', 'Paranormal', 'Thriller', 'Fantasy']
 COLOR_BLUE_TYPE = ['Comedy', 'Comedy-Drama', 'Romance-Comedy', 'Sitcom', 'Comedy-Romance']
 COLOR_ltBLUE_TYPE = ['2', '4', '14', '15', '16', 'Movie']
-COLOR_CYAN_TYPE = ['8', 'Documentary', 'History', 'Biography', 'Educational', 'Animals', 'Nature', 'Health']
-COLOR_ltCYAN_TYPE = ['Outdoors', 'Special', 'Reality']
+COLOR_CYAN_TYPE = ['8', 'Documentary', 'History', 'Biography', 'Educational', 'Animals', 'Nature', 'Health', 'Science & Tech', 'Learning & Education', 'Foreign Language']
+COLOR_ltCYAN_TYPE = ['Outdoors', 'Special', 'Reality', 'Reality & Game Shows']
 COLOR_PURPLE_TYPE = ['Drama', 'Romance', 'Historical Drama']
 COLOR_ltPURPLE_TYPE = ['12', '13', 'LastFM', 'Vevo', 'VevoTV', 'Musical', 'Music', 'Musical Comedy']
-COLOR_ORANGE_TYPE = ['11', 'TV-PG', 'TV-14', 'PG', 'PG-13', 'RSS', 'Animation', 'Animated', 'Anime', 'Children', 'Cartoon', 'Family']
-COLOR_YELLOW_TYPE = ['1', '3', '6', 'TV-Y7', 'TV-Y', 'TV-G', 'G', 'Action', 'Adventure', 'Action and Adventure', 'Action Adventure', 'Crime', 'Crime Drama', 'Mystery', 'Science Fiction', 'Series', 'Western', 'Soap', 'Variety', 'War', 'Law', 'Adults Only']
-COLOR_GRAY_TYPE = ['Auto', 'Collectibles', 'Travel', 'Shopping', 'House Garden', 'Home and Garden', 'Gardening', 'Fitness Health', 'Fitness', 'Home Improvement', 'How-To', 'Cooking', 'Fashion', 'Aviation', 'Dance', 'Auction', 'Art', 'Exercise', 'Parenting']
+COLOR_ORANGE_TYPE = ['11', 'TV-PG', 'TV-14', 'PG', 'PG-13', 'RSS', 'Animation', 'Animation & Cartoons', 'Animated', 'Anime', 'Children', 'Cartoon', 'Family']
+COLOR_YELLOW_TYPE = ['1', '3', '6', 'TV-Y7', 'TV-Y', 'TV-G', 'G', 'Classic TV', 'Action', 'Adventure', 'Action & Adventure', 'Action and Adventure', 'Action Adventure', 'Crime', 'Crime Drama', 'Mystery', 'Science Fiction', 'Series', 'Western', 'Soap', 'Soaps', 'Variety', 'War', 'Law', 'Adults Only']
+COLOR_GRAY_TYPE = ['Auto', 'Collectibles', 'Travel', 'Shopping', 'House Garden', 'Home & Garden', 'Home and Garden', 'Gardening', 'Fitness Health', 'Fitness', 'Home Improvement', 'How-To', 'Cooking', 'Fashion', 'Beauty & Fashion', 'Aviation', 'Dance', 'Auction', 'Art', 'Exercise', 'Parenting', 'Food', 'Health & Fitness']
 COLOR_ltGRAY_TYPE = ['0', '7', 'NR', 'Consumer', 'Game Show', 'Other', 'Unknown', 'Religious', 'Anthology', 'None']
 
 # http://developer.android.com/reference/android/graphics/Color.html
@@ -319,7 +297,7 @@ COLOR_CHANNUM = ['0xFF0297eb', '0xC0C0C0C0', '0xff00ff00', '0xff888888', '0xffcc
 CHANBUG_COLOR = COLOR_CHANNUM[int(REAL_SETTINGS.getSetting('COLOR_CHANNUM'))]
 
 #Actions
-#https://github.com/xbmc/xbmc/blob/master/xbmc/guilib/Key.h
+#https://github.com/xbmc/xbmc/blob/master/xbmc/input/Key.h
 ACTION_MOVE_LEFT = 1
 ACTION_MOVE_RIGHT = 2
 ACTION_MOVE_UP = 3
@@ -328,10 +306,10 @@ ACTION_PAGEUP = 5
 ACTION_PAGEDOWN = 6
 ACTION_SELECT_ITEM = 7
 ACTION_PREVIOUS_MENU = (9, 10, 92, 247, 257, 275, 61467, 61448)
-##KEY_BUTTON_BACK = 275   
-##ACTION_NAV_BACK = 92
+ACTION_DELETE_ITEM = 80
 ACTION_SHOW_INFO = 11
 ACTION_PAUSE = 12
+ACTION_PLAYER_PLAYPAUSE = 229 #// Play/pause. If playing it pauses, if paused it plays.
 ACTION_STOP = 13
 ACTION_OSD = 122
 ACTION_NUMBER_0 = 58
@@ -347,6 +325,7 @@ ACTION_NUMBER_9 = 67
 ACTION_INVALID = 999
 ACTION_SHOW_SUBTITLES = 25 #turn subtitles on/off. 
 ACTION_AUDIO_NEXT_LANGUAGE = 56 #Select next language in movie
+ACTION_CONTEXT_MENU = 117
 ACTION_RECORD = 170 #PVR Backend Record
 ACTION_SHOW_CODEC = 27
 ACTION_ASPECT_RATIO = 19 
@@ -365,21 +344,19 @@ ACTION_PLAYER_PLAYPAUSE = 76
 ACTION_TRIGGER_OSD = 243 #show autoclosing OSD. Can b used in videoFullScreen.xml window id=2005
 ACTION_SHOW_MPLAYER_OSD = 83 #toggles mplayers OSD. Can be used in videofullscreen.xml window id=2005
 ACTION_SHOW_OSD_TIME = 123 #displays current time, can be used in videoFullScreen.xml window id=2005
-#ACTION_MENU = 117
 ACTION_MENU = 7
 ACTION_TELETEXT_RED = 215
 ACTION_TELETEXT_GREEN = 216
 ACTION_TELETEXT_YELLOW = 217
 ACTION_TELETEXT_BLUE = 218
-
-#define ACTION_VOLUME_UP            88
-#define ACTION_VOLUME_DOWN          89
-#define ACTION_MUTE                 91
-#define ACTION_VOLAMP_UP            93
-#define ACTION_VOLAMP_DOWN          94
+#unused
+#define ACTION_MUTE                   91
 #define ACTION_CHANNEL_SWITCH         183 #last channel?
 #define ACTION_TOGGLE_WATCHED         200 // Toggle watched status (videos)
 #define ACTION_TOGGLE_DIGITAL_ANALOG  202 // switch digital <-> analog
+#define ACTION_TRIGGER_OSD            243 // show autoclosing OSD. Can b used in videoFullScreen.xml window id=2005
+#define ACTION_INPUT_TEXT             244
+#define ACTION_STEREOMODE_TOGGLE      237 // turns 3d mode on/off
 
 #UTC XMLTV - XMLTV that uses UTC w/ Offset timing (not local time).
 UTC_XMLTV = []

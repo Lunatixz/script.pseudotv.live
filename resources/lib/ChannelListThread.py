@@ -103,12 +103,10 @@ class ChannelListThread(threading.Thread):
 
         REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
         self.chanlist.sleepTime = 3
-
-        if REAL_SETTINGS.getSetting("ArtService_Enabled") == "true":
-            InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
-            self.myOverlay.ArtServiceThread = threading.Timer(float(InfoTimer), self.myOverlay.ArtService)
-            self.myOverlay.ArtServiceThread.name = "ArtServiceThread"
-            self.myOverlay.ArtServiceThread.start()
+        InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
+        self.myOverlay.ArtServiceThread = threading.Timer(float(InfoTimer), self.myOverlay.ArtService)
+        self.myOverlay.ArtServiceThread.name = "ArtServiceThread"
+        self.myOverlay.ArtServiceThread.start()
 
         if REAL_SETTINGS.getSetting("EnableSettop") == "true":
             self.log('onInit, Settop Enabled')

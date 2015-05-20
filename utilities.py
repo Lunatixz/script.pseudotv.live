@@ -176,6 +176,17 @@ def LogoDownloader():
     # Return to PTVL Settings
     REAL_SETTINGS.openSettings()
         
+        
+def DeleteSettings2():
+    xbmc.log('script.pseudotv.live-utilities: DeleteSettings2')
+    if xbmcvfs.exists(os.path.join(SETTINGS_LOC, 'settings2.xml')):
+        if dlg.yesno("PseudoTV Live", "Delete All Current Channel Configurations?"):
+            try:
+                xbmcvfs.delete(xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml')))
+            except:
+                pass
+    # Return to PTVL Settings
+    REAL_SETTINGS.openSettings()
 #########################################################################
 
 
@@ -188,4 +199,8 @@ elif sys.argv[1] == '-LogoDownloader':
 elif sys.argv[1] == '-SimpleDownloader':
     xbmcaddon.Addon(id='script.module.simple.downloader').openSettings()
 elif sys.argv[1] == '-showChangelog':
-    showChangelog(ADDON_ID)
+    showChangelog(ADDON_ID) 
+elif sys.argv[1] == '-DeleteSettings2':
+    DeleteSettings2()
+elif sys.argv[1] == '-DefragSettings2':
+    DefragSettings2()

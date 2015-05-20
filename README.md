@@ -75,8 +75,8 @@ Setup
 Controls
 ------------------
 
-    There are only a few things you need to know in order to control everything. First of all, the Stop button 
-    ('X') stops the video and exits the script.  You may also press the Previous Menu ('Escape') button to do 
+    There are only a few things you need to know in order to control everything. First of all, the Close/Exit button 
+    exits the script.  You may also press the Previous Menu ('Escape') button to do 
     this (don't worry, it will prompt you to verify first).  Scroll through channels using the arrow up and down 
     keys, or alternatively by pressing Page up or down. You can also jump through the EPG using page up and down.
     To open the EPG, press the Select key ('Enter'). Move around using the arrow keys. Start a program by pressing 

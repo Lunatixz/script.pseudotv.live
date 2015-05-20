@@ -1073,7 +1073,6 @@ class InterleaveChannel(BaseRule):
         return filelist
 
 
-
 class ForceRealTime(BaseRule):
     def __init__(self):
         self.name = "Force Real-Time Mode"
