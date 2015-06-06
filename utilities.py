@@ -16,14 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
         
-    
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import os, sys, time, urllib
 
 from resources.lib.Globals import *
 from resources.lib.utils import *
 
-# Showchangelog
+# showInfo
 def showText(heading, text):
     xbmc.log('script.pseudotv.live-utilities: showText')
     id = 10147
@@ -41,32 +40,29 @@ def showText(heading, text):
         except:
             pass
             
-            
-def showChangelog(addonID=None):
-    xbmc.log('script.pseudotv.live-utilities: showChangelog')
+def showInfo(addonID=None, type='changelog'):
+    xbmc.log('script.pseudotv.live-utilities: showInfo')
     try:
         if addonID:
             ADDON = xbmcaddon.Addon(addonID)
         else: 
             ADDON = xbmcaddon.Addon(ADDONID)
-        f = open(ADDON.getAddonInfo('changelog'))
+        if type == 'changelog':
+            title = "PseudoTV Live - Changelog"
+            f = open(ADDON.getAddonInfo('changelog'))
+        if type == 'readme':
+            title = "PseudoTV Live - Readme"
+            f = open(os.path.join(ADDON_PATH,'README.md'))
         text  = f.read()
-        title = "PseudoTV Live - Changelog"
         showText(title, text)
     except:
-        pass
-        
-    if dlg.yesno("PseudoTV Live", "System Reboot recommend after update, Exit XBMC?"):
-        xbmc.executebuiltin( "XBMC.AlarmClock(shutdowntimer,XBMC.Quit(),%d,true)" % ( 0.5, ) )       
-#########################################################################
-
+        pass      
 
 #DonorDownload
 DonorURLPath = (PTVLURL + 'Donor.py')
 LinkPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'links.py'))
 DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.pyo'))
 DL_DonorPath = (os.path.join(ADDON_PATH, 'resources', 'lib', 'Donor.py'))
-
 
 def DDautopatch():
     xbmc.log('script.pseudotv.live-utilities: DDautopatch')
@@ -97,7 +93,6 @@ def DDautopatch():
             xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Donor Autoupdate Complete", 4000, THUMB) ) 
     except:
         pass
-    
 
 def DonorDownloader():
     xbmc.log('script.pseudotv.live-utilities: DonorDownloader')
@@ -146,8 +141,7 @@ def DonorDownloader():
             REAL_SETTINGS.openSettings()
         except:
             pass
-           
-            
+         
 def LogoDownloader():
     xbmc.log('script.pseudotv.live-utilities: LogoDownloader')
     if dlg.yesno("PseudoTV Live", "Download Color Logos or No, Download Mono Logos"):
@@ -175,21 +169,21 @@ def LogoDownloader():
         
     # Return to PTVL Settings
     REAL_SETTINGS.openSettings()
-        
-        
+ 
 def DeleteSettings2():
     xbmc.log('script.pseudotv.live-utilities: DeleteSettings2')
     if xbmcvfs.exists(os.path.join(SETTINGS_LOC, 'settings2.xml')):
-        if dlg.yesno("PseudoTV Live", "Delete All Current Channel Configurations?"):
+        if dlg.yesno("PseudoTV Live", "Delete Current Channel Configurations?"):
             try:
                 xbmcvfs.delete(xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml')))
+                xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Channel Configurations Cleared", 1000, THUMB) )
             except:
                 pass
+
     # Return to PTVL Settings
     REAL_SETTINGS.openSettings()
-#########################################################################
-
-
+    
+    
 if sys.argv[1] == '-DDautopatch':
     DDautopatch()   
 elif sys.argv[1] == '-DonorDownloader':
@@ -199,8 +193,12 @@ elif sys.argv[1] == '-LogoDownloader':
 elif sys.argv[1] == '-SimpleDownloader':
     xbmcaddon.Addon(id='script.module.simple.downloader').openSettings()
 elif sys.argv[1] == '-showChangelog':
-    showChangelog(ADDON_ID) 
+    showInfo(ADDON_ID, 'changelog') 
+elif sys.argv[1] == '-showReadme':
+    showInfo(ADDON_ID, 'readme') 
 elif sys.argv[1] == '-DeleteSettings2':
     DeleteSettings2()
-elif sys.argv[1] == '-DefragSettings2':
-    DefragSettings2()
+elif sys.argv[1] == '-repairSettings2':
+    from resources.lib.Settings import *
+    Setfun = Settings()
+    Setfun.repairSettings()

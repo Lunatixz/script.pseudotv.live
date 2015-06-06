@@ -61,15 +61,6 @@ except:
     
 socket.setdefaulttimeout(30)
 
-# class FuncThread(threading.Thread):
-    # def __init__(self, target, *args):
-        # self._target = target
-        # self._args = args
-        # threading.Thread.__init__(self)
- 
-    # def run(self):
-        # self._target(*self._args)
- 
 class Artdownloader:
 
     def __init__(self):
@@ -211,34 +202,37 @@ class Artdownloader:
         setImage = ''
         LogoName = (chname[0:18] + '.png')
         LogoFolder = os.path.join(LOGO_LOC,LogoName)
-        self.logoParser = lsHTMLParser()
         
         if FileAccess.exists(LogoFolder):
             return LogoFolder
         else:
-            # if chtype == 1:
-                # setImage = self.logoParser.retrieve_icon(chname)
             if chtype == 6 or chtype == 7:
                 smpath = mpath.rsplit('/',2)[0] #Path Above mpath ie Series folder
                 artSeries = xbmc.translatePath(os.path.join(smpath, 'logo.png'))
                 artSeason = xbmc.translatePath(os.path.join(mpath, 'logo.png'))
                 if FileAccess.exists(artSeries): 
-                    setImage = artSeries
+                    return artSeries
                 elif FileAccess.exists(artSeason): 
-                    setImage = artSeason
+                    return artSeason
+                else:
+                    return 'NA.png'
+            else:
+                return 'NA.png'
                 # else:
                     # if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true': 
                         # self.Fanart_Download('tvshow', 'logo', id, LogoFolder)
                         
-            if setImage.startswith('http'):
-                requestDownload(setImage, LogoFolder)
-            else:
-                FileAccess.copy(setImage, LogoFolder)
-            return LogoFolder
-                
-   
+            # if setImage.startswith('http'):
+                # requestDownload(setImage, LogoFolder)
+            # else:
+                # FileAccess.copy(setImage, LogoFolder)
+            # return LogoFolder
+
+        # if chtype == 1:
+            # setImage = self.logoParser.retrieve_icon(chname)
         #if chtype 0, 9 check chname to fanart.tv for logo match.
         # elif REAL_SETTINGS.getSetting('FindLogos_Enabled') == 'true':
+            # self.logoParser = lsHTMLParser()
             # file_detail = str(self.logoParser.retrieve_icons_avail())
             # file_detail = file_detail.replace("{'",'').replace("'}",'').replace("': '","|")
             # file_detail = file_detail.split("', '")
@@ -349,7 +343,6 @@ class Artdownloader:
                 if type == 'youtube':
                     self.logDebug('FindArtwork_NEW, Youtube')
                     return "http://i.ytimg.com/vi/"+dbid+"/mqdefault.jpg"
-                    # return "http://img.youtube.com/vi/"+dbid+"/0.jpg"
                 elif type == 'rss':
                     self.logDebug('FindArtwork_NEW, RSS')
                     if dbid != '0':
@@ -374,9 +367,9 @@ class Artdownloader:
                 else:
                     if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true': 
                         self.logDebug('FindArtwork_NEW, Artwork Download')
-                        self.DownloadArt(type, id, arttype, arttype_fallback, cachefile)
-                        return cachefile
-            
+                        self.DownloadArt(type, id, arttype, arttype_fallback, cachefile, chname, mpath, arttypeEXT)
+                        # return cachefile
+                
                 
     def SetDefaultArt(self, chname, mpath, arttypeEXT):
         self.logDebug("SetDefaultArt Cache")
@@ -419,142 +412,152 @@ class Artdownloader:
             return THUMB
     
               
-    def DownloadArt(self, type, id, arttype, arttype_fallback, cachefile):
+    def DownloadArt(self, type, id, arttype, arttype_fallback, cachefile, chname, mpath, arttypeEXT):
         self.log('DownloadArt')
-        data = [type, id, arttype, arttype_fallback, cachefile]
-        # DownloadArt = FuncThread(self.DownloadArt_Thread, data)
+        data = [type, id, arttype, arttype_fallback, cachefile, chname, mpath, arttypeEXT]
         try:
             if self.DownloadArtTimer.isAlive():
+                self.DownloadArtTimer.cancel()
                 self.DownloadArtTimer.join()
         except:
             pass
-        self.DownloadArtTimer = threading.Timer(1.0, self.DownloadArt_Thread, [data])
-        self.DownloadArtTimer.name = "DownloadArt"
-        self.DownloadArtTimer.start()
-        # Sleep between Download, keeps cpu usage down and reduces the number of simultaneous threads.
-        xbmc.sleep(100)
+        try:
+            self.DownloadArtTimer = threading.Timer(1.0, self.DownloadArt_Thread, [data])
+            self.DownloadArtTimer.name = "DownloadArtTimer"
+            self.DownloadArtTimer.start()
+            # Sleep between Download, keeps cpu usage down and reduces the number of simultaneous threads.
+            # xbmc.sleep(15000)
+            xbmc.sleep(100)
+        except:
+            pass
             
                        
     def DownloadArt_Thread(self, data):
         self.log('DownloadArt_Thread')
-        type = data[0]
-        id = data[1]
-        arttype = data[2]
-        arttype_fallback = data[3]
-        cachefile = data[4]
-        print cachefile
-        drive, Dpath = os.path.splitdrive(cachefile)
-        path, filename = os.path.split(Dpath)
-        print drive, Dpath, path, filename
-
-        if not FileAccess.exists(os.path.join(drive,path)):
-            FileAccess.makedirs(os.path.join(drive,path))   
-                
-        if type == 'tvshow':
-            self.logDebug('DownloadArt_Thread, tvshow')
-            FanTVDownload = True
-            TVFilePath = cachefile
-            tvdb_Types = ['banner', 'fanart', 'folder', 'poster']
-                
-            try:
-                if arttype in tvdb_Types:
-                    self.logDebug('DownloadArt_Thread, TVDB')
-                    arttype = arttype.replace('banner', 'graphical').replace('folder', 'poster')
-                    tvdb = str(self.tvdbAPI.getBannerByID(id, arttype))
-                    tvdbPath = tvdb.split(', ')[0].replace("[('", "").replace("'", "") 
-                    if tvdbPath.startswith('http'):
-                        requestDownload(tvdbPath,TVFilePath)
-                        FanTVDownload = False
-            except Exception,e:
-                self.log('DownloadArt_Thread, self.tvdbAPI Failed!')
-                pass
-                
-            if FanTVDownload == True:
-                self.logDebug('DownloadArt_Thread, Fanart.TV')
-                try:
-                    arttype = arttype.replace('graphical', 'banner').replace('folder', 'poster').replace('fanart', 'landscape')
-                    fan = str(self.fanarttv.get_image_list_TV(id))
-                    file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(fan)
-                    pref_language = self.fanarttv.get_abbrev(REAL_SETTINGS.getSetting('limit_preferred_language'))
-                    
-                    for f in file_detail:
-                        languages = re.search("'language' *: *(.*?),", f)
-                        art_types = re.search("'art_type' *: *(.*?),", f)
-                        fanPaths = re.search("'url' *: *(.*?),", f)       
-                        if languages and len(languages.group(1)) > 0:
-                            language = (languages.group(1)).replace("u'",'').replace("'",'')
-                            if language == pref_language:
-                                if art_types and len(art_types.group(1)) > 0:
-                                    art_type = art_types.group(1).replace("u'",'').replace("'",'').replace("[",'').replace("]",'')
-                                    if art_type.lower() == arttype.lower():
-                                        if fanPaths and len(fanPaths.group(1)) > 0:
-                                            fanPath = fanPaths.group(1).replace("u'",'').replace("'",'')
-                                            if fanPath.startswith('http'):
-                                                requestDownload(fanPath,TVFilePath)
-                                                break 
-                except:
-                    pass
-                
-        elif type == 'movie':
-            self.logDebug('DownloadArt_Thread, movie')
-            FanMovieDownload = True
-            MovieFilePath = cachefile
-            tmdb_Types = ['fanart', 'folder', 'poster']
+        if getProperty("PseudoTVRunning") == "True":   
+            type = data[0]
+            id = data[1]
+            arttype = data[2]
+            arttype_fallback = data[3]
+            cachefile = data[4]
+            chname = data[5]
+            mpath = data[6]
+            arttypeEXT = data[7]
             
+            # print cachefile
+            drive, Dpath = os.path.splitdrive(cachefile)
+            path, filename = os.path.split(Dpath)
+            # print drive, Dpath, path, filename
+
+            if not FileAccess.exists(os.path.join(drive,path)):
+                FileAccess.makedirs(os.path.join(drive,path))   
+                    
+            if type == 'tvshow':
+                self.logDebug('DownloadArt_Thread, tvshow')
+                FanTVDownload = True
+                TVFilePath = cachefile
+                tvdb_Types = ['banner', 'fanart', 'folder', 'poster']
+                    
+                try:
+                    if arttype in tvdb_Types:
+                        self.logDebug('DownloadArt_Thread, TVDB')
+                        arttype = arttype.replace('banner', 'graphical').replace('folder', 'poster')
+                        tvdb = str(self.tvdbAPI.getBannerByID(id, arttype))
+                        tvdbPath = tvdb.split(', ')[0].replace("[('", "").replace("'", "") 
+                        if tvdbPath.startswith('http'):
+                            requestDownload(tvdbPath,TVFilePath)
+                            FanTVDownload = False
+                except Exception,e:
+                    self.log('DownloadArt_Thread, self.tvdbAPI Failed!')
+                    pass
+                    
+                if FanTVDownload == True:
+                    self.logDebug('DownloadArt_Thread, Fanart.TV')
+                    try:
+                        arttype = arttype.replace('graphical', 'banner').replace('folder', 'poster').replace('fanart', 'landscape')
+                        fan = str(self.fanarttv.get_image_list_TV(id))
+                        file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(fan)
+                        pref_language = self.fanarttv.get_abbrev(REAL_SETTINGS.getSetting('limit_preferred_language'))
+                        
+                        for f in file_detail:
+                            languages = re.search("'language' *: *(.*?),", f)
+                            art_types = re.search("'art_type' *: *(.*?),", f)
+                            fanPaths = re.search("'url' *: *(.*?),", f)       
+                            if languages and len(languages.group(1)) > 0:
+                                language = (languages.group(1)).replace("u'",'').replace("'",'')
+                                if language == pref_language:
+                                    if art_types and len(art_types.group(1)) > 0:
+                                        art_type = art_types.group(1).replace("u'",'').replace("'",'').replace("[",'').replace("]",'')
+                                        if art_type.lower() == arttype.lower():
+                                            if fanPaths and len(fanPaths.group(1)) > 0:
+                                                fanPath = fanPaths.group(1).replace("u'",'').replace("'",'')
+                                                if fanPath.startswith('http'):
+                                                    requestDownload(fanPath,TVFilePath)
+                                                    break 
+                    except:
+                        pass
+                    
+            elif type == 'movie':
+                self.logDebug('DownloadArt_Thread, movie')
+                FanMovieDownload = True
+                MovieFilePath = cachefile
+                tmdb_Types = ['fanart', 'folder', 'poster']
+                
+                try:
+                    if arttype in tmdb_Types:
+                        self.logDebug('DownloadArt_Thread, TMDB')
+                        arttype = arttype.replace('folder', 'poster')
+                        tmdb = self.tmdbAPI.get_image_list(id)
+                        data = str(tmdb).replace("[", "").replace("]", "").replace("'", "")
+                        data = data.split('}, {')
+                        tmdbPath = str([s for s in data if arttype in s]).split("', 'width: ")[0]
+                        match = re.search('url *: *(.*?),', tmdbPath)
+                        tmdbPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
+                        if tmdbPath.startswith('http'):
+                            requestDownload(tmdbPath,MovieFilePath)
+                            FanMovieDownload = False
+                except Exception,e:
+                    self.logDebug('DownloadArt_Thread, self.tmdbAPI Failed!')
+                    pass
+
+                if FanMovieDownload == True:
+                    self.logDebug('DownloadArt_Thread, Fanart.TV')
+                    try:
+                        arttype = arttype.replace('graphical', 'banner').replace('folder', 'poster').replace('fanart', 'landscape')
+                        fan = str(self.fanarttv.get_image_list_Movie(id))
+                        file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(fan)
+                        # print file_detail
+                        pref_language = self.fanarttv.get_abbrev(REAL_SETTINGS.getSetting('limit_preferred_language'))
+                        
+                        for f in file_detail:
+                            languages = re.search("'language' *: *(.*?),", f)
+                            art_types = re.search("'art_type' *: *(.*?),", f)
+                            fanPaths = re.search("'url' *: *(.*?),", f)    
+                            if languages and len(languages.group(1)) > 0:
+                                language = (languages.group(1)).replace("u'",'').replace("'",'')
+                                if language == pref_language:
+                                    if art_types and len(art_types.group(1)) > 0:
+                                        art_type = art_types.group(1).replace("u'",'').replace("'",'').replace("[",'').replace("]",'')
+                                        if art_type.lower() == arttype.lower():
+                                            if fanPaths and len(fanPaths.group(1)) > 0:
+                                                fanPath = fanPaths.group(1).replace("u'",'').replace("'",'')
+                                                # print fanPath
+                                                if fanPath.startswith('http'):
+                                                    requestDownload(fanPath,MovieFilePath)
+                                                    break                            
+                    except:
+                        pass
             try:
-                if arttype in tmdb_Types:
-                    self.logDebug('DownloadArt_Thread, TMDB')
-                    arttype = arttype.replace('folder', 'poster')
-                    tmdb = self.tmdbAPI.get_image_list(id)
-                    data = str(tmdb).replace("[", "").replace("]", "").replace("'", "")
-                    data = data.split('}, {')
-                    tmdbPath = str([s for s in data if arttype in s]).split("', 'width: ")[0]
-                    match = re.search('url *: *(.*?),', tmdbPath)
-                    tmdbPath = match.group().replace(",", "").replace("url: u", "").replace("url: ", "")
-                    if tmdbPath.startswith('http'):
-                        requestDownload(tmdbPath,MovieFilePath)
-                        FanMovieDownload = False
-            except Exception,e:
-                self.logDebug('DownloadArt_Thread, self.tmdbAPI Failed!')
+                if not FileAccess.exists(cachefile):    
+                    if arttype == arttype_fallback:
+                        print 'No Art Downloaded'
+                        # FileAccess.copy(self.SetDefaultArt_NEW(chname, mpath, arttypeEXT), cachefile)
+                    else:
+                        self.DownloadArt(type, id, arttype_fallback, arttype_fallback, cachefile, chname, mpath, arttypeEXT)
+            except:
                 pass
 
-            if FanMovieDownload == True:
-                self.logDebug('DownloadArt_Thread, Fanart.TV')
-                try:
-                    arttype = arttype.replace('graphical', 'banner').replace('folder', 'poster').replace('fanart', 'landscape')
-                    fan = str(self.fanarttv.get_image_list_Movie(id))
-                    file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(fan)
-                    print file_detail
-                    pref_language = self.fanarttv.get_abbrev(REAL_SETTINGS.getSetting('limit_preferred_language'))
-                    
-                    for f in file_detail:
-                        languages = re.search("'language' *: *(.*?),", f)
-                        art_types = re.search("'art_type' *: *(.*?),", f)
-                        fanPaths = re.search("'url' *: *(.*?),", f)    
-                        if languages and len(languages.group(1)) > 0:
-                            language = (languages.group(1)).replace("u'",'').replace("'",'')
-                            if language == pref_language:
-                                if art_types and len(art_types.group(1)) > 0:
-                                    art_type = art_types.group(1).replace("u'",'').replace("'",'').replace("[",'').replace("]",'')
-                                    if art_type.lower() == arttype.lower():
-                                        if fanPaths and len(fanPaths.group(1)) > 0:
-                                            fanPath = fanPaths.group(1).replace("u'",'').replace("'",'')
-                                            print fanPath
-                                            if fanPath.startswith('http'):
-                                                requestDownload(fanPath,MovieFilePath)
-                                                break                            
-                except:
-                    pass
-                                 
-        if not FileAccess.exists(cachefile):    
-            if arttype == arttype_fallback:
-                print 'No Art Downloaded'
-            else:
-                data = [type, id, arttype_fallback, arttype_fallback, cachefile]
-                self.DownloadArt_Thread(data)
-                # self.DownloadArt(type, id, arttype_fallback, arttype_fallback, cachefile)
-
-
+            
     def DownloadMetaArt(self, type, fle, id, typeEXT, ART_LOC):
         self.log('DownloadMetaArt')
         ArtPath = os.path.join(ART_LOC, fle)

@@ -23,6 +23,7 @@ import datetime
 import sys, re
 import random, traceback
 
+from utils import *
 from ChannelList import ChannelList
 from Channel import Channel
 from Globals import *
@@ -104,9 +105,10 @@ class ChannelListThread(threading.Thread):
         REAL_SETTINGS.setSetting('ForceChannelReset', 'false')
         self.chanlist.sleepTime = 3
         InfoTimer = INFOBAR_TIMER[int(REAL_SETTINGS.getSetting('InfoTimer'))]
-        self.myOverlay.ArtServiceThread = threading.Timer(float(InfoTimer), self.myOverlay.ArtService)
-        self.myOverlay.ArtServiceThread.name = "ArtServiceThread"
-        self.myOverlay.ArtServiceThread.start()
+        # self.myOverlay.ArtServiceThread = threading.Timer(float(InfoTimer), self.myOverlay.ArtService)
+        # self.myOverlay.ArtServiceThread.name = "ArtServiceThread"
+        # self.myOverlay.ArtServiceThread.start()
+        setProperty("EnableArtwork","true")
 
         if REAL_SETTINGS.getSetting("EnableSettop") == "true":
             self.log('onInit, Settop Enabled')
@@ -118,7 +120,7 @@ class ChannelListThread(threading.Thread):
             for i in range(self.myOverlay.maxChannels):
                 modified = True
 
-                while modified == True and self.myOverlay.channels[i].getTotalDuration() < PREP_CHANNEL_TIME and self.myOverlay.channels[i].Playlist.size() < 16288:
+                while modified == True and self.myOverlay.channels[i].getTotalDuration() < PREP_CHANNEL_TIME and self.myOverlay.channels[i].Playlist.size() < 4096:
                     # If minimum updating is on, don't attempt to load invalid channels
                     if self.fullUpdating == False and self.myOverlay.channels[i].isValid == False and self.myOverlay.isMaster:
                         break

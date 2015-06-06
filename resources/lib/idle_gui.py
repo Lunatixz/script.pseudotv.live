@@ -33,9 +33,9 @@ if rootDir[-1] == ';':rootDir = rootDir[0:-1]
 resDir = os.path.join(rootDir, 'resources')
 skinsDir = os.path.join(resDir, 'skins')
 addon_image_path = os.path.join( resDir, "skins", "Default", "media")
-background = (os.path.join( addon_image_path, "Background"))
-digits = os.path.join( addon_image_path, "Digits")
-backMEDIA_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, 'pstvlBackground.png'))
+background = (os.path.join( addon_image_path, "idle", "Background"))
+digits = os.path.join( addon_image_path, "idle", "Digits")
+backMEDIA_LOC = xbmc.translatePath(os.path.join(MEDIA_LOC, "idle", 'pstvlidle.png'))
 
 cacheDir = xbmc.translatePath('special://profile/addon_data/script.twitXBMC/cache/')
 if not os.path.exists(cacheDir): os.makedirs(cacheDir)

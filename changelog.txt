@@ -1,14 +1,22 @@
+[*] New! Setting Tabs "Utilities" & "Help", both are a work in progress. Utilities features a "repair" and "delete" channel configurations (settings2) tool.
+[*] Eventghost trigger sleep action.
+[*] NEW! "Direct Channel Input" setting under "Tweaks". When enabled users are no longer required to hit select after inputting a channel number.
+[*] NEW! EPG Menus (EPG/DVR/OnDemand/Apps), Accessed using "Red","Green","Yellow" or "Blue" remote keys. [Work In Progress]
+[*] NEW! Channel Favourites, Set/Remove Favourites from overlay sidebar, Favourite channel jumping requires mapping "ACTION_SYMBOLS".
+[*] In-app channel manager resized and tweaked, LiveTV/InternetTV EPG can't be "paused".
+[*] NEW! EPG Context Menu: More Info, Find similar (Coming Soon), Record Show (Coming Soon), Set Reminder (Coming Soon).
+[*] NEW! Start Over prompt when a show is 1/2 through show duration.
+[*] NEW! EPG RSS Push feed, Displayed once every 15mins on/off during a 60min period. Disabled on startup, it can provide you with instant PTVL Status, Repository activity, twitter posts.
 [*] NEW! Direct EPG navigation via channel number. [Experimental]
-[*] NEW! "Quickflip" [Experimental] feature under "Tweaks". When enabled, On startup and while flipping thru channels PTVL will ignore .strms & plugin sources and skip to the 
-    next available channel. Effectively bypassing slow channel loading... creating a smoother surfing experience. Strms & Plugins can still be loaded via EPG.
-[*] Heavy "PTVL" skin tweaking and added enhancements.
+[*] NEW! "Quickflip"feature under "Tweaks". When enabled, On startup and while flipping thru channels PTVL will ignore .strms & chtype 15 "Plugin" sources in favour of flipping performance.
+    Channels will be skipped; effectively bypassing channels with long load times. creating a smoother surfing experience. Strms & Plugins can still be loaded via EPG. [Experimental] 
+[*] Heavy "PTVL" skin tweaking and added enhancements. Goal is to create a very detailed skin base for future skinners to use as a guide.
 [*] NEW! "Dynamic" EPG Timebar and past event fading...
-[*] Initial (WIP) code for new overlay menu "MoreInfo". Activate while the Info Overlay is displaying; click "Down". Click "Up", "Back" or "Close" to exit.
-[*] Various tweaks & bug corrections.
-[*] EPG/Overlay/Artwork parallel multi-threading, should improve performance. 
-[*] Youtube fixed, but not 100% of all features restored... 
-    Not working: Search, RawGdata, User Subs&Favs and Last.FM
-    Unknown Issues: Some videos found may not be playable in your region.
+[*] NEW! Overlay menu "MoreInfo". Activate from overlay using context button. Click "Back", "Close" or the context button again to exit.
+[*] Various tweaks & bug corrections. including Youtube limit fix.
+[*] Added EPG/Overlay Artwork multi-threading, this should improve performance. Artwork is disable until channel building is finished only when background building is enabled.
+    Current build no longer needs the "Artwork Spooler" all artwork is queued/downloaded on demand. [Experimental]
+[*] Youtube fixed, but not 100% of all features restored... Not working: Search, RawGdata, User Subs&Favs and Last.FM.
 [*] Default skin changed to "PTVL" and upgraded to 1080i.
 [*] All Skins temporarily removed, include "Custom" Option.
 [*] [COLOR=blue][B]^ v.0.6.2 ^[/B][/COLOR]
@@ -118,7 +126,7 @@
 [*] LiveTV XMLTV parsing performance tweaks. 
 [*] Added new "Coming Up Next" type. "Overlay" was renamed to "Popup", "Overlay" now triggers standard Overlay panel.
 [*] [COLOR=blue][B]^ v.0.5.3 ^[/B][/COLOR] 
-[*] Temporary disabled Art/XMLTV services. They still run at start-up.
+[*] Temporarily disabled Art/XMLTV services. They still run at start-up.
 [*] NEW! Optimized "LowPower" configurations based on OS Selection, Override under "Misc" settings.
 [*] Improved plugin detection, Fixed Internet Trailers BCT's
 [*] Global media limits and XMLTV service tweaks. 

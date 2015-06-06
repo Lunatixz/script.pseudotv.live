@@ -2,8 +2,10 @@
     <allowoverlay>yes</allowoverlay>   
     <onload>ActivateWindow(9506)</onload>
     <onunload>ActivateWindow(12005)</onunload>
+    <onload>SetProperty(PTVL.EPG_Opened,true,10000)</onload>
+    <onunload>SetProperty(PTVL.EPG_Opened,false,10000)</onunload>
     <onload condition="System.HasAddon(script.tv.show.next.aired)">RunScript(script.tv.show.next.aired,backend=True)</onload>
-    <!-- <onload condition="System.HasAddon(script.extendedinfo)">RunScript(script.extendedinfo,info=trendingshows)</onload> -->
+    <onload condition="System.HasAddon(script.extendedinfo)">RunScript(script.extendedinfo,info=trendingshows)</onload>
     <coordinates>
         <system>1</system>
         <posx>0</posx>
@@ -15,7 +17,7 @@
         <control type="button" id="99">
             <description>focused text color</description>
             <visible>false</visible>
-            <label>0xFFFFFFFF</label>
+            <label>0xFF0297eb</label>
         </control>
         <control type="button" id="100">
             <description>text color</description>
@@ -37,21 +39,24 @@
             <colordiffuse>FFFFFFFF</colordiffuse>
         </control> 
         <!-- Trending Box --> 
-        <control type="group"> 
+        <control type="grouplist">
+            <posx>30</posx>
+            <posy>15</posy>
+            <itemgap>10</itemgap> 
+            <orientation>vertical</orientation>
             <control type="label">
-                <posx>-15</posx>
-                <posy>0</posy>
-                <align>center</align>
-                <width>300</width>
-                <height>30</height>
-                <textcolor>C0C0C0C0</textcolor>
+                <width>360</width>       
+                <height>24</height>
                 <font>font12</font>
-                <label>$INFO[Window(Home).Property(TrendingShows.1.Title)]</label>            
+                <textcolor>C0C0C0C0</textcolor>
+                <align>center</align>
+                <scroll>true</scroll>
+                <scrollspeed>40</scrollspeed>
+                <label>Trending Now:</label>      
                 <visible>!Control.IsVisible(523)</visible>
+                <aligny>center</aligny>
             </control>
             <control type="image">
-                <posx>0</posx>
-                <posy>0</posy>
                 <width>360</width>      
                 <height>180</height>
                 <aspectratio align="center">keep</aspectratio>
@@ -59,40 +64,29 @@
                 <visible>!Control.IsVisible(523)</visible>
             </control> 
             <control type="image">
-                <posx>0</posx>
-                <posy>0</posy>
                 <width>360</width>      
                 <height>180</height>
                 <aspectratio align="center">keep</aspectratio>
                 <texture>$INFO[Window(Home).Property(TrendingShows.1.Art(landscape))]</texture>  
                 <visible>!Control.IsVisible(523)</visible>
             </control> 
-            <control type="label" id="522">
-                <posx>0</posx>
-                <posy>0</posy>
-                <width>360</width>      
-                <height>180</height>
-                <fadetime>250</fadetime>
-                <textcolor>C0C0C0C0</textcolor>
-                <font>font12</font>
-                <label>Trending Now</label>
-                <align>center</align>
-                <visible>!Control.IsVisible(523) + !IsEmpty(Window(Home).Property(TrendingShows.1.Title))</visible>
-            </control>
         </control>   
         <!-- VideoWindow Box --> 
-        <control type="grouplist" id="523">    
+        <control type="grouplist">
             <posx>30</posx>
             <posy>15</posy>
             <itemgap>10</itemgap>
             <orientation>vertical</orientation>
-            <control type="label" id="524">
+            <control type="label" id="523"> 
                 <width>360</width>       
                 <height>24</height>
                 <font>font12</font>
                 <textcolor>C0C0C0C0</textcolor>
                 <align>center</align>
+                <scroll>true</scroll>
+                <scrollspeed>40</scrollspeed>
                 <label>$INFO[Window(10000).Property(Playing.Title)]</label>
+                <visible>Control.IsVisible(523)</visible>
                 <aligny>center</aligny>
             </control>   
             <!-- #### Skinners Include Everything for videowindow patch to work #### -->
@@ -104,6 +98,7 @@
                 <align>center</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
+                <visible>Control.IsVisible(523)</visible>
             </control>
             <!-- PATCH END -->
             <!-- ################################################################## -->
@@ -128,7 +123,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <label>$INFO[Window(Home).Property(NextAired.4.Label)]</label>
-                    <scroll>True</scroll>
                     <textcolor>C0C0C0C0</textcolor>
                     <fadetime>2000</fadetime>
                 </control> 
@@ -166,7 +160,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <label>$INFO[Window(Home).Property(NextAired.3.Label)]</label>
-                    <scroll>True</scroll>
                     <textcolor>C0C0C0C0</textcolor>
                     <fadetime>1500</fadetime>
                 </control> 
@@ -291,10 +284,10 @@
                 <textcolor>FFFFFFFF</textcolor>
             </control>               
             <control type="label" id="217">
-                <description>Ondemand Label</description>               
+                <description>OnDemand Label</description>               
                 <width>373</width>
                 <height>38</height>
-                <label>Ondemand</label>
+                <label>OnDemand</label>
                 <font>font12</font>
                 <align>center</align>
                 <aligny>center</aligny>
@@ -311,46 +304,60 @@
                 <textcolor>FFFFFFFF</textcolor>
             </control>   
         </control>           
-        <!--Twitter-->   
-<!--         <control type="grouplist">
-            <posx>35</posx>
+        <!-- Twitter    -->
+        <control type="grouplist">
+            <posx>5</posx>
             <posy>258</posy>
             <align>left</align>
             <orientation>horizontal</orientation>
-            <itemgap>1</itemgap>   -->
-            <!--Twitter ICON-->
-<!--             <control type="image">
-                <width>32</width>
-                <height>32</height>
+            <itemgap>1</itemgap>  
+            <!-- Twitter ICON -->
+            <control type="image">
+                <width>21</width>
+                <height>35</height>
                 <aspectratio>keep</aspectratio>
                 <aligny>center</aligny>
                 <align>left</align>
-                <visible>!IsEmpty(Control.GetLabel(131))</visible>
-                <texture>twitter.png</texture>
-            </control> -->
-            <!--Twitter RSS-->
-<!--             <control type="fadelabel" id = "131">
+                <visible>Control.IsVisible(131)</visible>
+                <texture colordiffuse="C0C0C0C0">rss.png</texture>
+                <!-- <texture>twitter.png</texture> -->
+            </control>
+            <!-- Twitter RSS -->
+            <control type="fadelabel" id = "131">
                 <description>ticker text</description>
-                <width>405</width>
+                <width>370</width>
                 <height>35</height>
-                <font>font12</font>
+                <font>font10</font>
                 <aligny>center</aligny>
                 <align>left</align>
-                <visible>true</visible>
                 <scroll>true</scroll>
                 <scrollout>true</scrollout>
-                <pauseatend>1000</pauseatend>
+                <pauseatend>900000</pauseatend>
+                <angle>90</angle>
                 <scrollspeed>40</scrollspeed>
                 <textcolor>C0C0C0C0</textcolor>
                 <textoffsetx>20</textoffsetx>
+                <resetonlabelchange>true</resetonlabelchange>
                 <visible>!IsEmpty(Control.GetLabel(131))</visible>
-                <label>Follow @PseudoTV_Live</label>
-                <label>$INFO[Window(10000).Property(twitter.1.Label)]</label>
-                <label>$INFO[Window(10000).Property(twitter.2.Label)]</label>
-                <label>$INFO[Window(10000).Property(twitter.3.Label)]</label>
-                <label>$INFO[Window(10000).Property(twitter.4.Label)]</label>
-            </control>
-        </control> -->
+                <label>Follow @PseudoTV_Live on Twitter</label>
+                <label>$INFO[Window(10000).Property(twitter.1.label)]</label>
+                <label>$INFO[Window(10000).Property(twitter.2.label)]</label>
+                <label>$INFO[Window(10000).Property(twitter.3.label)]</label>
+                <label>$INFO[Window(10000).Property(twitter.4.label)]</label>
+            </control>           
+            <control type="label">
+                <description>twit Sep</description>
+                <width>10</width>
+                <height>35</height>
+                <aspectratio>keep</aspectratio>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label>|</label>
+                <font>font10</font>
+                <textcolor>C0C0C0C0</textcolor>
+                <visible>Control.IsVisible(131)</visible>
+            </control>  
+        </control>
         <!--Date-->
         <control type="label" id="104">
             <description>Date Label</description>
@@ -368,7 +375,7 @@
         <control type="label" id="106">
             <posx>420</posx>
             <posy>300</posy>
-            <width min="125" max="400">auto</width>
+            <width min="128" max="400">auto</width>
             <height>38</height>
             <fadetime>250</fadetime>
             <textcolor>FFFFFFFF</textcolor>
@@ -376,12 +383,21 @@
             <align>center</align>
             <aligny>center</aligny>
         </control>
+        <control type="image" id="109">
+            <posx>410</posx>
+            <posy>300</posy>
+            <width>10</width>
+            <height>38</height>
+            <aspectratio align="center">keep</aspectratio>
+            <colordiffuse>C0C0C0C0</colordiffuse>
+            <texture>left.png</texture>  
+        </control> 
         <!--Time Bar 1/3-->
         <control type="label" id="101">
             <description>Time Left Label</description>
             <posx>420</posx>
             <posy>300</posy>
-            <width min="150" max="400">auto</width>
+            <width min="155" max="400">auto</width>
             <height>38</height>
             <label>Time 1</label>
             <font>font12</font>
@@ -415,6 +431,15 @@
             <aligny>center</aligny>
             <textcolor>FFFFFFFF</textcolor>
         </control>
+        <control type="image" id="110">
+            <posx>1910</posx>
+            <posy>300</posy>
+            <width>10</width>
+            <height>38</height>
+            <aspectratio align="center">keep</aspectratio>
+            <colordiffuse>C0C0C0C0</colordiffuse>
+            <texture>right.png</texture>  
+        </control> 
         <!--CHANNEL Number-->
         <control type="grouplist">            
             <posx>0</posx>
@@ -566,7 +591,7 @@
                 <textcolor>FF0297eb</textcolor>
                 <visible>StringCompare(Control.GetLabel(321),)</visible>
                 <scroll>true</scroll>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
             </control>
             <control type="image" id="321">
                 <description>Channel 1 Icon</description>              
@@ -588,7 +613,7 @@
                 <textcolor>FF0297eb</textcolor>
                 <visible>StringCompare(Control.GetLabel(322),)</visible>
                 <scroll>true</scroll>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
             </control>
             <control type="image" id="322">
                 <description>Channel 2 Icon</description>
@@ -610,7 +635,7 @@
                 <textcolor>FF0297eb</textcolor>
                 <visible>StringCompare(Control.GetLabel(323),)</visible>
                 <scroll>true</scroll>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
             </control>
             <control type="image" id="323">
                 <description>Channel 3 Icon</description>
@@ -632,7 +657,7 @@
                 <textcolor>FF0297eb</textcolor>
                 <visible>StringCompare(Control.GetLabel(324),)</visible>
                 <scroll>true</scroll>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
             </control>
             <control type="image" id="324">
                 <description>Channel 4 Icon</description>
@@ -654,7 +679,7 @@
                 <textcolor>FF0297eb</textcolor>
                 <visible>StringCompare(Control.GetLabel(325),)</visible>
                 <scroll>true</scroll>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
             </control>
             <control type="image" id="325">
                 <description>Channel 5 Icon</description>
@@ -676,7 +701,7 @@
                 <textcolor>FF0297eb</textcolor>
                 <visible>StringCompare(Control.GetLabel(326),)</visible>
                 <scroll>true</scroll>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
             </control>
             <control type="image" id="326">
                 <description>Channel 6 Icon</description>
@@ -725,17 +750,30 @@
             <width>1515</width>
             <height>74</height>
         </control>    
-        <!-- Timefade -->
-        <control type="image" id="119"> 
+        <!-- Timefade Future -->
+        <control type="image" id="118"> 
+            <description>Timebar Optional future fade</description>
             <posx>411</posx>
             <posy>340</posy>
             <width>-1</width>
             <height>448</height>
             <aspectratio>scale</aspectratio>
-            <texture>pstvButtonNoFocus1.png</texture>
+            <texture>pstvlTimeFadeF.png</texture>
+            <visible>false</visible>
+        </control>  
+        <!-- Timefade Past -->
+        <control type="image" id="119"> 
+            <description>Timebar Optional past fade</description>
+            <posx>411</posx>
+            <posy>340</posy>
+            <width>-1</width>
+            <height>448</height>
+            <aspectratio>scale</aspectratio>
+            <texture>pstvlTimeFadeP.png</texture>
         </control>  
         <!-- Timebar -->
         <control type="image" id="120">
+            <description>Timebar line</description>
             <posx>411</posx>
             <posy>334</posy>
             <width>2</width>
@@ -781,8 +819,8 @@
             <description>Sickbeard/Couchpotato image</description>   
             <posx>345</posx>
             <posy>120r</posy>         
-            <width>22</width>
-            <height>23</height>
+            <width>32</width>
+            <height>32</height>
             <aspectratio>keep</aspectratio>
             <visible>true</visible>
         </control> 
@@ -823,7 +861,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <wrapmultiline>false</wrapmultiline>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
                 <scrollsuffix> - </scrollsuffix>
                 <label>$INFO[Control.GetLabel(500)][COLOR=C0C0C0C0][B] • [/B][/COLOR][COLOR=FFFFFFFF]$INFO[Control.GetLabel(501)][/COLOR]</label>
             </control>
@@ -837,7 +875,7 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <wrapmultiline>false</wrapmultiline>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
                 <scrollsuffix> - </scrollsuffix>
                 <visible>false</visible>
             </control>
@@ -862,7 +900,7 @@
                 <scroll>true</scroll>
                 <align>left</align>
                 <aligny>center</aligny>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
                 <scrollsuffix> - </scrollsuffix>
                 <visible>false</visible>
             </control>
@@ -875,7 +913,7 @@
                 <scroll>true</scroll>
                 <align>left</align>
                 <aligny>center</aligny>
-                <scrollspeed>50</scrollspeed>
+                <scrollspeed>40</scrollspeed>
                 <scrollsuffix> - </scrollsuffix>
                 <visible>IsEmpty(Control.GetLabel(501))</visible>
                 <visible>false</visible>
@@ -887,7 +925,7 @@
             <posy>240r</posy>
             <width>1400</width>
             <orientation>vertical</orientation>
-            <itemgap>2</itemgap>
+            <itemgap>4</itemgap>
            <control type="image">
                 <description>Seekbar Line</description>
                 <width>1400</width>
@@ -950,7 +988,7 @@
         </control>    
         <!--RSS-->   
         <control type="grouplist">
-            <posx>35</posx>
+            <posx>10</posx>
             <posy>60r</posy>
             <align>left</align>
             <orientation>horizontal</orientation>
@@ -962,8 +1000,8 @@
                 <aspectratio>keep</aspectratio>
                 <aligny>center</aligny>
                 <align>left</align>
-                <visible>!IsEmpty(Window(home).Property(NextAired.1.Label))</visible>
                 <texture colordiffuse="C0C0C0C0">rss.png</texture>
+                <visible>false</visible>
             </control>
            <control type="label">
                 <description>RSS Sep</description>
@@ -978,7 +1016,7 @@
             </control>  
             <!--Next Aired RSS-->
             <control type="label">
-                <width>1810</width>
+                <width>1890</width>
                 <height>55</height>
                 <font>Font-RSS</font>
                 <aligny>center</aligny>
@@ -989,7 +1027,7 @@
                 <visible>!IsEmpty(Window(home).Property(NextAired.1.Label))</visible>
                 <autoscroll time="1000" delay="1000" repeat="2000">True</autoscroll>
                 <scrollspeed>40</scrollspeed>
-                <label>[COLOR=C0C0C0C0][B]$INFO[Window(home).Property(NextAired.1.Label),,  ][/B][/COLOR]$INFO[Window(home).Property(NextAired.1.AirTime),,  ]$INFO[Window(home).Property(NextAired.1.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.1.Network),on  ,  ]$INFO[Window(home).Property(NextAired.2.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.2.AirTime),,  ]$INFO[Window(home).Property(NextAired.2.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.2.Network),on  ,  ]$INFO[Window(home).Property(NextAired.3.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.3.AirTime),,  ]$INFO[Window(home).Property(NextAired.3.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.3.Network),on  ,  ]$INFO[Window(home).Property(NextAired.4.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.4.AirTime),,  ]$INFO[Window(home).Property(NextAired.4.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.4.Network),on  ,  ]$INFO[Window(home).Property(NextAired.5.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.5.AirTime),,  ]$INFO[Window(home).Property(NextAired.5.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.5.Network),on  ,  ]$INFO[Window(home).Property(NextAired.6.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.6.AirTime),,  ]$INFO[Window(home).Property(NextAired.6.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.6.Network),on  ,  ]$INFO[Window(home).Property(NextAired.7.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.7.AirTime),,  ]$INFO[Window(home).Property(NextAired.7.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.7.Network),on  ,  ]$INFO[Window(home).Property(NextAired.8.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.8.AirTime),,  ]$INFO[Window(home).Property(NextAired.8.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.8.Network),on  ,  ]$INFO[Window(home).Property(NextAired.9.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.9.AirTime),,  ]$INFO[Window(home).Property(NextAired.9.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.9.Network),on  ,  ]$INFO[Window(home).Property(NextAired.10.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.10.AirTime),,  ]$INFO[Window(home).Property(NextAired.10.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.10.Network),on  ,  ]</label>
+                <label>$INFO[Control.GetLabel(501)], [COLOR=C0C0C0C0][B]$INFO[Window(home).Property(NextAired.1.Label),,  ][/B][/COLOR]$INFO[Window(home).Property(NextAired.1.AirTime),,  ]$INFO[Window(home).Property(NextAired.1.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.1.Network),on  ,  ]$INFO[Window(home).Property(NextAired.2.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.2.AirTime),,  ]$INFO[Window(home).Property(NextAired.2.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.2.Network),on  ,  ]$INFO[Window(home).Property(NextAired.3.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.3.AirTime),,  ]$INFO[Window(home).Property(NextAired.3.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.3.Network),on  ,  ]$INFO[Window(home).Property(NextAired.4.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.4.AirTime),,  ]$INFO[Window(home).Property(NextAired.4.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.4.Network),on  ,  ]$INFO[Window(home).Property(NextAired.5.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.5.AirTime),,  ]$INFO[Window(home).Property(NextAired.5.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.5.Network),on  ,  ]$INFO[Window(home).Property(NextAired.6.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.6.AirTime),,  ]$INFO[Window(home).Property(NextAired.6.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.6.Network),on  ,  ]$INFO[Window(home).Property(NextAired.7.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.7.AirTime),,  ]$INFO[Window(home).Property(NextAired.7.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.7.Network),on  ,  ]$INFO[Window(home).Property(NextAired.8.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.8.AirTime),,  ]$INFO[Window(home).Property(NextAired.8.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.8.Network),on  ,  ]$INFO[Window(home).Property(NextAired.9.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.9.AirTime),,  ]$INFO[Window(home).Property(NextAired.9.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.9.Network),on  ,  ]$INFO[Window(home).Property(NextAired.10.Label),  •    [COLOR=C0C0C0C0][B],[/B][/COLOR]  ]$INFO[Window(home).Property(NextAired.10.AirTime),,  ]$INFO[Window(home).Property(NextAired.10.NextDate),(,)  ]$INFO[Window(home).Property(NextAired.10.Network),on  ,  ]</label>
             </control>
            <control type="label">
                 <description>RSS Sep</description>

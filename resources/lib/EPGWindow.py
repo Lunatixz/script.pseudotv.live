@@ -28,19 +28,14 @@ from ChannelList import ChannelList
 from FileAccess import FileAccess
 from xml.etree import ElementTree as ET
 from Artdownloader import *
-from PVRdownload import *
+from utils import *
 
 try:
     import buggalo
     buggalo.SUBMIT_URL = 'http://pseudotvlive.com/buggalo-web/submit.php'
 except:
     pass
-    
-class MyPlayer(xbmc.Player):
-
-    def onPlayBackStarted(self):
-        xbmc.log('script.pseudotv.live-EPGWindow: onPlayBackStarted') 
-        
+      
 class EPGWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.log('__init__')
@@ -65,14 +60,20 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.showingInfo = False
         self.infoOffset = 0
         self.infoOffsetV = 0
-        self.timeButtonNoFocus = MEDIA_LOC + TIME_BUTTON
         self.showSeasonEpisode = REAL_SETTINGS.getSetting("ShowSeEp") == "true"
         self.PVRTimeOffset = 0
         self.Artdownloader = Artdownloader()
         self.inputChannel = -1
         self.channelLabel = []    
         self.channelbugcolor = CHANBUG_COLOR
-            
+        self.chanlist = ChannelList()
+        self.showingContext = False
+        self.timeButtonNoFocus = MEDIA_LOC + TIME_BUTTON
+        self.timeButtonBar = MEDIA_LOC + TIME_BAR
+        self.ButtonContextB = MEDIA_LOC + BUTTON_GAUSS_CONTEXT
+        self.ButtonContextF = MEDIA_LOC + BUTTON_FOCUS_CONTEXT
+        self.ButtonContextC = MEDIA_LOC + BUTTON_NO_FOCUS_CONTEXT
+        
         for i in range(self.rowCount):
             self.channelButtons[i] = []
             
@@ -110,28 +111,28 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
     
     def onInit(self):
         self.log('onInit')
+        now = datetime.datetime.now()        
+        if self.clockMode == "0":
+            timeex = now.strftime("%I:%M%p").lower()
+        else:
+            timeex = now.strftime("%H:%M")
+
         timetx, timety = self.getControl(106).getPosition()
         timetw = self.getControl(106).getWidth()
         timeth = self.getControl(106).getHeight()
         timex, timey = self.getControl(120).getPosition()
         timew = self.getControl(120).getWidth()
         timeh = self.getControl(120).getHeight()
-        self.MyOverlayWindow.showingEPG = True
-        
-        now = datetime.datetime.now()        
-        if self.clockMode == "0":
-            timeex = now.strftime("%I:%M%p").lower()
-        else:
-            timeex = now.strftime("%H:%M")
-        
+            
         self.textureButtonFocus = MEDIA_LOC + BUTTON_FOCUS
         self.textureButtonNoFocus = MEDIA_LOC + BUTTON_NO_FOCUS
+        self.textureButtonFocusAlt = MEDIA_LOC + BUTTON_FOCUS_ALT
+        self.textureButtonNoFocusAlt = MEDIA_LOC + BUTTON_NO_FOCUS_ALT
         self.currentTime = xbmcgui.ControlButton(timetx, timety, timetw, timeth, timeex, font='font12', noFocusTexture=self.timeButtonNoFocus)
-        self.currentTimeBar = xbmcgui.ControlImage(timex, timey, timew, timeh, MEDIA_LOC + TIME_BAR) 
+        self.currentTimeBar = xbmcgui.ControlImage(timex, timey, timew, timeh, self.timeButtonBar) 
         self.addControl(self.currentTime)
         self.addControl(self.currentTimeBar)
         self.curchannelIndex = []
-        self.startNotificationTimer()
         
         try:
             textcolor = int(self.getControl(100).getLabel(), 16)            
@@ -191,8 +192,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 self.focusEndTime = endtime
             self.focusRow = 2
             self.setShowInfo()
-        except:
-            self.log("Unknown EPG Initialization Exception", xbmc.LOGERROR)
+        except Exception,e:
+            self.log("Unknown EPG Initialization Exception " + str(e), xbmc.LOGERROR)
             self.log(traceback.format_exc(), xbmc.LOGERROR)          
             try:
                 self.close()
@@ -221,11 +222,12 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             if self.MyOverlayWindow.VideoWindow == True:
                 self.log('VideoWindow = True')
                 self.getControl(523).setVisible(True)
-                self.getControl(524).setLabel(getProperty("Playing.Title"))
             else:
                 self.log('VideoWindow = False')
                 self.getControl(523).setVisible(False)
         except:
+            self.log('VideoWindow Failed!')
+            self.getControl(523).setVisible(False)
             pass
             
         try:
@@ -237,6 +239,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         except:
             pass
             
+        if getProperty("PTVL.FEEDtoggle") == "true":
+            self.getControl(131).setVisible(True)
+        else:
+            self.getControl(131).setVisible(False)
         self.log('onInit return')
 
         
@@ -295,15 +301,15 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         self.log("Unknown EPG Chtype Exception", xbmc.LOGERROR)
                         chtype = (ADDON_SETTINGS.getSetting('Channel_' + str(curchannel) + '_type'))
                         pass  
-                    chname = (self.MyOverlayWindow.channels[curchannel - 1].name)
-                    plpos = self.determinePlaylistPosAtTime(starttime, (curchannel - 1))
-                    mediapath = ascii(self.MyOverlayWindow.channels[curchannel - 1].getItemFilename(plpos))
-                    mpath = self.MyOverlayWindow.GetMpath(mediapath)
-                    setImage = self.Artdownloader.FindLogo_NEW(chtype, chname, mpath)
-                    self.getControl(321 + i).setImage(setImage)
-                    # self.getControl(321 + i).setImage(self.channelLogos + ascii(self.MyOverlayWindow.channels[curchannel - 1].name) + ".png")
-                    # if not FileAccess.exists(self.channelLogos + ascii(self.MyOverlayWindow.channels[curchannel - 1].name) + ".png"):
-                        # self.getControl(321 + i).setImage('NA.png')
+                    # chname = (self.MyOverlayWindow.channels[curchannel - 1].name)
+                    # plpos = self.determinePlaylistPosAtTime(starttime, (curchannel - 1))
+                    # mediapath = ascii(self.MyOverlayWindow.channels[curchannel - 1].getItemFilename(plpos))
+                    # mpath = self.MyOverlayWindow.GetMpath(mediapath)
+                    # setImage = self.Artdownloader.FindLogo_NEW(chtype, chname, mpath)
+                    # self.getControl(321 + i).setImage(setImage)
+                    self.getControl(321 + i).setImage(self.channelLogos + ascii(self.MyOverlayWindow.channels[curchannel - 1].name) + ".png")
+                    if not FileAccess.exists(self.channelLogos + ascii(self.MyOverlayWindow.channels[curchannel - 1].name) + ".png"):
+                        self.getControl(321 + i).setImage('NA.png')
                 else:
                     self.getControl(321 + i).setImage('NA.png')
             except:
@@ -336,31 +342,44 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         
         # Set backtime focus width
         TimeBX, TimeBY = self.currentTimeBar.getPosition()
-        FadeX, FadeY = self.getControl(119).getPosition()
-        self.getControl(119).setWidth(TimeBX-FadeX)
+        PFadeX, PFadeY = self.getControl(119).getPosition()
+        self.getControl(119).setWidth(TimeBX-PFadeX)
+        self.getControl(118).setPosition(TimeBX, PFadeY)
+        self.getControl(118).setWidth(1920-TimeBX)
 
         Time1X, Time1Y = self.getControl(101).getPosition()
         Time2X, Time2Y = self.getControl(102).getPosition()
         Time3X, Time3Y = self.getControl(103).getPosition()
-        TimeBW = int(self.currentTimeBar.getWidth())
+        TimeBW = int(self.currentTime.getWidth())
         Time1W = int(self.getControl(101).getWidth())
         Time2W = int(self.getControl(102).getWidth())
         Time3W = int(self.getControl(103).getWidth())
         
+        # Arrow color
+        if TimeBX > Time3X:
+            self.getControl(109).setColorDiffuse('0x'+self.focusedcolor)
+        else:
+            self.getControl(109).setColorDiffuse('0x'+self.textcolor)
+        if TimeBX < Time1X:
+            self.getControl(110).setColorDiffuse('0x'+self.focusedcolor)
+        else:
+            self.getControl(110).setColorDiffuse('0x'+self.textcolor)
+         
+        # Hide timebutton when near timebar
         self.getControl(101).setVisible(True)
-        if TimeBX + TimeBW  < Time1X or TimeBX > Time1X + Time1W:
+        if TimeBX < Time1X or TimeBX > Time1X + Time1W:
             self.getControl(101).setVisible(True)
         else:
             self.getControl(101).setVisible(False)
             
         self.getControl(102).setVisible(True)
-        if TimeBX < Time2X + TimeBW or TimeBX > Time2X + Time2W:
+        if TimeBX + TimeBW < Time2X or TimeBX > Time2X + Time2W:
             self.getControl(102).setVisible(True)
         else:
             self.getControl(102).setVisible(False)
             
-        self.getControl(103).setVisible(True)
-        if TimeBX < Time3X + TimeBW or TimeBX > Time3X + Time3W:
+        self.getControl(103).setVisible(True)            
+        if TimeBX + TimeBW < Time3X or TimeBX > Time3X + Time3W:
             self.getControl(103).setVisible(True)
         else:
             self.getControl(103).setVisible(False)
@@ -458,7 +477,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             playlistpos = int(xbmc.PlayList(xbmc.PLAYLIST_VIDEO).getposition())
                         
 
-            if self.MyOverlayWindow.channels[curchannel - 1].isPaused and (chtype != 8 or chtype != 9):
+
+            if self.MyOverlayWindow.channels[curchannel - 1].isPaused:
                 self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].getCurrentTitle() + " (paused)", focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
             elif chname in BYPASS_EPG:
                 self.channelButtons[row].append(xbmcgui.ControlButton(basex, basey, basew, baseh, self.MyOverlayWindow.channels[curchannel - 1].name, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor))
@@ -574,12 +594,11 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         width = basex + basew - xpos
 
                     if shouldskip == False and width >= 30:
-                        chanlist = ChannelList()
                         chname = (self.MyOverlayWindow.channels[curchannel - 1].name)
                         mediapath = ascii(self.MyOverlayWindow.channels[curchannel - 1].getItemFilename(playlistpos))
                         mylabel = self.MyOverlayWindow.channels[curchannel - 1].getItemTitle(playlistpos)
                         myLiveID = self.MyOverlayWindow.channels[curchannel - 1].getItemLiveID(playlistpos)
-                        LiveID = chanlist.unpackLiveID(myLiveID)
+                        LiveID = self.chanlist.unpackLiveID(myLiveID)
                         type = LiveID[0]
                         id = LiveID[1]
                         playcount = int(LiveID[4])  
@@ -612,6 +631,9 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         else:   
                             self.textureButtonNoFocus = MEDIA_LOC + BUTTON_NO_FOCUS
                             
+                        # if self.MyOverlayWindow.channels[self.centerChannel - 1].getItemEpisodeTitle(-999) == ('[COLOR=%s][B]OnDemand[/B][/COLOR]' % ((self.MyOverlayWindow.channelbugcolor).replace('0x',''))):
+                            # self.textureButtonFocus = IMAGES_LOC + 'label_ondemand.png'
+                            # self.textureButtonNoFocus = MEDIA_LOC + 'label_ondemand.png'
                         # Filtered = True
                         #Create Control array
                         self.channelButtons[row].append(xbmcgui.ControlButton(xpos, basey, width, baseh, mylabel, focusTexture=self.textureButtonFocus, noFocusTexture=self.textureButtonNoFocus, alignment=4, font=self.textfont, textColor=self.textcolor, focusedColor=self.focusedcolor))
@@ -646,28 +668,36 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         
         try:
             if action in ACTION_PREVIOUS_MENU:
-                self.closeEPG()           
+                if self.showingContext:    
+                    self.closeContext()
+                else:
+                    self.closeEPG()   
+                    
                 if self.showingInfo:
                     self.infoOffset = 0
                     self.infoOffsetV = 0
             
             elif action == ACTION_MOVE_DOWN: 
-                self.GoDown()     
+                if not self.showingContext:
+                    self.GoDown()    
                 if self.showingInfo:  
                     self.infoOffsetV -= 1
-            
+                    
             elif action == ACTION_MOVE_UP:
-                self.GoUp()           
+                if not self.showingContext:
+                    self.GoUp()         
                 if self.showingInfo: 
                     self.infoOffsetV += 1
 
-            elif action == ACTION_MOVE_LEFT:
-                self.GoLeft()           
+            elif action == ACTION_MOVE_LEFT: 
+                if not self.showingContext:
+                    self.GoLeft()           
                 if self.showingInfo:
                     self.infoOffset -= 1
             
-            elif action == ACTION_MOVE_RIGHT:
-                self.GoRight()           
+            elif action == ACTION_MOVE_RIGHT: 
+                if not self.showingContext:
+                    self.GoRight()           
                 if self.showingInfo:
                     self.infoOffset += 1
             
@@ -678,25 +708,76 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     self.infoOffsetV = 0
             
             elif action == ACTION_SELECT_ITEM:
-                lastaction = time.time() - self.lastActionTime           
-                if self.showingInfo:
-                    self.infoOffset = 0
-                    self.infoOffsetV = 0
+                print 'showingContext = ' + str(self.showingContext)
+                if self.showingContext:
+                    pos = self.contextButton.getSelectedPosition()  
+                    
+                    if getProperty("PVR.Type") == 'tvshow':
+                        print getProperty("PVR.Season"), getProperty("PVR.Episode")
+                        if getProperty("PVR.Season") != '0' and getProperty("PVR.Episode") != '0':
+                            info = 'seasoninfo'
+                            # traktinfo = 'similar'
+                            traktinfo = 'similartvshowstrakt'
+                            dbtype = 'tvdb_id'
+                            title = 'tvshow'
+                        else:
+                            info = 'extendedtvinfo'
+                            # traktinfo = 'similar'
+                            traktinfo = 'similartvshowstrakt'
+                            dbtype = 'tvdb_id'
+                            title = 'name'                    
+                    else:
+                        info = 'extendedinfo'
+                        # traktinfo = 'similarmovies'
+                        traktinfo = 'similarmoviestrakt'
+                        dbtype = 'imdb_id'
+                        title = 'name'  
+                                            
+                    if pos == 0:
+                        print 'Context, MoreInfo'
+                        if info == 'seasoninfo':
+                            xbmc.executebuiltin("XBMC.RunScript(script.extendedinfo,info=%s,dbid=%s,%s=%s,%s=%s,season=%s)" % (info, getProperty("PVR.DBID"), title, getProperty("PVR.Title"), dbtype, getProperty("PVR.ID"), getProperty("PVR.Season")))
+                        else:
+                            xbmc.executebuiltin("XBMC.RunScript(script.extendedinfo,info=%s,dbid=%s,%s=%s,%s=%s)" % (info, getProperty("PVR.DBID"), title, getProperty("PVR.Title"), dbtype, getProperty("PVR.ID")))
+                    elif pos == 1:
+                        print 'Context, Similar'
+                        print getProperty("PVR.DBID")
+                        if getProperty("PVR.DBID") != '0':
+                            print GetSimilarFromOwnLibrary(getProperty("PVR.DBID"))
+                        # if getProperty("PVR.DBID") == '0' and getProperty("PVR.ID") != '0':
+                            # xbmc.executebuiltin("XBMC.RunScript(script.extendedinfo,info=%s,id=%s)" % (traktinfo, getProperty("PVR.ID")))#NONLOCAL
+                        # elif getProperty("PVR.ID") == '0' and getProperty("PVR.DBID") != '0':
+                            # xbmc.executebuiltin("XBMC.RunScript(script.extendedinfo,info=%s,dbid=%s)" % (traktinfo, getProperty("PVR.DBID")))#LOCAL
+                        # else:
+                            # xbmc.executebuiltin("XBMC.RunScript(script.extendedinfo,info=%s,dbid=%s,id=%s)" % (traktinfo, getProperty("PVR.DBID"), getProperty("PVR.ID")))#OTHER
+                        Comingsoon()
+                    elif pos == 2:
+                        Comingsoon()
+                    elif pos == 3:
+                        Comingsoon()
+                else:
+                    lastaction = time.time() - self.lastActionTime           
+                    if self.showingInfo:
+                        self.infoOffset = 0
+                        self.infoOffsetV = 0
 
-                if lastaction >= 2:
-                    self.selectShow()
-                    self.closeEPG()
-                    self.infoOffset = 0
-                    self.infoOffsetV = 0
-                    self.lastActionTime = time.time()
-            
+                    if lastaction >= 2:
+                        self.selectShow()
+                        self.closeEPG()
+                        self.infoOffset = 0
+                        self.infoOffsetV = 0
+                        self.lastActionTime = time.time()
+                
+                    
             elif action == ACTION_PAGEDOWN: 
-                self.GoPgDown()  
+                if not self.showingContext:
+                    self.GoPgDown()  
                 if self.showingInfo:  
                     self.infoOffsetV -= 6       
 
-            elif action == ACTION_PAGEUP:
-                self.GoPgUp()           
+            elif action == ACTION_PAGEUP: 
+                if not self.showingContext:
+                    self.GoPgUp()           
                 if self.showingInfo:
                     self.infoOffsetV += 6
                     
@@ -704,26 +785,38 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 self.log('ACTION_RECORD')
                 # PVRrecord(self.PVRchtype, self.PVRmediapath, self.PVRchname, getProperty("PVR.Title"))
                     
-            elif action == ACTION_CONTEXT_MENU:
-                self.log('ACTION_CONTEXT_MENU')
-                # self.Conlist = xbmcgui.ControlList(200, 150, 300, 400)
-                # self.addControl(self.Conlist)
-                # self.Conlist.addItem('Item 1')
-                # self.Conlist.addItem('Item 2')
-                # self.Conlist.addItem('Item 3')
-                # self.setFocus(self.Conlist)
             elif action == ACTION_TELETEXT_RED:
                 self.log('ACTION_TELETEXT_RED')
-                self.closeEPG()
+                self.MyOverlayWindow.myOndemand.close()
+                self.MyOverlayWindow.myDVR.close()
+                self.MyOverlayWindow.myApps.close()
+                    
+                if getProperty("PTVL.EPG_Opened") != "true":
+                    self.MyOverlayWindow.myepg.doModal()
+            
             elif action == ACTION_TELETEXT_GREEN:
                 self.log('ACTION_TELETEXT_GREEN')
-                self.closeEPG()
+                self.MyOverlayWindow.myOndemand.close()
+                self.MyOverlayWindow.myApps.close()
+
+                if getProperty("PTVL.PVR_Opened") != "true":
+                    self.MyOverlayWindow.myDVR.doModal()
+            
             elif action == ACTION_TELETEXT_YELLOW:
                 self.log('ACTION_TELETEXT_YELLOW')
-                self.closeEPG()
+                self.MyOverlayWindow.myDVR.close()
+                self.MyOverlayWindow.myApps.close()
+                
+                if getProperty("PTVL.ONDEMAND__Opened") != "true":
+                    self.MyOverlayWindow.myOndemand.doModal()
+            
             elif action == ACTION_TELETEXT_BLUE:
                 self.log('ACTION_TELETEXT_BLUE')
-                self.closeEPG()
+                self.MyOverlayWindow.myOndemand.close()
+                self.MyOverlayWindow.myDVR.close()
+                
+                if getProperty("PTVL.APPS_Opened") != "true":
+                    self.MyOverlayWindow.myApps.doModal()
                 
             elif action >= ACTION_NUMBER_0 and action <= ACTION_NUMBER_9:
                 if self.inputChannel < 0:
@@ -732,8 +825,16 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     if self.inputChannel < 100:
                         self.inputChannel = self.inputChannel * 10 + action - ACTION_NUMBER_0
                 
-                self.showChannelLabel(self.inputChannel)
-                
+                self.showChannelLabel(self.inputChannel)  
+
+            elif action == ACTION_SYMBOLS: #Toggle thru favourite channels
+                self.log('ACTION_SYMBOLS')
+                self.showChannelLabel(self.MyOverlayWindow.Jump2Favorite())  
+
+            elif action == ACTION_CONTEXT_MENU:
+                if not self.showingContext:
+                    self.showContextMenu()
+
         except:
             self.log("Unknown EPG Exception", xbmc.LOGERROR)
             self.log(traceback.format_exc(), xbmc.LOGERROR)
@@ -751,15 +852,42 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.logDebug('onAction return')
 
 
+    def closeContext(self):
+        self.showingContext = False
+        try:
+            self.removeControl(self.contextButtonB)
+            self.removeControl(self.contextButtonC)
+            self.removeControl(self.contextButtonF)
+            self.removeControl(self.contextButton)
+        except:
+            pass     
+        
+
     def closeEPG(self):
         self.log('closeEPG')
-        self.MyOverlayWindow.showingEPG = False
+        self.closeContext()
+        setProperty("PTVL.EPG_Opened","false")
+        
         try:
             if self.channelLabelTimer.isAlive():
                 self.channelLabelTimer.cancel()
-                self.channelLabelTimer.join()
         except:
             pass
+        try:
+            if self.GotoChannelTimer.isAlive():
+                self.GotoChannelTimer.cancel()
+        except:
+            pass
+        try:
+            if self.ArtThread1.isAlive():
+                self.ArtThread1.cancel()
+        except:
+            pass
+        try:
+            if self.ArtThread2.isAlive():
+                self.ArtThread2.cancel()
+        except:
+            pass    
         try:
             self.removeControl(self.currentTime)
             self.removeControl(self.currentTimeBar)
@@ -777,43 +905,44 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
     # Run when a show is selected, so close the epg and run the show
     def onClick(self, controlid):
         self.log('onClick')
-        try:
-            if self.actionSemaphore.acquire(False) == False:
-                self.log('Unable to get semaphore')
-                return
-
-            lastaction = time.time() - self.lastActionTime
-
-            if lastaction >= 2:
-                try:
-                    selectedbutton = self.getControl(controlid)
-                except:
-                    self.actionSemaphore.release()
-                    self.log('onClick unknown controlid ' + str(controlid))
+        if not self.showingContext:
+            try:
+                if self.actionSemaphore.acquire(False) == False:
+                    self.log('Unable to get semaphore')
                     return
 
-                for i in range(self.rowCount):
-                    for x in range(len(self.channelButtons[i])):
-                        mycontrol = 0
-                        mycontrol = self.channelButtons[i][x]
+                lastaction = time.time() - self.lastActionTime
 
-                        if selectedbutton == mycontrol:
-                            self.focusRow = i
-                            self.focusIndex = x
-                            self.selectShow()
-                            self.closeEPG()
-                            self.lastActionTime = time.time()
-                            self.actionSemaphore.release()
-                            self.log('onClick found button return')
-                            return
+                if lastaction >= 2:
+                    try:
+                        selectedbutton = self.getControl(controlid)
+                    except:
+                        self.actionSemaphore.release()
+                        self.log('onClick unknown controlid ' + str(controlid))
+                        return
 
-                self.lastActionTime = time.time()
-                self.closeEPG()
+                    for i in range(self.rowCount):
+                        for x in range(len(self.channelButtons[i])):
+                            mycontrol = 0
+                            mycontrol = self.channelButtons[i][x]
 
-            self.actionSemaphore.release()
-            self.log('onClick return')
-        except:
-            pass
+                            if selectedbutton == mycontrol:
+                                self.focusRow = i
+                                self.focusIndex = x
+                                self.selectShow()
+                                self.closeEPG()
+                                self.lastActionTime = time.time()
+                                self.actionSemaphore.release()
+                                self.log('onClick found button return')
+                                return
+
+                    self.lastActionTime = time.time()
+                    self.closeEPG()
+
+                self.actionSemaphore.release()
+                self.log('onClick return')
+            except:
+                pass
     
     
     # Called from the timer to hide the channel label.
@@ -830,8 +959,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 self.channelLabel[i].setVisible(False)
         except:
             pass
-        self.GotoChannelTimer = threading.Timer(2.0, self.GotoChannel, [self.inputChannel])
+        inputChannel = self.inputChannel
+        self.GotoChannelTimer = threading.Timer(2.1, self.GotoChannel, [inputChannel])
         self.GotoChannelTimer.start()
+        self.inputChannel = -1
         
           
     # Display the current channel based on self.currentChannel.
@@ -842,9 +973,8 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         try:
             if self.channelLabelTimer.isAlive():
                 self.channelLabelTimer.cancel()
-                self.channelLabelTimer = threading.Timer(2.0, self.hideChannelLabel)
         except:
-            pass
+            pass            
             
         tmp = self.inputChannel
         self.hideChannelLabel()
@@ -867,37 +997,19 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             self.channelLabel[curlabel].setImage(IMAGES_LOC + 'label_' + str(channel % 10) + '.png')
         self.channelLabel[curlabel].setVisible(True)
 
-        try:
-            self.channelLabelTimer.name = "ChannelLabel"
-            if self.channelLabelTimer.isAlive():
-                self.channelLabelTimer.cancel()
-                self.channelLabelTimer = threading.Timer(2.0, self.hideChannelLabel)
-                self.channelLabelTimer.start()
-            else:
-                self.channelLabelTimer.start()
-        except:
-            pass
-            
-        self.startNotificationTimer(10.0)
+        self.channelLabelTimer = threading.Timer(2.0, self.hideChannelLabel)
+        self.channelLabelTimer.name = "ChannelLabel"
+        self.channelLabelTimer.start()
         self.log('showChannelLabel return')
         
-        
-    def startNotificationTimer(self, timertime = NOTIFICATION_CHECK_TIME):
-        self.log("startNotificationTimer")
-        try:
-            if self.notificationTimer.isAlive():
-                self.notificationTimer.cancel()
-
-            self.notificationTimer = threading.Timer(timertime, self.notificationAction)
-            if self.MyOverlayWindow.Player.stopped == False:
-                self.notificationTimer.name = "NotificationTimer"
-                self.notificationTimer.start()
-        except:
-            pass
-
             
     def GotoChannel(self,inchannel):
-        print 'GotoChannel'        
+        print 'GotoChannel'
+        try:
+            if self.GotoChannelTimer.isAlive():
+                self.GotoChannelTimer.cancel()
+        except:
+            pass
         try:
             if inchannel > self.centerChannel:
                 newchannel = self.MyOverlayWindow.fixChannel(inchannel+2)
@@ -1103,7 +1215,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         self.setShowInfo()
         self.log('setProperButton return')
 
-        
+            
     def setShowInfo(self):
         self.log('setShowInfo')        
         self.showingInfo = True
@@ -1172,36 +1284,59 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         
     def SetMediaInfo(self, chtype, chname, mediapath, newchan, plpos):
         self.log('SetMediaInfo') 
-        chanlist = ChannelList()
         mpath = self.MyOverlayWindow.GetMpath(mediapath)
         
         if plpos == -999:
-            tmpstr = (self.MyOverlayWindow.GetPlayingItem()).split('//')
-            title = tmpstr[0]
-            SEtitle = ('[COLOR=%s][B]OnDemand[/B][/COLOR]' % ((CHANBUG_COLOR).replace('0x','')))
-            Description = tmpstr[2]
-            timestamp = tmpstr[4]
-            LiveID = chanlist.unpackLiveID(tmpstr[5])
-            try:
-                self.getControl(503).setImage(IMAGES_LOC + 'label_ondemand.png')
-            except:
-                pass
+            if len(getProperty("Playing.OnDemand_tmpstr")) > 0:
+                tmpstr = (getProperty("Playing.OnDemand_tmpstr")).split('//')
+                title = tmpstr[0]
+                SEtitle = ('[COLOR=%s][B]OnDemand[/B][/COLOR]' % ((self.channelbugcolor).replace('0x','')))
+                Description = tmpstr[2]
+                genre = tmpstr[3]
+                timestamp = tmpstr[4]
+                LiveID = self.chanlist.unpackLiveID(tmpstr[5])
+                self.getControl(503).setImage(IMAGES_LOC + 'ondemand.png')
+                try:
+                    self.getControl(508).setImage(IMAGES_LOC + 'ondemand.png')
+                    self.getControl(510).setImage(IMAGES_LOC + 'ondemand.png')
+                except:
+                    pass
+            else:
+                try:
+                    if self.MyOverlayWindow.GetPlayingTmpstrTimer.isAlive():
+                        self.MyOverlayWindow.GetPlayingTmpstrTimer.cancel()
+                except:
+                    pass
+                data = [chtype, chname, mediapath, plpos]
+                self.MyOverlayWindow.GetPlayingTmpstrTimer = threading.Timer(1.0, self.MyOverlayWindow.GetPlayingTmpstrThread, [data])
+                self.MyOverlayWindow.GetPlayingTmpstrTimer.name = "GetPlayingTmpstrTimer"  
+                self.MyOverlayWindow.GetPlayingTmpstrTimer.start()  
+                return
         else:
             title = (self.MyOverlayWindow.channels[newchan - 1].getItemTitle(plpos))   
             SEtitle = self.MyOverlayWindow.channels[newchan - 1].getItemEpisodeTitle(plpos) 
             Description = self.MyOverlayWindow.channels[newchan - 1].getItemDescription(plpos)
             timestamp = (self.MyOverlayWindow.channels[newchan - 1].getItemtimestamp(plpos))
             myLiveID = (self.MyOverlayWindow.channels[newchan - 1].getItemLiveID(plpos))      
-            LiveID = chanlist.unpackLiveID(myLiveID)
+            LiveID = self.chanlist.unpackLiveID(myLiveID)
             try:
                 self.getControl(503).setImage(ascii(self.channelLogos + (self.MyOverlayWindow.channels[newchan - 1].name + '.png')))
             except:
                 pass
+                
+        try:
+            SEinfo = SEtitle.split(' -')[0]
+            season = int(SEinfo.split('x')[0])
+            episode = int(SEinfo.split('x')[1])
+        except:
+            season = 0
+            episode = 0  
+            
+        setProperty("PVR.Season",str(season))
+        setProperty("PVR.Episode",str(episode))
+        
         try:
             if self.showSeasonEpisode:
-                SEinfo = SEtitle.split(' -')[0]
-                season = int(SEinfo.split('x')[0])
-                episode = int(SEinfo.split('x')[1])
                 eptitles = SEtitle.split('- ')
                 eptitle = (eptitles[1] + (' - ' + eptitles[2] if len(eptitles) > 2 else ''))
                 swtitle = ('S' + ('0' if season < 10 else '') + str(season) + 'E' + ('0' if episode < 10 else '') + str(episode) + ' - ' + (eptitle)).replace('  ',' ')
@@ -1224,7 +1359,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         
         #PVR Globals
         setProperty("PVR.Chtype",str(chtype))
-        setProperty("PVR.Title",title)
+        setProperty("PVR.Title",((title).replace("*NEW*","")))
         setProperty("PVR.Mpath",mpath)
         setProperty("PVR.Chname",chname)
         setProperty("PVR.SEtitle",SEtitle)
@@ -1232,7 +1367,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
         setProperty("PVR.DBID",dbid)
         setProperty("PVR.ID",id)
         setProperty("PVR.Type",type)
-        
+            
         #Notification Globals
         setProperty("PVR.ChanNum",str(newchan))
         setProperty("PVR.TimeStamp",str(timestamp))
@@ -1282,19 +1417,19 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
 
             
     def FindArtwork_Thread(self, data):
-        self.log('FindArtwork_Thread, key = ' + str(data[7]))
         try:
             self.getControl(data[7]).setVisible(True)
-            # if getProperty("ArtService_onInit") == "true":
-                # setImage = self.Artdownloader.SetDefaultArt_NEW(data[2], data[5], data[6])
-            # else:
-            setImage = self.Artdownloader.FindArtwork_NEW(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
-            if FileAccess.exists(setImage) == False:
+            if getProperty("EnableArtwork") == "false":
                 setImage = self.Artdownloader.SetDefaultArt_NEW(data[2], data[5], data[6])
+            else:
+                setImage = self.Artdownloader.FindArtwork_NEW(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
+                if FileAccess.exists(setImage) == False:
+                    setImage = self.Artdownloader.SetDefaultArt_NEW(data[2], data[5], data[6])
             self.getControl(data[7]).setImage(setImage)
         except Exception,e:
             self.log('FindArtwork_Thread, Failed!', str(e))
             pass  
+        
         
     def setArtwork1(self, type, chtype, chname, id, dbid, mpath, type1EXT):
         self.log('setArtwork1')
@@ -1306,7 +1441,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 pass
                 
             data = [type, chtype, chname, id, dbid, mpath, type1EXT, 508]
-            self.ArtThread1 = threading.Timer(0.1, self.FindArtwork_Thread, [data])
+            self.ArtThread1 = threading.Timer(0.5, self.FindArtwork_Thread, [data])
             self.ArtThread1.name = "ArtThread1"
             self.ArtThread1.start()
         except Exception,e:
@@ -1324,7 +1459,7 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 pass
                 
             data = [type, chtype, chname, id, dbid, mpath, type2EXT, 510]
-            self.ArtThread2 = threading.Timer(0.1, self.FindArtwork_Thread, [data])
+            self.ArtThread2 = threading.Timer(0.5, self.FindArtwork_Thread, [data])
             self.ArtThread2.name = "ArtThread2"
             self.ArtThread2.start()
         except Exception,e:
@@ -1375,10 +1510,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
             timedif = (time.time() - self.MyOverlayWindow.channels[newchan - 1].lastAccessTime)
             pos = self.MyOverlayWindow.channels[newchan - 1].playlistPosition
             showoffset = self.MyOverlayWindow.channels[newchan - 1].showTimeOffset
-
-            #code added for "LiveTV" types
-            #Get the Start time of the show from "episodeitemtitle"
-            #we just passed this from channellist.py ; just a fill in to get value
             #Start at the beginning of the playlist get the first epoch date
             #position pos of the playlist convert the string add until we get to the current item in the playlist
 
@@ -1409,7 +1540,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                     showoffset = 0
                 self.log('pos + plpos ' + str(pos) +', ' + str(plpos))
             
-
             if self.MyOverlayWindow.currentChannel == newchan:
                 if plpos == xbmc.PlayList(xbmc.PLAYLIST_MUSIC).getposition():
                     self.log('selectShow return current show')
@@ -1423,9 +1553,6 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
                         pass
                     Notify_Time = time.strftime('%I:%M%p, %A', t)
-                    
-                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(getProperty("PVR.Title")) + '[/B] on channel [B]' + str(int(getProperty("PVR.ChanNum"))), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
-                        self.setReminder(int(getProperty("PVR.TimeStamp")), Notify_Time, getProperty("PVR.Title"), int(getProperty("PVR.ChanNum")))
                     self.log('selectShow return current LiveTV channel')
                     return
             
@@ -1438,28 +1565,10 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                         t = time.strptime(tmpDate, '%Y-%m-%d %H:%M:%S')
                         pass
                     Notify_Time = time.strftime('%I:%M%p, %A', t)
-                    
-                    if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(getProperty("PVR.Title")) + '[/B] on channel [B]' + str(int(getProperty("PVR.ChanNum"))), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
-                        self.setReminder(int(getProperty("PVR.TimeStamp")), Notify_Time, getProperty("PVR.Title"), int(getProperty("PVR.ChanNum")))
-
                     self.log('selectShow return different LiveTV channel')
                     return
                 else:
                     Notify_Time = self.PVRTimeOffset
-                    
-                    if REAL_SETTINGS.getSetting("SelectAction") == "1":
-                        self.log('selectShow, Different Channel SelectAction = 1')
-                        if dlg.yesno("PseudoTV Live", "Would you like to set a reminder for [B]", str(getProperty("PVR.Title")) + '[/B] on channel [B]' + str(int(getProperty("PVR.ChanNum"))), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
-                            self.setReminder(int(getProperty("PVR.TimeStamp")), Notify_Time, getProperty("PVR.Title"), int(getProperty("PVR.ChanNum"))) 
-                            return
-                    elif REAL_SETTINGS.getSetting("SelectAction") == "2":
-                        self.log('selectShow, Different Channel SelectAction = 2')
-                        if dlg.yesno("PseudoTV Live", "Would you like to watch [B]", str(getProperty("PVR.Title")) + '[/B] Now or set a reminder for channel [B]' + str(int(getProperty("PVR.ChanNum"))), '[/B]at [B]'+ str(Notify_Time) + '[/B] ?'):
-                            print 'Watch Now Selected'
-                        else:
-                            self.setReminder(int(getProperty("PVR.TimeStamp")), Notify_Time, getProperty("PVR.Title"), int(getProperty("PVR.ChanNum")))
-                            return
-                            
                     self.MyOverlayWindow.channels[newchan - 1].setShowPosition(plpos)
                     self.MyOverlayWindow.channels[newchan - 1].setShowTime(0)
                     self.MyOverlayWindow.channels[newchan - 1].setAccessTime(time.time())
@@ -1557,8 +1666,28 @@ class EPGWindow(xbmcgui.WindowXMLDialog):
                 return self.MyOverlayWindow.channels[channel - 1].fixPlaylistIndex(playlistpos)
         except:
             pass
+
+            
+    def showContextMenu(self):
+        self.log('showContextMenu')
+        self.showingContext = True
+        ChanButtonx, ChanButtony = self.channelButtons[self.focusRow][self.focusIndex].getPosition()
+        ChanButtonw = self.channelButtons[self.focusRow][self.focusIndex].getWidth()
+        ChanButtonh = self.channelButtons[self.focusRow][self.focusIndex].getHeight()
         
-      
+        self.contextButtonB = xbmcgui.ControlImage(0, 0, 1920, 1080, self.ButtonContextB)
+        self.addControl(self.contextButtonB)
+        self.contextButtonC = xbmcgui.ControlImage(ChanButtonx-4, ChanButtony+71, 258, 308, self.ButtonContextC)
+        self.addControl(self.contextButtonC)
+        self.contextButtonF = xbmcgui.ControlButton(ChanButtonx-4, ChanButtony, ChanButtonw+8, ChanButtonh, '[ '+getProperty("PVR.Title")+' ]', focusTexture=self.ButtonContextF, noFocusTexture=self.ButtonContextF, alignment=4, textColor=self.textcolor, focusedColor=self.focusedcolor)
+        self.addControl(self.contextButtonF)
+        
+        self.contextButton = xbmcgui.ControlList(ChanButtonx, ChanButtony+75, 250, 1000, self.textfont, self.textcolor, self.textureButtonNoFocusAlt, self.textureButtonFocus, self.focusedcolor, 0, 0, 0, 0, 75, 0, 4)
+        self.addControl(self.contextButton)
+        self.ContextList = ['More Info','Find Similar','Record Show','Set Reminder']
+        self.contextButton.addItems(items=self.ContextList)
+        self.setFocus(self.contextButton)
+           
     def setReminder(self, tmpDate, cleanDate, title, channel):
         self.log('setReminder')
         jump = REAL_SETTINGS.getSetting("AutoJump") == "true"

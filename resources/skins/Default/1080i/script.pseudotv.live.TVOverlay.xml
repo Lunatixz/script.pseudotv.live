@@ -33,6 +33,7 @@
             <aspectratio>keep</aspectratio>
             <animation effect="fade" start="50" end="50" condition="True">Conditional</animation>
         </control>  
+        <!-- moreinfo overlay -->
         <control type="group" id="222">
             <posx>0</posx>
             <posy>0</posy>
@@ -41,7 +42,7 @@
                 <description>MoreInfo Overlay</description>
                 <width>1920</width>
                 <height>1080</height>
-                <texture>pstvlBackground3.png</texture>
+                <texture>pstvlMoreInfoBackground.png</texture>
             </control>    
             <control type="button" id="509">
                 <description>Dynamic art2 - MoreInfo</description>
@@ -50,18 +51,18 @@
             </control> 
             <control type="image" id="510">
                 <description>Dynamic art2  - MoreInfo</description>
-                <posx>35</posx>
+                <posx>0</posx>
                 <posy>415r</posy>  
                 <width>360</width>      
-                <height>450</height>
+                <height>375</height>
                 <align>center</align>
                 <aligny>center</aligny>
                 <aspectratio>keep</aspectratio>
                 <texture fallback="logo.png"></texture>
             </control>            
             <control type="grouplist">
-                <posx>67</posx>
-                <posy>216</posy>
+                <posx>295r</posx>
+                <posy>371r</posy>
                 <width>225</width>
                 <orientation>vertical</orientation>
                 <itemgap>0</itemgap>
@@ -73,10 +74,10 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
-                    <onup>1011</onup>
-                    <ondown>1001</ondown>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
+                    <onup>1015</onup>
+                    <ondown>1013</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1012))</visible>
                 </control>
                 <control type="button" id="1013">
@@ -87,10 +88,10 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
-                    <onup>1000</onup>
-                    <ondown>1002</ondown>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
+                    <onup>1012</onup>
+                    <ondown>1014</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1013))</visible>
                 </control>
                 <control type="button" id="1014">
@@ -101,22 +102,91 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
-                    <onup>1001</onup>
-                    <ondown>1003</ondown>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
+                    <onup>1013</onup>
+                    <ondown>1015</ondown>
+                    <visible>!IsEmpty(Control.GetLabel(1014))</visible>
+                </control>
+                <control type="button" id="1015">
+                    <width>225</width>
+                    <height>72</height>
+                    <label></label>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <font>font12</font>
+                    <textcolor>ffffffff</textcolor>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
+                    <onup>1014</onup>
+                    <ondown>1012</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1014))</visible>
                 </control>
             </control>
-        </control>    
+            <control type="grouplist">
+                <posx>430</posx>
+                <posy>70r</posy>
+                <width>1045</width>
+                <height>90</height>
+                <orientation>horizontal</orientation>
+                <itemgap>25</itemgap>
+                <usecontrolcoords>true</usecontrolcoords>
+                <control type="image" id="900011">
+                    <posy>5</posy>
+                    <width>100</width>
+                    <height>62</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture colordiffuse="ffffffff">$VAR[SourceFlagVar,extendedinfo/flags/source/,.png]</texture>
+                </control>
+                <control type="image" id="900012">
+                    <posy>5</posy>
+                    <width>100</width>
+                    <height>62</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture colordiffuse="ffffffff">$INFO[VideoPlayer.VideoCodec,extendedinfo/flags/source/,.png]</texture>
+                </control>
+                <control type="image" id="900013">
+                    <posy>5</posy>
+                    <width>126</width>
+                    <height>62</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture colordiffuse="ffffffff">$INFO[VideoPlayer.AudioCodec,extendedinfo/flags/audio/,.png]</texture>
+                </control>
+                <control type="image" id="900014">
+                    <posy>5</posy>
+                    <width>80</width>
+                    <height>62</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture colordiffuse="ffffffff">$INFO[VideoPlayer.VideoResolution,extendedinfo/flags/resolution/,.png]</texture>
+                </control>
+                <control type="image" id="900015">
+                    <posy>5</posy>
+                    <width>80</width>
+                    <height>62</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture colordiffuse="ffffffff">$INFO[VideoPlayer.VideoAspect,extendedinfo/flags/aspectratio/,.png]</texture>
+                </control>
+                <control type="image">
+                    <posy>5</posy>
+                    <width>100</width>
+                    <height>62</height>
+                    <aspectratio aligny="center" align="center">keep</aspectratio>
+                    <texture colordiffuse="ffffffff">extendedinfo/flags/cc.png</texture>
+                    <visible>!IsEmpty(ListItem.SubtitleLanguage) + IsEmpty(Window.Property(SubtitleLanguage.1))</visible>
+                </control>
+            </control>
+        </control>             
+        <!-- info overlay -->
         <control type="group" id="102">
             <animation effect="fade" time="500">VisibleChange</animation> 
             <control type="image">
                 <description>Info Overlay </description>
                 <width>1920</width>
                 <height>1080</height>
-                <texture>pstvlBackground2.png</texture>
-            </control> 
+                <texture>pstvlInfoBackground.png</texture>
+                <visible>!Control.IsVisible(104)</visible>
+            </control>
+            <!-- Time/Weather -->
              <control type="label">
                 <description>Time/Weather</description>
                 <posx>430r</posx>
@@ -128,6 +198,42 @@
                 <align>left</align>
                 <aligny>center</aligny>
                 <textcolor>FFFFFFFF</textcolor>
+            </control>
+            <!-- Starover -->
+            <control type="image" id="104">
+                <description>Background StarOver Image</description>
+                <width>1920</width>
+                <height>1080</height>
+                <texture>pstvlInfoBackground1.png</texture>
+                <align>center</align>
+                <aligny>center</aligny>
+            </control>
+            <control type="grouplist">
+                <posx>0</posx>
+                <posy>370r</posy>
+                <itemgap>0</itemgap>
+                <orientation>horizontal</orientation>
+                <control type="label">
+                    <width>336</width>
+                    <height>75</height>
+                    <description>StarOver Label</description>
+                    <label>To Start Over | Press </label>
+                    <font>font14</font>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <visible>Control.IsVisible(104)</visible>
+                </control>
+                <control type="image">
+                    <width>55</width>
+                    <height>75</height>
+                    <description>StarOver SEL image</description> 
+                    <align>left</align>
+                    <aligny>bottom</aligny>
+                    <aspectratio>keep</aspectratio>
+                    <texture>sel.png</texture>
+                    <visible>Control.IsVisible(104)</visible>
+                </control>
             </control>
             <control type="group">
                 <control type="button" id="507">
@@ -150,8 +256,8 @@
                 <description>Sickbeard/Couchpotato image</description>   
                 <posx>345</posx>
                 <posy>120r</posy>         
-                <width>22</width>
-                <height>23</height>
+                <width>32</width>
+                <height>32</height>
                 <aspectratio>keep</aspectratio>
                 <visible>true</visible>
             </control> 
@@ -256,7 +362,7 @@
                 <posy>240r</posy>
                 <width>1400</width>
                 <orientation>vertical</orientation>
-                <itemgap>2</itemgap>
+                <itemgap>4</itemgap>
                <control type="image">
                     <description>Seekbar Line</description>
                     <width>1400</width>
@@ -323,7 +429,7 @@
             <posy>688</posy>
             <width>100</width>
             <height>10</height>
-            <label>$INFO[Player.TimeRemaining(ii:mm)]</label>
+            <label>$INFO[VideoPlayer.TimeRemaining(ii:mm)]</label>
             <font>font12</font>
             <align>right</align>
             <textcolor>C0C0C0C0</textcolor>
@@ -334,12 +440,11 @@
             <posy>688</posy>
             <width>100</width>
             <height>10</height>
-            <label>$INFO[Player.FinishTime(ii:mm)]</label>
+            <label>$INFO[VideoPlayer.FinishTime(ii:mm)]</label>
             <font>font12</font>
             <align>right</align>
             <textcolor>C0C0C0C0</textcolor>
         </control>      -->
-        
         <!--Bottom bar-->   
         <control type="grouplist">
 	        <posx>18</posx>
@@ -356,7 +461,7 @@
                 <aligny>center</aligny>
                 <visible>False</visible>
             </control>
-            <control type="label">
+            <!-- <control type="label">
                 <width>1250</width>
                 <height>50</height>
                 <font>Font-RSS</font>
@@ -368,10 +473,9 @@
                 <textcolor>C0C0C0C0</textcolor>
                 <autoscroll time="1000" delay="1000" repeat="0">True</autoscroll>
                 <label>$INFO[VideoPlayer.Genre, ,  ]$INFO[VideoPlayer.mpaa,,  ]$INFO[VideoPlayer.LastPlayed,,  ]$INFO[VideoPlayer.EndTime,,  ]$INFO[VideoPlayer.TimeRemaining,  •   </label>
-            </control>
+            </control> -->
         </control> 
     </control>
-    
     <!-- Overlay Coming Up Next Popup -->
         <control type="group" id="120">
             <control type="image">
@@ -501,8 +605,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1011</onup>
                     <ondown>1001</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1000))</visible>
@@ -515,8 +619,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1000</onup>
                     <ondown>1002</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1001))</visible>
@@ -529,8 +633,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1001</onup>
                     <ondown>1003</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1002))</visible>
@@ -543,8 +647,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1002</onup>
                     <ondown>1004</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1003))</visible>
@@ -557,8 +661,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1003</onup>
                     <ondown>1005</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1004))</visible>
@@ -571,8 +675,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1004</onup>
                     <ondown>1006</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1005))</visible>
@@ -585,8 +689,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1005</onup>
                     <ondown>1007</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1006))</visible>
@@ -599,8 +703,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1006</onup>
                     <ondown>1008</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1007))</visible>
@@ -613,8 +717,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1007</onup>
                     <ondown>1009</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1008))</visible>
@@ -627,8 +731,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1008</onup>
                     <ondown>1010</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1009))</visible>
@@ -641,8 +745,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1009</onup>
                     <ondown>1011</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1010))</visible>
@@ -655,8 +759,8 @@
                     <aligny>center</aligny>
                     <font>font12</font>
                     <textcolor>ffffffff</textcolor>
-                    <texturefocus>pstvButtonFocus.png</texturefocus>
-                    <texturenofocus>button-nofocus.png</texturenofocus>
+                    <texturefocus>pstvlButtonFocus.png</texturefocus>
+                    <texturenofocus>pstvlButtonNoFocus.png</texturenofocus>
                     <onup>1010</onup>
                     <ondown>1000</ondown>
                     <visible>!IsEmpty(Control.GetLabel(1010))</visible>

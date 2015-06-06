@@ -21,9 +21,10 @@ import subprocess, os, sys, re
 import time, datetime, threading, _strptime, calendar
 import httplib, urllib, urllib2, feedparser, socket, json
 import base64, shutil, random, errno
-import Globals
+
 
 from parsers import xmltv
+from utils import *
 from urllib import unquote
 from urllib import urlopen
 from xml.etree import ElementTree as ET
@@ -43,7 +44,6 @@ from apis import tmdb
 from urllib2 import urlopen
 from urllib2 import HTTPError, URLError
 from datetime import date
-from utils import *
 from datetime import timedelta
 from BeautifulSoup import BeautifulSoup
 
@@ -316,6 +316,11 @@ class ChannelList:
                 self.log("Force LiveTV rebuild")
                 needsreset = True
                 
+            # # forcereset livetv when needed
+            # if chtype == 8 and self.channelResetSetting == 0 and self.channels[channel - 1].totalTimePlayed >= 86400:
+                # liveTV.delete("%")
+                # needsreset = True
+
             if needsreset:
                 self.channels[channel - 1].isSetup = False
         except:
@@ -1169,7 +1174,7 @@ class ChannelList:
         return file
         
 
-    def CleanLabels(self, text):
+    def CleanLabels(self, text, format='title'):
         self.logDebug('CleanLabels, in = ' + text)
         text = re.sub('\[COLOR (.+?)\]', '', text)
         text = re.sub('\[/COLOR\]', '', text)
@@ -1199,8 +1204,15 @@ class ChannelList:
         text = text.replace("\r", "")
         text = text.replace("\t", "")
         text = text.replace("*", "")
+        text = text.replace(" [Favorite]", "")
+        text = text.replace(" [DRM]", "")
         text = text.strip()
-        text = (text.title()).replace("'S","'s")
+        if format == 'title':
+            text = (text.title()).replace("'S","'s")
+        elif format == 'upper':
+            text = (text.upper())
+        elif format == 'lower':
+            text = (text.lower())
         self.logDebug('CleanLabels, out = ' + text)
         return text
     
@@ -1390,7 +1402,11 @@ class ChannelList:
 
         if (len(self.showList) == 0) and (len(self.showGenreList) == 0) and (len(self.networkList) == 0):
             self.logDebug(json_folder_detail)
-
+            
+        self.showList = removeEmptyElem(self.showList)
+        self.showGenreList = removeEmptyElem(self.showGenreList)
+        self.networkList = removeEmptyElem(self.networkList)
+        
         self.log("found shows " + str(self.showList))
         self.log("found genres " + str(self.showGenreList))
         self.log("fillTVInfo return " + str(self.networkList))
@@ -1501,6 +1517,9 @@ class ChannelList:
         if (len(self.movieGenreList) == 0) and (len(self.studioList) == 0):
             self.logDebug(json_folder_detail)
 
+        self.movieGenreList = removeEmptyElem(self.movieGenreList)
+        self.studioList = removeEmptyElem(self.studioList)
+        
         self.log("found genres " + str(self.movieGenreList))
         self.log("fillMovieInfo return " + str(self.studioList))
 
@@ -1652,10 +1671,10 @@ class ChannelList:
                             
                             if showtitles != None and len(showtitles.group(1)) > 0:
                                 type = 'tvshow'
-                                dbids = re.search('"tvshowid" *: *(.*),', f)
+                                dbids = re.search('"tvshowid" *: *: *([\d.]*\d+),', f)
                             else:
                                 type = 'movie'
-                                dbids = re.search('"id" *: *: *(.*),', f)
+                                dbids = re.search('"id" *: *([\d.]*\d+),', f)
 
                             # if possible find year by title
                             try:
@@ -2796,26 +2815,24 @@ class ChannelList:
         try:
             f = (Request_URL(YT_URL_Search))
             detail = re.compile( "{(.*?)}", re.DOTALL ).findall(f)
-            tmpstr = ''
 
             for f in detail:
                 if self.threadPause() == False:
                     del self.YT_showList[:]
                     break
-                    
+
                 VidIDS = re.search('"videoId" *: *"(.*?)"', f)
                 YT_NextPGS = re.search('"nextPageToken" *: *"(.*?)"', f)
                 if YT_NextPGS:
                     YT_NextPG = YT_NextPGS.group(1)
                 else:
                     YT_NextPG = ''
+                    
                 if VidIDS:
                     VidID = VidIDS.group(1)
                     YT_Meta = self.getYoutubeMeta(VidID)
                     
-                    if YT_Meta and YT_Meta[2] > 0:
-                        self.YT_VideoCount += 1
-                        
+                    if YT_Meta and YT_Meta[2] > 0:                        
                         cats = {0 : '',
                             1 : 'Action & Adventure',
                             2 : 'Animation & Cartoons',
@@ -2848,15 +2865,17 @@ class ChannelList:
                         tmpstr = tmpstr.replace("\\n", " ").replace("\\r", " ").replace("\\\"", "\"")
                         self.log("createYoutubeFilelist, CHANNEL: " + str(self.settingChannel) + ", " + YT_Meta[0] + "  DUR: " + str(YT_Meta[2]))
                         self.YT_showList.append(tmpstr)
+                        self.YT_VideoCount += 1
                         
                         if self.background == False:
                             self.updateDialog.update(self.updateDialogProgress, "Updating channel " + str(self.settingChannel), "adding Youtube, parsing " + str(YT_Meta[4]), "added " + str(self.YT_VideoCount) + " entries")
 
-                if self.YT_VideoCount >= limit:
-                    break
+                    if self.YT_VideoCount >= limit:
+                        break
 
-            if YT_NextPG and self.YT_VideoCount < limit:
-                self.YT_showList += self.getYoutubeVideos(YT_Type, YT_ID, YT_NextPG, limit, YTMSG)
+                if YT_NextPG and self.YT_VideoCount < limit:
+                    limit = limit - self.YT_VideoCount
+                    self.YT_showList += self.getYoutubeVideos(YT_Type, YT_ID, YT_NextPG, limit, YTMSG)
         except:
             pass
         return self.YT_showList
@@ -4738,7 +4757,7 @@ class ChannelList:
                                         showtitle = (showtitles.group(1))
                                         showtitle = self.CleanLabels(showtitle)
                                              
-                                        if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                                        if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and PluginPath in DYNAMIC_PLUGIN_TV:
                                             self.log("PluginWalk, Enhanced TV GuideData Enabled") 
 
                                             if year == 0:
@@ -4795,7 +4814,7 @@ class ChannelList:
                                             else:
                                                 tagline = ''
                                                 
-                                            if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true':
+                                            if REAL_SETTINGS.getSetting('EnhancedGuideData') == 'true' and PluginPath in DYNAMIC_PLUGIN_MOVIE:
                                                 self.log("buildFileList, Enhanced Movie GuideData Enabled")   
 
   
@@ -5005,7 +5024,7 @@ class ChannelList:
         if len(CHname) <= 1:
             CHname = 'Unknown'
         self.log("findZap2itID, CHname = " + CHname)
-        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+        show_busy_dialog()
         orgCHname = CHname
         CHname = CHname.upper()
         XMLTVMatchlst = []
@@ -5060,11 +5079,11 @@ class ChannelList:
 
             if dname.upper() in matchLST: 
                 found = True
-                xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+                hide_busy_dialog()
                 return orgCHname, CHid
                     
         if not found:
-            xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+            hide_busy_dialog()
             XMLTVMatchlst = []
 
             for s in range(len(sorted_XMLTVMatchlst)):
@@ -5096,7 +5115,7 @@ class ChannelList:
         TMPIPTVList = []
         IPTVNameList = []
         IPTVPathList = []
-        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+        show_busy_dialog()
         try:
             if type == 'IPTV':
                 TMPIPTVList = IPTVtuning(url)
@@ -5119,7 +5138,7 @@ class ChannelList:
                     IPTVPathList.append((SortIPTVList[n]).split('@#@')[1])
         except Exception,e:
             self.log("IPTVtuning, Failed! " + str(e))    
-        xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+        hide_busy_dialog()
         return IPTVNameList, IPTVPathList
 
 
@@ -5167,22 +5186,22 @@ class ChannelList:
         json_detail = self.sendJSON(json_query)
         detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_detail)
         TMPpluginList = []
-        try:
-            for f in detail:
-                names = re.search('"name" *: *"(.*?)",', f)
-                paths = re.search('"addonid" *: *"(.*?)",', f)
-                if names and paths:
-                    name = self.CleanLabels(names.group(1))
-                    path = paths.group(1)
-                    if name.lower() != 'super favourites' and name.lower() != '.playon browser' and name.lower() != 'playon browser':
-                        TMPpluginList.append(name+','+path)  
-                    
-            SortedpluginList = sorted_nicely(TMPpluginList)
-            for i in range(len(SortedpluginList)):
-                self.pluginNameList.append((SortedpluginList[i]).split(',')[0])
-                self.pluginPathList.append((SortedpluginList[i]).split(',')[1]) 
-        except Exception,e:
-            self.log("fillPluginList, Failed! " + str(e))
+        # try:
+        for f in detail:
+            names = re.search('"name" *: *"(.*?)",', f)
+            paths = re.search('"addonid" *: *"(.*?)",', f)
+            if names and paths:
+                name = self.CleanLabels(names.group(1))
+                path = paths.group(1)
+                if name.lower() != 'super favourites' and name.lower() != '.playon browser' and name.lower() != 'playon browser':
+                    TMPpluginList.append(name+','+path)  
+                
+        SortedpluginList = sorted_nicely(TMPpluginList)
+        for i in range(len(SortedpluginList)):
+            self.pluginNameList.append((SortedpluginList[i]).split(',')[0])
+            self.pluginPathList.append((SortedpluginList[i]).split(',')[1]) 
+        # except Exception,e:
+            # self.log("fillPluginList, Failed! " + str(e))
 
         if len(TMPpluginList) == 0:
             self.pluginNameList = ['No Kodi plugins unavailable!']
@@ -5190,7 +5209,7 @@ class ChannelList:
     
     def fillPVR(self):
         self.log('fillPVR')
-        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+        show_busy_dialog()
         json_query = uni('{"jsonrpc":"2.0","method":"PVR.GetChannels","params":{"channelgroupid":2,"properties":["thumbnail"]},"id": 1 }')
         json_detail = self.sendJSON(json_query)
         file_detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_detail)
@@ -5223,7 +5242,7 @@ class ChannelList:
                         thumb = thumbs.group(1)
                         self.GrabLogo(thumb, CHname + ' PVR')
                                                
-                    name = str(CHid) + ' - ' + CHname
+                    name = '[COLOR=blue][B]'+str(CHid)+'[/B][/COLOR] - ' + CHname
                     path = PVRverPath + str(CHid - 1) + ".pvr"
                     TMPPVRList.append(name+'@#@'+path)  
 
@@ -5236,14 +5255,14 @@ class ChannelList:
 
         if len(TMPPVRList) == 0:
             PVRNameList = ['Kodi PVR is empty or unavailable!']
-        xbmc.executebuiltin( "Dialog.Close(busydialog)" ) 
+        hide_busy_dialog() 
         return PVRNameList, PVRPathList
-    
-    
+
+        
     def fillFavourites(self):
         self.log('fillFavourites')
-        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
-        json_query = uni('{"jsonrpc":"2.0","method":"Favourites.GetFavourites","params":{"properties":["path"]},"id":3}')
+        show_busy_dialog()
+        json_query = uni('{"jsonrpc":"2.0","method":"Favourites.GetFavourites","params":{"type": null, "properties": ["path", "thumbnail", "window", "windowparameter"]},"id":3}')
         json_detail = self.sendJSON(json_query)
         detail = re.compile( "{(.*?)}", re.DOTALL ).findall(json_detail)
         TMPfavouritesList = []
@@ -5256,10 +5275,15 @@ class ChannelList:
                 types = re.search('"type" *: *"(.*?)"', f)
                 if types != None and len(types.group(1)) > 0:
                     type = types.group(1)
-                    if type == 'media' and names and paths:
+                    if names and paths:
                         name = self.CleanLabels(names.group(1))
-                        path = paths.group(1)
-                        TMPfavouritesList.append(name+'@#@'+path)  
+                        if type == 'media':
+                            path = "PlayMedia(%s)" % (paths.group(1))
+                        # elif type == 'script': 
+                            # path = "RunScript(%s)" % (paths.group(1)) 
+                        # elif "window" in fav and "windowparameter" in fav:
+                            # path = "ActivateWindow(%s,%s)" % (fav["window"], fav["windowparameter"])
+                            TMPfavouritesList.append(name+'@#@'+path) 
 
             SortedFavouritesList = sorted_nicely(TMPfavouritesList)
             for i in range(len(SortedFavouritesList)):  
@@ -5270,13 +5294,13 @@ class ChannelList:
 
         if len(TMPfavouritesList) == 0:
             FavouritesNameList = ['Kodi Favorites is empty or unavailable!']
-        xbmc.executebuiltin( "Dialog.Close(busydialog)" ) 
+        hide_busy_dialog() 
         return FavouritesNameList, FavouritesPathList
         
         
     def fillExternalList(self, type, source='', list='Community', Random=False):
         self.log('fillExternalList, type = ' + type)
-        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+        show_busy_dialog()
         TMPExternalList = []
         ExternalNameList = []
         SortedExternalList = []
@@ -5348,7 +5372,10 @@ class ChannelList:
                         setting_3 = uni(line[4])
                         setting_4 = uni(line[5])
                         channel_name = uni((self.CleanLabels(line[6])).title())
-
+                        
+                        if setting_1[0:9].lower() != 'plugin://':
+                            setting_1 = 'plugin://' + setting_1
+                        
                         if genre.lower() == 'tv':
                             genre = '[COLOR=yellow]'+genre+'[/COLOR]'
                         elif genre.lower() == 'movies':
@@ -5377,8 +5404,11 @@ class ChannelList:
                             channel_name = channel_name + ' - ' + genre
                         elif chtype == '8':
                             Pluginvalid = self.Valid_ok(setting_2)
-                            
-                            if setting_2.startswith('plugin'):    
+                                                    
+                            if setting_2[0:9].lower() != 'plugin://':
+                                setting_2 = 'plugin://' + setting_2
+                        
+                            if setting_2.startswith('plugin://'):    
                                 channel_name = (((setting_2.split('//')[1]).split('/')[0]).replace('plugin.video.','').replace('plugin.audio.','')).title() + ' - ' + channel_name
                             else:
                                 channel_name =  'Internet - ' + channel_name
@@ -5414,13 +5444,14 @@ class ChannelList:
                                 Pluginvalid = self.Valid_ok(url)
                                 if Pluginvalid != False:
                                     TMPExternalList.append(channel_name+'@#@'+url+'@#@'+''+'@#@'+''+'@#@'+'')
-
+                                    
             if Random == True:
                 print 'shuffling TMPExternalList'
                 SortedExternalList = TMPExternalList
                 random.shuffle(SortedExternalList)
             else:
                 SortedExternalList = sorted_nicely(TMPExternalList)
+                
             for n in range(len(SortedExternalList)):
                 if SortedExternalList[n] != None:
                     ExternalNameList.append((SortedExternalList[n]).split('@#@')[0])   
@@ -5432,16 +5463,16 @@ class ChannelList:
             self.log("fillExternalList, Failed! " + str(e))
 
         if len(TMPExternalList) == 0:
-            ExternalNameList = ['This list is empty or unavailable, Please Contribute.']
-        xbmc.executebuiltin( "Dialog.Close(busydialog)" ) 
+            ExternalNameList = ['This list is empty or unavailable, Please try again later.']
+        hide_busy_dialog() 
         return ExternalNameList, ExternalSetting1List, ExternalSetting2List, ExternalSetting3List, ExternalSetting4List
               
         
     def fillHDHR(self):
         self.log("fillHDHR")
-        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+        show_busy_dialog()
         Chanlist = []
-        HDHRNameList = ['[COLOR=gold][Favorite][/COLOR][COLOR=green][noDRM][/COLOR][COLOR=red][DRM][/COLOR]']
+        HDHRNameList = ['']
         HDHRPathList  = ['']
         list = ''
         try:
@@ -5482,18 +5513,15 @@ class ChannelList:
                         drm = bool(drms.group(1))
 
                     if fav:
-                        chname = '[COLOR=gold]'+chname+'[/COLOR]'
-                    else:
-                        chname = '[COLOR=green]'+chname+'[/COLOR]'
-                    
+                        chname = chname+'[COLOR=gold] [Favorite][/COLOR]'                    
                     if drm:
-                        chname = '[COLOR=red]'+self.CleanLabels(chname)+'[/COLOR]'
+                        chname = chname+'[COLOR=red] [DRM][/COLOR]'
                                            
-                    chname = chnum + ' - ' + chname
+                    chname = '[COLOR=blue][B]'+chnum+'[/B][/COLOR] - ' + chname
                     tmp = chname + '@#@' + link
                     Chanlist.append(tmp)
-                    
             SortChanlist = sorted_nicely(Chanlist)
+            
             for n in range(len(SortChanlist)):
                 if SortChanlist[n] != None:
                     HDHRNameList.append((SortChanlist[n]).split('@#@')[0])   
@@ -5503,8 +5531,8 @@ class ChannelList:
 
         if len(Chanlist) == 0:
             HDHRNameList = ['HDHR ERROR: Unable to find device or favorite channels']
-        xbmc.executebuiltin( "Dialog.Close(busydialog)" ) 
-        return HDHRNameList, HDHRPathList
+        hide_busy_dialog() 
+        return removeEmptyElem(HDHRNameList), removeEmptyElem(HDHRPathList)
             
             
     def fillCustomCommunityPlaylists(self, arg=1):
@@ -5524,7 +5552,7 @@ class ChannelList:
         
     def fillCustomCommunityPlaylists_NEW(self, arg):
         self.log("fillCustomCommunityPlaylists")
-        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+        show_busy_dialog()
         baseurl='https://github.com/Lunatixz/PseudoTV_Playlists'
         XSPlist = []
         #PageParse
@@ -5536,7 +5564,7 @@ class ChannelList:
             if link.endswith(".xsp"):
                 XSPlist.append(link.replace('&amp;','&'))
         SortXSPlist = sorted_nicely(XSPlist) 
-        xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+        hide_busy_dialog()
         return SortXSPlist
                 
 #MediaManagers
@@ -5740,4 +5768,3 @@ class ChannelList:
         self.log("fileListCache")
         cachetype = str(chtype) + ':' + str(channel) 
         self.FileListCache = StorageServer.StorageServer("plugin://script.pseudotv.live/" + cachetype,life)
-    

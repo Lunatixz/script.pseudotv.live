@@ -232,9 +232,9 @@ class Migrate:
             PVRnum = 0
             try:
                 PVRNameList, PVRPathList = chanlist.fillPVR()
-                
+
                 for PVRnum in range(len(PVRNameList)):
-                    PVRName = PVRNameList[PVRnum]
+                    PVRName = chanlist.CleanLabels(PVRNameList[PVRnum], 'upper')
                     chid = PVRName.split(' - ')[0]
                     CHname = PVRName.split(' - ')[1]
                     path = PVRPathList[PVRnum]
@@ -330,26 +330,25 @@ class Migrate:
 
                         CHid = HDHRname.split(' - ')[0]
                         CHname = HDHRname.split(' - ')[1]
-                        if CHname.startswith('[COLOR=gold]'):
-                            CHname = chanlist.CleanLabels(CHname)
-                            path = HDHRPathList[HDUPNPnum]
+                        CHname = chanlist.CleanLabels(CHname, 'upper')
+                        path = HDHRPathList[HDUPNPnum]
 
-                            if xbmcvfs.exists(xmlTvFile): 
-                                CHSetName, CHzapit = chanlist.findZap2itID(CHname, xmlTvFile)
+                        if xbmcvfs.exists(xmlTvFile): 
+                            CHSetName, CHzapit = chanlist.findZap2itID(CHname, xmlTvFile)
 
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", path)
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "xmltv")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' HDHR')  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
-                                Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                        
-                                self.updateDialog.update(self.updateDialogProgress,"AutoTuning","adding HDHomeRun UPNP Channels",CHname)  
-                                channelNum += 1 
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_type", "8")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_time", "0")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_1", CHzapit)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_2", path)
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_3", "xmltv")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rulecount", "2")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_id", "1")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_1_opt_1", CHname + ' HDHR')  
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_id", "13")
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_rule_2_opt_1", "24")  
+                            Globals.ADDON_SETTINGS.setSetting("Channel_" + str(channelNum) + "_changed", "true")                        
+                            self.updateDialog.update(self.updateDialogProgress,"AutoTuning","adding HDHomeRun UPNP Channels",CHname)  
+                            channelNum += 1 
                 except Exception,e:
                     self.log("autoFindLiveHD, Failed! " + str(e))
              

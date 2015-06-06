@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with PseudoTV Live.  If not, see <http://www.gnu.org/licenses/>.
     
-  
 import os, sys, re, shutil, threading
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
@@ -24,7 +23,6 @@ from resources.lib.GA import *
 from resources.lib.Globals import *
 from resources.lib.FileAccess import *
 from resources.lib.utils import *
-from resources.lib.ChannelList import *
 
 # Script constants
 __scriptname__ = "PseudoTV Live"
@@ -37,14 +35,11 @@ __language__   = __settings__.getLocalizedString
        
 def PseudoTV():
     import resources.lib.Overlay as Overlay
-    setProperty("PseudoTVRunning", "true")
-    
+    setProperty("PseudoTVRunning", "True")
     try:
-        # Player = Overlay.MyPlayer()
-        # Player.start()
         MyOverlayWindow = Overlay.TVOverlay("script.pseudotv.live.TVOverlay.xml", __cwd__, Skin_Select)
     except Exception,e:
-        print str(e)
+        xbmc.log('script.pseudotv.live-default: PseudoTV Overlay Failed! ' + str(e))
         Error('PseudoTV Live','Error loading "' + Skin_Select + '" skin!','Verify selected skin.') 
         return
         
@@ -61,11 +56,10 @@ def PseudoTV():
             pass
             
     del MyOverlayWindow
-    setProperty("PseudoTVRunning", "false")
-
+    setProperty("PseudoTVRunning", "False")
     
 # Adapting a solution from ronie (http://forum.xbmc.org/showthread.php?t=97353)
-if getProperty("PseudoTVRunning") != "true":   
+if getProperty("PseudoTVRunning") != "True":
     try:
         PTVL_Version = REAL_SETTINGS.getSetting("PTVL_Version")
         if not PTVL_Version:
@@ -81,12 +75,12 @@ if getProperty("PseudoTVRunning") != "true":
         
         # Donor Download
         xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-DDautopatch)")
-        
+
         # Auto VideoWindow Patch.
         VideoWindow()
         
-        if CHKAutoplay() > 0:
-            okDialog("Its recommended you disable Kodi's"+' "Play the next video/song automatically" ' + "feature found under Kodi's video/playback and music/playback settings.")
+        # Check if autoplay is enabled
+        CHKAutoplay()
 
         #call showChangeLog like this to workaround bug in openElec, *Thanks spoyser
         xbmc.executebuiltin("RunScript("+__cwd__+"/utilities.py,-showChangelog)")  
@@ -94,9 +88,6 @@ if getProperty("PseudoTVRunning") != "true":
         #Check if Outdated/Install Repo
         VersionCompare()
         
-        # #Check Messaging Service todo
-        # Announcement()
-
         # Auto VideoWindow Patch.
         VideoWindow()
                  
@@ -112,32 +103,8 @@ if getProperty("PseudoTVRunning") != "true":
         if REAL_SETTINGS.getSetting("ClearLiveArt") == "true":
             ClearCache('Art')
 
-        #Back/Restore Settings2
-        settingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.xml'))
-        nsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.bak.xml'))
-        atsettingsFile = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'settings2.pretune.xml'))
-        
-        try:
-            Normal_Shutdown = REAL_SETTINGS.getSetting('Normal_Shutdown') == "true"
-        except:
-            REAL_SETTINGS.setSetting('Normal_Shutdown', "true")
-            Normal_Shutdown = REAL_SETTINGS.getSetting('Normal_Shutdown') == "true"
-                
-        if REAL_SETTINGS.getSetting("ATRestore") == "true" and REAL_SETTINGS.getSetting("Warning2") == "true":
-            log('Setting2 ATRestore') 
-            if getSize(atsettingsFile) > 100:
-                REAL_SETTINGS.setSetting("ATRestore","false")
-                REAL_SETTINGS.setSetting("Warning2","false")
-                REAL_SETTINGS.setSetting('ForceChannelReset', 'true')
-                Restore(atsettingsFile, settingsFile)   
-        elif Normal_Shutdown == False:
-            log('Setting2 Restore') 
-            if getSize(settingsFile) < 100 and getSize(nsettingsFile) > 100:
-                Restore(nsettingsFile, settingsFile)
-        else:
-            log('Setting2 Backup') 
-            if getSize(settingsFile) > 100:
-                Backup(settingsFile, nsettingsFile)
+        # Backup/Restore settings2
+        ChkSettings2()
 
         #Start PseudoTV
         PseudoTV()

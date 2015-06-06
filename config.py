@@ -443,17 +443,20 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             if len(self.showList[select]) > 0:
                 self.getControl(190).setLabel(self.showList[select])
         
+        #Directory
         elif controlId == 200:      # Directory channel, select
             retval = dlg.browse(0, "Channel " + str(self.channel) + " Directory", "files")
             if len(retval) > 0:
                 self.getControl(200).setLabel(retval)       
-        
         elif controlId == 201:    # setLabel MediaLimit, select 
             select = selectDialog(self.MediaLimitList, 'Select Media Limit')
-            self.getControl(201).setLabel(self.MediaLimitList[select])
+            if select:
+                self.getControl(201).setLabel(self.MediaLimitList[select])
         elif controlId == 202:    # setLabel SortOrder, select 
             select = selectDialog(self.SortOrderList, 'Select Sorting Order')
-            self.getControl(202).setLabel(self.SortOrderList[select]) 
+            if select:
+                self.getControl(202).setLabel(self.SortOrderList[select]) 
+            
         #LiveTV
         elif controlId == 211:    # LiveTV Browse, select
             if self.LockBrowse:
@@ -477,11 +480,11 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                     if self.getControl(214).getLabel() == 'PVR':
                         self.getControl(212).setLabel('pvr')
                         self.getControl(216).setLabel(chid)
-                
-                self.getControl(211).setLabel(title)
-                self.getControl(217).setLabel(retval)
-                
+                elif self.getControl(214).getLabel() == 'Plugin' or self.getControl(214).getLabel() == 'UPNP':
+                    self.getControl(211).setLabel(title)
+
                 #Set Channel Name
+                self.getControl(217).setLabel(retval)
                 self.getControl(213).setLabel(title)
                 ADDON_SETTINGS.setSetting("Channel_" + str(self.channel) + "_rulecount", "1")
                 ADDON_SETTINGS.setSetting("Channel_" + str(self.channel) + "_rule_1_id", "1")
@@ -489,8 +492,6 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             
         elif controlId == 212:    # LiveTV XMLTV Name, Select
             xmltvLst = []
-            self.clearLabel(213)
-            self.clearLabel(216)
             dirs,files = xbmcvfs.listdir(XMLTV_CACHE_LOC)
             dir,file = xbmcvfs.listdir(XMLTV_LOC)
             xmltvcacheLst = [s.replace('.xml','') for s in files if s.endswith('.xml')] + ['pvr','scheduledirect (Coming Soon)','zap2it (Coming Soon)']
@@ -509,7 +510,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
         
         elif controlId == 216:    # LiveTV Channel ID, select
             setting3 = self.getControl(212).getLabel()
-            if setting3 == '':
+            if len(setting3) <= 1:
                 xbmc.executebuiltin("Notification( %s, %s, %d, %s)" % ("PseudoTV Live", "Enter Channel & XMLTV Name", 4000, THUMB) )
             else:
                 if setting3[0:4] == 'http' or setting3.lower() == 'pvr' or setting3.lower() == 'scheduledirect' or setting3.lower() == 'zap2it':
@@ -519,8 +520,6 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                 else:
                     xmlTvFile = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('xmltvLOC'), str(setting3) +'.xml'))
                 dname = self.getControl(213).getLabel()
-                self.clearLabel(213)
-                self.clearLabel(216)
                 dnameID, CHid = self.chnlst.findZap2itID(dname, xmlTvFile)
                 if dnameID != 'XMLTV ERROR':
                     self.getControl(216).setLabel(CHid)
@@ -530,13 +529,17 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             self.changeListData(self.SourceList, 214, -1)
             self.LockBrowse = False
             self.clearLabel(211)
+            self.clearLabel(212)
             self.clearLabel(213)
+            self.clearLabel(216)
             self.clearLabel(217)
         elif controlId == 210:      # LiveTV Source Type, right
             self.changeListData(self.SourceList, 214, 1)
             self.LockBrowse = False
             self.clearLabel(211)
+            self.clearLabel(212)
             self.clearLabel(213)
+            self.clearLabel(216)
             self.clearLabel(217)
 
         #InternetTV
@@ -610,7 +613,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             else:
                 self.getControl(239).setVisible(False)
                 
-            if self.getControl(232).getLabel() in YTFilter:
+            if self.getControl(232).getLabel() in self.YTFilter:
                 self.getControl(233).setVisible(False)
             else:
                 self.getControl(233).setVisible(True)
@@ -627,7 +630,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             else:
                 self.getControl(239).setVisible(False)
                 
-            if self.getControl(232).getLabel() in YTFilter:
+            if self.getControl(232).getLabel() in self.YTFilter:
                 self.getControl(233).setVisible(False)
             else:
                 self.getControl(233).setVisible(True)
@@ -784,7 +787,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                 self.getControl(282).setLabel(self.PluginSourcePath)
 
         elif controlId == 281:      # Plugin browse, input
-            xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+            show_busy_dialog()
             
             if len(self.getControl(281).getLabel()) > 1:
                 PluginDirNameLst, PluginDirPathLst = self.parsePlugin(self.chnlst.PluginInfo(self.PluginSourcePathDir), 'Dir')
@@ -825,7 +828,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             ADDON_SETTINGS.setSetting("Channel_" + str(self.channel) + "_rulecount", "1")
             ADDON_SETTINGS.setSetting("Channel_" + str(self.channel) + "_rule_1_id", "1")
             ADDON_SETTINGS.setSetting("Channel_" + str(self.channel) + "_rule_1_opt_1", Chname)
-            xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+            hide_busy_dialog()
             
         elif controlId == 283:    # Plugin Exclude, input
             retval = dlg.input(self.getControl(283).getLabel(), type=xbmcgui.INPUT_ALPHANUM)
@@ -1212,8 +1215,8 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
         self.showGenreList = self.chnlst.showGenreList
         self.movieGenreList = self.chnlst.movieGenreList
         self.musicGenreList = self.chnlst.musicGenreList
-        self.MediaLimitList = ['25','50','100','150','200','250','500','1000']
-        self.SortOrderList = ['Default','Random','Reverse']
+        self.MediaLimitList = ['25','50','100','150','200','250','500','1000','']
+        self.SortOrderList = ['Default','Random','Reverse','']
         self.ExternalPlaylistSources = ['[COLOR=blue][B]Donor List[/B][/COLOR]','Local File','URL']
         self.SourceList = ['PVR','HDhomerun','Local Video','Local Music','Plugin','UPNP','Kodi Favourites','URL']
         self.YoutubeList = ['Channel','Playlist','User Subscription','User Favorites','Search Query','Multi Playlist','Multi Channel','Raw gdata','Seasonal']
@@ -1237,8 +1240,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             
         for i in range(len(self.chnlst.showList)):
             self.showList.append(self.chnlst.showList[i][0])
-        
-        self.showList =  sorted_nicely(self.showList)
+        self.showList =  sorted_nicely(self.showList) + ['']
         self.mixedGenreList.sort(key=lambda x: x.lower())
         self.listcontrol = self.getControl(102)
 
@@ -1259,7 +1261,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
     def parsePlugin(self, DetailLST, type='all'):
         self.log("parsePlugin")
         try:
-            xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+            show_busy_dialog()
             dirCount = 0
             fleCount = 0
             PluginNameLst = []
@@ -1293,10 +1295,10 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             PluginPathLst.append('Back')
             PluginNameLst.append('[B]Return to settings[/B]')
             PluginPathLst.append('Return')
-            xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+            hide_busy_dialog()
             return PluginNameLst, PluginPathLst
         except:
-            xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+            hide_busy_dialog()
             buggalo.onExceptionRaised() 
              
             
@@ -1330,22 +1332,22 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
         try:
             if source == 'PVR':
                 self.log("PVR")
-                xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+                show_busy_dialog()
                 NameLst, PathLst = self.chnlst.fillPVR()
-                xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+                hide_busy_dialog()
                 select = selectDialog(NameLst, 'Select Kodi PVR Channel')
-                name = NameLst[select]
+                name = self.chnlst.CleanLabels(NameLst[select], 'upper')
                 path = PathLst[select]
                 if len(path) > 0:
                     return name, path
 
             elif source == 'HDhomerun':
                 self.log("HDhomerun")
-                xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+                show_busy_dialog()
                 NameLst, PathLst = self.chnlst.fillHDHR()
-                xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+                hide_busy_dialog()
                 select = selectDialog(NameLst, 'Select HDhomerun Channel')
-                name = self.chnlst.CleanLabels(NameLst[select])
+                name = self.chnlst.CleanLabels(NameLst[select], 'upper')
                 path = PathLst[select]
                 if len(path) > 0:
                     return name, path
@@ -1366,9 +1368,9 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                 self.log("Plugin")
                 if path:
                     while not self.LockBrowse:
-                        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+                        show_busy_dialog()
                         NameLst, PathLst = self.parsePlugin(self.chnlst.PluginInfo(path))
-                        xbmc.executebuiltin( "Dialog.Close(busydialog)" ) 
+                        hide_busy_dialog() 
                         select = selectDialog(NameLst, 'Select [COLOR=green][F][/COLOR]ile')
                         if (NameLst[select]).startswith('[COLOR=green][F]'):
                             self.LockBrowse = True
@@ -1399,9 +1401,9 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                 self.log("Playon")
                 if path:
                     while not self.LockBrowse:
-                        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+                        show_busy_dialog()
                         NameLst, PathLst = self.parsePlugin(self.chnlst.PluginInfo(path))
-                        xbmc.executebuiltin( "Dialog.Close(busydialog)" ) 
+                        hide_busy_dialog() 
                         select = selectDialog(NameLst, 'Select [COLOR=green][F][/COLOR]ile')
                         if (NameLst[select]).startswith('[COLOR=green][F]'):
                             self.LockBrowse = True
@@ -1422,7 +1424,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                 else:
                     self.PreviousPath = []
                     NameLst, PathLst = self.parsePlugin(self.chnlst.PluginInfo('plugin://plugin.video.Playonbrowser'))
-                    xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+                    hide_busy_dialog()
                     select = selectDialog(NameLst, 'Select [COLOR=green][F][/COLOR]ile')
                     return self.chnlst.CleanLabels(NameLst[select]).replace('[D]','').replace('[F]',''), PathLst[select]
                     
@@ -1437,9 +1439,9 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                     
             elif source == 'Kodi Favourites':
                 self.log("Kodi Favourites")
-                xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+                show_busy_dialog()
                 FavouritesNameList, FavouritesPathList = self.chnlst.fillFavourites()
-                xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+                hide_busy_dialog()
                 select = selectDialog(FavouritesNameList, 'Select Favourites')
                 return FavouritesNameList[select], FavouritesPathList[select]  
                   
@@ -1447,7 +1449,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                 self.log("Super Favourites")
                 if path:
                     while not self.LockBrowse:
-                        xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+                        show_busy_dialog()
                         #remove unwanted reference to super favourites 
                         if 'ActivateWindow%2810025%2C%22plugin%3A%2F%2Fplugin' in path:
                             path = unquote(path).replace('",return)','')
@@ -1456,7 +1458,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                             path = unquote(path).replace('",return)','')
                             path = ((path.split('PlayMedia("')[1]).split('")')[0])
                         NameLst, PathLst = self.parsePlugin(self.chnlst.PluginInfo(path))
-                        xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+                        hide_busy_dialog()
                         select = selectDialog(NameLst, 'Select [COLOR=green][F][/COLOR]ile')
                         name = self.chnlst.CleanLabels(NameLst[select])
                         path = PathLst[select]
@@ -1487,7 +1489,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
                 else:
                     self.PreviousPath = []
                     NameLst, PathLst = self.parsePlugin(self.chnlst.PluginInfo('plugin://plugin.program.super.favourites'))
-                    xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+                    hide_busy_dialog()
                     select = selectDialog(NameLst, 'Select [COLOR=green][F][/COLOR]ile')
                     return self.chnlst.CleanLabels(NameLst[select]).replace('[D]','').replace('[F]',''), PathLst[select]
                     
@@ -1629,7 +1631,7 @@ class ConfigWindow(xbmcgui.WindowXMLDialog):
             else:
                 return  
         except:
-            xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+            hide_busy_dialog()
             buggalo.onExceptionRaised() 
             
 

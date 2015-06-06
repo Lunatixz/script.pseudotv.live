@@ -139,13 +139,21 @@ DEFAULT_MEDIA_LOC =  xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 's
 DEFAULT_EPGGENRE_LOC = xbmc.translatePath(os.path.join(ADDON_PATH, 'resources', 'skins', 'Default', 'media', 'epg-genres')) + '/'
 DEFAULT_LOGO_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'logos')) + '/'
 
-#CORE IMG FILENAMES
-TIME_BAR = 'pstvTimeBar.png'
-TIME_BUTTON = 'pstvTimeButton.png'
-BUTTON_FOCUS = 'pstvButtonFocus.png'
-BUTTON_NO_FOCUS = 'pstvButtonNoFocusn.png'
-BUTTON_NO_FOCUS_ALT = 'pstvButtonNoFocusAlt.png'
-THUMB = (IMAGES_LOC + 'icon.png')
+# CORE IMG FILENAMES
+THUMB = IMAGES_LOC + 'icon.png'
+# EPG
+TIME_BAR = 'pstvlTimeBar.png'
+TIME_BUTTON = 'pstvlTimeButton.png'
+BUTTON_FOCUS = 'pstvlButtonFocus.png'
+BUTTON_NO_FOCUS = 'pstvlButtonNoFocus.png'
+BUTTON_FOCUS_CONTEXT = 'pstvlContextF.png'
+BUTTON_NO_FOCUS_CONTEXT = 'pstvlContextC.png'
+BUTTON_GAUSS_CONTEXT = 'pstvlBackground_gauss.png'
+# Overlay
+BUTTON_FOCUS_ALT = 'pstvlButtonFocusAlt.png'
+BUTTON_NO_FOCUS_ALT = 'pstvlButtonNoFocusAlt.png'
+
+
 
 #Channel Sharing location
 if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
@@ -153,14 +161,12 @@ if REAL_SETTINGS.getSetting('ChannelSharing') == "true":
     LOCK_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache')) + '/'
     XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'xmltv')) + '/'
     STRM_CACHE_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'strm','')) 
-    EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
     ART_LOC = xbmc.translatePath(os.path.join(REAL_SETTINGS.getSetting('SettingsFolder'), 'cache', 'artwork')) + '/' #Missing Artwork cache location
 else:
     CHANNEL_SHARING = False  
     LOCK_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache')) + '/'
     XMLTV_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'xmltv')) + '/'
     STRM_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'strm','')) 
-    EPGGENRE_CACHE_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'epg-genres')) + '/' #Post EPG IMG Processing location for future use!
     ART_LOC = xbmc.translatePath(os.path.join(SETTINGS_LOC, 'cache', 'artwork')) + '/' #Missing Artwork cache location
 
 #XMLTV FILENAME
@@ -216,9 +222,8 @@ if REAL_SETTINGS.getSetting('EnableSettop') == 'true':
 else:
     SETTOP_REFRESH = 72000
 
-# Common Cache types, Stacked and sorted for read performance?... Todo convert to DB (local sqlite, mysql)? 
-# Cache is redundant to m3u's, but eliminates repetitive off-site parsing. 
-
+# Common Cache types, Stacked and sorted for read performance?... todo convert to DB (local sqlite, mysql)? 
+# Cache is redundant to m3u's, but eliminates repetitive off-site parsing.
 #General
 quarterly = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "quarterly",6)                  #System Purge, ForceReset
 bidaily = StorageServer.StorageServer("plugin://script.pseudotv.live/" + "bidaily",12)                     #System Purge, ForceReset
@@ -298,6 +303,7 @@ CHANBUG_COLOR = COLOR_CHANNUM[int(REAL_SETTINGS.getSetting('COLOR_CHANNUM'))]
 
 #Actions
 #https://github.com/xbmc/xbmc/blob/master/xbmc/input/Key.h
+# https://github.com/xbmc/xbmc/blob/master/xbmc/input/ButtonTranslator.cpp
 ACTION_MOVE_LEFT = 1
 ACTION_MOVE_RIGHT = 2
 ACTION_MOVE_UP = 3
@@ -330,6 +336,9 @@ ACTION_RECORD = 170 #PVR Backend Record
 ACTION_SHOW_CODEC = 27
 ACTION_ASPECT_RATIO = 19 
 ACTION_SHIFT = 118
+ACTION_SYMBOLS = 119
+ACTION_CURSOR_LEFT  = 120
+ACTION_CURSOR_RIGHT = 121
 #unused
 ACTION_NEXT_ITEM = 14
 ACTION_PREV_ITEM = 15
@@ -361,9 +370,9 @@ ACTION_TELETEXT_BLUE = 218
 #UTC XMLTV - XMLTV that uses UTC w/ Offset timing (not local time).
 UTC_XMLTV = []
 
-#Dynamic Artwork plugins - #Title format must be "Title (Year)" or "Title" or "Title - Episode"
-DYNAMIC_PLUGIN_TV = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'UPNP', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']
-DYNAMIC_PLUGIN_MOVIE = ['plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.iwannawatch', 'plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'UPNP', 'plugin.video.F.T.V', 'plugin.video.salts']
+#Dynamic Artwork for plugins - #Media title format must be "Title (Year)" or "Title" or "Title - Episode"
+DYNAMIC_PLUGIN_TV = ['plugin.video.playonbrowser', 'plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.GOtv', 'plugin.video.genesis', 'PlayOn', 'UPNP', 'plugin.video.ororotv', 'plugin.video.F.T.V', 'plugin.video.salts']
+DYNAMIC_PLUGIN_MOVIE = ['plugin.video.playonbrowser', 'plugin.video.prime_instant', 'plugin.video.simply.player', 'plugin.video.1channel', 'plugin.video.iwannawatch', 'plugin.video.viooz.co', 'plugin.video.glowmovies.hd', 'plugin.video.genesis', 'plugin.video.yifymovies.hd', 'plugin.video.GOmovies', 'plugin.video.muchmovies.hd', 'plugin.video.cartoonhd', 'PlayOn', 'UPNP', 'plugin.video.F.T.V', 'plugin.video.salts']
 
 # Plugin seek blacklist - Plugins that are known to use rtmp source which lockup xbmc during seek
 BYPASS_SEEK = ['plugin.video.vevo_tv','plugin.video.g4tv','plugin.video.ustvnow', 'plugin.video.mystreamstv.beta']
