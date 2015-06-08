@@ -25,6 +25,8 @@
         <minversion></minversion>
         <summary lang="en">Channel surfing for your video library and online sources</summary>
         <description lang="en">PseudoTV Live acts similar to normal broadcast or cable TV, complete with multiple preset and user-defined channels and an EPG.</description>
+        <summary lang="pt">Surfing de canal para sua biblioteca de vídeo e streaming on-line</summary>
+        <description lang="pt">PseudoTV Live atua semelhante a transmissão normal ou TV a cabo, completo com pré-ajustes e canais definidos pelo usuário e um EPG.</description>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <website>www.pseudotv.com</website>
         <source>http://github.com/Lunatixz/script.pseudotv.live</source>
